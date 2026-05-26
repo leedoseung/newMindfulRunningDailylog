@@ -7,7 +7,7 @@ import { MemberSelect } from './member-select'
 import { DurationPicker } from './duration-picker'
 import { ThoughtInputs } from './thought-inputs'
 import { PhotoUpload } from './photo-upload'
-import { createBrowserClient } from '@/infrastructure/supabase/client'
+import { createBrowserClient } from '@/infrastructure/supabase/browser-client'
 
 type ThoughtKey = 'before' | 'during' | 'after'
 

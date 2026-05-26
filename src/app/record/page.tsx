@@ -3,12 +3,46 @@ import { RunLogForm } from '@/presentation/components/form/run-log-form'
 import { redirect } from 'next/navigation'
 import Link from 'next/link'
 
-export default async function RecordPage() {
-  const supabase = await createServerClient()
-  const { data: { session } } = await supabase.auth.getSession()
+type RunLogFormInitial = {
+  date: string; durationMin: number; title: string; location: string
+  thoughtBefore: string; thoughtDuring: string; thoughtAfter: string; photoUrl: string
+}
 
-  if (!session?.user?.id) {
+export default async function RecordPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ edit?: string }>
+}) {
+  const { edit } = await searchParams
+  const supabase = await createServerClient()
+
+  const { data: { user } } = await supabase.auth.getUser()
+
+  if (!user?.id) {
     redirect('/login')
+  }
+
+  const memberId = (user?.user_metadata?.member_id as string | undefined) ?? ''
+
+  let initialData: RunLogFormInitial | undefined
+  if (edit) {
+    const { data } = await supabase
+      .from('run_logs')
+      .select('date, duration_min, title, location, thought_before, thought_during, thought_after, photo_url')
+      .eq('id', edit)
+      .single()
+    if (data) {
+      initialData = {
+        date: data.date as string,
+        durationMin: data.duration_min as number,
+        title: data.title as string,
+        location: data.location as string,
+        thoughtBefore: data.thought_before as string,
+        thoughtDuring: data.thought_during as string,
+        thoughtAfter: data.thought_after as string,
+        photoUrl: data.photo_url as string,
+      }
+    }
   }
 
   return (
@@ -27,11 +61,16 @@ export default async function RecordPage() {
           }}
         >←</Link>
         <div style={{ fontFamily: 'var(--font-raleway)', fontSize: '1rem', fontWeight: 700, color: '#2d3031' }}>
-          달리기 기록하기
+          {edit ? '기록 수정하기' : '달리기 기록하기'}
         </div>
         <div style={{ width: '36px' }} />
       </div>
-      <RunLogForm memberId={session.user.id} />
+      <RunLogForm
+        memberId={memberId}
+        mode={edit ? 'edit' : 'create'}
+        recordId={edit}
+        initialData={initialData}
+      />
     </main>
   )
 }

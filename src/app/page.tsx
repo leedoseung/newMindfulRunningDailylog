@@ -11,22 +11,46 @@ export default async function HomePage() {
   const runs = await useCase.execute(7)
 
   return (
-    <main className="min-h-screen" style={{ background: 'var(--color-surface)' }}>
-      <header className="px-4 pt-6 pb-3 flex items-center justify-between">
-        <div>
-          <h1 className="text-xl font-bold font-display text-white tracking-tight">
-            마인드풀러닝
-          </h1>
-          <p className="text-xs text-white/30 mt-0.5">최근 7일 기록 · {runs.length}건</p>
+    <main style={{ minHeight: '100vh', background: '#F4F5F6' }}>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '52px 22px 0' }}>
+        <div style={{ fontFamily: 'var(--font-raleway)', fontSize: '0.68rem', fontWeight: 700, color: '#888', letterSpacing: '2px', textTransform: 'uppercase' }}>
+          Mindful Running
         </div>
         <Link
           href="/leaderboard"
-          className="text-xs text-white/40 hover:text-white/70 transition-colors"
+          style={{ fontSize: '0.72rem', fontWeight: 500, color: '#2E91FC', textDecoration: 'none' }}
         >
           리더보드
         </Link>
-      </header>
+      </div>
+      <div style={{ padding: '18px 22px 20px' }}>
+        <div style={{ fontSize: '0.78rem', color: '#888', marginBottom: '4px' }}>
+          최근 7일 달리기 기록 · {runs.length}건
+        </div>
+        <div style={{ fontFamily: 'var(--font-raleway)', fontSize: '1.8rem', fontWeight: 800, color: '#2d3031', lineHeight: 1.15, letterSpacing: '-0.3px' }}>
+          오늘도<br /><em style={{ fontStyle: 'italic', fontWeight: 400, color: '#2E91FC' }}>달려볼까요</em>
+        </div>
+      </div>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '0 22px 12px' }}>
+        <div style={{ fontFamily: 'var(--font-raleway)', fontSize: '0.65rem', fontWeight: 700, color: '#888', letterSpacing: '1.8px', textTransform: 'uppercase' }}>
+          Records
+        </div>
+      </div>
       <RunFeed runs={runs} />
+
+      {/* FAB — 기록하기 */}
+      <Link
+        href="/record"
+        style={{
+          position: 'fixed', bottom: '28px', right: '20px',
+          width: '50px', height: '50px', borderRadius: '50%',
+          background: '#2E91FC', color: '#fff',
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
+          fontSize: '1.5rem', textDecoration: 'none',
+          boxShadow: '0 6px 20px rgba(46,145,252,0.4)',
+          zIndex: 101,
+        }}
+      >+</Link>
     </main>
   )
 }

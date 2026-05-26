@@ -1,36 +1,70 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# 마인드풀러닝 (Mindful Running)
 
-## Getting Started
+마음챙김 달리기 기록 앱 — Next.js 15 + Clean Architecture
 
-First, run the development server:
+## 기술 스택
+
+- **Framework:** Next.js 16 (App Router)
+- **Language:** TypeScript (strict)
+- **Styling:** Tailwind CSS v4 + shadcn/ui
+- **Database:** Supabase (PostgreSQL)
+- **Testing:** Vitest + React Testing Library + Playwright
+
+## 시작하기
 
 ```bash
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+개발 서버는 [http://localhost:3000](http://localhost:3000)에서 실행됩니다.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## 환경 변수 설정
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+`.env.local` 파일을 생성하고 Supabase 자격증명을 입력하세요:
 
-## Learn More
+```
+NEXT_PUBLIC_SUPABASE_URL=https://<project>.supabase.co
+NEXT_PUBLIC_SUPABASE_ANON_KEY=<anon-key>
+```
 
-To learn more about Next.js, take a look at the following resources:
+## 테스트
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+```bash
+npm test                    # 단위 테스트
+npm run test:integration    # 통합 테스트 (.env.test.local 필요)
+npm run test:e2e            # E2E 테스트 (dev 서버 실행 상태)
+```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## 빌드 및 배포
 
-## Deploy on Vercel
+```bash
+npm run build               # 프로덕션 빌드
+npm run preview             # 빌드 결과 미리보기
+```
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+Vercel에서 배포:
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+1. GitHub 저장소에 코드 푸시
+2. [Vercel Dashboard](https://vercel.com/dashboard)에서 프로젝트 생성
+3. 환경 변수 설정 후 배포
+
+## 구조
+
+```
+app/
+├── page.tsx              # 홈/피드 페이지
+├── leaderboard/          # 리더보드 페이지
+├── api/                  # API 라우트
+└── components/           # UI 컴포넌트
+
+core/
+├── domain/               # 엔티티, 유스케이스
+├── application/          # 애플리케이션 서비스
+└── infrastructure/       # 저장소, 외부 API
+
+tests/
+├── unit/                 # 단위 테스트
+├── integration/          # 통합 테스트
+└── e2e/                  # E2E 테스트
+```

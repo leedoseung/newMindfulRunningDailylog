@@ -2,8 +2,6 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
-import type { Member } from '@/domain/entities/member'
-import { MemberSelect } from './member-select'
 import { DurationPicker } from './duration-picker'
 import { ThoughtInputs } from './thought-inputs'
 import { PhotoUpload } from './photo-upload'
@@ -11,8 +9,22 @@ import { createBrowserClient } from '@/infrastructure/supabase/browser-client'
 
 type ThoughtKey = 'before' | 'during' | 'after'
 
+type RunLogFormInitial = {
+  date: string
+  durationMin: number
+  title: string
+  location: string
+  thoughtBefore: string
+  thoughtDuring: string
+  thoughtAfter: string
+  photoUrl: string
+}
+
 type Props = {
-  members: Member[]
+  memberId: string
+  mode?: 'create' | 'edit'
+  recordId?: string
+  initialData?: RunLogFormInitial
 }
 
 const LABEL_STYLE: React.CSSProperties = {
@@ -29,16 +41,15 @@ const TEXT_INPUT_STYLE: React.CSSProperties = {
   boxSizing: 'border-box',
 }
 
-export function RunLogForm({ members }: Props) {
+export function RunLogForm({ memberId, mode = 'create', recordId, initialData }: Props) {
   const router = useRouter()
-  const [memberId, setMemberId]           = useState('')
-  const [date, setDate]                   = useState(() => new Date().toISOString().split('T')[0]!)
-  const [durationMin, setDurationMin]     = useState(30)
-  const [title, setTitle]                 = useState('')
-  const [location, setLocation]           = useState('')
-  const [thoughtBefore, setThoughtBefore] = useState('')
-  const [thoughtDuring, setThoughtDuring] = useState('')
-  const [thoughtAfter, setThoughtAfter]   = useState('')
+  const [date, setDate]                   = useState(() => initialData?.date ?? new Date().toISOString().split('T')[0]!)
+  const [durationMin, setDurationMin]     = useState(initialData?.durationMin ?? 30)
+  const [title, setTitle]                 = useState(initialData?.title ?? '')
+  const [location, setLocation]           = useState(initialData?.location ?? '')
+  const [thoughtBefore, setThoughtBefore] = useState(initialData?.thoughtBefore ?? '')
+  const [thoughtDuring, setThoughtDuring] = useState(initialData?.thoughtDuring ?? '')
+  const [thoughtAfter, setThoughtAfter]   = useState(initialData?.thoughtAfter ?? '')
   const [photoFile, setPhotoFile]         = useState<File | null>(null)
   const [submitting, setSubmitting]       = useState(false)
   const [error, setError]                 = useState('')
@@ -51,12 +62,11 @@ export function RunLogForm({ members }: Props) {
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
-    if (!memberId) { setError('이름을 선택해주세요'); return }
     setSubmitting(true)
     setError('')
 
     try {
-      let photoUrl = ''
+      let photoUrl = initialData?.photoUrl ?? ''
       if (photoFile) {
         const supabase = createBrowserClient()
         const ext = photoFile.name.split('.').pop() ?? 'jpg'
@@ -69,22 +79,23 @@ export function RunLogForm({ members }: Props) {
         photoUrl = urlData.publicUrl
       }
 
-      const res = await fetch('/api/record', {
-        method: 'POST',
+      const payload = { memberId, date, durationMin, title, thoughtBefore, thoughtDuring, thoughtAfter, location, photoUrl }
+
+      const url    = mode === 'edit' ? `/api/record/${recordId}` : '/api/record'
+      const method = mode === 'edit' ? 'PUT' : 'POST'
+
+      const res = await fetch(url, {
+        method,
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          memberId, date, durationMin, title,
-          thoughtBefore, thoughtDuring, thoughtAfter,
-          location, photoUrl,
-        }),
+        body: JSON.stringify(payload),
       })
       if (!res.ok) {
-        const body = await res.json().catch(() => ({}))
+        const body = await res.json().catch(() => ({})) as { error?: string }
         throw new Error(body.error ?? '저장 실패')
       }
       router.push('/')
     } catch (err: unknown) {
-      setError(err instanceof Error ? err.message : String(err))
+      setError(err instanceof Error ? err.message : '저장 실패')
     } finally {
       setSubmitting(false)
     }
@@ -92,12 +103,6 @@ export function RunLogForm({ members }: Props) {
 
   return (
     <form onSubmit={handleSubmit} style={{ paddingBottom: '40px' }}>
-
-      {/* 이름 */}
-      <div style={SECTION_STYLE}>
-        <div style={LABEL_STYLE}>이름</div>
-        <MemberSelect members={members} value={memberId} onChange={setMemberId} />
-      </div>
 
       {/* 날짜 */}
       <div style={SECTION_STYLE}>
@@ -163,14 +168,10 @@ export function RunLogForm({ members }: Props) {
         <PhotoUpload file={photoFile} onChange={setPhotoFile} />
       </div>
 
-      {/* 오류 메시지 */}
       {error && (
-        <div style={{ padding: '0 22px 10px', color: '#ef4444', fontSize: '0.8rem' }}>
-          {error}
-        </div>
+        <div style={{ padding: '0 22px 10px', color: '#ef4444', fontSize: '0.8rem' }}>{error}</div>
       )}
 
-      {/* 제출 버튼 */}
       <div style={{ padding: '0 22px' }}>
         <button
           type="submit"
@@ -181,12 +182,10 @@ export function RunLogForm({ members }: Props) {
             border: 'none', borderRadius: '16px',
             fontFamily: 'var(--font-raleway)', fontSize: '0.9rem', fontWeight: 700,
             color: '#fff', cursor: submitting ? 'not-allowed' : 'pointer',
-            letterSpacing: '0.5px',
             boxShadow: '0 6px 20px rgba(45,48,49,0.2)',
-            transition: 'transform 0.15s cubic-bezier(0.34,1.56,0.64,1)',
           }}
         >
-          {submitting ? '저장 중...' : '기록 저장하기'}
+          {submitting ? '저장 중...' : mode === 'edit' ? '수정 완료' : '기록 저장하기'}
         </button>
       </div>
     </form>

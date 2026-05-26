@@ -1,12 +1,15 @@
 import { createServerClient } from '@/infrastructure/supabase/client'
-import { SupabaseMemberRepository } from '@/infrastructure/supabase/member-repository'
 import { RunLogForm } from '@/presentation/components/form/run-log-form'
+import { redirect } from 'next/navigation'
 import Link from 'next/link'
 
 export default async function RecordPage() {
   const supabase = await createServerClient()
-  const repo = new SupabaseMemberRepository(supabase)
-  const members = await repo.getAll()
+  const { data: { session } } = await supabase.auth.getSession()
+
+  if (!session?.user?.id) {
+    redirect('/login')
+  }
 
   return (
     <main style={{ minHeight: '100vh', background: '#F4F5F6' }}>
@@ -28,7 +31,7 @@ export default async function RecordPage() {
         </div>
         <div style={{ width: '36px' }} />
       </div>
-      <RunLogForm members={members} />
+      <RunLogForm memberId={session.user.id} />
     </main>
   )
 }

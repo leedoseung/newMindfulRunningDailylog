@@ -1,6 +1,6 @@
 'use client'
 
-import { useRef } from 'react'
+import { useRef, useState, useEffect } from 'react'
 
 type Props = {
   file: File | null
@@ -9,7 +9,17 @@ type Props = {
 
 export function PhotoUpload({ file, onChange }: Props) {
   const inputRef = useRef<HTMLInputElement>(null)
-  const previewUrl = file ? URL.createObjectURL(file) : null
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null)
+
+  useEffect(() => {
+    if (!file) {
+      setPreviewUrl(null)
+      return
+    }
+    const url = URL.createObjectURL(file)
+    setPreviewUrl(url)
+    return () => URL.revokeObjectURL(url)
+  }, [file])
 
   return (
     <div

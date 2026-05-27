@@ -1,43 +1,167 @@
 import type { RunLog } from '@/domain/entities/run-log'
 
+export type CardType = 'hero' | 'photo' | 'white'
+
 type Props = {
   run: RunLog
+  cardType: CardType
   onClick: (run: RunLog) => void
 }
 
-export function RunCard({ run, onClick }: Props) {
-  const hasPhoto = run.photoUrl !== ''
+function timeAgo(dateStr: string): string {
+  const days = Math.floor(
+    (Date.now() - new Date(dateStr + 'T00:00:00').getTime()) / 86400000
+  )
+  if (days === 0) return '오늘'
+  if (days === 1) return '어제'
+  return `${days}일 전`
+}
 
-  const style: React.CSSProperties = hasPhoto
-    ? {
-        backgroundImage: `url(${run.photoUrl})`,
-        backgroundSize: 'cover',
-        backgroundPosition: 'center',
-      }
-    : {}
+const THEME = {
+  hero: {
+    card: '#2d3031', name: '#fff', time: '#555',
+    badge: 'rgba(255,255,255,0.1)', badgeText: '#fff',
+    quote: '#fff', snippet: '#555',
+    divider: 'rgba(255,255,255,0.07)',
+    chip: 'rgba(255,255,255,0.08)', chipText: '#888',
+    av: 'rgba(255,255,255,0.14)',
+  },
+  photo: {
+    card: 'transparent', name: 'rgba(255,255,255,0.9)', time: 'rgba(255,255,255,0.45)',
+    badge: 'rgba(255,255,255,0.18)', badgeText: '#fff',
+    quote: '#fff', snippet: 'rgba(255,255,255,0.55)',
+    divider: 'rgba(255,255,255,0.12)',
+    chip: 'rgba(255,255,255,0.14)', chipText: 'rgba(255,255,255,0.7)',
+    av: 'rgba(255,255,255,0.18)',
+  },
+  white: {
+    card: '#fff', name: '#2d3031', time: '#999',
+    badge: 'rgba(46,145,252,0.08)', badgeText: '#2E91FC',
+    quote: '#2d3031', snippet: '#777',
+    divider: 'rgba(0,0,0,0.05)',
+    chip: '#F0F1F2', chipText: '#666',
+    av: '#2d3031',
+  },
+}
+
+export function RunCard({ run, cardType, onClick }: Props) {
+  const t = THEME[cardType]
+  const isPhoto = cardType === 'photo'
+  const isHero  = cardType === 'hero'
+
+  const chips: string[] = []
+  if (run.location) chips.push(`📍 ${run.location}`)
+  if (run.photoUrl) chips.push('📸 사진')
+
+  const content = (
+    <>
+      {/* Author row */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '14px 16px 0' }}>
+        <div style={{
+          width: 32, height: 32, borderRadius: '50%', background: t.av,
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
+          fontFamily: 'var(--font-raleway)', fontSize: '0.72rem', fontWeight: 800,
+          color: '#fff', flexShrink: 0,
+        }}>
+          {run.memberName[0]}
+        </div>
+        <div style={{ flex: 1 }}>
+          <div style={{ fontFamily: 'var(--font-raleway)', fontSize: '0.78rem', fontWeight: 700, color: t.name }}>
+            {run.memberName}
+          </div>
+          <div style={{ fontSize: '0.6rem', color: t.time, marginTop: 1 }}>
+            {timeAgo(run.date)}{run.location ? ` · ${run.location}` : ''}
+          </div>
+        </div>
+        <div style={{
+          fontFamily: 'var(--font-raleway)', fontSize: '0.72rem', fontWeight: 800,
+          color: t.badgeText, background: t.badge,
+          padding: '4px 10px', borderRadius: 20, flexShrink: 0,
+        }}>
+          {run.durationMin}분
+        </div>
+      </div>
+
+      {/* Hero big number */}
+      {isHero && (
+        <div style={{ display: 'flex', alignItems: 'baseline', gap: 4, padding: '4px 16px 0' }}>
+          <span style={{
+            fontFamily: 'var(--font-raleway)', fontSize: '4.5rem', fontWeight: 900,
+            color: '#fff', lineHeight: 1, letterSpacing: '-3px',
+          }}>
+            {run.durationMin}
+          </span>
+          <span style={{ fontSize: '1.1rem', fontWeight: 300, color: '#555' }}>분</span>
+        </div>
+      )}
+
+      {/* Quote + snippet */}
+      <div style={{ padding: isHero ? '6px 16px 14px' : '12px 16px 14px' }}>
+        {run.title && (
+          <div style={{
+            fontFamily: 'var(--font-raleway)', fontSize: '1.05rem', fontWeight: 700,
+            color: t.quote, lineHeight: 1.45, wordBreak: 'keep-all',
+          }}>
+            "{run.title}"
+          </div>
+        )}
+        {(run.thoughtBefore || run.thoughtDuring || run.thoughtAfter) && (
+          <div style={{
+            fontSize: '0.72rem', color: t.snippet, lineHeight: 1.6, marginTop: 6,
+            display: '-webkit-box',
+            WebkitLineClamp: 2,
+            WebkitBoxOrient: 'vertical',
+            overflow: 'hidden',
+          }}>
+            {run.thoughtBefore || run.thoughtDuring || run.thoughtAfter}
+          </div>
+        )}
+      </div>
+
+      {/* Divider */}
+      <div style={{ height: 1, background: t.divider, margin: '0 16px' }} />
+
+      {/* Chips */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '10px 16px 14px', flexWrap: 'wrap' }}>
+        {chips.length > 0 ? chips.map(c => (
+          <div key={c} style={{
+            background: t.chip, borderRadius: 20, padding: '4px 10px',
+            fontSize: '0.6rem', fontWeight: 500, color: t.chipText,
+          }}>{c}</div>
+        )) : (
+          <div style={{ fontSize: '0.6rem', color: t.chipText, opacity: 0.5 }}>{run.date}</div>
+        )}
+      </div>
+    </>
+  )
 
   return (
     <button
       type="button"
       onClick={() => onClick(run)}
-      className={[
-        'relative w-full rounded-2xl overflow-hidden text-left transition-transform active:scale-95',
-        hasPhoto ? 'h-48' : 'h-28 bg-card',
-      ].join(' ')}
-      style={style}
+      style={{
+        background: t.card, borderRadius: 22, overflow: 'hidden',
+        boxShadow: '0 2px 12px rgba(0,0,0,0.06)',
+        cursor: 'pointer', width: '100%', border: 'none',
+        textAlign: 'left', display: 'block', position: 'relative',
+        minHeight: isPhoto ? 220 : undefined,
+        transition: 'transform 0.18s cubic-bezier(0.34,1.2,0.64,1)',
+      }}
     >
-      {hasPhoto && (
-        <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent" />
-      )}
-      <div className="absolute bottom-0 left-0 right-0 p-3 z-10">
-        <div className="text-2xl font-bold font-display text-white leading-none">
-          {run.durationMin}분
-        </div>
-        <div className="text-xs text-white/50 mt-1">{run.memberName}</div>
-        {run.title && (
-          <div className="text-xs text-white/60 mt-0.5 line-clamp-1">{run.title}</div>
-        )}
-      </div>
+      {isPhoto ? (
+        <>
+          <div style={{
+            position: 'absolute', inset: 0,
+            backgroundImage: `url(${run.photoUrl})`,
+            backgroundSize: 'cover', backgroundPosition: 'center',
+          }} />
+          <div style={{
+            position: 'absolute', inset: 0,
+            background: 'linear-gradient(to bottom, rgba(0,0,0,0.1) 0%, rgba(0,0,0,0.7) 100%)',
+          }} />
+          <div style={{ position: 'relative', zIndex: 1 }}>{content}</div>
+        </>
+      ) : content}
     </button>
   )
 }

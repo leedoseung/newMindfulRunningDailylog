@@ -4,6 +4,10 @@ import type { NextRequest } from 'next/server'
 import { getRedirectPath } from './lib/auth-redirect'
 
 export async function middleware(request: NextRequest) {
+  if (process.env.DEV_BYPASS === 'true') {
+    return NextResponse.next({ request })
+  }
+
   let supabaseResponse = NextResponse.next({ request })
 
   const supabase = createServerClient(

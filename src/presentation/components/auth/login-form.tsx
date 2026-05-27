@@ -19,7 +19,10 @@ export function LoginForm({ error }: Props) {
     const supabase = createBrowserClient()
     await supabase.auth.signInWithOAuth({
       provider: 'kakao',
-      options: { redirectTo: `${window.location.origin}/auth/callback` },
+      options: {
+        redirectTo: `${window.location.origin}/auth/callback`,
+        scopes: 'profile_nickname profile_image',
+      },
     })
   }
 
@@ -225,6 +228,18 @@ export function LoginForm({ error }: Props) {
           }}>
             ✉️ 이메일을 확인해주세요
           </div>
+        )}
+
+        {process.env.NEXT_PUBLIC_DEV_BYPASS === 'true' && (
+          <a
+            href="/"
+            style={{
+              fontSize: '0.6rem', color: 'rgba(255,255,255,0.2)',
+              textDecoration: 'none', marginTop: '8px', display: 'block', textAlign: 'center',
+            }}
+          >
+            개발 환경 임시 접근
+          </a>
         )}
       </div>
     </div>

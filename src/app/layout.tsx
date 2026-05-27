@@ -2,6 +2,7 @@
 import type { Metadata } from 'next'
 import { Raleway, Roboto } from 'next/font/google'
 import './globals.css'
+import { BottomNav } from '@/presentation/components/layout/bottom-nav'
 
 const raleway = Raleway({
   subsets: ['latin'],
@@ -27,7 +28,10 @@ export default function RootLayout({
 }) {
   return (
     <html lang="ko" className={`${raleway.variable} ${roboto.variable}`}>
-      <body>{children}</body>
+      <body style={{ paddingBottom: '80px' }}>
+        {children}
+        <BottomNav />
+      </body>
     </html>
   )
 }

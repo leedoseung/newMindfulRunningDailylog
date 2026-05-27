@@ -39,18 +39,6 @@ export default async function HomePage() {
 
       <HomeFeed recentRuns={recentRuns} myRuns={myRuns} memberId={memberId} />
 
-      <Link
-        href="/record"
-        style={{
-          position: 'fixed', bottom: '28px', right: '20px',
-          width: '50px', height: '50px', borderRadius: '50%',
-          background: '#2E91FC', color: '#fff',
-          display: 'flex', alignItems: 'center', justifyContent: 'center',
-          fontSize: '1.5rem', textDecoration: 'none',
-          boxShadow: '0 6px 20px rgba(46,145,252,0.4)',
-          zIndex: 101,
-        }}
-      >+</Link>
     </main>
   )
 }

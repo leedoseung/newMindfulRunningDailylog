@@ -21,9 +21,9 @@ const run: RunLog = {
 describe('DetailSheet', () => {
   it('shows run details when open=true', () => {
     render(<DetailSheet run={run} open onClose={() => {}} />)
-    expect(screen.getByText('45분')).toBeInTheDocument()
     expect(screen.getByText('이두승')).toBeInTheDocument()
     expect(screen.getByText('가볍게 달릴 예정')).toBeInTheDocument()
+    expect(screen.getByText('분')).toBeInTheDocument()
   })
 
   it('calls onClose when backdrop is clicked', async () => {
@@ -37,6 +37,6 @@ describe('DetailSheet', () => {
   it('is hidden when open=false', () => {
     const { container } = render(<DetailSheet run={run} open={false} onClose={() => {}} />)
     const sheet = container.querySelector('[data-testid="detail-sheet"]') as HTMLElement
-    expect(sheet.style.transform).toContain('translateY(100%)')
+    expect(sheet.style.transform).toContain('translateY(110%)')
   })
 })

@@ -1,7 +1,7 @@
 import { createServerClient } from '@supabase/ssr'
 import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
-import { getRedirectPath } from '@/lib/auth-redirect'
+import { getRedirectPath } from './lib/auth-redirect'
 
 export async function middleware(request: NextRequest) {
   let supabaseResponse = NextResponse.next({ request })

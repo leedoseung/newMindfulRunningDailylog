@@ -4,8 +4,7 @@ import { SupabaseRunLogRepository } from '@/infrastructure/supabase/run-log-repo
 import { createServerClient } from '@/infrastructure/supabase/client'
 import { HomeFeed } from '@/presentation/components/home/home-feed'
 import type { CrewMember, WeeklyBar } from '@/presentation/components/home/home-feed'
-import { AvatarImage } from '@/presentation/components/shared/avatar-image'
-import Link from 'next/link'
+import { AppHeader } from '@/presentation/components/layout/app-header'
 import type { RunLog } from '@/domain/entities/run-log'
 
 const DAY_LABELS = ['일', '월', '화', '수', '목', '금', '토']
@@ -65,36 +64,7 @@ export default async function HomePage() {
 
   return (
     <main style={{ minHeight: '100vh', background: '#F7F7F5', position: 'relative' }}>
-      {/* Sticky header */}
-      <div style={{
-        display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-        padding: '52px 22px 16px',
-        background: 'rgba(240,241,242,0.92)', backdropFilter: 'blur(20px)',
-        position: 'sticky', top: 0, zIndex: 10,
-      }}>
-        <div style={{
-          fontFamily: "'Pretendard Variable', Pretendard, -apple-system, sans-serif", fontSize: '0.65rem', fontWeight: 500,
-          color: '#999', letterSpacing: '2.5px', textTransform: 'uppercase',
-        }}>
-          Mindful Running
-        </div>
-        <Link
-          href="/profile"
-          style={{
-            display: 'block', borderRadius: '50%', flexShrink: 0,
-            textDecoration: 'none',
-            boxShadow: '0 0 0 2px rgba(0,0,0,0.08)',
-          }}
-        >
-          <AvatarImage
-            name={memberName || '?'}
-            avatarUrl={memberAvatarUrl}
-            size={34}
-            bg="#111111"
-            color="#fff"
-          />
-        </Link>
-      </div>
+      <AppHeader memberName={memberName || '?'} memberAvatarUrl={memberAvatarUrl} />
 
       <HomeFeed
         recentRuns={recentRuns}

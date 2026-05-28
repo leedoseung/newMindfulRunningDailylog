@@ -1,17 +1,28 @@
 import { GetLeaderboardUseCase } from '@/application/use-cases/get-leaderboard'
 import { SupabaseMemberRepository } from '@/infrastructure/supabase/member-repository'
 import { LeaderboardList } from '@/presentation/components/leaderboard/leaderboard-list'
+import { AppHeader } from '@/presentation/components/layout/app-header'
 import { createServerClient } from '@/infrastructure/supabase/client'
 
 export default async function LeaderboardPage() {
   const supabase = await createServerClient()
-  const repo = new SupabaseMemberRepository(supabase)
-  const useCase = new GetLeaderboardUseCase(repo)
-  const stats = await useCase.execute()
+  const { data: { user } } = await supabase.auth.getUser()
+  const memberId = (user?.user_metadata?.member_id as string | undefined) ?? ''
+
+  const [stats, memberRow] = await Promise.all([
+    new GetLeaderboardUseCase(new SupabaseMemberRepository(supabase)).execute(),
+    memberId
+      ? supabase.from('members').select('name, avatar_url').eq('id', memberId).single()
+      : Promise.resolve({ data: null }),
+  ])
+
+  const memberName = (memberRow.data?.name as string | undefined) ?? ''
+  const memberAvatarUrl = (memberRow.data?.avatar_url as string | undefined) ?? ''
 
   return (
     <main style={{ minHeight: '100vh', background: '#F7F7F5' }}>
-      <div style={{ padding: '30px 22px 0' }}>
+      <AppHeader memberName={memberName} memberAvatarUrl={memberAvatarUrl} />
+      <div style={{ padding: '20px 22px 0' }}>
         <div style={{ fontSize: '0.7rem', color: '#888', marginBottom: '4px' }}>
           {stats.length}명 참여중
         </div>

@@ -9,6 +9,8 @@ import {
 } from '@/components/ui/dialog'
 import type { RunLog } from '@/domain/entities/run-log'
 
+const FONT = "'Pretendard Variable', Pretendard, -apple-system, sans-serif"
+
 type Props = {
   memberId: string | null
   memberName: string
@@ -33,33 +35,49 @@ export function DiaryModal({ memberId, memberName, open, onClose }: Props) {
   return (
     <Dialog open={open} onOpenChange={v => !v && onClose()}>
       <DialogContent
-        className="max-w-sm max-h-[80vh] overflow-y-auto"
-        style={{ background: '#161616', border: '1px solid rgba(255,255,255,0.08)' }}
+        className="max-w-sm"
+        style={{
+          background: '#fff', border: '1px solid rgba(0,0,0,0.06)',
+          borderRadius: 20, maxHeight: '80vh', overflowY: 'auto',
+        }}
       >
         <DialogHeader>
-          <DialogTitle className="text-white text-base">
+          <DialogTitle style={{ fontFamily: FONT, fontSize: '0.95rem', fontWeight: 500, color: '#111' }}>
             {memberName}의 달리기 일기장
           </DialogTitle>
         </DialogHeader>
         {loading ? (
-          <p className="text-white/40 text-sm py-4 text-center">불러오는 중...</p>
+          <p style={{ fontFamily: FONT, fontSize: '0.82rem', color: '#BBB', padding: '16px 0', textAlign: 'center' }}>
+            불러오는 중...
+          </p>
         ) : records.length === 0 ? (
-          <p className="text-white/40 text-sm py-4 text-center">기록이 없습니다</p>
+          <p style={{ fontFamily: FONT, fontSize: '0.82rem', color: '#BBB', padding: '16px 0', textAlign: 'center' }}>
+            기록이 없습니다
+          </p>
         ) : (
-          <div className="space-y-3 mt-2">
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 8, marginTop: 8 }}>
             {records.map(run => (
               <div
                 key={run.id}
-                className="rounded-xl p-3 border border-white/5"
-                style={{ background: 'rgba(255,255,255,0.03)' }}
+                style={{ background: '#F7F7F5', borderRadius: 14, padding: '14px 16px' }}
               >
-                <div className="flex justify-between items-baseline">
-                  <span className="text-lg font-bold font-display text-white">{run.durationMin}분</span>
-                  <span className="text-xs text-white/30">{run.date}</span>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
+                  <span style={{ fontFamily: FONT, fontSize: '1.4rem', fontWeight: 300, color: '#111', lineHeight: 1 }}>
+                    {run.durationMin}<span style={{ fontSize: '0.75rem', fontWeight: 400, color: '#AAA', marginLeft: 3 }}>분</span>
+                  </span>
+                  <span style={{ fontFamily: FONT, fontSize: '0.62rem', color: '#CCC' }}>{run.date}</span>
                 </div>
-                {run.title && <div className="text-sm text-white/70 mt-1">{run.title}</div>}
+                {run.title && (
+                  <div style={{ fontFamily: FONT, fontSize: '0.82rem', fontWeight: 500, color: '#333', marginTop: 6 }}>
+                    {run.title}
+                  </div>
+                )}
                 {run.thoughtAfter && (
-                  <p className="text-xs text-white/50 mt-1.5 line-clamp-2">{run.thoughtAfter}</p>
+                  <p style={{
+                    fontFamily: FONT, fontSize: '0.72rem', color: '#888', marginTop: 5,
+                    lineHeight: 1.55, display: '-webkit-box', WebkitLineClamp: 2,
+                    WebkitBoxOrient: 'vertical', overflow: 'hidden',
+                  }}>{run.thoughtAfter}</p>
                 )}
               </div>
             ))}

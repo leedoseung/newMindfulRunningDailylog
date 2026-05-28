@@ -36,6 +36,8 @@ function useCountUp(target: number, active: boolean) {
   return value
 }
 
+const FONT = "'Pretendard Variable', Pretendard, -apple-system, sans-serif"
+
 export function DetailSheet({ run, open, onClose }: Props) {
   const [photoMode, setPhotoMode] = useState(false)
   const count = useCountUp(run?.durationMin ?? 0, open)
@@ -47,16 +49,6 @@ export function DetailSheet({ run, open, onClose }: Props) {
   if (!run) return null
 
   const hasPhoto = Boolean(run.photoUrl)
-
-  const bgStyle: React.CSSProperties = run.photoUrl
-    ? {
-        backgroundImage: `url(${run.photoUrl})`,
-        backgroundSize: 'cover',
-        backgroundPosition: 'center',
-        transform: photoMode ? 'scale(1.06)' : 'scale(1)',
-        transition: 'transform 0.5s cubic-bezier(0.32,0.72,0,1)',
-      }
-    : { background: 'linear-gradient(170deg, #1a1c1d 0%, #111111 100%)' }
 
   const thoughts = [
     { step: '전', text: run.thoughtBefore },
@@ -76,7 +68,7 @@ export function DetailSheet({ run, open, onClose }: Props) {
         onClick={onClose}
         style={{
           position: 'absolute', inset: 0,
-          background: open ? 'rgba(0,0,0,0.5)' : 'rgba(0,0,0,0)',
+          background: open ? 'rgba(0,0,0,0.32)' : 'rgba(0,0,0,0)',
           transition: 'background 0.38s ease',
         }}
       />
@@ -84,32 +76,49 @@ export function DetailSheet({ run, open, onClose }: Props) {
       {/* Sheet */}
       <div
         data-testid="detail-sheet"
-        onClick={() => { if (photoMode) setPhotoMode(false) }}
         style={{
           position: 'relative', width: '100%', height: '88vh',
-          background: '#0a0a0a', borderRadius: '28px 28px 0 0',
+          background: '#F7F7F5', borderRadius: '28px 28px 0 0',
           transform: open ? 'translateY(0)' : 'translateY(110%)',
           transition: 'transform 0.52s cubic-bezier(0.32,0.72,0,1)',
           overflow: 'hidden', zIndex: 201,
+          display: 'flex', flexDirection: 'column',
         }}
       >
-        {/* Photo background */}
-        <div style={{ position: 'absolute', inset: 0, ...bgStyle }} />
+        {/* Photo background (photo mode) */}
+        {hasPhoto && (
+          <div
+            onClick={() => photoMode && setPhotoMode(false)}
+            style={{
+              position: 'absolute', inset: 0,
+              backgroundImage: `url(${run.photoUrl})`,
+              backgroundSize: 'cover', backgroundPosition: 'center',
+              transform: photoMode ? 'scale(1.04)' : 'scale(1.12)',
+              opacity: photoMode ? 1 : 0,
+              transition: 'transform 0.55s cubic-bezier(0.32,0.72,0,1), opacity 0.35s',
+              pointerEvents: photoMode ? 'auto' : 'none',
+              zIndex: 10,
+              cursor: 'pointer',
+            }}
+          />
+        )}
 
-        {/* Top button bar */}
+        {/* Top bar */}
         <div style={{
-          position: 'absolute', top: 16, left: 0, right: 0,
           display: 'flex', justifyContent: 'space-between', alignItems: 'center',
-          padding: '0 20px', zIndex: 20,
+          padding: '16px 20px 0', flexShrink: 0, position: 'relative', zIndex: 20,
         }}>
+          {/* Handle */}
+          <div style={{ position: 'absolute', top: 10, left: '50%', transform: 'translateX(-50%)',
+            width: 32, height: 3, background: 'rgba(0,0,0,0.12)', borderRadius: 2 }} />
+
           <button
             type="button"
-            onClick={e => { e.stopPropagation(); onClose() }}
+            onClick={onClose}
             style={{
-              width: 32, height: 32, borderRadius: '50%',
-              background: 'rgba(0,0,0,0.35)', backdropFilter: 'blur(8px)',
-              border: 'none', color: 'rgba(255,255,255,0.85)',
-              fontSize: '0.9rem', cursor: 'pointer',
+              width: 32, height: 32, borderRadius: '50%', marginTop: 8,
+              background: '#EBEBEA', border: 'none', color: '#111',
+              fontSize: '0.85rem', cursor: 'pointer',
               display: 'flex', alignItems: 'center', justifyContent: 'center',
             }}
           >✕</button>
@@ -117,128 +126,116 @@ export function DetailSheet({ run, open, onClose }: Props) {
           {hasPhoto && (
             <button
               type="button"
-              onClick={e => { e.stopPropagation(); setPhotoMode(v => !v) }}
+              onClick={() => setPhotoMode(v => !v)}
               style={{
-                background: 'rgba(255,255,255,0.14)', backdropFilter: 'blur(8px)',
-                border: '1px solid rgba(255,255,255,0.18)', borderRadius: 20,
-                padding: '5px 13px',
-                fontFamily: "'Pretendard Variable', Pretendard, -apple-system, sans-serif", fontSize: '0.58rem', fontWeight: 500,
-                color: 'rgba(255,255,255,0.82)', cursor: 'pointer',
+                background: '#111', border: 'none', borderRadius: 20,
+                padding: '6px 14px', marginTop: 8,
+                fontFamily: FONT, fontSize: '0.6rem', fontWeight: 500,
+                color: '#fff', cursor: 'pointer',
               }}
             >{photoMode ? '텍스트 보기' : '사진 보기'}</button>
           )}
         </div>
 
-        {/* Glass panel */}
+        {/* Content */}
         <div style={{
-          position: 'absolute', bottom: 0, left: 0, right: 0,
-          backdropFilter: 'blur(22px)', WebkitBackdropFilter: 'blur(22px)',
-          background: 'rgba(0,0,0,0.22)', borderRadius: '26px 26px 0 0',
-          maxHeight: '72%', overflowY: 'auto', scrollbarWidth: 'none',
-          padding: '18px 22px 32px',
-          transform: photoMode ? 'translateY(108%)' : 'translateY(0)',
+          flex: 1, overflowY: 'auto', scrollbarWidth: 'none',
+          padding: '24px 24px 40px',
           opacity: photoMode ? 0 : 1,
-          transition: 'transform 0.48s cubic-bezier(0.32,0.72,0,1), opacity 0.35s',
+          transition: 'opacity 0.25s',
           pointerEvents: photoMode ? 'none' : 'auto',
-          zIndex: 10,
         }}>
-          {/* Handle bar */}
+          {/* Duration */}
           <div style={{
-            width: 32, height: 3, background: 'rgba(255,255,255,0.2)',
-            borderRadius: 2, margin: '0 auto 18px',
-          }} />
-
-          <div style={{
-            fontFamily: "'Pretendard Variable', Pretendard, -apple-system, sans-serif", fontSize: '0.56rem', fontWeight: 600,
-            color: 'rgba(255,255,255,0.35)', letterSpacing: '1.5px', textTransform: 'uppercase',
-            marginBottom: 5,
+            fontFamily: FONT, fontSize: '0.52rem', fontWeight: 500,
+            color: '#BBB', letterSpacing: '2px', textTransform: 'uppercase',
+            marginBottom: 4,
           }}>달린 시간</div>
 
-          <div style={{ display: 'flex', alignItems: 'baseline', gap: 4 }}>
+          <div style={{ display: 'flex', alignItems: 'baseline', gap: 4, marginBottom: 4 }}>
             <span style={{
-              fontFamily: "'Pretendard Variable', Pretendard, -apple-system, sans-serif", fontSize: '4.2rem', fontWeight: 300,
-              color: '#fff', lineHeight: 1, letterSpacing: '-2px',
+              fontFamily: FONT, fontSize: '4.2rem', fontWeight: 300,
+              color: '#111', lineHeight: 1, letterSpacing: '-2px',
             }}>{count}</span>
-            <span style={{ fontSize: '0.95rem', fontWeight: 300, color: 'rgba(255,255,255,0.35)' }}>분</span>
+            <span style={{ fontFamily: FONT, fontSize: '1rem', fontWeight: 300, color: '#999' }}>분</span>
           </div>
 
-          <div style={{ fontSize: '0.62rem', color: 'rgba(255,255,255,0.32)', marginTop: 6 }}>
+          <div style={{ fontFamily: FONT, fontSize: '0.72rem', fontWeight: 400, color: '#AAA', marginBottom: 16 }}>
             {run.memberName}
           </div>
 
-          {run.location && (
-            <div style={{ display: 'flex', gap: 5, flexWrap: 'wrap', marginTop: 10 }}>
-              <div style={{
-                background: 'rgba(255,255,255,0.09)', border: '1px solid rgba(255,255,255,0.12)',
-                borderRadius: 20, padding: '3px 10px', fontSize: '0.6rem', color: 'rgba(255,255,255,0.58)',
-              }}>📍 {run.location}</div>
+          {/* Chips */}
+          {(run.location || hasPhoto) && (
+            <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', marginBottom: 20 }}>
+              {run.location && (
+                <div style={{
+                  background: '#EBEBEA', borderRadius: 20, padding: '4px 12px',
+                  fontFamily: FONT, fontSize: '0.62rem', fontWeight: 400, color: '#555',
+                }}>📍 {run.location}</div>
+              )}
+              {hasPhoto && (
+                <div style={{
+                  background: '#EBEBEA', borderRadius: 20, padding: '4px 12px',
+                  fontFamily: FONT, fontSize: '0.62rem', fontWeight: 400, color: '#555',
+                }}>📸 사진</div>
+              )}
             </div>
           )}
 
-          <div style={{ padding: '16px 0 0' }}>
-            <div style={{ fontSize: '0.6rem', color: 'rgba(255,255,255,0.28)', marginBottom: 3 }}>
-              {run.date}
-            </div>
-            {run.title && (
-              <div style={{
-                fontFamily: "'Pretendard Variable', Pretendard, -apple-system, sans-serif", fontSize: '1.1rem', fontWeight: 500,
-                color: '#fff', lineHeight: 1.3, marginBottom: 16,
-              }}>{run.title}</div>
-            )}
+          {/* Divider */}
+          <div style={{ height: 1, background: 'rgba(0,0,0,0.06)', marginBottom: 20 }} />
 
-            {thoughts.length > 0 && (
-              <>
-                <div style={{
-                  fontFamily: "'Pretendard Variable', Pretendard, -apple-system, sans-serif", fontSize: '0.54rem', fontWeight: 600,
-                  color: 'rgba(255,255,255,0.18)', letterSpacing: '2px', textTransform: 'uppercase',
-                  marginBottom: 12,
-                }}>Before · During · After</div>
-                {thoughts.map(({ step, text }) => (
-                  <div key={step} style={{
-                    display: 'flex', gap: 12, alignItems: 'flex-start',
-                    paddingBottom: 12, borderBottom: '1px solid rgba(255,255,255,0.07)',
-                    marginBottom: 12,
-                  }}>
-                    <div style={{
-                      fontSize: '0.55rem', fontWeight: 500, color: 'rgba(255,255,255,0.2)',
-                      textTransform: 'uppercase', letterSpacing: '0.5px',
-                      whiteSpace: 'nowrap', paddingTop: 3, minWidth: 28,
-                    }}>{step}</div>
-                    <div style={{ fontSize: '0.78rem', color: 'rgba(255,255,255,0.72)', lineHeight: 1.65 }}>
-                      {text}
-                    </div>
-                  </div>
-                ))}
-              </>
-            )}
+          {/* Date + title */}
+          <div style={{ fontFamily: FONT, fontSize: '0.62rem', fontWeight: 400, color: '#BBB', marginBottom: 8 }}>
+            {run.date}
           </div>
+          {run.title && (
+            <div style={{
+              fontFamily: FONT, fontSize: '1.15rem', fontWeight: 500,
+              color: '#111', lineHeight: 1.35, marginBottom: 24,
+            }}>"{run.title}"</div>
+          )}
 
-          {hasPhoto && (
-            <button
-              type="button"
-              onClick={e => { e.stopPropagation(); setPhotoMode(true) }}
-              style={{
-                display: 'block', width: '100%', marginTop: 16, padding: 13,
-                background: 'rgba(255,255,255,0.07)', border: 'none', borderRadius: 12,
-                fontFamily: "'Pretendard Variable', Pretendard, -apple-system, sans-serif", fontSize: '0.74rem', fontWeight: 600,
-                color: 'rgba(255,255,255,0.25)', cursor: 'pointer',
-              }}
-            >텍스트 닫고 사진 보기</button>
+          {/* Thoughts */}
+          {thoughts.length > 0 && (
+            <>
+              <div style={{
+                fontFamily: FONT, fontSize: '0.5rem', fontWeight: 500,
+                color: '#CCC', letterSpacing: '2px', textTransform: 'uppercase',
+                marginBottom: 14,
+              }}>Before · During · After</div>
+              {thoughts.map(({ step, text }) => (
+                <div key={step} style={{
+                  display: 'flex', gap: 14, alignItems: 'flex-start',
+                  paddingBottom: 16, marginBottom: 16,
+                  borderBottom: '1px solid rgba(0,0,0,0.05)',
+                }}>
+                  <div style={{
+                    fontFamily: FONT, fontSize: '0.55rem', fontWeight: 500,
+                    color: '#CCC', textTransform: 'uppercase', letterSpacing: '0.5px',
+                    whiteSpace: 'nowrap', paddingTop: 3, minWidth: 24,
+                  }}>{step}</div>
+                  <div style={{
+                    fontFamily: FONT, fontSize: '0.85rem', fontWeight: 400,
+                    color: '#444', lineHeight: 1.7,
+                  }}>{text}</div>
+                </div>
+              ))}
+            </>
           )}
         </div>
 
-        {/* Photo-mode tap hint */}
+        {/* Photo mode tap hint */}
         {hasPhoto && (
           <div style={{
-            position: 'absolute', bottom: 28, left: '50%', transform: 'translateX(-50%)',
-            background: 'rgba(0,0,0,0.4)', backdropFilter: 'blur(8px)',
-            border: '1px solid rgba(255,255,255,0.1)', borderRadius: 20,
-            padding: '7px 16px',
-            fontFamily: "'Pretendard Variable', Pretendard, -apple-system, sans-serif", fontSize: '0.58rem', fontWeight: 600,
-            color: 'rgba(255,255,255,0.5)', whiteSpace: 'nowrap',
+            position: 'absolute', bottom: 32, left: '50%', transform: 'translateX(-50%)',
+            background: 'rgba(0,0,0,0.5)', backdropFilter: 'blur(8px)',
+            borderRadius: 20, padding: '7px 16px',
+            fontFamily: FONT, fontSize: '0.58rem', fontWeight: 500,
+            color: 'rgba(255,255,255,0.7)', whiteSpace: 'nowrap',
             opacity: photoMode ? 1 : 0, transition: 'opacity 0.3s',
-            pointerEvents: 'none', zIndex: 5,
-          }}>사진 탭하면 텍스트 다시 보기</div>
+            pointerEvents: 'none', zIndex: 20,
+          }}>탭하면 텍스트 다시 보기</div>
         )}
       </div>
     </div>

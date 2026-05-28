@@ -73,9 +73,9 @@ export function MemberRankRow({ stats, rank, statValue, statUnit, statSub, onTod
         style={{
           fontSize: '0.65rem', fontWeight: 500,
           padding: '5px 10px', borderRadius: '20px',
-          background: 'rgba(46,145,252,0.08)',
-          color: '#111111',
-          border: '1px solid rgba(46,145,252,0.2)',
+          background: '#F7F7F5',
+          color: '#555',
+          border: '1px solid rgba(0,0,0,0.08)',
           cursor: 'pointer',
           whiteSpace: 'nowrap',
         }}

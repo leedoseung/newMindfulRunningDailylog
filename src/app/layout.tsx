@@ -1,20 +1,6 @@
-// src/app/layout.tsx
 import type { Metadata } from 'next'
-import { Raleway, Roboto } from 'next/font/google'
 import './globals.css'
 import { BottomNav } from '@/presentation/components/layout/bottom-nav'
-
-const raleway = Raleway({
-  subsets: ['latin'],
-  weight: ['400', '700', '800'],
-  variable: '--font-raleway',
-})
-
-const roboto = Roboto({
-  subsets: ['latin'],
-  weight: ['300', '400', '500'],
-  variable: '--font-roboto',
-})
 
 export const metadata: Metadata = {
   title: '마인드풀러닝',
@@ -27,7 +13,13 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <html lang="ko" className={`${raleway.variable} ${roboto.variable}`}>
+    <html lang="ko">
+      <head>
+        <link
+          rel="stylesheet"
+          href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.min.css"
+        />
+      </head>
       <body style={{ paddingBottom: '80px' }}>
         {children}
         <BottomNav />

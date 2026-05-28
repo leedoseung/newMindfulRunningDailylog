@@ -34,15 +34,15 @@ export function ProfileView({ member, stats, monthlyChart, recentRuns }: Props) 
   ].filter(Boolean) as string[]
 
   return (
-    <main style={{ minHeight: '100vh', background: '#F4F5F6' }}>
+    <main style={{ minHeight: '100vh', background: '#F7F7F5' }}>
       {/* Hero */}
-      <div style={{ background: '#2d3031', padding: '52px 22px 28px', position: 'relative', overflow: 'hidden' }}>
+      <div style={{ background: '#111111', padding: '52px 22px 28px', position: 'relative', overflow: 'hidden' }}>
         <div style={{
           position: 'absolute', right: -10, bottom: -10,
           fontSize: '8rem', opacity: 0.06, pointerEvents: 'none', userSelect: 'none',
         }}>🏃</div>
         <div style={{
-          fontFamily: 'var(--font-raleway)', fontSize: '2rem', fontWeight: 800,
+          fontFamily: "'Pretendard Variable', Pretendard, -apple-system, sans-serif", fontSize: '2rem', fontWeight: 500,
           color: '#fff', letterSpacing: '-0.5px', lineHeight: 1.1, marginBottom: 4,
         }}>
           {member.name}<br />
@@ -66,8 +66,8 @@ export function ProfileView({ member, stats, monthlyChart, recentRuns }: Props) 
         {statBoxes.map(({ label, value }) => (
           <div key={label} style={{ background: '#fff', borderRadius: 16, padding: 16 }}>
             <span style={{
-              fontFamily: 'var(--font-raleway)', fontSize: '1.6rem', fontWeight: 800,
-              color: '#2d3031', display: 'block', marginBottom: 3,
+              fontFamily: "'Pretendard Variable', Pretendard, -apple-system, sans-serif", fontSize: '1.6rem', fontWeight: 500,
+              color: '#111111', display: 'block', marginBottom: 3,
             }}>{value}</span>
             <span style={{ fontSize: '0.62rem', color: '#888' }}>{label}</span>
           </div>
@@ -86,7 +86,7 @@ export function ProfileView({ member, stats, monthlyChart, recentRuns }: Props) 
                   <div style={{
                     width: '100%', height: heightPct,
                     borderRadius: '4px 4px 0 0',
-                    background: isCurrent ? '#2d3031' : '#EBEBEB',
+                    background: isCurrent ? '#111111' : '#EBEBEB',
                   }} />
                   <div style={{ fontSize: '0.5rem', color: '#888' }}>{label}</div>
                 </div>
@@ -99,7 +99,7 @@ export function ProfileView({ member, stats, monthlyChart, recentRuns }: Props) 
       {/* Recent runs header */}
       <div style={{ padding: '18px 22px 12px' }}>
         <div style={{
-          fontFamily: 'var(--font-raleway)', fontSize: '0.65rem', fontWeight: 700,
+          fontFamily: "'Pretendard Variable', Pretendard, -apple-system, sans-serif", fontSize: '0.65rem', fontWeight: 500,
           color: '#888', letterSpacing: '1.8px', textTransform: 'uppercase',
         }}>최근 기록</div>
       </div>
@@ -125,12 +125,12 @@ export function ProfileView({ member, stats, monthlyChart, recentRuns }: Props) 
                 {run.date}
               </div>
               <div style={{
-                fontFamily: 'var(--font-raleway)', fontSize: '0.76rem', fontWeight: 700,
-                color: '#2d3031', marginBottom: 8, lineHeight: 1.3,
+                fontFamily: "'Pretendard Variable', Pretendard, -apple-system, sans-serif", fontSize: '0.76rem', fontWeight: 500,
+                color: '#111111', marginBottom: 8, lineHeight: 1.3,
               }}>
                 {run.title || '달리기'}
               </div>
-              <span style={{ fontFamily: 'var(--font-raleway)', fontSize: '1.3rem', fontWeight: 800, color: '#2d3031' }}>
+              <span style={{ fontFamily: "'Pretendard Variable', Pretendard, -apple-system, sans-serif", fontSize: '1.3rem', fontWeight: 500, color: '#111111' }}>
                 {run.durationMin}
               </span>
               <span style={{ fontSize: '0.6rem', color: '#888' }}> 분</span>

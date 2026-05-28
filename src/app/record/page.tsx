@@ -46,7 +46,7 @@ export default async function RecordPage({
   }
 
   return (
-    <main style={{ minHeight: '100vh', background: '#F4F5F6' }}>
+    <main style={{ minHeight: '100vh', background: '#F7F7F5' }}>
       <div style={{
         display: 'flex', alignItems: 'center', justifyContent: 'space-between',
         padding: '52px 22px 20px',
@@ -57,10 +57,10 @@ export default async function RecordPage({
             width: '36px', height: '36px', borderRadius: '50%',
             background: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center',
             fontSize: '1rem', boxShadow: '0 1px 6px rgba(0,0,0,0.08)',
-            textDecoration: 'none', color: '#2d3031',
+            textDecoration: 'none', color: '#111111',
           }}
         >←</Link>
-        <div style={{ fontFamily: 'var(--font-raleway)', fontSize: '1rem', fontWeight: 700, color: '#2d3031' }}>
+        <div style={{ fontFamily: "'Pretendard Variable', Pretendard, -apple-system, sans-serif", fontSize: '1rem', fontWeight: 500, color: '#111111' }}>
           {edit ? '기록 수정하기' : '달리기 기록하기'}
         </div>
         <div style={{ width: '36px' }} />

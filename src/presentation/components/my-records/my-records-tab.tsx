@@ -47,23 +47,23 @@ export function MyRecordsTab({ runs, memberId: _memberId }: Props) {
     <div style={{ paddingBottom: 40 }}>
       {/* Stats summary card */}
       <div style={{
-        margin: '0 22px 16px', background: '#2d3031', borderRadius: 20,
+        margin: '0 22px 16px', background: '#111111', borderRadius: 20,
         padding: '20px 22px', display: 'flex', justifyContent: 'space-between', alignItems: 'center',
       }}>
         <div>
-          <div style={{ fontFamily: 'var(--font-raleway)', fontSize: '0.58rem', color: '#666', letterSpacing: '2px', textTransform: 'uppercase', marginBottom: 4 }}>
+          <div style={{ fontFamily: "'Pretendard Variable', Pretendard, -apple-system, sans-serif", fontSize: '0.58rem', color: '#666', letterSpacing: '2px', textTransform: 'uppercase', marginBottom: 4 }}>
             이번달
           </div>
-          <div style={{ fontFamily: 'var(--font-raleway)', fontSize: '2.2rem', fontWeight: 800, color: '#fff', lineHeight: 1 }}>
+          <div style={{ fontFamily: "'Pretendard Variable', Pretendard, -apple-system, sans-serif", fontSize: '2.2rem', fontWeight: 300, color: '#fff', lineHeight: 1 }}>
             {stats.monthlyCount}
             <span style={{ fontSize: '0.8rem', fontWeight: 400, color: '#888', marginLeft: 4 }}>회</span>
           </div>
         </div>
         <div style={{ textAlign: 'right' }}>
-          <div style={{ fontFamily: 'var(--font-raleway)', fontSize: '0.58rem', color: '#666', letterSpacing: '2px', textTransform: 'uppercase', marginBottom: 4 }}>
+          <div style={{ fontFamily: "'Pretendard Variable', Pretendard, -apple-system, sans-serif", fontSize: '0.58rem', color: '#666', letterSpacing: '2px', textTransform: 'uppercase', marginBottom: 4 }}>
             누적 시간
           </div>
-          <div style={{ fontFamily: 'var(--font-raleway)', fontSize: '2.2rem', fontWeight: 800, color: '#fff', lineHeight: 1 }}>
+          <div style={{ fontFamily: "'Pretendard Variable', Pretendard, -apple-system, sans-serif", fontSize: '2.2rem', fontWeight: 300, color: '#fff', lineHeight: 1 }}>
             {stats.totalHours}
             <span style={{ fontSize: '0.8rem', fontWeight: 400, color: '#888', marginLeft: 2 }}>h</span>
             {stats.remainMin > 0 && (
@@ -85,9 +85,9 @@ export function MyRecordsTab({ runs, memberId: _memberId }: Props) {
             onClick={() => setSubView(v)}
             style={{
               flex: 1, padding: '7px', textAlign: 'center',
-              fontFamily: 'var(--font-raleway)', fontSize: '0.65rem', fontWeight: 700,
+              fontFamily: "'Pretendard Variable', Pretendard, -apple-system, sans-serif", fontSize: '0.65rem', fontWeight: 500,
               color: subView === v ? '#fff' : '#888',
-              background: subView === v ? '#2d3031' : 'transparent',
+              background: subView === v ? '#111111' : 'transparent',
               borderRadius: 8, border: 'none', cursor: 'pointer',
               transition: 'all 0.2s',
             }}

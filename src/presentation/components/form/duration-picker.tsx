@@ -16,8 +16,8 @@ export function DurationPicker({ value, onChange }: Props) {
   const adj = (delta: number) => onChange(Math.max(1, value + delta))
 
   return (
-    <div style={{ background: '#2d3031', borderRadius: '20px', padding: '28px 24px', textAlign: 'center' }}>
-      <div style={{ fontFamily: 'var(--font-raleway)', fontSize: '0.6rem', fontWeight: 600, color: '#555', letterSpacing: '1.5px', textTransform: 'uppercase', marginBottom: '12px' }}>
+    <div style={{ background: '#111111', borderRadius: '20px', padding: '28px 24px', textAlign: 'center' }}>
+      <div style={{ fontFamily: "'Pretendard Variable', Pretendard, -apple-system, sans-serif", fontSize: '0.6rem', fontWeight: 600, color: '#555', letterSpacing: '1.5px', textTransform: 'uppercase', marginBottom: '12px' }}>
         Minutes — 제한 없음
       </div>
       <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'center', gap: '6px', marginBottom: '20px' }}>
@@ -26,7 +26,7 @@ export function DurationPicker({ value, onChange }: Props) {
           value={value}
           onChange={e => onChange(Math.max(1, parseInt(e.target.value, 10) || 1))}
           style={{
-            fontFamily: 'var(--font-raleway)', fontSize: '5rem', fontWeight: 800,
+            fontFamily: "'Pretendard Variable', Pretendard, -apple-system, sans-serif", fontSize: '5rem', fontWeight: 500,
             color: '#fff', lineHeight: 1, letterSpacing: '-3px',
             minWidth: '140px', textAlign: 'center',
             background: 'transparent', border: 'none', outline: 'none',
@@ -43,9 +43,9 @@ export function DurationPicker({ value, onChange }: Props) {
             style={{
               background: 'rgba(255,255,255,0.07)', border: 'none', borderRadius: '12px',
               padding: '12px 0',
-              fontFamily: 'var(--font-raleway)',
+              fontFamily: "'Pretendard Variable', Pretendard, -apple-system, sans-serif",
               fontSize: sm ? '0.78rem' : '0.85rem',
-              fontWeight: 700,
+              fontWeight: 500,
               color: sm ? '#888' : '#fff',
               cursor: 'pointer',
             }}

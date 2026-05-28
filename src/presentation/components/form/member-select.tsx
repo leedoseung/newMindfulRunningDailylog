@@ -14,8 +14,8 @@ export function MemberSelect({ members, value, onChange }: Props) {
         value={value}
         onChange={e => onChange(e.target.value)}
         style={{
-          fontFamily: 'var(--font-raleway)', fontSize: '0.92rem', fontWeight: 700,
-          color: value ? '#2d3031' : '#ccc',
+          fontFamily: "'Pretendard Variable', Pretendard, -apple-system, sans-serif", fontSize: '0.92rem', fontWeight: 500,
+          color: value ? '#111111' : '#ccc',
           border: 'none', background: 'transparent',
           width: '100%', outline: 'none', cursor: 'pointer',
         }}

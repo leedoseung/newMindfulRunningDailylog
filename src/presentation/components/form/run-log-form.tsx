@@ -28,7 +28,7 @@ type Props = {
 }
 
 const LABEL_STYLE: React.CSSProperties = {
-  fontFamily: 'var(--font-raleway)', fontSize: '0.6rem', fontWeight: 700,
+  fontFamily: "'Pretendard Variable', Pretendard, -apple-system, sans-serif", fontSize: '0.6rem', fontWeight: 500,
   color: '#888', letterSpacing: '1.8px', textTransform: 'uppercase', marginBottom: '10px',
 }
 
@@ -36,8 +36,8 @@ const SECTION_STYLE: React.CSSProperties = { padding: '0 22px 18px' }
 
 const TEXT_INPUT_STYLE: React.CSSProperties = {
   width: '100%', background: '#fff', border: 'none', borderRadius: '16px',
-  padding: '16px 18px', fontFamily: 'var(--font-roboto)', fontSize: '0.92rem',
-  color: '#2d3031', outline: 'none', boxShadow: '0 1px 6px rgba(0,0,0,0.05)',
+  padding: '16px 18px', fontFamily: "'Pretendard Variable', Pretendard, -apple-system, sans-serif", fontSize: '0.92rem',
+  color: '#111111', outline: 'none', boxShadow: '0 1px 6px rgba(0,0,0,0.05)',
   boxSizing: 'border-box',
 }
 
@@ -113,7 +113,7 @@ export function RunLogForm({ memberId, mode = 'create', recordId, initialData }:
             type="date"
             value={date}
             onChange={e => setDate(e.target.value)}
-            style={{ fontFamily: 'var(--font-raleway)', fontSize: '0.92rem', fontWeight: 700, color: '#2d3031', border: 'none', background: 'transparent', outline: 'none', width: '100%' }}
+            style={{ fontFamily: "'Pretendard Variable', Pretendard, -apple-system, sans-serif", fontSize: '0.92rem', fontWeight: 500, color: '#111111', border: 'none', background: 'transparent', outline: 'none', width: '100%' }}
           />
         </div>
       </div>
@@ -144,7 +144,7 @@ export function RunLogForm({ memberId, mode = 'create', recordId, initialData }:
           value={title}
           onChange={e => setTitle(e.target.value.slice(0, 40))}
           placeholder="달리기를 한 줄로 표현한다면?"
-          style={{ ...TEXT_INPUT_STYLE, fontFamily: 'var(--font-raleway)', fontWeight: 700 }}
+          style={{ ...TEXT_INPUT_STYLE, fontFamily: "'Pretendard Variable', Pretendard, -apple-system, sans-serif", fontWeight: 500 }}
         />
         <div style={{ textAlign: 'right', fontSize: '0.62rem', color: '#888', padding: '4px 4px 0' }}>
           {title.length} / 40
@@ -178,9 +178,9 @@ export function RunLogForm({ memberId, mode = 'create', recordId, initialData }:
           disabled={submitting}
           style={{
             width: '100%', padding: '16px',
-            background: submitting ? '#888' : '#2d3031',
+            background: submitting ? '#888' : '#111111',
             border: 'none', borderRadius: '16px',
-            fontFamily: 'var(--font-raleway)', fontSize: '0.9rem', fontWeight: 700,
+            fontFamily: "'Pretendard Variable', Pretendard, -apple-system, sans-serif", fontSize: '0.9rem', fontWeight: 500,
             color: '#fff', cursor: submitting ? 'not-allowed' : 'pointer',
             boxShadow: '0 6px 20px rgba(45,48,49,0.2)',
           }}

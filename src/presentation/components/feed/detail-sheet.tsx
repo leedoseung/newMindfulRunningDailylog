@@ -56,7 +56,7 @@ export function DetailSheet({ run, open, onClose }: Props) {
         transform: photoMode ? 'scale(1.06)' : 'scale(1)',
         transition: 'transform 0.5s cubic-bezier(0.32,0.72,0,1)',
       }
-    : { background: 'linear-gradient(170deg, #1a1c1d 0%, #2d3031 100%)' }
+    : { background: 'linear-gradient(170deg, #1a1c1d 0%, #111111 100%)' }
 
   const thoughts = [
     { step: '전', text: run.thoughtBefore },
@@ -122,7 +122,7 @@ export function DetailSheet({ run, open, onClose }: Props) {
                 background: 'rgba(255,255,255,0.14)', backdropFilter: 'blur(8px)',
                 border: '1px solid rgba(255,255,255,0.18)', borderRadius: 20,
                 padding: '5px 13px',
-                fontFamily: 'var(--font-raleway)', fontSize: '0.58rem', fontWeight: 700,
+                fontFamily: "'Pretendard Variable', Pretendard, -apple-system, sans-serif", fontSize: '0.58rem', fontWeight: 500,
                 color: 'rgba(255,255,255,0.82)', cursor: 'pointer',
               }}
             >{photoMode ? '텍스트 보기' : '사진 보기'}</button>
@@ -149,14 +149,14 @@ export function DetailSheet({ run, open, onClose }: Props) {
           }} />
 
           <div style={{
-            fontFamily: 'var(--font-raleway)', fontSize: '0.56rem', fontWeight: 600,
+            fontFamily: "'Pretendard Variable', Pretendard, -apple-system, sans-serif", fontSize: '0.56rem', fontWeight: 600,
             color: 'rgba(255,255,255,0.35)', letterSpacing: '1.5px', textTransform: 'uppercase',
             marginBottom: 5,
           }}>달린 시간</div>
 
           <div style={{ display: 'flex', alignItems: 'baseline', gap: 4 }}>
             <span style={{
-              fontFamily: 'var(--font-raleway)', fontSize: '4.2rem', fontWeight: 800,
+              fontFamily: "'Pretendard Variable', Pretendard, -apple-system, sans-serif", fontSize: '4.2rem', fontWeight: 300,
               color: '#fff', lineHeight: 1, letterSpacing: '-2px',
             }}>{count}</span>
             <span style={{ fontSize: '0.95rem', fontWeight: 300, color: 'rgba(255,255,255,0.35)' }}>분</span>
@@ -181,7 +181,7 @@ export function DetailSheet({ run, open, onClose }: Props) {
             </div>
             {run.title && (
               <div style={{
-                fontFamily: 'var(--font-raleway)', fontSize: '1.1rem', fontWeight: 700,
+                fontFamily: "'Pretendard Variable', Pretendard, -apple-system, sans-serif", fontSize: '1.1rem', fontWeight: 500,
                 color: '#fff', lineHeight: 1.3, marginBottom: 16,
               }}>{run.title}</div>
             )}
@@ -189,7 +189,7 @@ export function DetailSheet({ run, open, onClose }: Props) {
             {thoughts.length > 0 && (
               <>
                 <div style={{
-                  fontFamily: 'var(--font-raleway)', fontSize: '0.54rem', fontWeight: 600,
+                  fontFamily: "'Pretendard Variable', Pretendard, -apple-system, sans-serif", fontSize: '0.54rem', fontWeight: 600,
                   color: 'rgba(255,255,255,0.18)', letterSpacing: '2px', textTransform: 'uppercase',
                   marginBottom: 12,
                 }}>Before · During · After</div>
@@ -220,7 +220,7 @@ export function DetailSheet({ run, open, onClose }: Props) {
               style={{
                 display: 'block', width: '100%', marginTop: 16, padding: 13,
                 background: 'rgba(255,255,255,0.07)', border: 'none', borderRadius: 12,
-                fontFamily: 'var(--font-raleway)', fontSize: '0.74rem', fontWeight: 600,
+                fontFamily: "'Pretendard Variable', Pretendard, -apple-system, sans-serif", fontSize: '0.74rem', fontWeight: 600,
                 color: 'rgba(255,255,255,0.25)', cursor: 'pointer',
               }}
             >텍스트 닫고 사진 보기</button>
@@ -234,7 +234,7 @@ export function DetailSheet({ run, open, onClose }: Props) {
             background: 'rgba(0,0,0,0.4)', backdropFilter: 'blur(8px)',
             border: '1px solid rgba(255,255,255,0.1)', borderRadius: 20,
             padding: '7px 16px',
-            fontFamily: 'var(--font-raleway)', fontSize: '0.58rem', fontWeight: 600,
+            fontFamily: "'Pretendard Variable', Pretendard, -apple-system, sans-serif", fontSize: '0.58rem', fontWeight: 600,
             color: 'rgba(255,255,255,0.5)', whiteSpace: 'nowrap',
             opacity: photoMode ? 1 : 0, transition: 'opacity 0.3s',
             pointerEvents: 'none', zIndex: 5,

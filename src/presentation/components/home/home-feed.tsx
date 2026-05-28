@@ -50,31 +50,31 @@ function CrewStrip({ crew, todayCount }: { crew: CrewMember[]; todayCount: numbe
             <div style={{
               width: 52, height: 52, borderRadius: '50%', padding: 2.5,
               background: m.ranToday
-                ? 'linear-gradient(135deg, #2E91FC, #6dd5fa)'
+                ? 'linear-gradient(135deg, #111111, #6dd5fa)'
                 : '#ddd',
             }}>
               <div style={{
                 width: '100%', height: '100%', borderRadius: '50%',
-                background: m.ranToday ? '#2d3031' : '#bbb',
-                border: '2px solid #F0F1F2',
+                background: m.ranToday ? '#111111' : '#bbb',
+                border: '2px solid #F7F7F5',
                 display: 'flex', alignItems: 'center', justifyContent: 'center',
-                fontFamily: 'var(--font-raleway)', fontSize: '0.85rem',
-                fontWeight: 800, color: '#fff',
+                fontFamily: "'Pretendard Variable', Pretendard, -apple-system, sans-serif", fontSize: '0.85rem',
+                fontWeight: 500, color: '#fff',
               }}>
                 {m.memberName[0]}
               </div>
             </div>
             <div style={{
               fontSize: '0.55rem', fontWeight: 500,
-              color: m.ranToday ? '#2d3031' : '#bbb',
+              color: m.ranToday ? '#111111' : '#bbb',
               maxWidth: 48, textAlign: 'center',
               whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',
             }}>
               {m.memberName}
             </div>
             <div style={{
-              fontFamily: 'var(--font-raleway)', fontSize: '0.58rem', fontWeight: 700,
-              color: m.ranToday ? '#2E91FC' : '#ddd',
+              fontFamily: "'Pretendard Variable', Pretendard, -apple-system, sans-serif", fontSize: '0.58rem', fontWeight: 500,
+              color: m.ranToday ? '#111111' : '#ddd',
             }}>
               {m.ranToday ? `${m.todayMinutes}분` : '–'}
             </div>
@@ -112,8 +112,8 @@ export function HomeFeed({ recentRuns, myRuns, memberId, crew, weeklyBars }: Pro
             onClick={() => setTab(t.key)}
             style={{
               flex: 1, textAlign: 'center', padding: '7px',
-              fontFamily: 'var(--font-raleway)', fontSize: '0.65rem', fontWeight: 700,
-              color: tab === t.key ? '#2d3031' : '#888',
+              fontFamily: "'Pretendard Variable', Pretendard, -apple-system, sans-serif", fontSize: '0.65rem', fontWeight: 500,
+              color: tab === t.key ? '#111111' : '#888',
               background: tab === t.key ? '#fff' : 'transparent',
               borderRadius: '8px', border: 'none', cursor: 'pointer',
               transition: 'all 0.2s',

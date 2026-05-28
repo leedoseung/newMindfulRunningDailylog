@@ -27,7 +27,7 @@ export function ThoughtInputs({ before, during, after, onChange }: Props) {
           >
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '10px' }}>
               <div style={{ width: '8px', height: '8px', borderRadius: '50%', background: c.dot, flexShrink: 0 }} />
-              <div style={{ fontFamily: 'var(--font-raleway)', fontSize: '0.72rem', fontWeight: 700, color: '#2d3031' }}>
+              <div style={{ fontFamily: "'Pretendard Variable', Pretendard, -apple-system, sans-serif", fontSize: '0.72rem', fontWeight: 500, color: '#111111' }}>
                 {c.label}
               </div>
             </div>
@@ -38,7 +38,7 @@ export function ThoughtInputs({ before, during, after, onChange }: Props) {
               rows={2}
               style={{
                 width: '100%', border: 'none', outline: 'none',
-                fontFamily: 'var(--font-roboto)', fontSize: '0.82rem', color: '#333',
+                fontFamily: "'Pretendard Variable', Pretendard, -apple-system, sans-serif", fontSize: '0.82rem', color: '#333',
                 lineHeight: 1.6, resize: 'none', background: 'transparent',
                 boxSizing: 'border-box',
               }}

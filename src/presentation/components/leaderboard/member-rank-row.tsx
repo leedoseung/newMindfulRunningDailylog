@@ -3,41 +3,82 @@ import type { MemberStats } from '@/domain/entities/member'
 type Props = {
   stats: MemberStats
   rank: number
+  statValue: string
+  statUnit: string
+  statSub: string
   onTodayRun: (memberId: string, memberName: string) => void
   onDiary: (memberId: string, memberName: string) => void
 }
 
-export function MemberRankRow({ stats, rank, onTodayRun, onDiary }: Props) {
-  const rankStyle =
-    rank === 1
-      ? 'text-yellow-400'
-      : rank === 2
-      ? 'text-gray-300'
-      : rank === 3
-      ? 'text-amber-600'
-      : 'text-white/30'
+function getAvatarBg(rank: number): string {
+  if (rank === 1) return '#111111'
+  if (rank === 2) return '#555555'
+  if (rank === 3) return '#777777'
+  return '#999999'
+}
 
+export function MemberRankRow({ stats, rank, statValue, statUnit, statSub, onTodayRun, onDiary }: Props) {
   return (
-    <div className="flex items-center gap-3 px-4 py-3 border-b border-white/5">
-      <span className={`w-6 text-center font-display font-bold text-sm ${rankStyle}`}>
+    <div
+      style={{
+        display: 'flex',
+        alignItems: 'center',
+        gap: '12px',
+        background: '#ffffff',
+        borderRadius: '16px',
+        padding: '14px 16px',
+        boxShadow: '0 1px 6px rgba(0,0,0,0.04)',
+        margin: '0 22px 8px',
+        transition: 'transform 0.15s',
+      }}
+    >
+      <span style={{
+        fontFamily: "'Pretendard Variable', Pretendard, -apple-system, sans-serif", fontSize: '0.9rem', fontWeight: 500,
+        color: '#888', minWidth: '20px', textAlign: 'center',
+      }}>
         {rank}
       </span>
-      <button
-        type="button"
-        className="flex-1 text-left text-sm text-white font-medium hover:text-accent transition-colors"
-        onClick={() => onDiary(stats.id, stats.name)}
-      >
-        {stats.name}
-      </button>
-      <div className="text-right mr-3">
-        <div className="text-lg font-bold font-display text-white leading-none">
-          {stats.totalCount}
+      <div style={{
+        width: '36px', height: '36px', borderRadius: '50%',
+        background: getAvatarBg(rank),
+        display: 'flex', alignItems: 'center', justifyContent: 'center',
+        fontFamily: "'Pretendard Variable', Pretendard, -apple-system, sans-serif", fontSize: '0.75rem', fontWeight: 500, color: '#fff',
+        flexShrink: 0,
+      }}>
+        {stats.name.charAt(0)}
+      </div>
+      <div style={{ flex: 1 }}>
+        <button
+          type="button"
+          style={{
+            fontFamily: "'Pretendard Variable', Pretendard, -apple-system, sans-serif", fontSize: '0.83rem', fontWeight: 500,
+            color: '#111111', background: 'none', border: 'none', cursor: 'pointer',
+            padding: 0, textAlign: 'left',
+          }}
+          onClick={() => onDiary(stats.id, stats.name)}
+        >
+          {stats.name}
+        </button>
+        <div style={{ fontSize: '0.62rem', color: '#888', marginTop: '1px' }}>
+          {statSub}
         </div>
-        <div className="text-xs text-white/30">총 {stats.totalMinutes}분</div>
+      </div>
+      <div style={{ textAlign: 'right' }}>
+        <div style={{ fontFamily: "'Pretendard Variable', Pretendard, -apple-system, sans-serif", fontSize: '1rem', fontWeight: 500, color: '#111111', lineHeight: 1 }}>
+          {statValue}<span style={{ fontSize: '0.6rem', color: '#888' }}>{statUnit}</span>
+        </div>
       </div>
       <button
         type="button"
-        className="text-xs px-3 py-1.5 rounded-full bg-accent/10 text-accent hover:bg-accent/20 transition-colors"
+        style={{
+          fontSize: '0.65rem', fontWeight: 500,
+          padding: '5px 10px', borderRadius: '20px',
+          background: 'rgba(46,145,252,0.08)',
+          color: '#111111',
+          border: '1px solid rgba(46,145,252,0.2)',
+          cursor: 'pointer',
+          whiteSpace: 'nowrap',
+        }}
         onClick={() => onTodayRun(stats.id, stats.name)}
       >
         오늘의 러닝

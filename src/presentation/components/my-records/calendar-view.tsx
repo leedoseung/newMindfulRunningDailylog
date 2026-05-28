@@ -74,7 +74,7 @@ export function CalendarView({ runs }: Props) {
           fontSize: '1.4rem', color: '#888', lineHeight: 1, padding: '2px 6px',
         }}>‹</button>
         <div style={{
-          fontFamily: 'var(--font-raleway)', fontSize: '0.9rem', fontWeight: 700, color: '#2d3031',
+          fontFamily: "'Pretendard Variable', Pretendard, -apple-system, sans-serif", fontSize: '0.9rem', fontWeight: 500, color: '#111111',
         }}>
           {viewYear}년 {viewMonth + 1}월
         </div>
@@ -91,7 +91,7 @@ export function CalendarView({ runs }: Props) {
           {DAY_LABELS.map((d, i) => (
             <div key={d} style={{
               textAlign: 'center', fontSize: '0.58rem', fontWeight: 600,
-              color: i === 0 ? '#FC5252' : i === 6 ? '#2E91FC' : '#aaa',
+              color: i === 0 ? '#FC5252' : i === 6 ? '#111111' : '#aaa',
               paddingBottom: 4,
             }}>{d}</div>
           ))}
@@ -120,18 +120,18 @@ export function CalendarView({ runs }: Props) {
                 <div style={{
                   width: 30, height: 30, borderRadius: '50%',
                   display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  fontFamily: 'var(--font-raleway)', fontSize: '0.78rem',
+                  fontFamily: "'Pretendard Variable', Pretendard, -apple-system, sans-serif", fontSize: '0.78rem',
                   fontWeight: isTdy ? 700 : 400,
-                  background: isSel ? '#2d3031' : isTdy ? '#f0f0f0' : 'transparent',
+                  background: isSel ? '#111111' : isTdy ? '#f0f0f0' : 'transparent',
                   color: isSel ? '#fff'
                     : col === 0 ? '#FC5252'
-                    : col === 6 ? '#2E91FC'
-                    : '#2d3031',
+                    : col === 6 ? '#111111'
+                    : '#111111',
                   transition: 'background 0.15s',
                 }}>{day}</div>
                 <div style={{
                   width: 4, height: 4, borderRadius: '50%', marginTop: 2,
-                  background: hasRun ? (isSel ? '#2E91FC' : '#2E91FC') : 'transparent',
+                  background: hasRun ? (isSel ? '#111111' : '#111111') : 'transparent',
                   opacity: hasRun ? 1 : 0,
                 }} />
               </div>
@@ -145,7 +145,7 @@ export function CalendarView({ runs }: Props) {
         <div>
           <div style={{
             padding: '0 22px 12px',
-            fontFamily: 'var(--font-raleway)', fontSize: '0.65rem', fontWeight: 700,
+            fontFamily: "'Pretendard Variable', Pretendard, -apple-system, sans-serif", fontSize: '0.65rem', fontWeight: 500,
             color: '#888', letterSpacing: '1.5px', textTransform: 'uppercase',
           }}>
             {selected} 기록

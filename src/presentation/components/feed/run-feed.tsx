@@ -19,19 +19,19 @@ function CommunityPulseCard({ weeklyBars, runs }: { weeklyBars: WeeklyBar[]; run
 
   return (
     <div style={{
-      background: 'linear-gradient(135deg, #2E91FC 0%, #1a6fd8 100%)',
+      background: 'linear-gradient(135deg, #111111 0%, #1a6fd8 100%)',
       borderRadius: 22, padding: '18px 18px',
       boxShadow: '0 6px 20px rgba(46,145,252,0.3)',
     }}>
       <div style={{
-        fontSize: '0.6rem', fontWeight: 700,
+        fontSize: '0.6rem', fontWeight: 500,
         color: 'rgba(255,255,255,0.6)', letterSpacing: '1.5px',
         textTransform: 'uppercase', marginBottom: 8,
       }}>이번 주 크루 현황</div>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end' }}>
         <div>
           <div style={{
-            fontFamily: 'var(--font-raleway)', fontSize: '2rem', fontWeight: 900,
+            fontFamily: "'Pretendard Variable', Pretendard, -apple-system, sans-serif", fontSize: '2rem', fontWeight: 900,
             color: '#fff', lineHeight: 1, letterSpacing: '-1px',
           }}>
             {totalThisWeek}
@@ -43,7 +43,7 @@ function CommunityPulseCard({ weeklyBars, runs }: { weeklyBars: WeeklyBar[]; run
         </div>
         <div style={{ textAlign: 'right' }}>
           <div style={{
-            fontFamily: 'var(--font-raleway)', fontSize: '1.3rem', fontWeight: 800, color: '#fff',
+            fontFamily: "'Pretendard Variable', Pretendard, -apple-system, sans-serif", fontSize: '1.3rem', fontWeight: 500, color: '#fff',
           }}>
             {totalHours}
             <span style={{ fontSize: '0.75rem', fontWeight: 400, color: 'rgba(255,255,255,0.5)', marginLeft: 2 }}>h</span>

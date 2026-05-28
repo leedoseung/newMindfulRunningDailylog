@@ -54,7 +54,7 @@ export function PhotoUpload({ file, onChange }: Props) {
               position: 'absolute', top: '8px', right: '8px',
               width: '28px', height: '28px', borderRadius: '50%',
               border: 'none', background: 'rgba(0,0,0,0.5)', color: '#fff',
-              fontSize: '1rem', fontWeight: 700, cursor: 'pointer',
+              fontSize: '1rem', fontWeight: 500, cursor: 'pointer',
               display: 'flex', alignItems: 'center', justifyContent: 'center',
             }}
           >×</button>
@@ -62,7 +62,7 @@ export function PhotoUpload({ file, onChange }: Props) {
       ) : (
         <div style={{ padding: '28px 16px', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px' }}>
           <div style={{ fontSize: '1.8rem', marginBottom: '4px', opacity: 0.6 }}>📷</div>
-          <div style={{ fontFamily: 'var(--font-raleway)', fontSize: '0.82rem', fontWeight: 700, color: '#2d3031' }}>사진 추가</div>
+          <div style={{ fontFamily: "'Pretendard Variable', Pretendard, -apple-system, sans-serif", fontSize: '0.82rem', fontWeight: 500, color: '#111111' }}>사진 추가</div>
           <div style={{ fontSize: '0.62rem', color: '#888' }}>탭해서 갤러리에서 선택</div>
         </div>
       )}

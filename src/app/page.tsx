@@ -56,7 +56,7 @@ export default async function HomePage() {
   const memberName = myRuns[0]?.memberName ?? ''
 
   return (
-    <main style={{ minHeight: '100vh', background: '#F0F1F2', position: 'relative' }}>
+    <main style={{ minHeight: '100vh', background: '#F7F7F5', position: 'relative' }}>
       {/* Sticky header */}
       <div style={{
         display: 'flex', alignItems: 'center', justifyContent: 'space-between',
@@ -65,7 +65,7 @@ export default async function HomePage() {
         position: 'sticky', top: 0, zIndex: 10,
       }}>
         <div style={{
-          fontFamily: 'var(--font-raleway)', fontSize: '0.65rem', fontWeight: 700,
+          fontFamily: "'Pretendard Variable', Pretendard, -apple-system, sans-serif", fontSize: '0.65rem', fontWeight: 500,
           color: '#999', letterSpacing: '2.5px', textTransform: 'uppercase',
         }}>
           Mindful Running
@@ -73,9 +73,9 @@ export default async function HomePage() {
         <Link
           href="/profile"
           style={{
-            width: 34, height: 34, borderRadius: '50%', background: '#2d3031',
+            width: 34, height: 34, borderRadius: '50%', background: '#111111',
             display: 'flex', alignItems: 'center', justifyContent: 'center',
-            color: '#fff', fontFamily: 'var(--font-raleway)', fontSize: '0.78rem', fontWeight: 700,
+            color: '#fff', fontFamily: "'Pretendard Variable', Pretendard, -apple-system, sans-serif", fontSize: '0.78rem', fontWeight: 500,
             textDecoration: 'none', flexShrink: 0,
           }}
         >

@@ -44,11 +44,11 @@ export function LoginForm({ error }: Props) {
   return (
     <div style={{
       position: 'relative', width: '100%', minHeight: '100vh',
-      background: 'linear-gradient(-45deg, #0f1923, #1e3a5f, #2E91FC, #162d4a, #0f1923)',
+      background: 'linear-gradient(-45deg, #0f1923, #1e3a5f, #111111, #162d4a, #0f1923)',
       backgroundSize: '400% 400%',
       animation: 'gradientShift 8s ease infinite',
       display: 'flex', flexDirection: 'column', alignItems: 'center',
-      fontFamily: 'var(--font-raleway)',
+      fontFamily: "'Pretendard Variable', Pretendard, -apple-system, sans-serif",
     }}>
       <style>{`
         @keyframes gradientShift {
@@ -73,7 +73,7 @@ export function LoginForm({ error }: Props) {
         padding: '80px 32px 40px',
       }}>
         <div style={{
-          fontSize: '0.56rem', fontWeight: 700, letterSpacing: '3.5px',
+          fontSize: '0.56rem', fontWeight: 500, letterSpacing: '3.5px',
           textTransform: 'uppercase', color: 'rgba(255,255,255,0.4)',
           marginBottom: '22px',
         }}>
@@ -96,7 +96,7 @@ export function LoginForm({ error }: Props) {
           lineHeight: 1.8, maxWidth: '255px',
         }}>
           "할 수 있는 달리기를 하다보면<br />
-          <strong style={{ fontStyle: 'normal', fontWeight: 700, color: '#fff' }}>
+          <strong style={{ fontStyle: 'normal', fontWeight: 500, color: '#fff' }}>
             할 수 없는 달리기를
           </strong>
           <br />하게된다"
@@ -196,7 +196,7 @@ export function LoginForm({ error }: Props) {
                 style={{
                   flex: 1, background: 'transparent', border: 'none',
                   borderBottom: '1.5px solid rgba(255,255,255,0.3)',
-                  outline: 'none', fontFamily: 'var(--font-roboto)',
+                  outline: 'none', fontFamily: "'Pretendard Variable', Pretendard, -apple-system, sans-serif",
                   fontSize: '0.88rem', color: '#fff', padding: '6px 0',
                 }}
               />
@@ -204,9 +204,9 @@ export function LoginForm({ error }: Props) {
                 type="submit"
                 disabled={loading}
                 style={{
-                  background: '#fff', color: '#2d3031', border: 'none',
+                  background: '#fff', color: '#111111', border: 'none',
                   borderRadius: '10px', padding: '9px 14px',
-                  fontFamily: 'var(--font-raleway)', fontSize: '0.7rem', fontWeight: 700,
+                  fontFamily: "'Pretendard Variable', Pretendard, -apple-system, sans-serif", fontSize: '0.7rem', fontWeight: 500,
                   cursor: loading ? 'not-allowed' : 'pointer', whiteSpace: 'nowrap',
                 }}
               >

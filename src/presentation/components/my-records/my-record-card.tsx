@@ -31,7 +31,7 @@ export function MyRecordCard({ run, deleting, onEdit, onDelete }: Props) {
           <div style={{ fontSize: '0.65rem', color: '#888', marginBottom: '4px' }}>
             {formatDate(run.date)} · {run.location || '장소 미입력'} · {run.durationMin}분
           </div>
-          <div style={{ fontFamily: 'var(--font-raleway)', fontSize: '0.88rem', fontWeight: 700, color: '#2d3031' }}>
+          <div style={{ fontFamily: "'Pretendard Variable', Pretendard, -apple-system, sans-serif", fontSize: '0.88rem', fontWeight: 500, color: '#111111' }}>
             {run.title || '제목 없음'}
           </div>
         </div>
@@ -59,7 +59,7 @@ export function MyRecordCard({ run, deleting, onEdit, onDelete }: Props) {
           <button
             type="button"
             onClick={() => { setMenuOpen(false); onEdit() }}
-            style={{ display: 'block', width: '100%', padding: '12px 18px', textAlign: 'left', border: 'none', background: 'none', fontSize: '0.82rem', color: '#2d3031', cursor: 'pointer' }}
+            style={{ display: 'block', width: '100%', padding: '12px 18px', textAlign: 'left', border: 'none', background: 'none', fontSize: '0.82rem', color: '#111111', cursor: 'pointer' }}
           >
             수정
           </button>

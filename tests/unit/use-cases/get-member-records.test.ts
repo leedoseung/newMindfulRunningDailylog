@@ -23,6 +23,7 @@ describe('GetMemberRecordsUseCase', () => {
     const mockRepo: IRunLogRepository = {
       getRecentRuns: vi.fn(),
       getByMemberId: vi.fn().mockResolvedValue([makeRun('r1')]),
+      save: vi.fn(),
     }
     const useCase = new GetMemberRecordsUseCase(mockRepo)
     await useCase.execute('mem-1')
@@ -34,6 +35,7 @@ describe('GetMemberRecordsUseCase', () => {
     const mockRepo: IRunLogRepository = {
       getRecentRuns: vi.fn(),
       getByMemberId: vi.fn().mockResolvedValue(runs),
+      save: vi.fn(),
     }
     const useCase = new GetMemberRecordsUseCase(mockRepo)
     const result = await useCase.execute('mem-1')

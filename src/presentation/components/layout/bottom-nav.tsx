@@ -27,7 +27,7 @@ export function BottomNav() {
           style={{
             position: 'fixed', bottom: '78px', right: '20px',
             width: '50px', height: '50px', borderRadius: '50%',
-            background: '#2E91FC', color: '#fff',
+            background: '#111111', color: '#fff',
             display: 'flex', alignItems: 'center', justifyContent: 'center',
             fontSize: '1.5rem', textDecoration: 'none',
             boxShadow: '0 6px 20px rgba(46,145,252,0.4)',
@@ -53,7 +53,7 @@ export function BottomNav() {
               style={{
                 display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '2px',
                 fontSize: '0.57rem', fontWeight: 500,
-                color: active ? '#2d3031' : '#C0C0C0',
+                color: active ? '#111111' : '#C0C0C0',
                 textDecoration: 'none', transition: 'color 0.15s',
               }}
             >

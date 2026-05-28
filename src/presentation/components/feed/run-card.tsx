@@ -19,7 +19,7 @@ function timeAgo(dateStr: string): string {
 
 const THEME = {
   hero: {
-    card: '#2d3031', name: '#fff', time: '#555',
+    card: '#111111', name: '#fff', time: '#555',
     badge: 'rgba(255,255,255,0.1)', badgeText: '#fff',
     quote: '#fff', snippet: '#555',
     divider: 'rgba(255,255,255,0.07)',
@@ -35,12 +35,12 @@ const THEME = {
     av: 'rgba(255,255,255,0.18)',
   },
   white: {
-    card: '#fff', name: '#2d3031', time: '#999',
-    badge: 'rgba(46,145,252,0.08)', badgeText: '#2E91FC',
-    quote: '#2d3031', snippet: '#777',
+    card: '#fff', name: '#111111', time: '#999',
+    badge: 'rgba(46,145,252,0.08)', badgeText: '#111111',
+    quote: '#111111', snippet: '#777',
     divider: 'rgba(0,0,0,0.05)',
-    chip: '#F0F1F2', chipText: '#666',
-    av: '#2d3031',
+    chip: '#F7F7F5', chipText: '#666',
+    av: '#111111',
   },
 }
 
@@ -60,13 +60,13 @@ export function RunCard({ run, cardType, onClick }: Props) {
         <div style={{
           width: 32, height: 32, borderRadius: '50%', background: t.av,
           display: 'flex', alignItems: 'center', justifyContent: 'center',
-          fontFamily: 'var(--font-raleway)', fontSize: '0.72rem', fontWeight: 800,
+          fontFamily: "'Pretendard Variable', Pretendard, -apple-system, sans-serif", fontSize: '0.72rem', fontWeight: 500,
           color: '#fff', flexShrink: 0,
         }}>
           {run.memberName[0]}
         </div>
         <div style={{ flex: 1 }}>
-          <div style={{ fontFamily: 'var(--font-raleway)', fontSize: '0.78rem', fontWeight: 700, color: t.name }}>
+          <div style={{ fontFamily: "'Pretendard Variable', Pretendard, -apple-system, sans-serif", fontSize: '0.78rem', fontWeight: 500, color: t.name }}>
             {run.memberName}
           </div>
           <div style={{ fontSize: '0.6rem', color: t.time, marginTop: 1 }}>
@@ -74,7 +74,7 @@ export function RunCard({ run, cardType, onClick }: Props) {
           </div>
         </div>
         <div style={{
-          fontFamily: 'var(--font-raleway)', fontSize: '0.72rem', fontWeight: 800,
+          fontFamily: "'Pretendard Variable', Pretendard, -apple-system, sans-serif", fontSize: '0.72rem', fontWeight: 500,
           color: t.badgeText, background: t.badge,
           padding: '4px 10px', borderRadius: 20, flexShrink: 0,
         }}>
@@ -86,7 +86,7 @@ export function RunCard({ run, cardType, onClick }: Props) {
       {isHero && (
         <div style={{ display: 'flex', alignItems: 'baseline', gap: 4, padding: '4px 16px 0' }}>
           <span style={{
-            fontFamily: 'var(--font-raleway)', fontSize: '4.5rem', fontWeight: 900,
+            fontFamily: "'Pretendard Variable', Pretendard, -apple-system, sans-serif", fontSize: '4.5rem', fontWeight: 300,
             color: '#fff', lineHeight: 1, letterSpacing: '-3px',
           }}>
             {run.durationMin}
@@ -99,7 +99,7 @@ export function RunCard({ run, cardType, onClick }: Props) {
       <div style={{ padding: isHero ? '6px 16px 14px' : '12px 16px 14px' }}>
         {run.title && (
           <div style={{
-            fontFamily: 'var(--font-raleway)', fontSize: '1.05rem', fontWeight: 700,
+            fontFamily: "'Pretendard Variable', Pretendard, -apple-system, sans-serif", fontSize: '1.05rem', fontWeight: 500,
             color: t.quote, lineHeight: 1.45, wordBreak: 'keep-all',
           }}>
             "{run.title}"

@@ -20,20 +20,27 @@ const makeRun = (overrides: Partial<RunLog> = {}): RunLog => ({
 
 describe('RunCard', () => {
   it('renders member name and duration', () => {
-    render(<RunCard run={makeRun()} onClick={() => {}} />)
+    render(<RunCard run={makeRun()} cardType="hero" onClick={() => {}} />)
     expect(screen.getByText('이두승')).toBeInTheDocument()
-    expect(screen.getByText('45분')).toBeInTheDocument()
+    expect(screen.getAllByText('45')[0]).toBeInTheDocument()
+    expect(screen.getAllByText('분')[0]).toBeInTheDocument()
   })
 
-  it('renders photo background when photoUrl is present', () => {
+  it('renders photo background image div when photoUrl is present', () => {
     const run = makeRun({ photoUrl: 'https://example.com/photo.jpg' })
-    const { container } = render(<RunCard run={run} onClick={() => {}} />)
-    const card = container.firstChild as HTMLElement
-    expect(card.style.backgroundImage).toContain('example.com/photo.jpg')
+    const { container } = render(<RunCard run={run} cardType="photo" onClick={() => {}} />)
+    const photoBg = container.querySelector('[style*="example.com/photo.jpg"]')
+    expect(photoBg).toBeInTheDocument()
   })
 
   it('renders title text', () => {
-    render(<RunCard run={makeRun()} onClick={() => {}} />)
-    expect(screen.getByText('남산 달리기')).toBeInTheDocument()
+    render(<RunCard run={makeRun()} cardType="white" onClick={() => {}} />)
+    expect(screen.getByText(/"남산 달리기"/)).toBeInTheDocument()
+  })
+
+  it('renders time-ago label', () => {
+    render(<RunCard run={makeRun()} cardType="white" onClick={() => {}} />)
+    // date is in the past, so should show X일 전 or 어제/오늘
+    expect(screen.getByText(/일 전|어제|오늘/)).toBeInTheDocument()
   })
 })

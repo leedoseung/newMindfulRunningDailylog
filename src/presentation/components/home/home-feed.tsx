@@ -78,12 +78,6 @@ function CrewStrip({ crew, todayCount, onCrewClick }: { crew: CrewMember[]; toda
             }}>
               {m.memberName}
             </div>
-            <div style={{
-              fontFamily: "'Pretendard Variable', Pretendard, -apple-system, sans-serif", fontSize: '0.58rem', fontWeight: 500,
-              color: m.ranToday ? '#111111' : '#ddd',
-            }}>
-              {m.ranToday ? `${m.todayMinutes}분` : '–'}
-            </div>
           </div>
         ))}
       </div>

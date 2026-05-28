@@ -49,19 +49,15 @@ function CrewStrip({ crew, todayCount }: { crew: CrewMember[]; todayCount: numbe
             display: 'flex', flexDirection: 'column',
             alignItems: 'center', gap: 5, flexShrink: 0,
           }}>
-            <div style={{
-              width: 52, height: 52, borderRadius: '50%', padding: 2.5,
-              background: m.ranToday ? 'linear-gradient(135deg, #111111, #555)' : '#ddd',
-              flexShrink: 0, overflow: 'hidden',
-            }}>
-              <AvatarImage
-                name={m.memberName}
-                avatarUrl={m.avatarUrl}
-                size={43}
-                bg={m.ranToday ? '#111' : '#bbb'}
-                style={{ border: '2px solid #F7F7F5' }}
-              />
-            </div>
+            <AvatarImage
+              name={m.memberName}
+              avatarUrl={m.avatarUrl}
+              size={46}
+              bg={m.ranToday ? '#111' : '#CCC'}
+              style={m.ranToday ? {
+                boxShadow: '0 0 0 2px #F7F7F5, 0 0 0 4px #111111',
+              } : undefined}
+            />
             <div style={{
               fontSize: '0.55rem', fontWeight: 500,
               color: m.ranToday ? '#111111' : '#bbb',

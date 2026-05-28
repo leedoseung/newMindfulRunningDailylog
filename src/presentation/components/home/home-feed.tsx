@@ -38,17 +38,31 @@ type Props = {
 function MiniBarChart({ bars }: { bars: WeeklyBar[] }) {
   const maxCount = Math.max(...bars.map(b => b.count), 1)
   return (
-    <div style={{ display: 'flex', alignItems: 'flex-end', gap: 3, height: 32, paddingBottom: 2 }}>
-      {bars.map(bar => (
-        <div key={bar.label} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 3, height: '100%', justifyContent: 'flex-end' }}>
-          <div style={{
-            width: 10, borderRadius: '3px 3px 0 0',
-            height: bar.count > 0 ? `${Math.max((bar.count / maxCount) * 100, 18)}%` : 3,
-            background: bar.isToday ? '#111' : '#e0e0e0',
-            transition: 'height 0.4s',
-          }} />
-        </div>
-      ))}
+    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'stretch', gap: 4 }}>
+      <div style={{ display: 'flex', alignItems: 'flex-end', gap: 3, height: 32 }}>
+        {bars.map(bar => (
+          <div key={bar.label} style={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'flex-end', height: '100%' }}>
+            <div style={{
+              borderRadius: '3px 3px 0 0',
+              height: bar.count > 0 ? `${Math.max((bar.count / maxCount) * 100, 18)}%` : 3,
+              background: bar.isToday ? '#111' : '#e0e0e0',
+              transition: 'height 0.4s',
+            }} />
+          </div>
+        ))}
+      </div>
+      <div style={{ display: 'flex', gap: 3 }}>
+        {bars.map(bar => (
+          <div key={bar.label} style={{
+            flex: 1, textAlign: 'center',
+            fontFamily: FONT, fontSize: '0.42rem',
+            color: bar.isToday ? '#111' : '#ccc',
+            fontWeight: bar.isToday ? 700 : 400,
+          }}>
+            {bar.label}
+          </div>
+        ))}
+      </div>
     </div>
   )
 }

@@ -2,7 +2,6 @@
 
 import { useEffect, useRef, useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { toPng } from 'html-to-image'
 import { ShareCard } from './share-card'
 import type { RunLog } from '@/domain/entities/run-log'
 
@@ -105,6 +104,7 @@ ${run.thoughtAfter}`
     if (!shareCardRef.current || !run) return
     setSaving(true)
     try {
+      const { toPng } = await import('html-to-image')
       const dataUrl = await toPng(shareCardRef.current, {
         pixelRatio: 2,
         cacheBust: true,

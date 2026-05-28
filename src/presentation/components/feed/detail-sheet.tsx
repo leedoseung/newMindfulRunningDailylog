@@ -48,7 +48,7 @@ const FONT = "'Pretendard Variable', Pretendard, -apple-system, sans-serif"
 
 export function DetailSheet({ run, open, onClose, memberId }: Props) {
   const router = useRouter()
-  const [photoMode, setPhotoMode] = useState(false)
+  const [photoFull, setPhotoFull] = useState(false)
   const [saving, setSaving] = useState(false)
   const [deleting, setDeleting] = useState(false)
   const [copied, setCopied] = useState(false)
@@ -56,6 +56,7 @@ export function DetailSheet({ run, open, onClose, memberId }: Props) {
   const count = useCountUp(run?.durationMin ?? 0, open)
 
   const isOwner = Boolean(memberId && run && run.memberId === memberId)
+  const hasPhoto = Boolean(run?.photoUrl)
 
   function handleEdit() {
     if (!run) return
@@ -80,7 +81,7 @@ export function DetailSheet({ run, open, onClose, memberId }: Props) {
   }
 
   useEffect(() => {
-    if (!open) setPhotoMode(false)
+    if (!open) setPhotoFull(false)
   }, [open])
 
   async function handleCopyText() {
@@ -118,7 +119,6 @@ ${run.thoughtAfter}`
 
       const fileName = `mindful-run-${run.date}.png`
 
-      // iOS / Android → 네이티브 공유 시트
       const blob = await (await fetch(dataUrl)).blob()
       const file = new File([blob], fileName, { type: 'image/png' })
       if (navigator.canShare?.({ files: [file] })) {
@@ -126,13 +126,11 @@ ${run.thoughtAfter}`
         return
       }
 
-      // 데스크탑 → 직접 다운로드
       const link = document.createElement('a')
       link.download = fileName
       link.href = dataUrl
       link.click()
     } catch (err) {
-      // 사용자가 공유 취소한 경우(AbortError)는 무시
       if (err instanceof Error && err.name !== 'AbortError') {
         alert('이미지 저장에 실패했습니다')
       }
@@ -143,13 +141,32 @@ ${run.thoughtAfter}`
 
   if (!run) return null
 
-  const hasPhoto = Boolean(run.photoUrl)
-
   const thoughts = [
     { step: '전', text: run.thoughtBefore },
     { step: '중', text: run.thoughtDuring },
     { step: '후', text: run.thoughtAfter },
   ].filter(t => t.text)
+
+  // 사진 있을 때 UI 색상
+  const onPhoto = hasPhoto
+  const labelColor  = onPhoto ? 'rgba(255,255,255,0.55)' : '#888'
+  const bigNumColor = onPhoto ? '#ffffff' : '#111'
+  const unitColor   = onPhoto ? 'rgba(255,255,255,0.7)' : '#555'
+  const nameColor   = onPhoto ? 'rgba(255,255,255,0.75)' : '#666'
+  const chipBg      = onPhoto ? 'rgba(255,255,255,0.15)' : '#EBEBEA'
+  const chipColor   = onPhoto ? 'rgba(255,255,255,0.85)' : '#555'
+  const dividerBg   = onPhoto ? 'rgba(255,255,255,0.12)' : 'rgba(0,0,0,0.06)'
+  const dateColor   = onPhoto ? 'rgba(255,255,255,0.5)' : '#999'
+  const titleColor  = onPhoto ? '#ffffff' : '#111'
+  const bdaColor    = onPhoto ? 'rgba(255,255,255,0.45)' : '#999'
+  const stepColor   = onPhoto ? 'rgba(255,255,255,0.55)' : '#888'
+  const bodyColor   = onPhoto ? 'rgba(255,255,255,0.9)' : '#333'
+  const rowBorder   = onPhoto ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.07)'
+  const handleColor = onPhoto ? 'rgba(255,255,255,0.25)' : 'rgba(0,0,0,0.12)'
+  const closeBg     = onPhoto ? 'rgba(0,0,0,0.35)' : '#EBEBEA'
+  const closeColor  = onPhoto ? '#fff' : '#111'
+  const btnBg       = onPhoto ? 'rgba(0,0,0,0.35)' : '#EBEBEA'
+  const btnColor    = onPhoto ? '#fff' : '#111'
 
   return (
     <div style={{
@@ -173,46 +190,63 @@ ${run.thoughtAfter}`
         data-testid="detail-sheet"
         style={{
           position: 'relative', width: '100%', height: '88vh',
-          background: '#F7F7F5', borderRadius: '28px 28px 0 0',
+          background: hasPhoto ? '#111' : '#F7F7F5',
+          borderRadius: '28px 28px 0 0',
           transform: open ? 'translateY(0)' : 'translateY(110%)',
           transition: 'transform 0.52s cubic-bezier(0.32,0.72,0,1)',
           overflow: 'hidden', zIndex: 201,
           display: 'flex', flexDirection: 'column',
         }}
       >
-        {/* Photo background (photo mode) */}
+        {/* Photo — always in background when hasPhoto */}
         {hasPhoto && (
           <div
-            onClick={() => photoMode && setPhotoMode(false)}
+            onClick={() => setPhotoFull(v => !v)}
             style={{
               position: 'absolute', inset: 0,
               backgroundImage: `url(${run.photoUrl})`,
               backgroundSize: 'cover', backgroundPosition: 'center',
-              transform: photoMode ? 'scale(1.04)' : 'scale(1.12)',
-              opacity: photoMode ? 1 : 0,
-              transition: 'transform 0.55s cubic-bezier(0.32,0.72,0,1), opacity 0.35s',
-              pointerEvents: photoMode ? 'auto' : 'none',
-              zIndex: 10,
+              zIndex: 0,
               cursor: 'pointer',
+              transition: 'transform 0.55s cubic-bezier(0.32,0.72,0,1)',
+              transform: photoFull ? 'scale(1.03)' : 'scale(1)',
             }}
           />
+        )}
+
+        {/* Dark overlay — dims photo so text is readable; hides in fullscreen mode */}
+        {hasPhoto && (
+          <div style={{
+            position: 'absolute', inset: 0,
+            background: 'linear-gradient(to bottom, rgba(0,0,0,0.38) 0%, rgba(0,0,0,0.55) 40%, rgba(0,0,0,0.65) 100%)',
+            opacity: photoFull ? 0 : 1,
+            transition: 'opacity 0.35s',
+            pointerEvents: 'none',
+            zIndex: 1,
+          }} />
         )}
 
         {/* Top bar */}
         <div style={{
           display: 'flex', justifyContent: 'space-between', alignItems: 'center',
-          padding: '16px 20px 0', flexShrink: 0, position: 'relative', zIndex: 20,
+          padding: '16px 20px 0', flexShrink: 0,
+          position: 'relative', zIndex: 20,
+          opacity: photoFull ? 0 : 1,
+          transition: 'opacity 0.25s',
+          pointerEvents: photoFull ? 'none' : 'auto',
         }}>
           {/* Handle */}
-          <div style={{ position: 'absolute', top: 10, left: '50%', transform: 'translateX(-50%)',
-            width: 32, height: 3, background: 'rgba(0,0,0,0.12)', borderRadius: 2 }} />
+          <div style={{
+            position: 'absolute', top: 10, left: '50%', transform: 'translateX(-50%)',
+            width: 32, height: 3, background: handleColor, borderRadius: 2,
+          }} />
 
           <button
             type="button"
             onClick={onClose}
             style={{
               width: 32, height: 32, borderRadius: '50%', marginTop: 8,
-              background: '#EBEBEA', border: 'none', color: '#111',
+              background: closeBg, border: 'none', color: closeColor,
               fontSize: '0.85rem', cursor: 'pointer',
               display: 'flex', alignItems: 'center', justifyContent: 'center',
             }}
@@ -225,9 +259,11 @@ ${run.thoughtAfter}`
                   type="button"
                   onClick={handleEdit}
                   style={{
-                    background: '#111', border: 'none', borderRadius: 20,
-                    padding: '6px 14px', fontFamily: FONT, fontSize: '0.6rem',
-                    fontWeight: 500, color: '#fff', cursor: 'pointer',
+                    background: onPhoto ? 'rgba(255,255,255,0.18)' : '#111',
+                    border: onPhoto ? '1px solid rgba(255,255,255,0.25)' : 'none',
+                    borderRadius: 20, padding: '6px 14px',
+                    fontFamily: FONT, fontSize: '0.6rem', fontWeight: 500,
+                    color: '#fff', cursor: 'pointer',
                   }}
                 >수정</button>
                 <button
@@ -235,9 +271,11 @@ ${run.thoughtAfter}`
                   onClick={handleDelete}
                   disabled={deleting}
                   style={{
-                    background: deleting ? '#ddd' : '#fee2e2', border: 'none', borderRadius: 20,
-                    padding: '6px 14px', fontFamily: FONT, fontSize: '0.6rem',
-                    fontWeight: 500, color: deleting ? '#aaa' : '#ef4444',
+                    background: deleting ? 'rgba(0,0,0,0.2)' : (onPhoto ? 'rgba(239,68,68,0.25)' : '#fee2e2'),
+                    border: onPhoto ? '1px solid rgba(239,68,68,0.4)' : 'none',
+                    borderRadius: 20, padding: '6px 14px',
+                    fontFamily: FONT, fontSize: '0.6rem', fontWeight: 500,
+                    color: deleting ? '#aaa' : '#ef4444',
                     cursor: deleting ? 'not-allowed' : 'pointer',
                   }}
                 >{deleting ? '삭제 중…' : '삭제'}</button>
@@ -246,27 +284,16 @@ ${run.thoughtAfter}`
           </div>
 
           <div style={{ display: 'flex', gap: 6, marginTop: 8, flexWrap: 'wrap' }}>
-            {hasPhoto && (
-              <button
-                type="button"
-                onClick={() => setPhotoMode(v => !v)}
-                style={{
-                  background: '#111', border: 'none', borderRadius: 20,
-                  padding: '6px 14px',
-                  fontFamily: FONT, fontSize: '0.6rem', fontWeight: 500,
-                  color: '#fff', cursor: 'pointer',
-                }}
-              >{photoMode ? '텍스트 보기' : '사진 보기'}</button>
-            )}
             <button
               type="button"
               onClick={handleSaveImage}
               disabled={saving}
               style={{
-                background: saving ? '#ddd' : '#EBEBEA', border: 'none', borderRadius: 20,
-                padding: '6px 14px',
+                background: saving ? 'rgba(0,0,0,0.2)' : btnBg,
+                border: onPhoto ? '1px solid rgba(255,255,255,0.2)' : 'none',
+                borderRadius: 20, padding: '6px 14px',
                 fontFamily: FONT, fontSize: '0.6rem', fontWeight: 500,
-                color: saving ? '#aaa' : '#111',
+                color: saving ? '#aaa' : btnColor,
                 cursor: saving ? 'not-allowed' : 'pointer',
               }}
             >{saving ? '저장 중…' : '이미지 저장'}</button>
@@ -274,10 +301,11 @@ ${run.thoughtAfter}`
               type="button"
               onClick={handleCopyText}
               style={{
-                background: copied ? '#111' : '#EBEBEA', border: 'none', borderRadius: 20,
-                padding: '6px 14px',
+                background: copied ? (onPhoto ? 'rgba(255,255,255,0.9)' : '#111') : btnBg,
+                border: onPhoto ? '1px solid rgba(255,255,255,0.2)' : 'none',
+                borderRadius: 20, padding: '6px 14px',
                 fontFamily: FONT, fontSize: '0.6rem', fontWeight: 500,
-                color: copied ? '#fff' : '#111',
+                color: copied ? (onPhoto ? '#111' : '#fff') : btnColor,
                 cursor: 'pointer',
                 transition: 'all 0.2s',
               }}
@@ -289,83 +317,71 @@ ${run.thoughtAfter}`
         <div style={{
           flex: 1, overflowY: 'auto', scrollbarWidth: 'none',
           padding: '24px 24px 40px',
-          opacity: photoMode ? 0 : 1,
+          position: 'relative', zIndex: 10,
+          opacity: photoFull ? 0 : 1,
           transition: 'opacity 0.25s',
-          pointerEvents: photoMode ? 'none' : 'auto',
+          pointerEvents: photoFull ? 'none' : 'auto',
         }}>
-          {/* Duration */}
           <div style={{
             fontFamily: FONT, fontSize: '0.52rem', fontWeight: 500,
-            color: '#888', letterSpacing: '2px', textTransform: 'uppercase',
+            color: labelColor, letterSpacing: '2px', textTransform: 'uppercase',
             marginBottom: 4,
           }}>달린 시간</div>
 
           <div style={{ display: 'flex', alignItems: 'baseline', gap: 4, marginBottom: 4 }}>
             <span style={{
               fontFamily: FONT, fontSize: '4.2rem', fontWeight: 300,
-              color: '#111', lineHeight: 1, letterSpacing: '-2px',
+              color: bigNumColor, lineHeight: 1, letterSpacing: '-2px',
             }}>{count}</span>
-            <span style={{ fontFamily: FONT, fontSize: '1rem', fontWeight: 400, color: '#555' }}>분</span>
+            <span style={{ fontFamily: FONT, fontSize: '1rem', fontWeight: 400, color: unitColor }}>분</span>
           </div>
 
-          <div style={{ fontFamily: FONT, fontSize: '0.78rem', fontWeight: 400, color: '#666', marginBottom: 16 }}>
+          <div style={{ fontFamily: FONT, fontSize: '0.78rem', fontWeight: 400, color: nameColor, marginBottom: 16 }}>
             {run.memberName}
           </div>
 
-          {/* Chips */}
-          {(run.location || hasPhoto) && (
+          {run.location && (
             <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', marginBottom: 20 }}>
-              {run.location && (
-                <div style={{
-                  background: '#EBEBEA', borderRadius: 20, padding: '4px 12px',
-                  fontFamily: FONT, fontSize: '0.62rem', fontWeight: 400, color: '#555',
-                }}>📍 {run.location}</div>
-              )}
-              {hasPhoto && (
-                <div style={{
-                  background: '#EBEBEA', borderRadius: 20, padding: '4px 12px',
-                  fontFamily: FONT, fontSize: '0.62rem', fontWeight: 400, color: '#555',
-                }}>📸 사진</div>
-              )}
+              <div style={{
+                background: chipBg, borderRadius: 20, padding: '4px 12px',
+                fontFamily: FONT, fontSize: '0.62rem', fontWeight: 400, color: chipColor,
+              }}>📍 {run.location}</div>
             </div>
           )}
 
-          {/* Divider */}
-          <div style={{ height: 1, background: 'rgba(0,0,0,0.06)', marginBottom: 20 }} />
+          <div style={{ height: 1, background: dividerBg, marginBottom: 20 }} />
 
-          {/* Date + title */}
-          <div style={{ fontFamily: FONT, fontSize: '0.62rem', fontWeight: 400, color: '#999', marginBottom: 8 }}>
+          <div style={{ fontFamily: FONT, fontSize: '0.62rem', fontWeight: 400, color: dateColor, marginBottom: 8 }}>
             {run.date}
           </div>
           {run.title && (
             <div style={{
               fontFamily: FONT, fontSize: '1.15rem', fontWeight: 500,
-              color: '#111', lineHeight: 1.35, marginBottom: 24,
+              color: titleColor, lineHeight: 1.35, marginBottom: 24,
             }}>"{run.title}"</div>
           )}
 
-          {/* Thoughts */}
           {thoughts.length > 0 && (
             <>
               <div style={{
                 fontFamily: FONT, fontSize: '0.5rem', fontWeight: 500,
-                color: '#999', letterSpacing: '2px', textTransform: 'uppercase',
+                color: bdaColor, letterSpacing: '2px', textTransform: 'uppercase',
                 marginBottom: 14,
               }}>Before · During · After</div>
               {thoughts.map(({ step, text }) => (
                 <div key={step} style={{
                   display: 'flex', gap: 14, alignItems: 'flex-start',
                   paddingBottom: 16, marginBottom: 16,
-                  borderBottom: '1px solid rgba(0,0,0,0.07)',
+                  borderBottom: `1px solid ${rowBorder}`,
                 }}>
                   <div style={{
                     fontFamily: FONT, fontSize: '0.6rem', fontWeight: 500,
-                    color: '#888', textTransform: 'uppercase', letterSpacing: '0.5px',
+                    color: stepColor, textTransform: 'uppercase', letterSpacing: '0.5px',
                     whiteSpace: 'nowrap', paddingTop: 3, minWidth: 24,
                   }}>{step}</div>
                   <div style={{
                     fontFamily: FONT, fontSize: '0.88rem', fontWeight: 400,
-                    color: '#333', lineHeight: 1.7,
+                    color: bodyColor, lineHeight: 1.7,
                   }}>{text}</div>
                 </div>
               ))}
@@ -373,7 +389,7 @@ ${run.thoughtAfter}`
           )}
         </div>
 
-        {/* Photo mode tap hint */}
+        {/* Fullscreen photo hint */}
         {hasPhoto && (
           <div style={{
             position: 'absolute', bottom: 32, left: '50%', transform: 'translateX(-50%)',
@@ -381,7 +397,7 @@ ${run.thoughtAfter}`
             borderRadius: 20, padding: '7px 16px',
             fontFamily: FONT, fontSize: '0.58rem', fontWeight: 500,
             color: 'rgba(255,255,255,0.7)', whiteSpace: 'nowrap',
-            opacity: photoMode ? 1 : 0, transition: 'opacity 0.3s',
+            opacity: photoFull ? 1 : 0, transition: 'opacity 0.3s',
             pointerEvents: 'none', zIndex: 20,
           }}>탭하면 텍스트 다시 보기</div>
         )}

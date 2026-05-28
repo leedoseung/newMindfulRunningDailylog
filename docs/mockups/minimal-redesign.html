@@ -1,0 +1,680 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Minimal Redesign Preview</title>
+<link rel="preconnect" href="https://cdn.jsdelivr.net">
+<link rel="stylesheet" as="style" onload="this.onload=null;this.rel='stylesheet'"
+  href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.min.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,700;1,9..40,300;1,9..40,400&family=DM+Serif+Display:ital@0;1&display=swap" rel="stylesheet">
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  background: #E8E8E6;
+  display: flex;
+  gap: 48px;
+  justify-content: center;
+  align-items: flex-start;
+  padding: 48px 24px;
+  min-height: 100vh;
+  flex-wrap: wrap;
+}
+
+.col {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+}
+
+.label {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: #555;
+}
+
+/* ─── Phone shell ─────────────────────────────── */
+.phone {
+  width: 320px;
+  min-height: 620px;
+  border-radius: 40px;
+  overflow: hidden;
+  position: relative;
+  box-shadow: 0 30px 80px rgba(0,0,0,0.18), 0 0 0 1px rgba(0,0,0,0.08);
+}
+
+/* ─────────────────────────────────────────────── */
+/* OPTION A — Pretendard + Minimal Black          */
+/* ─────────────────────────────────────────────── */
+.phone-a {
+  background: #F7F7F5;
+  font-family: 'Pretendard Variable', 'Pretendard', -apple-system, sans-serif;
+}
+
+.phone-a .header {
+  position: sticky;
+  top: 0;
+  padding: 52px 20px 14px;
+  background: rgba(247,247,245,0.88);
+  backdrop-filter: blur(20px);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.phone-a .header-title {
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: -0.2px;
+  color: #111;
+}
+.phone-a .avatar {
+  width: 32px; height: 32px; border-radius: 50%;
+  background: #111;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 14px;
+}
+
+.phone-a .crew-strip {
+  display: flex;
+  gap: 12px;
+  padding: 10px 20px 16px;
+  overflow-x: auto;
+}
+.phone-a .crew-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
+  flex-shrink: 0;
+}
+.phone-a .crew-avatar {
+  width: 40px; height: 40px; border-radius: 50%;
+  background: #E0E0DE;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 16px;
+  border: 2px solid transparent;
+}
+.phone-a .crew-avatar.ran {
+  border-color: #111;
+}
+.phone-a .crew-name {
+  font-size: 9px;
+  font-weight: 400;
+  color: #999;
+  letter-spacing: 0;
+}
+
+.phone-a .tabs {
+  display: flex;
+  margin: 0 20px 14px;
+  background: #EBEBEA;
+  border-radius: 10px;
+  padding: 3px;
+}
+.phone-a .tab {
+  flex: 1;
+  text-align: center;
+  padding: 7px;
+  font-size: 11px;
+  font-weight: 500;
+  color: #888;
+  border-radius: 8px;
+}
+.phone-a .tab.active {
+  background: #fff;
+  color: #111;
+  font-weight: 600;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+}
+
+/* Hero card A */
+.phone-a .hero-card {
+  margin: 0 20px 10px;
+  border-radius: 20px;
+  background: #111111;
+  padding: 20px;
+  color: #fff;
+}
+.phone-a .hero-card .run-meta {
+  font-size: 10px;
+  font-weight: 400;
+  color: rgba(255,255,255,0.4);
+  margin-bottom: 6px;
+  letter-spacing: 0;
+}
+.phone-a .hero-card .runner-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+.phone-a .hero-card .runner-ava {
+  width: 28px; height: 28px; border-radius: 50%;
+  background: rgba(255,255,255,0.15);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 13px;
+}
+.phone-a .hero-card .runner-name {
+  font-size: 12px;
+  font-weight: 500;
+  color: rgba(255,255,255,0.85);
+}
+.phone-a .hero-card .duration {
+  font-size: 52px;
+  font-weight: 300;
+  line-height: 1;
+  color: #fff;
+  letter-spacing: -2px;
+}
+.phone-a .hero-card .duration-unit {
+  font-size: 16px;
+  font-weight: 300;
+  color: rgba(255,255,255,0.5);
+  margin-left: 4px;
+}
+.phone-a .hero-card .title-text {
+  font-size: 12px;
+  font-weight: 400;
+  color: rgba(255,255,255,0.6);
+  margin-top: 10px;
+  line-height: 1.4;
+}
+
+/* Pulse card A */
+.phone-a .pulse-card {
+  margin: 0 20px 10px;
+  border-radius: 16px;
+  background: #F0F0EE;
+  padding: 16px 18px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.phone-a .pulse-label {
+  font-size: 10px;
+  font-weight: 400;
+  color: #888;
+  margin-bottom: 4px;
+}
+.phone-a .pulse-val {
+  font-size: 20px;
+  font-weight: 300;
+  color: #111;
+  letter-spacing: -0.5px;
+}
+.phone-a .pulse-bars {
+  display: flex;
+  align-items: flex-end;
+  gap: 3px;
+  height: 32px;
+}
+.phone-a .pulse-bar {
+  width: 6px;
+  border-radius: 3px;
+  background: #D0D0CE;
+}
+.phone-a .pulse-bar.today { background: #111; }
+
+/* White card A */
+.phone-a .white-card {
+  margin: 0 20px 10px;
+  border-radius: 16px;
+  background: #fff;
+  padding: 16px 18px;
+}
+.phone-a .white-card .card-meta {
+  font-size: 10px;
+  color: #AAA;
+  margin-bottom: 8px;
+}
+.phone-a .white-card .card-runner {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+.phone-a .white-card .card-ava {
+  width: 26px; height: 26px; border-radius: 50%;
+  background: #F0F0EE;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 12px;
+}
+.phone-a .white-card .card-name {
+  font-size: 12px;
+  font-weight: 500;
+  color: #111;
+}
+.phone-a .white-card .card-min {
+  font-size: 11px;
+  color: #999;
+  font-weight: 400;
+}
+.phone-a .white-card .card-title {
+  font-size: 13px;
+  font-weight: 500;
+  color: #111;
+  line-height: 1.35;
+  margin-bottom: 6px;
+}
+.phone-a .white-card .card-snippet {
+  font-size: 11px;
+  color: #888;
+  line-height: 1.5;
+}
+
+/* ─────────────────────────────────────────────── */
+/* OPTION B — DM Sans + Warm Neutral              */
+/* ─────────────────────────────────────────────── */
+.phone-b {
+  background: #F5F3EF;
+  font-family: 'DM Sans', sans-serif;
+}
+
+.phone-b .header {
+  position: sticky;
+  top: 0;
+  padding: 52px 20px 14px;
+  background: rgba(245,243,239,0.88);
+  backdrop-filter: blur(20px);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.phone-b .header-title {
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: -0.2px;
+  color: #1A1714;
+}
+.phone-b .avatar {
+  width: 32px; height: 32px; border-radius: 50%;
+  background: #1A1714;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 14px;
+}
+
+.phone-b .crew-strip {
+  display: flex;
+  gap: 12px;
+  padding: 10px 20px 16px;
+  overflow-x: auto;
+}
+.phone-b .crew-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
+  flex-shrink: 0;
+}
+.phone-b .crew-avatar {
+  width: 40px; height: 40px; border-radius: 50%;
+  background: #E6E2DA;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 16px;
+  border: 2px solid transparent;
+}
+.phone-b .crew-avatar.ran {
+  border-color: #8B7D6B;
+}
+.phone-b .crew-name {
+  font-size: 9px;
+  font-weight: 400;
+  color: #9B9188;
+  letter-spacing: 0;
+}
+
+.phone-b .tabs {
+  display: flex;
+  margin: 0 20px 14px;
+  background: #EAE7E1;
+  border-radius: 10px;
+  padding: 3px;
+}
+.phone-b .tab {
+  flex: 1;
+  text-align: center;
+  padding: 7px;
+  font-size: 11px;
+  font-weight: 400;
+  color: #9B9188;
+  border-radius: 8px;
+}
+.phone-b .tab.active {
+  background: #fff;
+  color: #1A1714;
+  font-weight: 500;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.07);
+}
+
+/* Hero card B */
+.phone-b .hero-card {
+  margin: 0 20px 10px;
+  border-radius: 20px;
+  background: #1A1714;
+  padding: 20px;
+  color: #fff;
+}
+.phone-b .hero-card .run-meta {
+  font-size: 10px;
+  font-weight: 400;
+  color: rgba(255,255,255,0.35);
+  margin-bottom: 6px;
+}
+.phone-b .hero-card .runner-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+.phone-b .hero-card .runner-ava {
+  width: 28px; height: 28px; border-radius: 50%;
+  background: rgba(255,255,255,0.12);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 13px;
+}
+.phone-b .hero-card .runner-name {
+  font-size: 12px;
+  font-weight: 400;
+  color: rgba(255,255,255,0.8);
+}
+.phone-b .hero-card .duration {
+  font-size: 52px;
+  font-weight: 300;
+  line-height: 1;
+  color: #fff;
+  letter-spacing: -2px;
+  font-family: 'DM Serif Display', serif;
+  font-style: italic;
+}
+.phone-b .hero-card .duration-unit {
+  font-size: 16px;
+  font-weight: 300;
+  color: rgba(255,255,255,0.4);
+  margin-left: 4px;
+  font-family: 'DM Sans', sans-serif;
+  font-style: normal;
+}
+.phone-b .hero-card .title-text {
+  font-size: 12px;
+  font-weight: 300;
+  color: rgba(255,255,255,0.55);
+  margin-top: 10px;
+  line-height: 1.45;
+}
+
+/* Pulse card B */
+.phone-b .pulse-card {
+  margin: 0 20px 10px;
+  border-radius: 16px;
+  background: #EDE9E2;
+  padding: 16px 18px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.phone-b .pulse-label {
+  font-size: 10px;
+  font-weight: 400;
+  color: #9B9188;
+  margin-bottom: 4px;
+}
+.phone-b .pulse-val {
+  font-size: 20px;
+  font-weight: 300;
+  color: #1A1714;
+  letter-spacing: -0.5px;
+}
+.phone-b .pulse-bars {
+  display: flex;
+  align-items: flex-end;
+  gap: 3px;
+  height: 32px;
+}
+.phone-b .pulse-bar {
+  width: 6px;
+  border-radius: 3px;
+  background: #D5CECD;
+}
+.phone-b .pulse-bar.today { background: #8B7D6B; }
+
+/* White card B */
+.phone-b .white-card {
+  margin: 0 20px 10px;
+  border-radius: 16px;
+  background: #fff;
+  padding: 16px 18px;
+}
+.phone-b .white-card .card-meta {
+  font-size: 10px;
+  color: #B5AFA8;
+  margin-bottom: 8px;
+}
+.phone-b .white-card .card-runner {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+.phone-b .white-card .card-ava {
+  width: 26px; height: 26px; border-radius: 50%;
+  background: #F0ECE6;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 12px;
+}
+.phone-b .white-card .card-name {
+  font-size: 12px;
+  font-weight: 500;
+  color: #1A1714;
+}
+.phone-b .white-card .card-min {
+  font-size: 11px;
+  color: #9B9188;
+  font-weight: 300;
+}
+.phone-b .white-card .card-title {
+  font-size: 13px;
+  font-weight: 500;
+  color: #1A1714;
+  line-height: 1.35;
+  margin-bottom: 6px;
+}
+.phone-b .white-card .card-snippet {
+  font-size: 11px;
+  color: #9B9188;
+  line-height: 1.5;
+  font-weight: 300;
+}
+
+/* bottom fade */
+.phone::after {
+  content: '';
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  height: 60px;
+  background: linear-gradient(transparent, rgba(0,0,0,0.06));
+  pointer-events: none;
+  border-radius: 0 0 40px 40px;
+}
+</style>
+</head>
+<body>
+
+<!-- OPTION A -->
+<div class="col">
+  <div class="label">A — Pretendard · Minimal Black</div>
+  <div class="phone phone-a">
+    <div class="header">
+      <div class="header-title">마인드풀러닝</div>
+      <div class="avatar">🏃</div>
+    </div>
+
+    <div class="crew-strip">
+      <div class="crew-item">
+        <div class="crew-avatar ran">🌿</div>
+        <div class="crew-name">두승</div>
+      </div>
+      <div class="crew-item">
+        <div class="crew-avatar ran">☁️</div>
+        <div class="crew-name">지수</div>
+      </div>
+      <div class="crew-item">
+        <div class="crew-avatar">🌙</div>
+        <div class="crew-name">민준</div>
+      </div>
+      <div class="crew-item">
+        <div class="crew-avatar">🔥</div>
+        <div class="crew-name">서연</div>
+      </div>
+      <div class="crew-item">
+        <div class="crew-avatar ran">⛅</div>
+        <div class="crew-name">현우</div>
+      </div>
+    </div>
+
+    <div class="tabs">
+      <div class="tab active">전체</div>
+      <div class="tab">내 기록</div>
+    </div>
+
+    <div class="hero-card">
+      <div class="run-meta">오늘 · 2분 전</div>
+      <div class="runner-row">
+        <div class="runner-ava">🌿</div>
+        <div class="runner-name">두승</div>
+      </div>
+      <div>
+        <span class="duration">45</span><span class="duration-unit">분</span>
+      </div>
+      <div class="title-text">"빗속에서 달렸다. 머리가 맑아지는 느낌"</div>
+    </div>
+
+    <div class="pulse-card">
+      <div>
+        <div class="pulse-label">이번 주 크루</div>
+        <div class="pulse-val">12<span style="font-size:12px;color:#888;font-weight:300;"> 명</span></div>
+      </div>
+      <div class="pulse-bars">
+        <div class="pulse-bar" style="height:40%"></div>
+        <div class="pulse-bar" style="height:60%"></div>
+        <div class="pulse-bar" style="height:45%"></div>
+        <div class="pulse-bar" style="height:80%"></div>
+        <div class="pulse-bar" style="height:55%"></div>
+        <div class="pulse-bar" style="height:70%"></div>
+        <div class="pulse-bar today" style="height:100%"></div>
+      </div>
+    </div>
+
+    <div class="white-card">
+      <div class="card-meta">어제 · 오후 6:30</div>
+      <div class="card-runner">
+        <div class="card-ava">☁️</div>
+        <div>
+          <div class="card-name">지수</div>
+          <div class="card-min">32분</div>
+        </div>
+      </div>
+      <div class="card-title">퇴근 후 한강변 조깅, 생각 정리됨</div>
+      <div class="card-snippet">오늘 일이 많았는데 달리고 나니 한결 가벼워진 느낌. 역시 러닝이 최고야.</div>
+    </div>
+  </div>
+
+  <div class="label" style="color:#333; max-width:280px; text-align:center; line-height:1.6">
+    폰트: Pretendard Variable<br>
+    색상: #111111 · #F7F7F5 · 컬러 없음
+  </div>
+</div>
+
+<!-- OPTION B -->
+<div class="col">
+  <div class="label">B — DM Sans + DM Serif · Warm Stone</div>
+  <div class="phone phone-b">
+    <div class="header">
+      <div class="header-title">마인드풀러닝</div>
+      <div class="avatar">🏃</div>
+    </div>
+
+    <div class="crew-strip">
+      <div class="crew-item">
+        <div class="crew-avatar ran">🌿</div>
+        <div class="crew-name">두승</div>
+      </div>
+      <div class="crew-item">
+        <div class="crew-avatar ran">☁️</div>
+        <div class="crew-name">지수</div>
+      </div>
+      <div class="crew-item">
+        <div class="crew-avatar">🌙</div>
+        <div class="crew-name">민준</div>
+      </div>
+      <div class="crew-item">
+        <div class="crew-avatar">🔥</div>
+        <div class="crew-name">서연</div>
+      </div>
+      <div class="crew-item">
+        <div class="crew-avatar ran">⛅</div>
+        <div class="crew-name">현우</div>
+      </div>
+    </div>
+
+    <div class="tabs">
+      <div class="tab active">전체</div>
+      <div class="tab">내 기록</div>
+    </div>
+
+    <div class="hero-card">
+      <div class="run-meta">오늘 · 2분 전</div>
+      <div class="runner-row">
+        <div class="runner-ava">🌿</div>
+        <div class="runner-name">두승</div>
+      </div>
+      <div>
+        <span class="duration">45</span><span class="duration-unit">분</span>
+      </div>
+      <div class="title-text">"빗속에서 달렸다. 머리가 맑아지는 느낌"</div>
+    </div>
+
+    <div class="pulse-card">
+      <div>
+        <div class="pulse-label">이번 주 크루</div>
+        <div class="pulse-val">12<span style="font-size:12px;color:#9B9188;font-weight:300;"> 명</span></div>
+      </div>
+      <div class="pulse-bars">
+        <div class="pulse-bar" style="height:40%"></div>
+        <div class="pulse-bar" style="height:60%"></div>
+        <div class="pulse-bar" style="height:45%"></div>
+        <div class="pulse-bar" style="height:80%"></div>
+        <div class="pulse-bar" style="height:55%"></div>
+        <div class="pulse-bar" style="height:70%"></div>
+        <div class="pulse-bar today" style="height:100%"></div>
+      </div>
+    </div>
+
+    <div class="white-card">
+      <div class="card-meta">어제 · 오후 6:30</div>
+      <div class="card-runner">
+        <div class="card-ava">☁️</div>
+        <div>
+          <div class="card-name">지수</div>
+          <div class="card-min">32분</div>
+        </div>
+      </div>
+      <div class="card-title">퇴근 후 한강변 조깅, 생각 정리됨</div>
+      <div class="card-snippet">오늘 일이 많았는데 달리고 나니 한결 가벼워진 느낌. 역시 러닝이 최고야.</div>
+    </div>
+  </div>
+
+  <div class="label" style="color:#333; max-width:280px; text-align:center; line-height:1.6">
+    폰트: DM Sans (본문) + DM Serif Display Italic (숫자)<br>
+    색상: #1A1714 · #F5F3EF · #8B7D6B 워밍 스톤
+  </div>
+</div>
+
+</body>
+</html>

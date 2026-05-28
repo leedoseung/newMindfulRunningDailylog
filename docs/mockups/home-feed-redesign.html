@@ -1,0 +1,676 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Home Feed Redesign — Mockup</title>
+<link href="https://fonts.googleapis.com/css2?family=Raleway:ital,wght@0,300;0,400;0,600;0,700;0,800;0,900;1,400;1,700&family=Roboto:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --dark: #2d3031;
+  --blue: #2E91FC;
+  --bg: #F0F1F2;
+  --white: #fff;
+  --muted: #999;
+  --border: rgba(0,0,0,0.06);
+}
+* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+body {
+  font-family: 'Roboto', sans-serif;
+  background: #ddd;
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  padding: 40px 0;
+  gap: 40px;
+}
+
+/* ── PHONE SHELL ── */
+.phone {
+  width: 390px;
+  min-height: 820px;
+  background: var(--bg);
+  border-radius: 44px;
+  overflow: hidden;
+  box-shadow: 0 40px 80px rgba(0,0,0,0.25), 0 0 0 10px #1a1a1a, 0 0 0 11px #333;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+}
+.phone-screen {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  -webkit-overflow-scrolling: touch;
+  padding-bottom: 90px;
+  scrollbar-width: none;
+}
+.phone-screen::-webkit-scrollbar { display: none; }
+
+/* ── HEADER ── */
+.hdr {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 52px 22px 16px;
+  background: var(--bg);
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+}
+.hdr-logo {
+  font-family: 'Raleway', sans-serif;
+  font-size: 0.65rem;
+  font-weight: 700;
+  color: var(--muted);
+  letter-spacing: 2.5px;
+  text-transform: uppercase;
+}
+.hdr-right { display: flex; align-items: center; gap: 10px; }
+.hdr-avatar {
+  width: 34px; height: 34px; border-radius: 50%;
+  background: var(--dark);
+  display: flex; align-items: center; justify-content: center;
+  font-family: 'Raleway', sans-serif; font-size: 0.78rem; font-weight: 700; color: #fff;
+}
+
+/* ── TODAY CREW STRIP ── */
+.crew-strip {
+  padding: 8px 22px 4px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.crew-label {
+  font-size: 0.6rem;
+  font-weight: 600;
+  color: var(--muted);
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+}
+.crew-scroll {
+  display: flex;
+  gap: 12px;
+  overflow-x: auto;
+  scrollbar-width: none;
+  padding-bottom: 2px;
+}
+.crew-scroll::-webkit-scrollbar { display: none; }
+.crew-member {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
+  flex-shrink: 0;
+  cursor: pointer;
+}
+.crew-ring {
+  width: 52px; height: 52px; border-radius: 50%;
+  padding: 2.5px;
+  background: linear-gradient(135deg, var(--blue), #6dd5fa);
+}
+.crew-ring.inactive {
+  background: #ddd;
+}
+.crew-av-inner {
+  width: 100%; height: 100%; border-radius: 50%;
+  background: var(--dark);
+  border: 2px solid var(--bg);
+  display: flex; align-items: center; justify-content: center;
+  font-family: 'Raleway', sans-serif; font-size: 0.85rem; font-weight: 800; color: #fff;
+}
+.crew-ring.inactive .crew-av-inner { background: #bbb; }
+.crew-name {
+  font-size: 0.56rem; font-weight: 500; color: var(--dark);
+  max-width: 48px; text-align: center; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.crew-min {
+  font-family: 'Raleway', sans-serif;
+  font-size: 0.6rem; font-weight: 700; color: var(--blue);
+}
+.crew-ring.inactive ~ .crew-name,
+.crew-ring.inactive ~ .crew-min { color: #bbb; }
+
+/* ── DIVIDER ── */
+.divider {
+  height: 1px;
+  background: var(--border);
+  margin: 14px 22px;
+}
+
+/* ── FEED TABS ── */
+.feed-tabs {
+  display: flex;
+  gap: 0;
+  margin: 0 22px 18px;
+  background: #e4e5e6;
+  border-radius: 10px;
+  padding: 3px;
+}
+.feed-tab {
+  flex: 1; text-align: center; padding: 7px;
+  font-family: 'Raleway', sans-serif; font-size: 0.65rem; font-weight: 700;
+  color: var(--muted);
+  border-radius: 8px; cursor: pointer; transition: all 0.2s;
+}
+.feed-tab.active { background: var(--white); color: var(--dark); box-shadow: 0 1px 4px rgba(0,0,0,0.1); }
+
+/* ══════════════════════════════
+   FEED CARDS
+══════════════════════════════ */
+.feed {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 0 16px;
+}
+
+/* ── BASE CARD ── */
+.card {
+  background: var(--white);
+  border-radius: 22px;
+  overflow: hidden;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+  cursor: pointer;
+  transition: transform 0.18s cubic-bezier(0.34,1.2,0.64,1);
+}
+.card:active { transform: scale(0.97); }
+
+/* Card author row */
+.card-author {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 14px 16px 0;
+}
+.card-av {
+  width: 32px; height: 32px; border-radius: 50%;
+  background: var(--dark);
+  display: flex; align-items: center; justify-content: center;
+  font-family: 'Raleway', sans-serif; font-size: 0.72rem; font-weight: 800; color: #fff;
+  flex-shrink: 0;
+}
+.card-meta { flex: 1; }
+.card-name { font-family: 'Raleway', sans-serif; font-size: 0.78rem; font-weight: 700; color: var(--dark); }
+.card-time { font-size: 0.6rem; color: var(--muted); margin-top: 1px; }
+.card-dur-badge {
+  font-family: 'Raleway', sans-serif;
+  font-size: 0.72rem; font-weight: 800;
+  color: var(--blue);
+  background: rgba(46,145,252,0.08);
+  padding: 4px 10px; border-radius: 20px;
+}
+
+/* Card quote */
+.card-quote {
+  padding: 12px 16px 14px;
+}
+.card-quote-text {
+  font-family: 'Raleway', sans-serif;
+  font-size: 1.05rem; font-weight: 700;
+  color: var(--dark);
+  line-height: 1.45;
+  word-break: keep-all;
+}
+.card-quote-text em {
+  font-style: italic; font-weight: 400; color: var(--blue);
+}
+
+/* Card thoughts snippet */
+.card-snippet {
+  font-size: 0.72rem; color: #777;
+  line-height: 1.6; margin-top: 6px;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* Card divider */
+.card-line {
+  height: 1px;
+  background: rgba(0,0,0,0.05);
+  margin: 0 16px;
+}
+
+/* Card stats chips row */
+.card-chips {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 10px 16px 14px;
+  flex-wrap: wrap;
+}
+.chip {
+  background: #f0f1f2;
+  border-radius: 20px;
+  padding: 4px 10px;
+  font-size: 0.6rem; font-weight: 500; color: #666;
+  display: flex; align-items: center; gap: 3px;
+}
+.chip-icon { font-size: 0.7rem; }
+
+/* ── HERO CARD (first card, dark) ── */
+.card.hero {
+  background: var(--dark);
+}
+.card.hero .card-name { color: #fff; }
+.card.hero .card-time { color: #555; }
+.card.hero .card-dur-badge { color: #fff; background: rgba(255,255,255,0.1); }
+.card.hero .card-quote-text { color: #fff; }
+.card.hero .card-snippet { color: #666; }
+.card.hero .card-line { background: rgba(255,255,255,0.07); }
+.card.hero .chip { background: rgba(255,255,255,0.07); color: #888; }
+.card.hero .card-av { background: rgba(255,255,255,0.12); }
+
+/* Hero card big number */
+.hero-num-row {
+  display: flex;
+  align-items: baseline;
+  gap: 4px;
+  padding: 4px 16px 0;
+}
+.hero-num {
+  font-family: 'Raleway', sans-serif;
+  font-size: 4.5rem; font-weight: 900;
+  color: #fff; line-height: 1;
+  letter-spacing: -3px;
+}
+.hero-unit {
+  font-size: 1.1rem; font-weight: 300; color: #555;
+}
+
+/* ── PHOTO CARD ── */
+.card.photo-card {
+  position: relative;
+  min-height: 220px;
+  background: #111;
+}
+.photo-bg {
+  position: absolute; inset: 0;
+  background-size: cover; background-position: center;
+}
+.photo-overlay {
+  position: absolute; inset: 0;
+  background: linear-gradient(to bottom, rgba(0,0,0,0.1) 0%, rgba(0,0,0,0.7) 100%);
+}
+.card.photo-card .card-content {
+  position: relative; z-index: 1;
+}
+.card.photo-card .card-name { color: rgba(255,255,255,0.9); }
+.card.photo-card .card-time { color: rgba(255,255,255,0.45); }
+.card.photo-card .card-dur-badge { color: rgba(255,255,255,0.9); background: rgba(255,255,255,0.15); backdrop-filter: blur(8px); }
+.card.photo-card .card-quote-text { color: #fff; }
+.card.photo-card .card-snippet { color: rgba(255,255,255,0.55); }
+.card.photo-card .card-line { background: rgba(255,255,255,0.1); }
+.card.photo-card .chip { background: rgba(255,255,255,0.12); color: rgba(255,255,255,0.7); }
+.card.photo-card .card-av { background: rgba(255,255,255,0.15); backdrop-filter: blur(8px); }
+
+/* ── COMMUNITY PULSE CARD ── */
+.pulse-card {
+  background: linear-gradient(135deg, var(--blue) 0%, #1a6fd8 100%);
+  border-radius: 22px;
+  padding: 18px 18px;
+  box-shadow: 0 6px 20px rgba(46,145,252,0.3);
+}
+.pulse-title {
+  font-family: 'Raleway', sans-serif;
+  font-size: 0.6rem; font-weight: 700;
+  color: rgba(255,255,255,0.6);
+  letter-spacing: 1.5px; text-transform: uppercase;
+  margin-bottom: 8px;
+}
+.pulse-stat {
+  font-family: 'Raleway', sans-serif;
+  font-size: 2rem; font-weight: 900;
+  color: #fff; line-height: 1;
+  letter-spacing: -1px;
+}
+.pulse-sub {
+  font-size: 0.7rem; color: rgba(255,255,255,0.6);
+  margin-top: 4px;
+}
+.pulse-bar {
+  display: flex;
+  gap: 3px;
+  margin-top: 14px;
+  align-items: flex-end;
+  height: 36px;
+}
+.pulse-bar-col {
+  flex: 1; border-radius: 3px 3px 0 0;
+  background: rgba(255,255,255,0.15);
+  position: relative;
+}
+.pulse-bar-col.active {
+  background: rgba(255,255,255,0.9);
+}
+
+/* ── BOTTOM NAV ── */
+.bottom-nav {
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  background: rgba(240,241,242,0.95);
+  backdrop-filter: blur(20px);
+  border-top: 1px solid rgba(0,0,0,0.06);
+  display: flex; justify-content: space-around;
+  padding: 12px 0 28px;
+  z-index: 100;
+}
+.nav-item {
+  display: flex; flex-direction: column; align-items: center; gap: 2px;
+  font-size: 0.57rem; font-weight: 500; color: #C0C0C0; cursor: pointer; transition: color 0.15s;
+}
+.nav-item.active { color: var(--dark); }
+.nav-icon { font-size: 1.2rem; line-height: 1; }
+.fab {
+  position: absolute; bottom: 78px; right: 20px;
+  width: 50px; height: 50px; border-radius: 50%;
+  background: var(--blue); color: #fff;
+  font-size: 1.5rem; display: flex; align-items: center; justify-content: center;
+  box-shadow: 0 6px 20px rgba(46,145,252,0.4);
+  cursor: pointer; z-index: 101;
+  transition: transform 0.18s cubic-bezier(0.34,1.56,0.64,1);
+}
+.fab:active { transform: scale(0.9); }
+
+/* ── LABEL OUTSIDE PHONE ── */
+.phone-label {
+  text-align: center;
+  font-family: 'Raleway', sans-serif;
+  font-size: 0.85rem; font-weight: 700;
+  color: #555;
+  margin-top: 16px;
+}
+.phone-desc {
+  text-align: center;
+  font-size: 0.75rem;
+  color: #999;
+  max-width: 280px;
+  margin: 6px auto 0;
+  line-height: 1.5;
+}
+
+/* Slide-in animation */
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(16px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.feed .card,
+.feed .pulse-card { animation: fadeUp 0.4s cubic-bezier(0.22,1,0.36,1) both; }
+.feed .card:nth-child(1) { animation-delay: 0.04s }
+.feed .card:nth-child(2) { animation-delay: 0.1s }
+.feed .card:nth-child(3) { animation-delay: 0.16s }
+.feed .card:nth-child(4) { animation-delay: 0.22s }
+.feed .card:nth-child(5) { animation-delay: 0.28s }
+</style>
+</head>
+<body>
+
+<!-- ══════════════════════════════════
+     PHONE MOCKUP
+══════════════════════════════════ -->
+<div style="display:flex;flex-direction:column;align-items:center;">
+<div class="phone">
+  <div class="phone-screen">
+
+    <!-- HEADER -->
+    <div class="hdr">
+      <div class="hdr-logo">Mindful Running</div>
+      <div class="hdr-right">
+        <div class="hdr-avatar">이</div>
+      </div>
+    </div>
+
+    <!-- TODAY CREW STRIP -->
+    <div class="crew-strip">
+      <div class="crew-label">오늘 함께 달린 크루 · 7명</div>
+      <div class="crew-scroll">
+        <div class="crew-member">
+          <div class="crew-ring"><div class="crew-av-inner">이</div></div>
+          <div class="crew-name">이두승</div>
+          <div class="crew-min">32분</div>
+        </div>
+        <div class="crew-member">
+          <div class="crew-ring"><div class="crew-av-inner">김</div></div>
+          <div class="crew-name">김미래</div>
+          <div class="crew-min">45분</div>
+        </div>
+        <div class="crew-member">
+          <div class="crew-ring"><div class="crew-av-inner">박</div></div>
+          <div class="crew-name">박달리</div>
+          <div class="crew-min">28분</div>
+        </div>
+        <div class="crew-member">
+          <div class="crew-ring"><div class="crew-av-inner">최</div></div>
+          <div class="crew-name">최런런</div>
+          <div class="crew-min">60분</div>
+        </div>
+        <div class="crew-member">
+          <div class="crew-ring inactive"><div class="crew-av-inner">정</div></div>
+          <div class="crew-name" style="color:#bbb">정마음</div>
+          <div class="crew-min" style="color:#ccc">-</div>
+        </div>
+        <div class="crew-member">
+          <div class="crew-ring inactive"><div class="crew-av-inner">한</div></div>
+          <div class="crew-name" style="color:#bbb">한강이</div>
+          <div class="crew-min" style="color:#ccc">-</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="divider"></div>
+
+    <!-- FEED TABS -->
+    <div class="feed-tabs" style="margin-bottom:16px;">
+      <div class="feed-tab active">전체 피드</div>
+      <div class="feed-tab">내 기록</div>
+    </div>
+
+    <!-- ══ FEED ══ -->
+    <div class="feed">
+
+      <!-- CARD 1: Hero (dark, with big number) -->
+      <div class="card hero">
+        <div class="card-author">
+          <div class="card-av">이</div>
+          <div class="card-meta">
+            <div class="card-name">이두승</div>
+            <div class="card-time">오늘 06:30 AM · 남산</div>
+          </div>
+          <div class="card-dur-badge">32분</div>
+        </div>
+        <div class="hero-num-row">
+          <span class="hero-num">32</span>
+          <span class="hero-unit">분</span>
+        </div>
+        <div class="card-quote" style="padding-top:6px;">
+          <div class="card-quote-text">"맑은 아침,<br>마음도 맑아졌다"</div>
+          <div class="card-snippet" style="color:#555;margin-top:8px;">
+            달리기 전엔 피곤했는데 강바람이 시원하고 사람이 별로 없어서 기분이 훨씬 좋아졌다. 역시 달리고 나면 개운해.
+          </div>
+        </div>
+        <div class="card-line"></div>
+        <div class="card-chips">
+          <div class="chip"><span class="chip-icon">☀️</span>맑음</div>
+          <div class="chip"><span class="chip-icon">📍</span>남산</div>
+          <div class="chip"><span class="chip-icon">🌡</span>18°C</div>
+        </div>
+      </div>
+
+      <!-- COMMUNITY PULSE CARD -->
+      <div class="pulse-card">
+        <div class="pulse-title">이번 주 크루 현황</div>
+        <div style="display:flex;justify-content:space-between;align-items:flex-end;">
+          <div>
+            <div class="pulse-stat">247<span style="font-size:1rem;font-weight:400;margin-left:2px;color:rgba(255,255,255,0.5)">회</span></div>
+            <div class="pulse-sub">8명이 이번주에 달렸어요</div>
+          </div>
+          <div style="text-align:right;">
+            <div style="font-family:'Raleway',sans-serif;font-size:1.3rem;font-weight:800;color:#fff;">142<span style="font-size:0.75rem;font-weight:400;color:rgba(255,255,255,0.5);margin-left:2px">h</span></div>
+            <div style="font-size:0.6rem;color:rgba(255,255,255,0.5);">누적 달린 시간</div>
+          </div>
+        </div>
+        <div class="pulse-bar">
+          <div class="pulse-bar-col" style="height:40%"></div>
+          <div class="pulse-bar-col" style="height:60%"></div>
+          <div class="pulse-bar-col" style="height:50%"></div>
+          <div class="pulse-bar-col" style="height:75%"></div>
+          <div class="pulse-bar-col" style="height:65%"></div>
+          <div class="pulse-bar-col" style="height:80%"></div>
+          <div class="pulse-bar-col active" style="height:90%"></div>
+        </div>
+      </div>
+
+      <!-- CARD 2: Photo card -->
+      <div class="card photo-card">
+        <div class="photo-bg" style="background-image:url('https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=500&q=80&fit=crop&crop=center');background-color:#1c3d2e;"></div>
+        <div class="photo-overlay"></div>
+        <div class="card-content">
+          <div class="card-author">
+            <div class="card-av">김</div>
+            <div class="card-meta">
+              <div class="card-name">김미래</div>
+              <div class="card-time">오늘 07:15 AM · 한강</div>
+            </div>
+            <div class="card-dur-badge">45분</div>
+          </div>
+          <div class="card-quote">
+            <div class="card-quote-text">"한강 노을,<br>달리면서 처음 봤다"</div>
+            <div class="card-snippet">
+              퇴근 후 처음으로 야간 달리기를 해봤다. 한강에 노을이 지는 걸 달리면서 봤는데 정말 아름다웠어.
+            </div>
+          </div>
+          <div class="card-line"></div>
+          <div class="card-chips">
+            <div class="chip"><span class="chip-icon">🌅</span>한강</div>
+            <div class="chip"><span class="chip-icon">📸</span>사진 있음</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- CARD 3: White card -->
+      <div class="card">
+        <div class="card-author">
+          <div class="card-av" style="background:#555">박</div>
+          <div class="card-meta">
+            <div class="card-name">박달리</div>
+            <div class="card-time">어제 07:00 PM · 공원</div>
+          </div>
+          <div class="card-dur-badge">28분</div>
+        </div>
+        <div class="card-quote">
+          <div class="card-quote-text">"비 와도<br><em>핑계 없이</em>"</div>
+          <div class="card-snippet">
+            오늘은 비가 와서 실내 트랙에서 뛰었다. 팟캐스트 들으면서 뛰니까 28분이 금방 지나갔다.
+          </div>
+        </div>
+        <div class="card-line"></div>
+        <div class="card-chips">
+          <div class="chip"><span class="chip-icon">🌧</span>비</div>
+          <div class="chip"><span class="chip-icon">🏟</span>실내</div>
+        </div>
+      </div>
+
+      <!-- CARD 4: White card, no snippet -->
+      <div class="card">
+        <div class="card-author">
+          <div class="card-av" style="background:#777">최</div>
+          <div class="card-meta">
+            <div class="card-name">최런런</div>
+            <div class="card-time">어제 06:00 AM</div>
+          </div>
+          <div class="card-dur-badge" style="background:rgba(46,145,252,0.08)">60분</div>
+        </div>
+        <div class="card-quote">
+          <div class="card-quote-text">"새벽 한 시간,<br>하루가 달라진다"</div>
+        </div>
+        <div class="card-line"></div>
+        <div class="card-chips">
+          <div class="chip"><span class="chip-icon">🌙</span>새벽</div>
+          <div class="chip" style="background:rgba(46,145,252,0.08);color:var(--blue);font-weight:600;">🏆 이번달 1위</div>
+        </div>
+      </div>
+
+    </div><!-- /feed -->
+
+    <div style="height:20px;"></div>
+
+  </div><!-- /phone-screen -->
+
+  <!-- BOTTOM NAV -->
+  <div class="bottom-nav">
+    <div class="nav-item active"><div class="nav-icon">⊞</div>홈</div>
+    <div class="nav-item"><div class="nav-icon">✏️</div>기록</div>
+    <div class="nav-item"><div class="nav-icon">↑</div>리더보드</div>
+    <div class="nav-item"><div class="nav-icon">○</div>프로필</div>
+  </div>
+  <div class="fab">+</div>
+</div>
+
+<div class="phone-label">Home Feed Redesign</div>
+<div class="phone-desc">소셜 다이어리 피드 · 크루 스트립 + 세로 카드</div>
+</div>
+
+<!-- ══════════════════════════════════
+     DESIGN NOTES (오른쪽 패널)
+══════════════════════════════════ -->
+<div style="max-width:320px;padding:40px 0;">
+  <div style="font-family:'Raleway',sans-serif;font-size:1.1rem;font-weight:800;color:#2d3031;margin-bottom:4px;">디자인 포인트</div>
+  <div style="font-size:0.75rem;color:#999;margin-bottom:28px;">2025 트렌드 적용 요소</div>
+
+  <div style="display:flex;flex-direction:column;gap:20px;">
+    <div style="background:#fff;border-radius:16px;padding:16px;box-shadow:0 2px 10px rgba(0,0,0,0.06);">
+      <div style="font-family:'Raleway',sans-serif;font-size:0.78rem;font-weight:700;color:#2d3031;margin-bottom:6px;">① 크루 스트립</div>
+      <div style="font-size:0.72rem;color:#666;line-height:1.6;">오늘 달린 멤버 → 파란 링 + 이름 + 달린 시간. 아직 안 달린 멤버 → 회색으로 표시. BeReal / Instagram Stories 스타일.</div>
+    </div>
+
+    <div style="background:#fff;border-radius:16px;padding:16px;box-shadow:0 2px 10px rgba(0,0,0,0.06);">
+      <div style="font-family:'Raleway',sans-serif;font-size:0.78rem;font-weight:700;color:#2d3031;margin-bottom:6px;">② 소셜 카드 구조</div>
+      <div style="font-size:0.72rem;color:#666;line-height:1.6;">각 카드에 아바타 + 이름 + 시간대를 명시. 기존 masonry에서 <strong>세로 단일 컬럼</strong>으로 전환 → 인용구가 더 크고 읽기 쉬워짐.</div>
+    </div>
+
+    <div style="background:#2d3031;border-radius:16px;padding:16px;">
+      <div style="font-family:'Raleway',sans-serif;font-size:0.78rem;font-weight:700;color:#fff;margin-bottom:6px;">③ 히어로 카드</div>
+      <div style="font-size:0.72rem;color:#666;line-height:1.6;">첫 번째 카드는 다크 배경 + <span style="color:#2E91FC;font-weight:700;">4.5rem</span> 숫자로 "오늘 달린 시간"을 강조. 나머지는 화이트.</div>
+    </div>
+
+    <div style="background:linear-gradient(135deg,#2E91FC,#1a6fd8);border-radius:16px;padding:16px;">
+      <div style="font-family:'Raleway',sans-serif;font-size:0.78rem;font-weight:700;color:#fff;margin-bottom:6px;">④ 커뮤니티 펄스 카드</div>
+      <div style="font-size:0.72rem;color:rgba(255,255,255,0.65);line-height:1.6;">이번 주 크루 달리기 현황을 블루 카드로. 요일별 바 차트 + 누적 시간. "혼자 달리는 게 아니다"는 느낌.</div>
+    </div>
+
+    <div style="background:#fff;border-radius:16px;padding:16px;box-shadow:0 2px 10px rgba(0,0,0,0.06);">
+      <div style="font-family:'Raleway',sans-serif;font-size:0.78rem;font-weight:700;color:#2d3031;margin-bottom:6px;">⑤ 칩(Chip) 태그</div>
+      <div style="font-size:0.72rem;color:#666;line-height:1.6;">날씨 / 장소 / 순위를 소형 칩으로 표시. 기록에 이미 <code style="background:#f0f1f2;padding:1px 4px;border-radius:4px;">location</code> 필드가 있어 즉시 적용 가능.</div>
+    </div>
+
+    <div style="background:#fff;border-radius:16px;padding:16px;box-shadow:0 2px 10px rgba(0,0,0,0.06);">
+      <div style="font-family:'Raleway',sans-serif;font-size:0.78rem;font-weight:700;color:#2d3031;margin-bottom:8px;">구현 크기 예상</div>
+      <div style="display:flex;flex-direction:column;gap:6px;">
+        <div style="display:flex;align-items:center;gap:8px;font-size:0.7rem;color:#444;">
+          <span style="width:8px;height:8px;border-radius:50%;background:#10B981;flex-shrink:0;display:inline-block;"></span>
+          크루 스트립 — 중간 (오늘 달린 사람 쿼리 필요)
+        </div>
+        <div style="display:flex;align-items:center;gap:8px;font-size:0.7rem;color:#444;">
+          <span style="width:8px;height:8px;border-radius:50%;background:#10B981;flex-shrink:0;display:inline-block;"></span>
+          카드 리디자인 — 작음 (CSS 교체)
+        </div>
+        <div style="display:flex;align-items:center;gap:8px;font-size:0.7rem;color:#444;">
+          <span style="width:8px;height:8px;border-radius:50%;background:#F59E0B;flex-shrink:0;display:inline-block;"></span>
+          커뮤니티 펄스 카드 — 중간 (주별 집계 쿼리)
+        </div>
+        <div style="display:flex;align-items:center;gap:8px;font-size:0.7rem;color:#444;">
+          <span style="width:8px;height:8px;border-radius:50%;background:#10B981;flex-shrink:0;display:inline-block;"></span>
+          칩 태그 — 작음 (기존 location 필드 활용)
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>

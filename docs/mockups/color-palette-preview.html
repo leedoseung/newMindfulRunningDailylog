@@ -1,0 +1,699 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Color Palette Preview — Mindful Running</title>
+<link href="https://fonts.googleapis.com/css2?family=Raleway:ital,wght@0,300;0,400;0,600;0,700;0,800;0,900;1,400;1,700&family=Roboto:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+body {
+  font-family: 'Roboto', sans-serif;
+  background: #111;
+  min-height: 100vh;
+  padding: 0;
+}
+
+/* ── PALETTE SELECTOR ── */
+.selector-bar {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  z-index: 1000;
+  background: rgba(10,10,10,0.92);
+  backdrop-filter: blur(20px);
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+  padding: 16px 24px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.selector-label {
+  font-family: 'Raleway', sans-serif;
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: rgba(255,255,255,0.35);
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+.palette-btns {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+.palette-btns::-webkit-scrollbar { display: none; }
+.pal-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 14px;
+  border-radius: 20px;
+  border: 1.5px solid rgba(255,255,255,0.1);
+  background: transparent;
+  cursor: pointer;
+  transition: all 0.2s;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+.pal-btn.active {
+  border-color: rgba(255,255,255,0.5);
+  background: rgba(255,255,255,0.08);
+}
+.pal-dot-group {
+  display: flex;
+  gap: 3px;
+}
+.pal-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+}
+.pal-btn-name {
+  font-family: 'Raleway', sans-serif;
+  font-size: 0.68rem;
+  font-weight: 700;
+  color: rgba(255,255,255,0.6);
+}
+.pal-btn.active .pal-btn-name { color: #fff; }
+
+/* ── PHONES GRID ── */
+.phones-grid {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  gap: 32px;
+  padding: 100px 40px 60px;
+  flex-wrap: wrap;
+}
+
+/* ── PHONE SHELL ── */
+.phone-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+  opacity: 0;
+  transform: translateY(16px);
+  transition: opacity 0.4s ease, transform 0.4s ease;
+}
+.phone-wrap.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+.phone {
+  width: 320px;
+  height: 680px;
+  border-radius: 40px;
+  overflow: hidden;
+  box-shadow: 0 40px 80px rgba(0,0,0,0.5), 0 0 0 8px #1a1a1a, 0 0 0 9px #333;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  transition: transform 0.3s cubic-bezier(0.34,1.2,0.64,1);
+}
+.phone:hover { transform: scale(1.02); }
+.phone-screen {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  scrollbar-width: none;
+  padding-bottom: 70px;
+}
+.phone-screen::-webkit-scrollbar { display: none; }
+
+/* ── PALETTE TAG ── */
+.palette-tag {
+  font-family: 'Raleway', sans-serif;
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: rgba(255,255,255,0.5);
+  text-align: center;
+  letter-spacing: 0.5px;
+}
+.palette-tag strong { color: #fff; }
+
+/* ── BOTTOM NAV ── */
+.bottom-nav {
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  backdrop-filter: blur(20px);
+  border-top: 1px solid rgba(0,0,0,0.06);
+  display: flex;
+  justify-content: space-around;
+  padding: 10px 0 20px;
+  z-index: 100;
+}
+.nav-item {
+  display: flex; flex-direction: column; align-items: center; gap: 2px;
+  font-size: 0.52rem; font-weight: 500; cursor: pointer;
+}
+.nav-icon { font-size: 1.1rem; line-height: 1; }
+
+/* ── COMMON INNER ELEMENTS ── */
+.hdr {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 40px 18px 14px;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  backdrop-filter: blur(20px);
+}
+.hdr-logo {
+  font-family: 'Raleway', sans-serif;
+  font-size: 0.6rem; font-weight: 700;
+  letter-spacing: 2.5px; text-transform: uppercase;
+}
+.hdr-av {
+  width: 30px; height: 30px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-family: 'Raleway', sans-serif; font-size: 0.7rem; font-weight: 800; color: #fff;
+}
+
+.crew-section { padding: 4px 18px 0; }
+.crew-lbl {
+  font-size: 0.54rem; font-weight: 600;
+  letter-spacing: 1.5px; text-transform: uppercase;
+  margin-bottom: 10px;
+}
+.crew-scroll { display: flex; gap: 10px; overflow-x: auto; scrollbar-width: none; }
+.crew-scroll::-webkit-scrollbar { display: none; }
+.crew-item {
+  display: flex; flex-direction: column; align-items: center; gap: 4px; flex-shrink: 0;
+}
+.crew-ring {
+  width: 44px; height: 44px; border-radius: 50%; padding: 2px;
+}
+.crew-inner {
+  width: 100%; height: 100%; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-family: 'Raleway', sans-serif; font-size: 0.75rem; font-weight: 800; color: #fff;
+  border: 2px solid transparent;
+}
+.crew-name { font-size: 0.5rem; font-weight: 500; }
+.crew-min { font-family: 'Raleway', sans-serif; font-size: 0.52rem; font-weight: 700; }
+
+.divider { height: 1px; margin: 12px 18px; opacity: 0.08; background: #000; }
+
+.tabs {
+  display: flex; margin: 0 18px 14px;
+  border-radius: 9px; padding: 3px;
+}
+.tab {
+  flex: 1; text-align: center; padding: 6px;
+  font-family: 'Raleway', sans-serif; font-size: 0.6rem; font-weight: 700;
+  border-radius: 7px; transition: all 0.2s;
+}
+
+.feed { display: flex; flex-direction: column; gap: 10px; padding: 0 14px; }
+
+/* ── HERO CARD ── */
+.hero-card {
+  border-radius: 18px; overflow: hidden; padding: 12px 14px 12px;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.12);
+}
+.card-author {
+  display: flex; align-items: center; gap: 8px; margin-bottom: 0;
+}
+.card-av {
+  width: 28px; height: 28px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-family: 'Raleway', sans-serif; font-size: 0.65rem; font-weight: 800; color: #fff;
+  flex-shrink: 0;
+}
+.card-meta { flex: 1; }
+.card-name { font-family: 'Raleway', sans-serif; font-size: 0.7rem; font-weight: 700; }
+.card-time { font-size: 0.54rem; margin-top: 1px; }
+.card-badge {
+  font-family: 'Raleway', sans-serif; font-size: 0.64rem; font-weight: 800;
+  padding: 3px 8px; border-radius: 20px; flex-shrink: 0;
+}
+.hero-num-row { display: flex; align-items: baseline; gap: 4px; margin: 2px 0 6px; }
+.hero-num {
+  font-family: 'Raleway', sans-serif;
+  font-size: 3.8rem; font-weight: 900; line-height: 1; letter-spacing: -3px;
+}
+.hero-unit { font-size: 1rem; font-weight: 300; }
+.card-quote {
+  font-family: 'Raleway', sans-serif;
+  font-size: 0.88rem; font-weight: 700; line-height: 1.4; word-break: keep-all;
+  margin-bottom: 6px;
+}
+.card-snippet {
+  font-size: 0.64rem; line-height: 1.55;
+  display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+  margin-bottom: 10px;
+}
+.card-divider { height: 1px; margin: 0 0 8px; }
+.chips { display: flex; gap: 5px; flex-wrap: wrap; }
+.chip {
+  border-radius: 20px; padding: 3px 9px;
+  font-size: 0.54rem; font-weight: 500;
+}
+
+/* ── PULSE CARD ── */
+.pulse-card {
+  border-radius: 18px; padding: 14px;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+}
+.pulse-lbl { font-size: 0.54rem; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; margin-bottom: 8px; }
+.pulse-stat-row { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 12px; }
+.pulse-num { font-family: 'Raleway', sans-serif; font-size: 1.6rem; font-weight: 900; line-height: 1; }
+.pulse-sub { font-size: 0.58rem; margin-top: 3px; }
+.pulse-bars { display: flex; align-items: flex-end; gap: 3px; height: 28px; margin-bottom: 4px; }
+.bar-col { flex: 1; border-radius: 2px 2px 0 0; }
+.bar-labels { display: flex; gap: 3px; }
+.bar-lbl { flex: 1; text-align: center; font-size: 0.44rem; }
+
+/* ── WHITE CARD ── */
+.white-card {
+  border-radius: 18px; overflow: hidden;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.06);
+}
+</style>
+</head>
+<body>
+
+<!-- PALETTE SELECTOR BAR -->
+<div class="selector-bar">
+  <div class="selector-label">Color</div>
+  <div class="palette-btns">
+    <button class="pal-btn active" onclick="setPalette(0)">
+      <div class="pal-dot-group">
+        <div class="pal-dot" style="background:#EFEDE8"></div>
+        <div class="pal-dot" style="background:#1C1C1A"></div>
+        <div class="pal-dot" style="background:#E8855A"></div>
+      </div>
+      <span class="pal-btn-name">Warm Terracotta</span>
+    </button>
+    <button class="pal-btn" onclick="setPalette(1)">
+      <div class="pal-dot-group">
+        <div class="pal-dot" style="background:#F0EDE6"></div>
+        <div class="pal-dot" style="background:#1A1C18"></div>
+        <div class="pal-dot" style="background:#6A8C5E"></div>
+      </div>
+      <span class="pal-btn-name">Sage & Obsidian</span>
+    </button>
+    <button class="pal-btn" onclick="setPalette(2)">
+      <div class="pal-dot-group">
+        <div class="pal-dot" style="background:#F6F4F1"></div>
+        <div class="pal-dot" style="background:#141414"></div>
+        <div class="pal-dot" style="background:#FF5C3A"></div>
+      </div>
+      <span class="pal-btn-name">Midnight Coral</span>
+    </button>
+    <button class="pal-btn" onclick="setPalette(3)">
+      <div class="pal-dot-group">
+        <div class="pal-dot" style="background:#F8F6F2"></div>
+        <div class="pal-dot" style="background:#1A1714"></div>
+        <div class="pal-dot" style="background:#C9A96E"></div>
+      </div>
+      <span class="pal-btn-name">Sand & Gold</span>
+    </button>
+    <button class="pal-btn" onclick="setPalette(4)">
+      <div class="pal-dot-group">
+        <div class="pal-dot" style="background:#EEF0F5"></div>
+        <div class="pal-dot" style="background:#161A28"></div>
+        <div class="pal-dot" style="background:#7B6EF6"></div>
+      </div>
+      <span class="pal-btn-name">Lavender Ink</span>
+    </button>
+  </div>
+</div>
+
+<!-- PHONES GRID -->
+<div class="phones-grid" id="phonesGrid">
+  <!-- phones rendered by JS -->
+</div>
+
+<script>
+const PALETTES = [
+  {
+    name: 'Warm Terracotta',
+    desc: '따뜻한 크림 + 테라코타 오렌지',
+    bg: '#EFEDE8',
+    dark: '#1C1C1A',
+    accent: '#E8855A',
+    accentLight: '#F2B49A',
+    accentGrad: 'linear-gradient(135deg,#E8855A,#F2B49A)',
+    card: '#FDFCF8',
+    muted: '#9E9181',
+    navBg: 'rgba(239,237,232,0.94)',
+    hdrBg: 'rgba(239,237,232,0.92)',
+    tabBg: '#E4E0D8',
+    tabActive: '#FDFCF8',
+    crewRingInactive: '#D8D2C8',
+    crewAvInactive: '#B5AFA7',
+    chipBg: '#EAE7E1',
+    dividerCard: 'rgba(0,0,0,0.06)',
+    pulseGrad: 'linear-gradient(135deg,#E8855A,#D4643A)',
+    pulseBarActive: 'rgba(255,255,255,0.9)',
+    pulseBarInactive: 'rgba(255,255,255,0.2)',
+    heroText: '#fff',
+    heroMuted: '#7A6A5A',
+    heroBadgeBg: 'rgba(255,255,255,0.1)',
+    heroChipBg: 'rgba(255,255,255,0.09)',
+  },
+  {
+    name: 'Sage & Obsidian',
+    desc: '따뜻한 샌드 + 세이지 그린',
+    bg: '#F0EDE6',
+    dark: '#1A1C18',
+    accent: '#6A8C5E',
+    accentLight: '#92B285',
+    accentGrad: 'linear-gradient(135deg,#6A8C5E,#92B285)',
+    card: '#FDFAF4',
+    muted: '#8E8A7A',
+    navBg: 'rgba(240,237,230,0.94)',
+    hdrBg: 'rgba(240,237,230,0.92)',
+    tabBg: '#E2DED4',
+    tabActive: '#FDFAF4',
+    crewRingInactive: '#D4CFC4',
+    crewAvInactive: '#AEAA9E',
+    chipBg: '#E6E2D8',
+    dividerCard: 'rgba(0,0,0,0.06)',
+    pulseGrad: 'linear-gradient(135deg,#6A8C5E,#3D5E35)',
+    pulseBarActive: 'rgba(255,255,255,0.9)',
+    pulseBarInactive: 'rgba(255,255,255,0.18)',
+    heroText: '#fff',
+    heroMuted: '#687060',
+    heroBadgeBg: 'rgba(255,255,255,0.1)',
+    heroChipBg: 'rgba(255,255,255,0.09)',
+  },
+  {
+    name: 'Midnight Coral',
+    desc: '오프화이트 + 코랄 레드',
+    bg: '#F6F4F1',
+    dark: '#141414',
+    accent: '#FF5C3A',
+    accentLight: '#FF9B80',
+    accentGrad: 'linear-gradient(135deg,#FF5C3A,#FF9B80)',
+    card: '#FFFFFF',
+    muted: '#9A9692',
+    navBg: 'rgba(246,244,241,0.94)',
+    hdrBg: 'rgba(246,244,241,0.92)',
+    tabBg: '#ECEAE6',
+    tabActive: '#FFFFFF',
+    crewRingInactive: '#DCDAD6',
+    crewAvInactive: '#B8B6B2',
+    chipBg: '#EDECEA',
+    dividerCard: 'rgba(0,0,0,0.05)',
+    pulseGrad: 'linear-gradient(135deg,#FF5C3A,#D93A1E)',
+    pulseBarActive: 'rgba(255,255,255,0.9)',
+    pulseBarInactive: 'rgba(255,255,255,0.2)',
+    heroText: '#fff',
+    heroMuted: '#666',
+    heroBadgeBg: 'rgba(255,255,255,0.1)',
+    heroChipBg: 'rgba(255,255,255,0.09)',
+  },
+  {
+    name: 'Sand & Gold',
+    desc: '따뜻한 샌드 + 앤틱 골드',
+    bg: '#F8F6F2',
+    dark: '#1A1714',
+    accent: '#C9A96E',
+    accentLight: '#DEC48E',
+    accentGrad: 'linear-gradient(135deg,#C9A96E,#DEC48E)',
+    card: '#FEFDFA',
+    muted: '#9C9080',
+    navBg: 'rgba(248,246,242,0.94)',
+    hdrBg: 'rgba(248,246,242,0.92)',
+    tabBg: '#EAE6DE',
+    tabActive: '#FEFDFA',
+    crewRingInactive: '#DCD8CE',
+    crewAvInactive: '#BAB6AE',
+    chipBg: '#EEE9DF',
+    dividerCard: 'rgba(0,0,0,0.05)',
+    pulseGrad: 'linear-gradient(135deg,#C9A96E,#A07C40)',
+    pulseBarActive: 'rgba(255,255,255,0.9)',
+    pulseBarInactive: 'rgba(255,255,255,0.2)',
+    heroText: '#fff',
+    heroMuted: '#7A6A4A',
+    heroBadgeBg: 'rgba(255,255,255,0.1)',
+    heroChipBg: 'rgba(255,255,255,0.09)',
+  },
+  {
+    name: 'Lavender Ink',
+    desc: '쿨 그레이 + 라벤더 퍼플',
+    bg: '#EEF0F5',
+    dark: '#161A28',
+    accent: '#7B6EF6',
+    accentLight: '#A89DF8',
+    accentGrad: 'linear-gradient(135deg,#7B6EF6,#A89DF8)',
+    card: '#FFFFFF',
+    muted: '#8A8EA8',
+    navBg: 'rgba(238,240,245,0.94)',
+    hdrBg: 'rgba(238,240,245,0.92)',
+    tabBg: '#E0E4EF',
+    tabActive: '#FFFFFF',
+    crewRingInactive: '#D4D8E8',
+    crewAvInactive: '#B0B4CC',
+    chipBg: '#E6E8F2',
+    dividerCard: 'rgba(0,0,0,0.06)',
+    pulseGrad: 'linear-gradient(135deg,#7B6EF6,#4E40D4)',
+    pulseBarActive: 'rgba(255,255,255,0.9)',
+    pulseBarInactive: 'rgba(255,255,255,0.2)',
+    heroText: '#fff',
+    heroMuted: '#6A6E88',
+    heroBadgeBg: 'rgba(255,255,255,0.1)',
+    heroChipBg: 'rgba(255,255,255,0.09)',
+  },
+];
+
+let currentPalette = 0;
+
+function renderPhone(p, delay) {
+  const wrap = document.createElement('div');
+  wrap.className = 'phone-wrap';
+  setTimeout(() => wrap.classList.add('visible'), delay);
+
+  const phone = document.createElement('div');
+  phone.className = 'phone';
+  phone.style.background = p.bg;
+
+  phone.innerHTML = `
+    <!-- HEADER -->
+    <div class="hdr" style="background:${p.hdrBg}">
+      <div class="hdr-logo" style="color:${p.muted}">${p.name}</div>
+      <div class="hdr-av" style="background:${p.dark}">이</div>
+    </div>
+
+    <div class="phone-screen">
+      <!-- CREW STRIP -->
+      <div class="crew-section">
+        <div class="crew-lbl" style="color:${p.muted}">오늘 함께 달린 크루 · 4명</div>
+        <div class="crew-scroll">
+          ${['이','김','박','최'].map((n,i) => `
+            <div class="crew-item">
+              <div class="crew-ring" style="background:${i<4?p.accentGrad:p.crewRingInactive}">
+                <div class="crew-inner" style="background:${i<4?p.dark:p.crewAvInactive};border-color:${p.bg}">${n}</div>
+              </div>
+              <div class="crew-name" style="color:${i<4?p.dark:p.crewAvInactive}">${['이두승','김미래','박달리','최런런'][i]}</div>
+              <div class="crew-min" style="color:${i<4?p.accent:p.crewRingInactive}">${i<4?['32분','45분','28분','60분'][i]:'–'}</div>
+            </div>
+          `).join('')}
+        </div>
+      </div>
+
+      <div class="divider"></div>
+
+      <!-- TABS -->
+      <div class="tabs" style="background:${p.tabBg}">
+        <div class="tab" style="background:${p.tabActive};color:${p.dark};box-shadow:0 1px 4px rgba(0,0,0,0.1)">전체 피드</div>
+        <div class="tab" style="color:${p.muted}">내 기록</div>
+      </div>
+
+      <!-- FEED -->
+      <div class="feed">
+
+        <!-- HERO CARD -->
+        <div class="hero-card" style="background:${p.dark}">
+          <div class="card-author">
+            <div class="card-av" style="background:${p.heroBadgeBg}">이</div>
+            <div class="card-meta">
+              <div class="card-name" style="color:${p.heroText}">이두승</div>
+              <div class="card-time" style="color:${p.heroMuted}">오늘 · 남산</div>
+            </div>
+            <div class="card-badge" style="background:${p.heroBadgeBg};color:${p.heroText}">32분</div>
+          </div>
+          <div class="hero-num-row">
+            <span class="hero-num" style="color:${p.accent}">32</span>
+            <span class="hero-unit" style="color:${p.heroMuted}">분</span>
+          </div>
+          <div class="card-quote" style="color:${p.heroText}">"맑은 아침, 마음도 맑아졌다"</div>
+          <div class="card-snippet" style="color:${p.heroMuted}">달리기 전엔 피곤했는데 강바람이 시원하고 사람이 별로 없어서 기분이 훨씬 좋아졌다.</div>
+          <div class="card-divider" style="background:rgba(255,255,255,0.07)"></div>
+          <div class="chips">
+            <div class="chip" style="background:${p.heroChipBg};color:${p.muted}">☀️ 맑음</div>
+            <div class="chip" style="background:${p.heroChipBg};color:${p.muted}">📍 남산</div>
+          </div>
+        </div>
+
+        <!-- PULSE CARD -->
+        <div class="pulse-card" style="background:${p.pulseGrad}">
+          <div class="pulse-lbl" style="color:rgba(255,255,255,0.6)">이번 주 크루 현황</div>
+          <div class="pulse-stat-row">
+            <div>
+              <div class="pulse-num" style="color:#fff">24<span style="font-size:0.8rem;font-weight:400;color:rgba(255,255,255,0.5);margin-left:2px">회</span></div>
+              <div class="pulse-sub" style="color:rgba(255,255,255,0.6)">6명이 이번주에 달렸어요</div>
+            </div>
+            <div style="text-align:right">
+              <div style="font-family:'Raleway',sans-serif;font-size:1.1rem;font-weight:800;color:#fff">47<span style="font-size:0.65rem;font-weight:400;color:rgba(255,255,255,0.5);margin-left:1px">h</span></div>
+              <div style="font-size:0.52rem;color:rgba(255,255,255,0.5)">누적 달린 시간</div>
+            </div>
+          </div>
+          <div class="pulse-bars">
+            ${[30,55,45,70,50,80,90].map((h,i) => `
+              <div class="bar-col" style="height:${h}%;background:${i===6?p.pulseBarActive:p.pulseBarInactive}"></div>
+            `).join('')}
+          </div>
+          <div class="bar-labels">
+            ${['월','화','수','목','금','토','오늘'].map((l,i) => `
+              <div class="bar-lbl" style="color:${i===6?'rgba(255,255,255,0.85)':'rgba(255,255,255,0.35)'};font-weight:${i===6?700:400}">${l}</div>
+            `).join('')}
+          </div>
+        </div>
+
+        <!-- WHITE CARD -->
+        <div class="white-card" style="background:${p.card}">
+          <div style="padding:12px 14px 0">
+            <div class="card-author">
+              <div class="card-av" style="background:${p.dark}">김</div>
+              <div class="card-meta">
+                <div class="card-name" style="color:${p.dark}">김미래</div>
+                <div class="card-time" style="color:${p.muted}">오늘 · 한강</div>
+              </div>
+              <div class="card-badge" style="background:rgba(0,0,0,0.05);color:${p.accent}">45분</div>
+            </div>
+          </div>
+          <div style="padding:10px 14px 0">
+            <div class="card-quote" style="color:${p.dark}">"한강 노을, 달리면서 처음 봤다"</div>
+            <div class="card-snippet" style="color:${p.muted}">퇴근 후 처음으로 야간 달리기를 해봤다. 한강에 노을이 지는 걸 보며 달렸는데 정말 아름다웠어.</div>
+          </div>
+          <div style="padding:8px 14px 12px">
+            <div class="card-divider" style="background:${p.dividerCard};margin-bottom:8px"></div>
+            <div class="chips">
+              <div class="chip" style="background:${p.chipBg};color:${p.muted}">📍 한강</div>
+              <div class="chip" style="background:${p.chipBg};color:${p.muted}">📸 사진</div>
+            </div>
+          </div>
+        </div>
+
+      </div><!-- /feed -->
+      <div style="height:16px"></div>
+    </div><!-- /phone-screen -->
+
+    <!-- BOTTOM NAV -->
+    <div class="bottom-nav" style="background:${p.navBg};border-color:rgba(0,0,0,0.06)">
+      <div class="nav-item" style="color:${p.dark}"><div class="nav-icon">⊞</div>홈</div>
+      <div class="nav-item" style="color:${p.crewAvInactive}"><div class="nav-icon">✏️</div>기록</div>
+      <div class="nav-item" style="color:${p.crewAvInactive}"><div class="nav-icon">↑</div>리더보드</div>
+      <div class="nav-item" style="color:${p.crewAvInactive}"><div class="nav-icon">○</div>프로필</div>
+    </div>
+  `;
+
+  const tag = document.createElement('div');
+  tag.className = 'palette-tag';
+  tag.innerHTML = `<strong>${p.name}</strong><br><span style="font-size:0.62rem;color:rgba(255,255,255,0.3)">${p.desc}</span>`;
+
+  // Color swatches
+  const swatches = document.createElement('div');
+  swatches.style.cssText = 'display:flex;gap:6px;justify-content:center;margin-top:6px';
+  [
+    { color: p.bg, label: 'BG' },
+    { color: p.dark, label: 'Dark' },
+    { color: p.accent, label: 'Accent' },
+    { color: p.card, label: 'Card' },
+  ].forEach(s => {
+    const sw = document.createElement('div');
+    sw.title = `${s.label}: ${s.color}`;
+    sw.style.cssText = `width:18px;height:18px;border-radius:50%;background:${s.color};border:1.5px solid rgba(255,255,255,0.15);cursor:default`;
+    sw.addEventListener('click', () => {
+      navigator.clipboard?.writeText(s.color).catch(()=>{});
+      sw.style.transform = 'scale(1.3)';
+      setTimeout(() => sw.style.transform = '', 300);
+    });
+    swatches.appendChild(sw);
+  });
+
+  wrap.appendChild(phone);
+  wrap.appendChild(tag);
+  wrap.appendChild(swatches);
+  return wrap;
+}
+
+function setPalette(idx) {
+  currentPalette = idx;
+  document.querySelectorAll('.pal-btn').forEach((b, i) => {
+    b.classList.toggle('active', i === idx);
+  });
+  renderGrid();
+}
+
+function renderGrid() {
+  const grid = document.getElementById('phonesGrid');
+  grid.innerHTML = '';
+  const p = PALETTES[currentPalette];
+  const wrap = renderPhone(p, 0);
+  grid.appendChild(wrap);
+
+  // Also show a mini "all palettes" row below
+  const allRow = document.createElement('div');
+  allRow.style.cssText = 'display:flex;flex-direction:column;align-items:center;gap:12px;padding:20px 0 0';
+
+  const allLabel = document.createElement('div');
+  allLabel.style.cssText = 'font-family:Raleway,sans-serif;font-size:0.62rem;font-weight:600;color:rgba(255,255,255,0.25);letter-spacing:2px;text-transform:uppercase';
+  allLabel.textContent = '다른 팔레트';
+  allRow.appendChild(allLabel);
+
+  const miniRow = document.createElement('div');
+  miniRow.style.cssText = 'display:flex;gap:10px;flex-wrap:wrap;justify-content:center';
+
+  PALETTES.forEach((pal, i) => {
+    if (i === currentPalette) return;
+    const miniBtn = document.createElement('button');
+    miniBtn.style.cssText = `display:flex;align-items:center;gap:8px;padding:8px 14px;border-radius:20px;border:1.5px solid rgba(255,255,255,0.1);background:transparent;cursor:pointer;transition:all 0.2s`;
+    miniBtn.innerHTML = `
+      <div style="display:flex;gap:3px">
+        <div style="width:10px;height:10px;border-radius:50%;background:${pal.bg}"></div>
+        <div style="width:10px;height:10px;border-radius:50%;background:${pal.dark}"></div>
+        <div style="width:10px;height:10px;border-radius:50%;background:${pal.accent}"></div>
+      </div>
+      <span style="font-family:Raleway,sans-serif;font-size:0.65rem;font-weight:700;color:rgba(255,255,255,0.5)">${pal.name}</span>
+    `;
+    miniBtn.addEventListener('mouseenter', () => miniBtn.style.borderColor = 'rgba(255,255,255,0.35)');
+    miniBtn.addEventListener('mouseleave', () => miniBtn.style.borderColor = 'rgba(255,255,255,0.1)');
+    miniBtn.addEventListener('click', () => setPalette(i));
+    miniRow.appendChild(miniBtn);
+  });
+
+  allRow.appendChild(miniRow);
+  grid.appendChild(allRow);
+}
+
+// Initial render — show ALL palettes side by side on wide screens
+function renderAll() {
+  const grid = document.getElementById('phonesGrid');
+  grid.innerHTML = '';
+  PALETTES.forEach((p, i) => {
+    const wrap = renderPhone(p, i * 80);
+    grid.appendChild(wrap);
+  });
+}
+
+// Responsive: show all on wide, one on narrow
+function checkWidth() {
+  if (window.innerWidth >= 1400) {
+    renderAll();
+  } else {
+    renderGrid();
+  }
+}
+
+checkWidth();
+window.addEventListener('resize', checkWidth);
+</script>
+</body>
+</html>

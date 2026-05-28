@@ -36,7 +36,7 @@ const THEME = {
   },
   white: {
     card: '#fff', name: '#111111', time: '#999',
-    badge: 'rgba(46,145,252,0.08)', badgeText: '#111111',
+    badge: 'rgba(0,0,0,0.05)', badgeText: '#555',
     quote: '#111111', snippet: '#777',
     divider: 'rgba(0,0,0,0.05)',
     chip: '#F7F7F5', chipText: '#666',

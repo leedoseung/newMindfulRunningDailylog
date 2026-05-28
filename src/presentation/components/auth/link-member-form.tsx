@@ -87,7 +87,7 @@ export function LinkMemberForm({ members }: Props) {
               background: !selectedId || submitting ? '#ccc' : '#111111',
               color: '#fff', fontFamily: "'Pretendard Variable', Pretendard, -apple-system, sans-serif", fontSize: '0.9rem', fontWeight: 500,
               cursor: !selectedId || submitting ? 'not-allowed' : 'pointer',
-              boxShadow: selectedId ? '0 6px 20px rgba(46,145,252,0.35)' : 'none',
+              boxShadow: selectedId ? '0 6px 20px rgba(0,0,0,0.2)' : 'none',
               transition: 'all 0.2s',
             }}
           >

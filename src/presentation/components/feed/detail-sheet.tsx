@@ -148,7 +148,7 @@ export function DetailSheet({ run, open, onClose }: Props) {
           {/* Duration */}
           <div style={{
             fontFamily: FONT, fontSize: '0.52rem', fontWeight: 500,
-            color: '#BBB', letterSpacing: '2px', textTransform: 'uppercase',
+            color: '#888', letterSpacing: '2px', textTransform: 'uppercase',
             marginBottom: 4,
           }}>달린 시간</div>
 
@@ -157,10 +157,10 @@ export function DetailSheet({ run, open, onClose }: Props) {
               fontFamily: FONT, fontSize: '4.2rem', fontWeight: 300,
               color: '#111', lineHeight: 1, letterSpacing: '-2px',
             }}>{count}</span>
-            <span style={{ fontFamily: FONT, fontSize: '1rem', fontWeight: 300, color: '#999' }}>분</span>
+            <span style={{ fontFamily: FONT, fontSize: '1rem', fontWeight: 400, color: '#555' }}>분</span>
           </div>
 
-          <div style={{ fontFamily: FONT, fontSize: '0.72rem', fontWeight: 400, color: '#AAA', marginBottom: 16 }}>
+          <div style={{ fontFamily: FONT, fontSize: '0.78rem', fontWeight: 400, color: '#666', marginBottom: 16 }}>
             {run.memberName}
           </div>
 
@@ -186,7 +186,7 @@ export function DetailSheet({ run, open, onClose }: Props) {
           <div style={{ height: 1, background: 'rgba(0,0,0,0.06)', marginBottom: 20 }} />
 
           {/* Date + title */}
-          <div style={{ fontFamily: FONT, fontSize: '0.62rem', fontWeight: 400, color: '#BBB', marginBottom: 8 }}>
+          <div style={{ fontFamily: FONT, fontSize: '0.62rem', fontWeight: 400, color: '#999', marginBottom: 8 }}>
             {run.date}
           </div>
           {run.title && (
@@ -201,23 +201,23 @@ export function DetailSheet({ run, open, onClose }: Props) {
             <>
               <div style={{
                 fontFamily: FONT, fontSize: '0.5rem', fontWeight: 500,
-                color: '#CCC', letterSpacing: '2px', textTransform: 'uppercase',
+                color: '#999', letterSpacing: '2px', textTransform: 'uppercase',
                 marginBottom: 14,
               }}>Before · During · After</div>
               {thoughts.map(({ step, text }) => (
                 <div key={step} style={{
                   display: 'flex', gap: 14, alignItems: 'flex-start',
                   paddingBottom: 16, marginBottom: 16,
-                  borderBottom: '1px solid rgba(0,0,0,0.05)',
+                  borderBottom: '1px solid rgba(0,0,0,0.07)',
                 }}>
                   <div style={{
-                    fontFamily: FONT, fontSize: '0.55rem', fontWeight: 500,
-                    color: '#CCC', textTransform: 'uppercase', letterSpacing: '0.5px',
+                    fontFamily: FONT, fontSize: '0.6rem', fontWeight: 500,
+                    color: '#888', textTransform: 'uppercase', letterSpacing: '0.5px',
                     whiteSpace: 'nowrap', paddingTop: 3, minWidth: 24,
                   }}>{step}</div>
                   <div style={{
-                    fontFamily: FONT, fontSize: '0.85rem', fontWeight: 400,
-                    color: '#444', lineHeight: 1.7,
+                    fontFamily: FONT, fontSize: '0.88rem', fontWeight: 400,
+                    color: '#333', lineHeight: 1.7,
                   }}>{text}</div>
                 </div>
               ))}

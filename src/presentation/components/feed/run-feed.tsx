@@ -8,6 +8,7 @@ import type { RunLog } from '@/domain/entities/run-log'
 import type { WeeklyBar } from '../home/home-feed'
 
 const FONT = "'Pretendard Variable', Pretendard, -apple-system, sans-serif"
+const DAY_LABELS = ['일', '월', '화', '수', '목', '금', '토']
 
 type Props = {
   runs: RunLog[]
@@ -15,6 +16,7 @@ type Props = {
   triggerRun?: RunLog | null
   onTriggerConsumed?: () => void
   memberId?: string
+  isMyFeed?: boolean
 }
 
 const GRADIENTS = [
@@ -87,6 +89,76 @@ function CommunityPulseCard({ weeklyBars, runs }: { weeklyBars: WeeklyBar[]; run
         </div>
         <div style={{ display: 'flex', gap: 3, marginTop: 4 }}>
           {weeklyBars.map(bar => (
+            <div key={bar.label} style={{
+              flex: 1, textAlign: 'center', fontSize: '0.5rem',
+              color: bar.isToday ? 'rgba(255,255,255,0.85)' : 'rgba(255,255,255,0.35)',
+              fontWeight: bar.isToday ? 700 : 400,
+            }}>{bar.label}</div>
+          ))}
+        </div>
+      </div>
+    </div>
+  )
+}
+
+function MyWeekCard({ runs }: { runs: RunLog[] }) {
+  const now = new Date()
+  const cutoff = new Date(now)
+  cutoff.setDate(now.getDate() - 6)
+  const cutoffStr = cutoff.toISOString().split('T')[0]!
+  const weekRuns = runs.filter(r => r.date >= cutoffStr)
+
+  const weekCount   = weekRuns.length
+  const weekMinutes = weekRuns.reduce((s, r) => s + r.durationMin, 0)
+  const weekHours   = Math.floor(weekMinutes / 60)
+  const weekRemMin  = weekMinutes % 60
+
+  const bars = Array.from({ length: 7 }, (_, i) => {
+    const d = new Date(now)
+    d.setDate(now.getDate() - 6 + i)
+    const dateStr = d.toISOString().split('T')[0]!
+    const count = runs.filter(r => r.date === dateStr).length
+    return { label: DAY_LABELS[d.getDay()] ?? '?', count, isToday: i === 6 }
+  })
+  const maxCount = Math.max(...bars.map(b => b.count), 1)
+
+  return (
+    <div style={{ background: '#111111', borderRadius: 22, padding: '18px 18px' }}>
+      <div style={{
+        fontSize: '0.6rem', fontWeight: 500,
+        color: 'rgba(255,255,255,0.5)', letterSpacing: '1.5px',
+        textTransform: 'uppercase', marginBottom: 8,
+      }}>내 이번 주 달리기</div>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end' }}>
+        <div>
+          <div style={{ fontFamily: FONT, fontSize: '2rem', fontWeight: 900, color: '#fff', lineHeight: 1, letterSpacing: '-1px' }}>
+            {weekCount}
+            <span style={{ fontSize: '1rem', fontWeight: 400, marginLeft: 2, color: 'rgba(255,255,255,0.5)' }}>회</span>
+          </div>
+          <div style={{ fontSize: '0.7rem', color: 'rgba(255,255,255,0.5)', marginTop: 4 }}>이번 주 달린 횟수</div>
+        </div>
+        <div style={{ textAlign: 'right' }}>
+          <div style={{ fontFamily: FONT, fontSize: '1.3rem', fontWeight: 500, color: '#fff' }}>
+            {weekHours}<span style={{ fontSize: '0.75rem', fontWeight: 400, color: 'rgba(255,255,255,0.5)', marginLeft: 2 }}>h</span>
+            {weekRemMin > 0 && <span style={{ fontSize: '0.75rem', fontWeight: 400, color: 'rgba(255,255,255,0.5)', marginLeft: 4 }}>{weekRemMin}m</span>}
+          </div>
+          <div style={{ fontSize: '0.6rem', color: 'rgba(255,255,255,0.5)' }}>이번 주 달린 시간</div>
+        </div>
+      </div>
+      <div style={{ marginTop: 14 }}>
+        <div style={{ display: 'flex', alignItems: 'flex-end', gap: 3, height: 36 }}>
+          {bars.map(bar => (
+            <div key={bar.label} style={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'flex-end', height: '100%' }}>
+              <div style={{
+                width: '100%', borderRadius: '3px 3px 0 0',
+                height: bar.count > 0 ? `${Math.max((bar.count / maxCount) * 100, 15)}%` : '4px',
+                background: bar.isToday ? 'rgba(255,255,255,0.9)' : 'rgba(255,255,255,0.25)',
+              }} />
+            </div>
+          ))}
+        </div>
+        <div style={{ display: 'flex', gap: 3, marginTop: 4 }}>
+          {bars.map(bar => (
             <div key={bar.label} style={{
               flex: 1, textAlign: 'center', fontSize: '0.5rem',
               color: bar.isToday ? 'rgba(255,255,255,0.85)' : 'rgba(255,255,255,0.35)',
@@ -217,7 +289,7 @@ export function PhotoGrid({ runs, weeklyBars, memberId }: { runs: RunLog[]; week
   )
 }
 
-export function RunFeed({ runs, weeklyBars, triggerRun, onTriggerConsumed, memberId }: Props) {
+export function RunFeed({ runs, weeklyBars, triggerRun, onTriggerConsumed, memberId, isMyFeed }: Props) {
   const [selected, setSelected] = useState<RunLog | null>(null)
 
   useEffect(() => {
@@ -253,7 +325,9 @@ export function RunFeed({ runs, weeklyBars, triggerRun, onTriggerConsumed, membe
                 <RunCard run={run} cardType={cardType(run, i)} onClick={setSelected} />
               </div>
               {i === 0 && (
-                <CommunityPulseCard weeklyBars={weeklyBars} runs={runs} />
+                isMyFeed
+                  ? <MyWeekCard runs={runs} />
+                  : <CommunityPulseCard weeklyBars={weeklyBars} runs={runs} />
               )}
             </Fragment>
           ))

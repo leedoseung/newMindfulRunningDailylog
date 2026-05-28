@@ -151,7 +151,7 @@ export function HomeFeed({ recentRuns, myRuns, memberId, crew, weeklyBars }: Pro
       {tab === 'all' ? (
         <PhotoGrid runs={recentRuns} weeklyBars={weeklyBars} memberId={memberId} />
       ) : (
-        <RunFeed runs={myRuns} weeklyBars={weeklyBars} memberId={memberId} />
+        <RunFeed runs={myRuns} weeklyBars={weeklyBars} memberId={memberId} isMyFeed />
       )}
 
       <DetailSheet

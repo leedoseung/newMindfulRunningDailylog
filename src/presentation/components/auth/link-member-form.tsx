@@ -13,6 +13,7 @@ export function LinkMemberForm({ members }: Props) {
   const [submitting, setSubmitting] = useState(false)
   const [error, setError]           = useState('')
   const [query, setQuery]           = useState('')
+  const [creatingNew, setCreatingNew] = useState(false)
 
   const filtered = query.trim()
     ? members.filter(m => m.name.includes(query.trim()))
@@ -34,7 +35,6 @@ export function LinkMemberForm({ members }: Props) {
         const body = await res.json().catch(() => ({})) as { error?: string }
         throw new Error(body.error ?? '연결 실패')
       }
-      // 브라우저 세션에 member_id를 직접 기록 (서버 쿠키 갱신 대신 클라이언트에서 처리)
       const { error: updateErr } = await createBrowserClient().auth.updateUser({
         data: { member_id: selectedId },
       })
@@ -44,6 +44,28 @@ export function LinkMemberForm({ members }: Props) {
       setError(err instanceof Error ? err.message : '연결 실패')
     } finally {
       setSubmitting(false)
+    }
+  }
+
+  async function handleNewMember() {
+    setCreatingNew(true)
+    setError('')
+    try {
+      const res = await fetch('/api/auth/create-member', { method: 'POST' })
+      if (!res.ok) {
+        const body = await res.json().catch(() => ({})) as { error?: string }
+        throw new Error(body.error ?? '생성 실패')
+      }
+      const { memberId } = await res.json() as { memberId: string }
+      const { error: updateErr } = await createBrowserClient().auth.updateUser({
+        data: { member_id: memberId },
+      })
+      if (updateErr) throw new Error(updateErr.message)
+      window.location.href = '/'
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : '생성 실패')
+    } finally {
+      setCreatingNew(false)
     }
   }
 
@@ -137,6 +159,27 @@ export function LinkMemberForm({ members }: Props) {
             {submitting ? '연결 중...' : '시작하기'}
           </button>
         </form>
+
+        {/* 신규 회원 */}
+        <div style={{ marginTop: '28px', textAlign: 'center' }}>
+          <div style={{ fontSize: '0.75rem', color: '#bbb', marginBottom: '12px' }}>
+            목록에 내 이름이 없나요?
+          </div>
+          <button
+            type="button"
+            onClick={handleNewMember}
+            disabled={creatingNew}
+            style={{
+              background: 'none', border: '1.5px solid #ddd', borderRadius: '14px',
+              padding: '12px 24px', cursor: creatingNew ? 'not-allowed' : 'pointer',
+              fontFamily: "'Pretendard Variable', Pretendard, -apple-system, sans-serif",
+              fontSize: '0.85rem', fontWeight: 500, color: '#555',
+              transition: 'border-color 0.15s',
+            }}
+          >
+            {creatingNew ? '처리 중...' : '신규 회원으로 시작하기'}
+          </button>
+        </div>
       </div>
     </main>
   )

@@ -42,7 +42,7 @@ function CrewStrip({ crew, todayCount }: { crew: CrewMember[]; todayCount: numbe
       </div>
       <div style={{
         display: 'flex', gap: 12, overflowX: 'auto',
-        scrollbarWidth: 'none', paddingBottom: 6, paddingTop: 6,
+        scrollbarWidth: 'none', paddingTop: 6, paddingBottom: 6, paddingLeft: 6, paddingRight: 6,
       }}>
         {crew.map(m => (
           <div key={m.memberId} style={{

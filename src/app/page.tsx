@@ -9,9 +9,11 @@ import type { RunLog } from '@/domain/entities/run-log'
 
 const DAY_LABELS = ['일', '월', '화', '수', '목', '금', '토']
 
+type CrewMemberInternal = CrewMember & { lastCreatedAt: string }
+
 function computeCrew(runs: RunLog[]): CrewMember[] {
-  const today = new Date().toISOString().split('T')[0]
-  const map = new Map<string, CrewMember>()
+  const today = new Date().toISOString().split('T')[0]!
+  const map = new Map<string, CrewMemberInternal>()
   for (const run of runs) {
     const cur = map.get(run.memberId)
     if (!cur) {
@@ -21,13 +23,20 @@ function computeCrew(runs: RunLog[]): CrewMember[] {
         avatarUrl: run.memberAvatarUrl,
         ranToday: run.date === today,
         todayMinutes: run.date === today ? run.durationMin : 0,
+        lastCreatedAt: run.createdAt,
       })
-    } else if (run.date === today) {
-      cur.ranToday = true
-      cur.todayMinutes += run.durationMin
+    } else {
+      if (run.date === today) {
+        cur.ranToday = true
+        cur.todayMinutes += run.durationMin
+      }
+      if (run.createdAt > cur.lastCreatedAt) cur.lastCreatedAt = run.createdAt
     }
   }
-  return [...map.values()].sort((a, b) => Number(b.ranToday) - Number(a.ranToday))
+  return [...map.values()].sort((a, b) => {
+    if (a.ranToday !== b.ranToday) return Number(b.ranToday) - Number(a.ranToday)
+    return b.lastCreatedAt.localeCompare(a.lastCreatedAt)
+  })
 }
 
 function computeWeeklyBars(runs: RunLog[]): WeeklyBar[] {

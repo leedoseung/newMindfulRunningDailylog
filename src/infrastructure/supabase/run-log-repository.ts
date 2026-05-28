@@ -57,6 +57,7 @@ export class SupabaseRunLogRepository implements IRunLogRepository {
       .select(SELECT_FIELDS)
       .gte('date', dateStr)
       .order('date', { ascending: false })
+      .order('created_at', { ascending: false })
 
     if (error) throw new Error(`getRecentRuns failed: ${error.message}`)
     return (data as unknown as RunLogRow[]).map(toRunLog)

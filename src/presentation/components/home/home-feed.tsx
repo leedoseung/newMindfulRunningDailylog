@@ -1,12 +1,13 @@
 'use client'
 
-import { useState, useCallback, useEffect } from 'react'
+import { useState, useCallback, useEffect, useMemo } from 'react'
 import { RunFeed, PhotoGrid } from '../feed/run-feed'
 import { DetailSheet } from '../feed/detail-sheet'
 import { AvatarImage } from '../shared/avatar-image'
 import type { RunLog } from '@/domain/entities/run-log'
 
 const FONT = "'Pretendard Variable', Pretendard, -apple-system, sans-serif"
+const DAY_LABELS = ['일', '월', '화', '수', '목', '금', '토']
 
 export type CrewMember = {
   memberId: string
@@ -34,69 +35,101 @@ type Props = {
   initialOffset?: number
 }
 
-function CrewStrip({
-  crew, todayCount, weeklyBars, weeklyTotalRuns, weeklyParticipants, weeklyTotalHours, onCrewClick,
+function MiniBarChart({ bars }: { bars: WeeklyBar[] }) {
+  const maxCount = Math.max(...bars.map(b => b.count), 1)
+  return (
+    <div style={{ display: 'flex', alignItems: 'flex-end', gap: 3, height: 32, paddingBottom: 2 }}>
+      {bars.map(bar => (
+        <div key={bar.label} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 3, height: '100%', justifyContent: 'flex-end' }}>
+          <div style={{
+            width: 10, borderRadius: '3px 3px 0 0',
+            height: bar.count > 0 ? `${Math.max((bar.count / maxCount) * 100, 18)}%` : 3,
+            background: bar.isToday ? '#111' : '#e0e0e0',
+            transition: 'height 0.4s',
+          }} />
+        </div>
+      ))}
+    </div>
+  )
+}
+
+function StatsHeader({
+  tab, crew, todayCount, onCrewClick,
+  weeklyBars, weeklyTotalRuns, weeklyParticipants, weeklyTotalHours,
+  myWeeklyBars, myWeekCount, myWeekHours, myWeekRemMin,
 }: {
+  tab: Tab
   crew: CrewMember[]
   todayCount: number
+  onCrewClick: (id: string) => void
   weeklyBars: WeeklyBar[]
   weeklyTotalRuns: number
   weeklyParticipants: number
   weeklyTotalHours: number
-  onCrewClick: (memberId: string) => void
+  myWeeklyBars: WeeklyBar[]
+  myWeekCount: number
+  myWeekHours: number
+  myWeekRemMin: number
 }) {
-  const maxCount = Math.max(...weeklyBars.map(b => b.count), 1)
+  const isMine = tab === 'mine'
 
   return (
     <div style={{ padding: '8px 22px 0', display: 'flex', flexDirection: 'column', gap: 14 }}>
 
-      {/* 이번 주 통계 + 미니 바 차트 */}
+      {/* 통계 헤더 — 탭에 따라 전환 */}
       <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between' }}>
         <div>
           <div style={{
             fontFamily: FONT, fontSize: '0.48rem', fontWeight: 500,
             color: '#bbb', letterSpacing: '1.8px', textTransform: 'uppercase', marginBottom: 6,
+            transition: 'opacity 0.2s',
           }}>
-            이번 주 마인드풀러너
+            {isMine ? '이번 주 나의 기록' : '이번 주 마인드풀러너'}
           </div>
-          <div style={{ display: 'flex', alignItems: 'baseline', gap: 6 }}>
-            <span style={{ fontFamily: FONT, fontSize: '1.7rem', fontWeight: 800, color: '#111', letterSpacing: '-1px', lineHeight: 1 }}>
-              {weeklyTotalRuns}
-            </span>
-            <span style={{ fontFamily: FONT, fontSize: '0.7rem', color: '#999', fontWeight: 400 }}>회</span>
-            <span style={{ color: '#e0e0e0', fontSize: '0.7rem' }}>·</span>
-            <span style={{ fontFamily: FONT, fontSize: '0.82rem', fontWeight: 600, color: '#444' }}>{weeklyParticipants}명</span>
-            {weeklyTotalHours > 0 && (
-              <>
-                <span style={{ color: '#e0e0e0', fontSize: '0.7rem' }}>·</span>
-                <span style={{ fontFamily: FONT, fontSize: '0.82rem', fontWeight: 500, color: '#888' }}>
-                  {weeklyTotalHours}h
-                </span>
-              </>
-            )}
-          </div>
+
+          {isMine ? (
+            <div style={{ display: 'flex', alignItems: 'baseline', gap: 6 }}>
+              <span style={{ fontFamily: FONT, fontSize: '1.7rem', fontWeight: 800, color: '#111', letterSpacing: '-1px', lineHeight: 1 }}>
+                {myWeekCount}
+              </span>
+              <span style={{ fontFamily: FONT, fontSize: '0.7rem', color: '#999', fontWeight: 400 }}>회</span>
+              {myWeekCount > 0 && (
+                <>
+                  <span style={{ color: '#e0e0e0', fontSize: '0.7rem' }}>·</span>
+                  <span style={{ fontFamily: FONT, fontSize: '0.82rem', fontWeight: 600, color: '#444' }}>
+                    {myWeekHours > 0 ? `${myWeekHours}h` : ''}{myWeekRemMin > 0 ? ` ${myWeekRemMin}m` : myWeekHours === 0 ? '0m' : ''}
+                  </span>
+                </>
+              )}
+            </div>
+          ) : (
+            <div style={{ display: 'flex', alignItems: 'baseline', gap: 6 }}>
+              <span style={{ fontFamily: FONT, fontSize: '1.7rem', fontWeight: 800, color: '#111', letterSpacing: '-1px', lineHeight: 1 }}>
+                {weeklyTotalRuns}
+              </span>
+              <span style={{ fontFamily: FONT, fontSize: '0.7rem', color: '#999', fontWeight: 400 }}>회</span>
+              <span style={{ color: '#e0e0e0', fontSize: '0.7rem' }}>·</span>
+              <span style={{ fontFamily: FONT, fontSize: '0.82rem', fontWeight: 600, color: '#444' }}>{weeklyParticipants}명</span>
+              {weeklyTotalHours > 0 && (
+                <>
+                  <span style={{ color: '#e0e0e0', fontSize: '0.7rem' }}>·</span>
+                  <span style={{ fontFamily: FONT, fontSize: '0.82rem', fontWeight: 500, color: '#888' }}>
+                    {weeklyTotalHours}h
+                  </span>
+                </>
+              )}
+            </div>
+          )}
         </div>
 
-        {/* 미니 7일 바 차트 */}
-        <div style={{ display: 'flex', alignItems: 'flex-end', gap: 3, height: 32, paddingBottom: 2 }}>
-          {weeklyBars.map(bar => (
-            <div key={bar.label} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 3, height: '100%', justifyContent: 'flex-end' }}>
-              <div style={{
-                width: 10, borderRadius: '3px 3px 0 0',
-                height: bar.count > 0 ? `${Math.max((bar.count / maxCount) * 100, 18)}%` : 3,
-                background: bar.isToday ? '#111' : '#e0e0e0',
-                transition: 'height 0.3s',
-              }} />
-            </div>
-          ))}
-        </div>
+        <MiniBarChart bars={isMine ? myWeeklyBars : weeklyBars} />
       </div>
 
       {/* 구분선 */}
       <div style={{ height: 1, background: 'rgba(0,0,0,0.05)' }} />
 
-      {/* 오늘 크루 */}
-      {crew.length > 0 && (
+      {/* 크루 원형 — 전체 피드 탭에만 표시 */}
+      {!isMine && crew.length > 0 && (
         <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
           <div style={{
             fontFamily: FONT, fontSize: '0.5rem', fontWeight: 500,
@@ -111,8 +144,7 @@ function CrewStrip({
             {crew.map(m => (
               <div key={m.memberId} onClick={() => onCrewClick(m.memberId)} style={{
                 display: 'flex', flexDirection: 'column',
-                alignItems: 'center', gap: 5, flexShrink: 0,
-                cursor: 'pointer',
+                alignItems: 'center', gap: 5, flexShrink: 0, cursor: 'pointer',
               }}>
                 {m.ranToday ? (
                   <div style={{ position: 'relative', width: 54, height: 54, flexShrink: 0 }}>
@@ -155,6 +187,29 @@ export function HomeFeed({ recentRuns, myRuns, memberId, crew, weeklyBars, weekl
   const weeklyTotalRuns = weeklyBars.reduce((s, b) => s + b.count, 0)
   const weeklyParticipants = crew.length
 
+  // 내 이번 주 통계
+  const { myWeeklyBars, myWeekCount, myWeekHours, myWeekRemMin } = useMemo(() => {
+    const now = new Date()
+    const bars = Array.from({ length: 7 }, (_, i) => {
+      const d = new Date(now)
+      d.setDate(now.getDate() - 6 + i)
+      const dateStr = d.toISOString().split('T')[0]!
+      const count = myRuns.filter(r => r.date === dateStr).length
+      return { label: DAY_LABELS[d.getDay()] ?? '?', count, isToday: i === 6 }
+    })
+    const cutoff = new Date(now)
+    cutoff.setDate(now.getDate() - 6)
+    const cutoffStr = cutoff.toISOString().split('T')[0]!
+    const weekRuns = myRuns.filter(r => r.date >= cutoffStr)
+    const totalMin = weekRuns.reduce((s, r) => s + r.durationMin, 0)
+    return {
+      myWeeklyBars: bars,
+      myWeekCount: weekRuns.length,
+      myWeekHours: Math.floor(totalMin / 60),
+      myWeekRemMin: totalMin % 60,
+    }
+  }, [myRuns])
+
   useEffect(() => {
     const stored = sessionStorage.getItem('openRun')
     if (!stored) return
@@ -176,14 +231,19 @@ export function HomeFeed({ recentRuns, myRuns, memberId, crew, weeklyBars, weekl
 
   return (
     <>
-      <CrewStrip
+      <StatsHeader
+        tab={tab}
         crew={crew}
         todayCount={todayCount}
+        onCrewClick={handleCrewClick}
         weeklyBars={weeklyBars}
         weeklyTotalRuns={weeklyTotalRuns}
         weeklyParticipants={weeklyParticipants}
         weeklyTotalHours={weeklyTotalHours}
-        onCrewClick={handleCrewClick}
+        myWeeklyBars={myWeeklyBars}
+        myWeekCount={myWeekCount}
+        myWeekHours={myWeekHours}
+        myWeekRemMin={myWeekRemMin}
       />
 
       <div style={{ height: 1, background: 'rgba(0,0,0,0.06)', margin: '16px 22px 0' }} />
@@ -222,7 +282,7 @@ export function HomeFeed({ recentRuns, myRuns, memberId, crew, weeklyBars, weekl
           initialOffset={initialOffset}
         />
       ) : (
-        <RunFeed runs={myRuns} weeklyBars={weeklyBars} memberId={memberId} isMyFeed />
+        <RunFeed runs={myRuns} memberId={memberId} />
       )}
 
       <DetailSheet

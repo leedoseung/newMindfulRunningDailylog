@@ -28,6 +28,7 @@ type Props = {
   memberId: string
   crew: CrewMember[]
   weeklyBars: WeeklyBar[]
+  initialOffset?: number
 }
 
 function CrewStrip({ crew, todayCount, onCrewClick }: { crew: CrewMember[]; todayCount: number; onCrewClick: (memberId: string) => void }) {
@@ -90,7 +91,7 @@ function CrewStrip({ crew, todayCount, onCrewClick }: { crew: CrewMember[]; toda
   )
 }
 
-export function HomeFeed({ recentRuns, myRuns, memberId, crew, weeklyBars }: Props) {
+export function HomeFeed({ recentRuns, myRuns, memberId, crew, weeklyBars, initialOffset = 20 }: Props) {
   const [tab, setTab] = useState<Tab>('all')
   const [triggerRun, setTriggerRun] = useState<RunLog | null>(null)
   const [autoOpenRun, setAutoOpenRun] = useState<RunLog | null>(null)
@@ -155,6 +156,7 @@ export function HomeFeed({ recentRuns, myRuns, memberId, crew, weeklyBars }: Pro
           memberId={memberId}
           triggerRun={triggerRun}
           onTriggerConsumed={() => setTriggerRun(null)}
+          initialOffset={initialOffset}
         />
       ) : (
         <RunFeed runs={myRuns} weeklyBars={weeklyBars} memberId={memberId} isMyFeed />

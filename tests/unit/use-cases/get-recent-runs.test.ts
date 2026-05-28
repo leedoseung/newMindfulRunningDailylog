@@ -23,6 +23,8 @@ describe('GetRecentRunsUseCase', () => {
   it('calls repo.getRecentRuns with given days', async () => {
     const mockRepo: IRunLogRepository = {
       getRecentRuns: vi.fn().mockResolvedValue([makeRun()]),
+      getRunsPage: vi.fn(),
+      getByDate: vi.fn(),
       getByMemberId: vi.fn(),
       save: vi.fn(),
     }
@@ -35,6 +37,8 @@ describe('GetRecentRunsUseCase', () => {
     const runs = [makeRun({ id: 'r1' }), makeRun({ id: 'r2' })]
     const mockRepo: IRunLogRepository = {
       getRecentRuns: vi.fn().mockResolvedValue(runs),
+      getRunsPage: vi.fn(),
+      getByDate: vi.fn(),
       getByMemberId: vi.fn(),
       save: vi.fn(),
     }
@@ -47,6 +51,8 @@ describe('GetRecentRunsUseCase', () => {
   it('defaults to 7 days', async () => {
     const mockRepo: IRunLogRepository = {
       getRecentRuns: vi.fn().mockResolvedValue([]),
+      getRunsPage: vi.fn(),
+      getByDate: vi.fn(),
       getByMemberId: vi.fn(),
       save: vi.fn(),
     }

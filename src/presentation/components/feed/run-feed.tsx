@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, Fragment } from 'react'
+import { useState, useEffect, useRef, useCallback, Fragment } from 'react'
 import { RunCard } from './run-card'
 import { DetailSheet } from './detail-sheet'
 import { AvatarImage } from '../shared/avatar-image'
@@ -239,20 +239,55 @@ function GridCell({ run, height, onClick }: { run: RunLog; height: number; onCli
   )
 }
 
-export function PhotoGrid({ runs, weeklyBars, memberId, triggerRun, onTriggerConsumed }: {
+const PAGE_LIMIT = 20
+
+export function PhotoGrid({ runs: initialRuns, weeklyBars, memberId, triggerRun, onTriggerConsumed, initialOffset = PAGE_LIMIT }: {
   runs: RunLog[]
   weeklyBars: WeeklyBar[]
   memberId?: string
   triggerRun?: RunLog | null
   onTriggerConsumed?: () => void
+  initialOffset?: number
 }) {
   const [selected, setSelected] = useState<RunLog | null>(null)
+  const [runs, setRuns] = useState<RunLog[]>(initialRuns)
+  const [offset, setOffset] = useState(initialOffset)
+  const [hasMore, setHasMore] = useState(initialRuns.length === PAGE_LIMIT)
+  const [loading, setLoading] = useState(false)
+  const sentinelRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
     if (!triggerRun) return
     setSelected(triggerRun)
     onTriggerConsumed?.()
   }, [triggerRun])
+
+  const loadMore = useCallback(async () => {
+    if (loading || !hasMore) return
+    setLoading(true)
+    try {
+      const res = await fetch(`/api/runs?offset=${offset}&limit=${PAGE_LIMIT}`)
+      const json = await res.json() as { runs: RunLog[]; hasMore: boolean }
+      setRuns(prev => [...prev, ...json.runs])
+      setOffset(prev => prev + json.runs.length)
+      setHasMore(json.hasMore)
+    } catch {
+      // silent fail — user can scroll up and back to retry
+    } finally {
+      setLoading(false)
+    }
+  }, [loading, hasMore, offset])
+
+  useEffect(() => {
+    const el = sentinelRef.current
+    if (!el) return
+    const observer = new IntersectionObserver(
+      entries => { if (entries[0]?.isIntersecting) loadMore() },
+      { rootMargin: '200px' }
+    )
+    observer.observe(el)
+    return () => observer.disconnect()
+  }, [loadMore])
 
   const leftRuns  = runs.filter((_, i) => i % 2 === 0)
   const rightRuns = runs.filter((_, i) => i % 2 !== 0)
@@ -268,7 +303,7 @@ export function PhotoGrid({ runs, weeklyBars, memberId, triggerRun, onTriggerCon
           최근 달리기 기록이 없습니다
         </p>
       ) : (
-        <div style={{ display: 'flex', gap: 4, padding: '0 16px 40px' }}>
+        <div style={{ display: 'flex', gap: 4, padding: '0 16px 0' }}>
           {/* 왼쪽 열 */}
           <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 4 }}>
             {leftRuns.map((run, rowIdx) => (
@@ -291,6 +326,19 @@ export function PhotoGrid({ runs, weeklyBars, memberId, triggerRun, onTriggerCon
               />
             ))}
           </div>
+        </div>
+      )}
+
+      {/* 무한스크롤 센티넬 */}
+      <div ref={sentinelRef} style={{ height: 1 }} />
+      {loading && (
+        <div style={{ textAlign: 'center', padding: '16px 0 40px', color: '#bbb', fontSize: '0.75rem' }}>
+          불러오는 중...
+        </div>
+      )}
+      {!hasMore && runs.length > 0 && (
+        <div style={{ textAlign: 'center', padding: '16px 0 40px', color: '#ccc', fontSize: '0.65rem', letterSpacing: '1px' }}>
+          • • •
         </div>
       )}
 

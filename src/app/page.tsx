@@ -48,18 +48,20 @@ export default async function HomePage() {
   const memberId = (user?.user_metadata?.member_id as string | undefined) ?? ''
 
   const repo = new SupabaseRunLogRepository(supabase)
-  const [recentRuns, myRuns, memberRow] = await Promise.all([
+  const [crewRuns, initialGridRuns, myRuns, memberRow] = await Promise.all([
     new GetRecentRunsUseCase(repo).execute(7),
+    repo.getRunsPage(0, 20),
     memberId ? new GetMemberRecordsUseCase(repo).execute(memberId) : Promise.resolve([]),
     memberId
       ? supabase.from('members').select('name, avatar_url').eq('id', memberId).single()
       : Promise.resolve({ data: null }),
   ])
 
-  const crew = computeCrew(recentRuns)
-  const weeklyBars = computeWeeklyBars(recentRuns)
+  const crew = computeCrew(crewRuns)
+  const weeklyBars = computeWeeklyBars(crewRuns)
   const memberName = (memberRow.data?.name as string | undefined) ?? myRuns[0]?.memberName ?? ''
   const memberAvatarUrl = (memberRow.data?.avatar_url as string | undefined) ?? myRuns[0]?.memberAvatarUrl ?? ''
+  const recentRuns = initialGridRuns
 
   return (
     <main style={{ minHeight: '100vh', background: '#F7F7F5', position: 'relative' }}>

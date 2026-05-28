@@ -62,6 +62,18 @@ export class SupabaseRunLogRepository implements IRunLogRepository {
     return (data as unknown as RunLogRow[]).map(toRunLog)
   }
 
+  async getRunsPage(offset: number, limit: number): Promise<RunLog[]> {
+    const { data, error } = await this.supabase
+      .from('run_logs')
+      .select(SELECT_FIELDS)
+      .order('date', { ascending: false })
+      .order('created_at', { ascending: false })
+      .range(offset, offset + limit - 1)
+
+    if (error) throw new Error(`getRunsPage failed: ${error.message}`)
+    return (data as unknown as RunLogRow[]).map(toRunLog)
+  }
+
   async getByDate(date: string): Promise<RunLog[]> {
     const { data, error } = await this.supabase
       .from('run_logs')

@@ -3,11 +3,58 @@
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 
+const FONT = "'Pretendard Variable', Pretendard, -apple-system, sans-serif"
+
+function IconHome({ active }: { active: boolean }) {
+  return (
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      strokeWidth={active ? 2.2 : 1.6} strokeLinecap="round" strokeLinejoin="round">
+      <path d="M3 9.5L12 3l9 6.5V20a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V9.5z" fill={active ? 'currentColor' : 'none'} />
+      <path d="M9 21V12h6v9" stroke={active ? '#fff' : 'currentColor'} />
+    </svg>
+  )
+}
+
+function IconPen({ active }: { active: boolean }) {
+  return (
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      strokeWidth={active ? 2.2 : 1.6} strokeLinecap="round" strokeLinejoin="round">
+      <path d="M12 20h9" />
+      <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"
+        fill={active ? 'currentColor' : 'none'}
+        stroke="currentColor" />
+    </svg>
+  )
+}
+
+function IconTrophy({ active }: { active: boolean }) {
+  return (
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      strokeWidth={active ? 2.2 : 1.6} strokeLinecap="round" strokeLinejoin="round">
+      <path d="M6 9H3.5a2.5 2.5 0 0 0 0 5H6" />
+      <path d="M18 9h2.5a2.5 2.5 0 0 1 0 5H18" />
+      <path d="M6 3h12v10a6 6 0 0 1-12 0V3z" fill={active ? 'currentColor' : 'none'} />
+      <path d="M12 19v2" />
+      <path d="M8 21h8" />
+    </svg>
+  )
+}
+
+function IconPerson({ active }: { active: boolean }) {
+  return (
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      strokeWidth={active ? 2.2 : 1.6} strokeLinecap="round" strokeLinejoin="round">
+      <circle cx="12" cy="7" r="4" fill={active ? 'currentColor' : 'none'} />
+      <path d="M4 21v-1a8 8 0 0 1 16 0v1" />
+    </svg>
+  )
+}
+
 const NAV_ITEMS = [
-  { href: '/',            icon: '⊞',  label: '홈' },
-  { href: '/record',      icon: '✏️', label: '기록' },
-  { href: '/leaderboard', icon: '↑',  label: '리더보드' },
-  { href: '/profile',     icon: '○',  label: '프로필' },
+  { href: '/',            Icon: IconHome,   label: '홈' },
+  { href: '/record',      Icon: IconPen,    label: '기록' },
+  { href: '/leaderboard', Icon: IconTrophy, label: '리더보드' },
+  { href: '/profile',     Icon: IconPerson, label: '프로필' },
 ]
 
 const HIDDEN_PATHS = ['/login', '/link-member', '/auth']
@@ -17,52 +64,49 @@ export function BottomNav() {
 
   if (HIDDEN_PATHS.some(p => pathname.startsWith(p))) return null
 
-  const showFab = !['/record', '/login', '/link-member'].some(p => pathname.startsWith(p))
-
   return (
-    <>
-      {showFab && (
-        <Link
-          href="/record"
-          style={{
-            position: 'fixed', bottom: '78px', right: '20px',
-            width: '50px', height: '50px', borderRadius: '50%',
-            background: '#111111', color: '#fff',
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
-            fontSize: '1.5rem', textDecoration: 'none',
-            boxShadow: '0 6px 20px rgba(46,145,252,0.4)',
-            zIndex: 101,
-          }}
-        >+</Link>
-      )}
-
-      <nav style={{
-        position: 'fixed', bottom: 0, left: 0, right: 0,
-        background: 'rgba(244,245,246,0.95)',
-        backdropFilter: 'blur(20px)',
-        borderTop: '1px solid rgba(0,0,0,0.06)',
-        display: 'flex', justifyContent: 'space-around',
-        padding: '12px 0 28px', zIndex: 100,
-      }}>
-        {NAV_ITEMS.map(({ href, icon, label }) => {
-          const active = href === '/' ? pathname === '/' : pathname.startsWith(href)
-          return (
-            <Link
-              key={href}
-              href={href}
-              style={{
-                display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '2px',
-                fontSize: '0.57rem', fontWeight: 500,
-                color: active ? '#111111' : '#C0C0C0',
-                textDecoration: 'none', transition: 'color 0.15s',
-              }}
-            >
-              <span style={{ fontSize: '1.2rem', lineHeight: 1 }}>{icon}</span>
+    <nav style={{
+      position: 'fixed', bottom: 20, left: '50%', transform: 'translateX(-50%)',
+      zIndex: 100,
+      display: 'flex', alignItems: 'center',
+      background: 'rgba(255,255,255,0.88)',
+      backdropFilter: 'blur(24px)',
+      WebkitBackdropFilter: 'blur(24px)',
+      borderRadius: 32,
+      padding: '8px 10px',
+      gap: 4,
+      boxShadow: '0 4px 32px rgba(0,0,0,0.10), 0 1px 4px rgba(0,0,0,0.06), inset 0 0 0 1px rgba(255,255,255,0.6)',
+    }}>
+      {NAV_ITEMS.map(({ href, Icon, label }) => {
+        const active = href === '/' ? pathname === '/' : pathname.startsWith(href)
+        return (
+          <Link
+            key={href}
+            href={href}
+            style={{
+              display: 'flex', flexDirection: 'column',
+              alignItems: 'center', justifyContent: 'center',
+              gap: 3,
+              width: 62, height: 52,
+              borderRadius: 22,
+              background: active ? '#111111' : 'transparent',
+              color: active ? '#ffffff' : '#aaaaaa',
+              textDecoration: 'none',
+              transition: 'background 0.2s, color 0.2s',
+            }}
+          >
+            <Icon active={active} />
+            <span style={{
+              fontFamily: FONT,
+              fontSize: '0.45rem',
+              fontWeight: active ? 600 : 400,
+              letterSpacing: '0.3px',
+            }}>
               {label}
-            </Link>
-          )
-        })}
-      </nav>
-    </>
+            </span>
+          </Link>
+        )
+      })}
+    </nav>
   )
 }

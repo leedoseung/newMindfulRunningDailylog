@@ -93,6 +93,8 @@ export function RunLogForm({ memberId, mode = 'create', recordId, initialData }:
         const body = await res.json().catch(() => ({})) as { error?: string }
         throw new Error(body.error ?? '저장 실패')
       }
+      const saved = await res.json()
+      sessionStorage.setItem('openRun', JSON.stringify(saved))
       router.push('/')
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : '저장 실패')

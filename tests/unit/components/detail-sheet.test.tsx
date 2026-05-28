@@ -2,6 +2,11 @@ import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { DetailSheet } from '@/presentation/components/feed/detail-sheet'
 import type { RunLog } from '@/domain/entities/run-log'
+import { vi } from 'vitest'
+
+vi.mock('next/navigation', () => ({
+  useRouter: () => ({ push: vi.fn(), refresh: vi.fn() }),
+}))
 
 const run: RunLog = {
   id: 'r1',
@@ -21,9 +26,9 @@ const run: RunLog = {
 describe('DetailSheet', () => {
   it('shows run details when open=true', () => {
     render(<DetailSheet run={run} open onClose={() => {}} />)
-    expect(screen.getByText('이두승')).toBeInTheDocument()
-    expect(screen.getByText('가볍게 달릴 예정')).toBeInTheDocument()
-    expect(screen.getByText('분')).toBeInTheDocument()
+    expect(screen.getAllByText('이두승').length).toBeGreaterThanOrEqual(1)
+    expect(screen.getAllByText('가볍게 달릴 예정').length).toBeGreaterThanOrEqual(1)
+    expect(screen.getAllByText('분').length).toBeGreaterThanOrEqual(1)
   })
 
   it('calls onClose when backdrop is clicked', async () => {

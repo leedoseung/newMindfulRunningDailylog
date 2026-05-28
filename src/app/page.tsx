@@ -4,6 +4,7 @@ import { SupabaseRunLogRepository } from '@/infrastructure/supabase/run-log-repo
 import { createServerClient } from '@/infrastructure/supabase/client'
 import { HomeFeed } from '@/presentation/components/home/home-feed'
 import type { CrewMember, WeeklyBar } from '@/presentation/components/home/home-feed'
+import { AvatarImage } from '@/presentation/components/shared/avatar-image'
 import Link from 'next/link'
 import type { RunLog } from '@/domain/entities/run-log'
 
@@ -47,14 +48,18 @@ export default async function HomePage() {
   const memberId = (user?.user_metadata?.member_id as string | undefined) ?? ''
 
   const repo = new SupabaseRunLogRepository(supabase)
-  const [recentRuns, myRuns] = await Promise.all([
+  const [recentRuns, myRuns, memberRow] = await Promise.all([
     new GetRecentRunsUseCase(repo).execute(7),
     memberId ? new GetMemberRecordsUseCase(repo).execute(memberId) : Promise.resolve([]),
+    memberId
+      ? supabase.from('members').select('name, avatar_url').eq('id', memberId).single()
+      : Promise.resolve({ data: null }),
   ])
 
   const crew = computeCrew(recentRuns)
   const weeklyBars = computeWeeklyBars(recentRuns)
-  const memberName = myRuns[0]?.memberName ?? ''
+  const memberName = (memberRow.data?.name as string | undefined) ?? myRuns[0]?.memberName ?? ''
+  const memberAvatarUrl = (memberRow.data?.avatar_url as string | undefined) ?? myRuns[0]?.memberAvatarUrl ?? ''
 
   return (
     <main style={{ minHeight: '100vh', background: '#F7F7F5', position: 'relative' }}>
@@ -74,13 +79,18 @@ export default async function HomePage() {
         <Link
           href="/profile"
           style={{
-            width: 34, height: 34, borderRadius: '50%', background: '#111111',
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
-            color: '#fff', fontFamily: "'Pretendard Variable', Pretendard, -apple-system, sans-serif", fontSize: '0.78rem', fontWeight: 500,
-            textDecoration: 'none', flexShrink: 0,
+            display: 'block', borderRadius: '50%', flexShrink: 0,
+            textDecoration: 'none',
+            boxShadow: '0 0 0 2px rgba(0,0,0,0.08)',
           }}
         >
-          {memberName ? memberName[0] : '○'}
+          <AvatarImage
+            name={memberName || '?'}
+            avatarUrl={memberAvatarUrl}
+            size={34}
+            bg="#111111"
+            color="#fff"
+          />
         </Link>
       </div>
 

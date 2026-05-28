@@ -1,8 +1,9 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useCallback, useEffect } from 'react'
 import { RunFeed } from '../feed/run-feed'
 import { MyRecordsTab } from '../my-records/my-records-tab'
+import { DetailSheet } from '../feed/detail-sheet'
 import { AvatarImage } from '../shared/avatar-image'
 import type { RunLog } from '@/domain/entities/run-log'
 
@@ -30,7 +31,7 @@ type Props = {
   weeklyBars: WeeklyBar[]
 }
 
-function CrewStrip({ crew, todayCount }: { crew: CrewMember[]; todayCount: number }) {
+function CrewStrip({ crew, todayCount, onCrewClick }: { crew: CrewMember[]; todayCount: number; onCrewClick: (memberId: string) => void }) {
   if (crew.length === 0) return null
   return (
     <div style={{ padding: '4px 22px 0', display: 'flex', flexDirection: 'column', gap: 10 }}>
@@ -38,16 +39,17 @@ function CrewStrip({ crew, todayCount }: { crew: CrewMember[]; todayCount: numbe
         fontSize: '0.6rem', fontWeight: 600, color: '#999',
         letterSpacing: '1.5px', textTransform: 'uppercase',
       }}>
-        오늘 함께 달린 크루 · {todayCount}명
+        오늘 함께 달린 마인드풀러너 · {todayCount}명
       </div>
       <div style={{
         display: 'flex', gap: 12, overflowX: 'auto',
         scrollbarWidth: 'none', paddingTop: 6, paddingBottom: 6, paddingLeft: 6, paddingRight: 6,
       }}>
         {crew.map(m => (
-          <div key={m.memberId} style={{
+          <div key={m.memberId} onClick={() => onCrewClick(m.memberId)} style={{
             display: 'flex', flexDirection: 'column',
             alignItems: 'center', gap: 5, flexShrink: 0,
+            cursor: 'pointer',
           }}>
             {m.ranToday ? (
               /* Instagram-style spinning gradient ring */
@@ -91,7 +93,25 @@ function CrewStrip({ crew, todayCount }: { crew: CrewMember[]; todayCount: numbe
 
 export function HomeFeed({ recentRuns, myRuns, memberId, crew, weeklyBars }: Props) {
   const [tab, setTab] = useState<Tab>('all')
+  const [triggerRun, setTriggerRun] = useState<RunLog | null>(null)
+  const [autoOpenRun, setAutoOpenRun] = useState<RunLog | null>(null)
   const todayCount = crew.filter(c => c.ranToday).length
+
+  useEffect(() => {
+    const stored = sessionStorage.getItem('openRun')
+    if (!stored) return
+    sessionStorage.removeItem('openRun')
+    try {
+      setAutoOpenRun(JSON.parse(stored) as RunLog)
+    } catch {}
+  }, [])
+
+  const handleCrewClick = useCallback((crewMemberId: string) => {
+    const run = recentRuns.find(r => r.memberId === crewMemberId) ?? null
+    if (!run) return
+    setTab('all')
+    setTriggerRun(run)
+  }, [recentRuns])
 
   const tabs = [
     { key: 'all' as Tab, label: '전체 피드' },
@@ -100,7 +120,7 @@ export function HomeFeed({ recentRuns, myRuns, memberId, crew, weeklyBars }: Pro
 
   return (
     <>
-      <CrewStrip crew={crew} todayCount={todayCount} />
+      <CrewStrip crew={crew} todayCount={todayCount} onCrewClick={handleCrewClick} />
 
       <div style={{ height: 1, background: 'rgba(0,0,0,0.06)', margin: '14px 22px' }} />
 
@@ -130,10 +150,23 @@ export function HomeFeed({ recentRuns, myRuns, memberId, crew, weeklyBars }: Pro
       </div>
 
       {tab === 'all' ? (
-        <RunFeed runs={recentRuns} weeklyBars={weeklyBars} />
+        <RunFeed
+          runs={recentRuns}
+          weeklyBars={weeklyBars}
+          triggerRun={triggerRun}
+          onTriggerConsumed={() => setTriggerRun(null)}
+          memberId={memberId}
+        />
       ) : (
         <MyRecordsTab runs={myRuns} memberId={memberId} />
       )}
+
+      <DetailSheet
+        run={autoOpenRun}
+        open={Boolean(autoOpenRun)}
+        onClose={() => setAutoOpenRun(null)}
+        memberId={memberId}
+      />
     </>
   )
 }

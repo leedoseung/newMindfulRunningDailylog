@@ -55,6 +55,7 @@ export default async function ProfilePage() {
       stats={computeStats(myRuns)}
       monthlyChart={computeMonthlyChart(myRuns)}
       recentRuns={myRuns.slice(0, 5)}
+      memberId={memberId}
     />
   )
 }

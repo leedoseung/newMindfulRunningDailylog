@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { useRouter } from 'next/navigation'
+import { createBrowserClient } from '@/infrastructure/supabase/browser-client'
 import type { Member } from '@/domain/entities/member'
 
 type Props = {
@@ -9,10 +9,14 @@ type Props = {
 }
 
 export function LinkMemberForm({ members }: Props) {
-  const router = useRouter()
   const [selectedId, setSelectedId] = useState('')
   const [submitting, setSubmitting] = useState(false)
   const [error, setError]           = useState('')
+  const [query, setQuery]           = useState('')
+
+  const filtered = query.trim()
+    ? members.filter(m => m.name.includes(query.trim()))
+    : members
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
@@ -30,7 +34,12 @@ export function LinkMemberForm({ members }: Props) {
         const body = await res.json().catch(() => ({})) as { error?: string }
         throw new Error(body.error ?? '연결 실패')
       }
-      router.push('/')
+      // 브라우저 세션에 member_id를 직접 기록 (서버 쿠키 갱신 대신 클라이언트에서 처리)
+      const { error: updateErr } = await createBrowserClient().auth.updateUser({
+        data: { member_id: selectedId },
+      })
+      if (updateErr) throw new Error(updateErr.message)
+      window.location.href = '/'
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : '연결 실패')
     } finally {
@@ -39,7 +48,7 @@ export function LinkMemberForm({ members }: Props) {
   }
 
   return (
-    <main style={{ minHeight: '100vh', background: '#F7F7F5', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '0 24px' }}>
+    <main style={{ minHeight: '100vh', background: '#F7F7F5', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '60px 24px 40px' }}>
       <div style={{ width: '100%', maxWidth: '400px' }}>
         <div style={{ textAlign: 'center', marginBottom: '32px' }}>
           <div style={{ fontFamily: "'Pretendard Variable', Pretendard, -apple-system, sans-serif", fontSize: '0.6rem', fontWeight: 500, letterSpacing: '2px', textTransform: 'uppercase', color: '#888', marginBottom: '8px' }}>
@@ -54,8 +63,42 @@ export function LinkMemberForm({ members }: Props) {
         </div>
 
         <form onSubmit={handleSubmit}>
+          {/* 검색 */}
+          <div style={{
+            display: 'flex', alignItems: 'center', gap: '10px',
+            background: '#fff', borderRadius: '14px', padding: '12px 16px',
+            boxShadow: '0 1px 6px rgba(0,0,0,0.06)', marginBottom: '12px',
+          }}>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
+              stroke="#aaa" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+            </svg>
+            <input
+              type="text"
+              value={query}
+              onChange={e => setQuery(e.target.value)}
+              placeholder="이름 검색"
+              style={{
+                flex: 1, border: 'none', outline: 'none', background: 'transparent',
+                fontFamily: "'Pretendard Variable', Pretendard, -apple-system, sans-serif",
+                fontSize: '0.9rem', color: '#111',
+              }}
+            />
+            {query && (
+              <button type="button" onClick={() => setQuery('')}
+                style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0, color: '#bbb', fontSize: '1rem', lineHeight: 1 }}>
+                ×
+              </button>
+            )}
+          </div>
+
           <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginBottom: '20px' }}>
-            {members.map(m => (
+            {filtered.length === 0 && (
+              <div style={{ textAlign: 'center', color: '#aaa', fontSize: '0.82rem', padding: '20px 0' }}>
+                검색 결과가 없습니다
+              </div>
+            )}
+            {filtered.map(m => (
               <button
                 key={m.id}
                 type="button"

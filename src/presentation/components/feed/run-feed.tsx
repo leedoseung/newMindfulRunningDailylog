@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect, Fragment } from 'react'
 import { RunCard } from './run-card'
 import { DetailSheet } from './detail-sheet'
 import type { RunLog } from '@/domain/entities/run-log'
@@ -9,6 +9,9 @@ import type { WeeklyBar } from '../home/home-feed'
 type Props = {
   runs: RunLog[]
   weeklyBars: WeeklyBar[]
+  triggerRun?: RunLog | null
+  onTriggerConsumed?: () => void
+  memberId?: string
 }
 
 function CommunityPulseCard({ weeklyBars, runs }: { weeklyBars: WeeklyBar[]; runs: RunLog[] }) {
@@ -27,7 +30,7 @@ function CommunityPulseCard({ weeklyBars, runs }: { weeklyBars: WeeklyBar[]; run
         fontSize: '0.6rem', fontWeight: 500,
         color: 'rgba(255,255,255,0.6)', letterSpacing: '1.5px',
         textTransform: 'uppercase', marginBottom: 8,
-      }}>이번 주 크루 현황</div>
+      }}>이번 주 마인드풀러너 현황</div>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end' }}>
         <div>
           <div style={{
@@ -79,8 +82,18 @@ function CommunityPulseCard({ weeklyBars, runs }: { weeklyBars: WeeklyBar[]; run
   )
 }
 
-export function RunFeed({ runs, weeklyBars }: Props) {
+export function RunFeed({ runs, weeklyBars, triggerRun, onTriggerConsumed, memberId }: Props) {
   const [selected, setSelected] = useState<RunLog | null>(null)
+
+  useEffect(() => {
+    if (!triggerRun) return
+    const id = setTimeout(() => {
+      document.getElementById(`run-${triggerRun.id}`)?.scrollIntoView({ behavior: 'smooth', block: 'center' })
+      setSelected(triggerRun)
+      onTriggerConsumed?.()
+    }, 60)
+    return () => clearTimeout(id)
+  }, [triggerRun])
 
   function cardType(run: RunLog, i: number): 'hero' | 'photo' | 'white' {
     if (i === 0) return 'hero'
@@ -100,18 +113,20 @@ export function RunFeed({ runs, weeklyBars }: Props) {
           </>
         ) : (
           runs.map((run, i) => (
-            <div key={run.id} style={{ display: 'contents' }}>
-              <RunCard run={run} cardType={cardType(run, i)} onClick={setSelected} />
+            <Fragment key={run.id}>
+              <div id={`run-${run.id}`}>
+                <RunCard run={run} cardType={cardType(run, i)} onClick={setSelected} />
+              </div>
               {i === 0 && (
                 <CommunityPulseCard weeklyBars={weeklyBars} runs={runs} />
               )}
-            </div>
+            </Fragment>
           ))
         )}
       </div>
 
       {selected && (
-        <DetailSheet run={selected} open={Boolean(selected)} onClose={() => setSelected(null)} />
+        <DetailSheet run={selected} open={Boolean(selected)} onClose={() => setSelected(null)} memberId={memberId} />
       )}
     </>
   )

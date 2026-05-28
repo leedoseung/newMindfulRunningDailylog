@@ -1,12 +1,16 @@
 'use client'
 
 import { useEffect, useRef, useState } from 'react'
+import { useRouter } from 'next/navigation'
+import { toPng } from 'html-to-image'
+import { ShareCard } from './share-card'
 import type { RunLog } from '@/domain/entities/run-log'
 
 type Props = {
   run: RunLog | null
   open: boolean
   onClose: () => void
+  memberId?: string
 }
 
 function useCountUp(target: number, active: boolean) {
@@ -38,13 +42,99 @@ function useCountUp(target: number, active: boolean) {
 
 const FONT = "'Pretendard Variable', Pretendard, -apple-system, sans-serif"
 
-export function DetailSheet({ run, open, onClose }: Props) {
+export function DetailSheet({ run, open, onClose, memberId }: Props) {
+  const router = useRouter()
   const [photoMode, setPhotoMode] = useState(false)
+  const [saving, setSaving] = useState(false)
+  const [deleting, setDeleting] = useState(false)
+  const [copied, setCopied] = useState(false)
+  const shareCardRef = useRef<HTMLDivElement>(null)
   const count = useCountUp(run?.durationMin ?? 0, open)
+
+  const isOwner = Boolean(memberId && run && run.memberId === memberId)
+
+  function handleEdit() {
+    if (!run) return
+    onClose()
+    router.push(`/record?edit=${run.id}`)
+  }
+
+  async function handleDelete() {
+    if (!run) return
+    if (!confirm('이 기록을 삭제할까요?')) return
+    setDeleting(true)
+    try {
+      const res = await fetch(`/api/record/${run.id}`, { method: 'DELETE' })
+      if (!res.ok) throw new Error('삭제 실패')
+      onClose()
+      router.refresh()
+    } catch {
+      alert('삭제에 실패했습니다')
+    } finally {
+      setDeleting(false)
+    }
+  }
 
   useEffect(() => {
     if (!open) setPhotoMode(false)
   }, [open])
+
+  async function handleCopyText() {
+    if (!run) return
+    const text = `📝 오늘의 마인드풀러닝 기록
+
+${run.memberName} | ${run.date} | ${run.durationMin}분${run.location ? ` | ${run.location}` : ''}
+
+🏃 오늘의 한줄: ${run.title}
+
+💭 달리기 전:
+${run.thoughtBefore}
+
+🏃‍♂️ 달리기 중:
+${run.thoughtDuring}
+
+✨ 달리기 후:
+${run.thoughtAfter}`
+
+    await navigator.clipboard.writeText(text)
+    setCopied(true)
+    setTimeout(() => setCopied(false), 2000)
+  }
+
+  async function handleSaveImage() {
+    if (!shareCardRef.current || !run) return
+    setSaving(true)
+    try {
+      const dataUrl = await toPng(shareCardRef.current, {
+        pixelRatio: 2,
+        cacheBust: true,
+        skipFonts: true,
+      })
+
+      const fileName = `mindful-run-${run.date}.png`
+
+      // iOS / Android → 네이티브 공유 시트
+      const blob = await (await fetch(dataUrl)).blob()
+      const file = new File([blob], fileName, { type: 'image/png' })
+      if (navigator.canShare?.({ files: [file] })) {
+        await navigator.share({ files: [file] })
+        return
+      }
+
+      // 데스크탑 → 직접 다운로드
+      const link = document.createElement('a')
+      link.download = fileName
+      link.href = dataUrl
+      link.click()
+    } catch (err) {
+      // 사용자가 공유 취소한 경우(AbortError)는 무시
+      if (err instanceof Error && err.name !== 'AbortError') {
+        alert('이미지 저장에 실패했습니다')
+      }
+    } finally {
+      setSaving(false)
+    }
+  }
 
   if (!run) return null
 
@@ -123,18 +213,71 @@ export function DetailSheet({ run, open, onClose }: Props) {
             }}
           >✕</button>
 
-          {hasPhoto && (
+          <div style={{ display: 'flex', gap: 6, marginTop: 8, flexWrap: 'wrap' }}>
+            {isOwner && (
+              <>
+                <button
+                  type="button"
+                  onClick={handleEdit}
+                  style={{
+                    background: '#111', border: 'none', borderRadius: 20,
+                    padding: '6px 14px', fontFamily: FONT, fontSize: '0.6rem',
+                    fontWeight: 500, color: '#fff', cursor: 'pointer',
+                  }}
+                >수정</button>
+                <button
+                  type="button"
+                  onClick={handleDelete}
+                  disabled={deleting}
+                  style={{
+                    background: deleting ? '#ddd' : '#fee2e2', border: 'none', borderRadius: 20,
+                    padding: '6px 14px', fontFamily: FONT, fontSize: '0.6rem',
+                    fontWeight: 500, color: deleting ? '#aaa' : '#ef4444',
+                    cursor: deleting ? 'not-allowed' : 'pointer',
+                  }}
+                >{deleting ? '삭제 중…' : '삭제'}</button>
+              </>
+            )}
+          </div>
+
+          <div style={{ display: 'flex', gap: 6, marginTop: 8, flexWrap: 'wrap' }}>
+            {hasPhoto && (
+              <button
+                type="button"
+                onClick={() => setPhotoMode(v => !v)}
+                style={{
+                  background: '#111', border: 'none', borderRadius: 20,
+                  padding: '6px 14px',
+                  fontFamily: FONT, fontSize: '0.6rem', fontWeight: 500,
+                  color: '#fff', cursor: 'pointer',
+                }}
+              >{photoMode ? '텍스트 보기' : '사진 보기'}</button>
+            )}
             <button
               type="button"
-              onClick={() => setPhotoMode(v => !v)}
+              onClick={handleSaveImage}
+              disabled={saving}
               style={{
-                background: '#111', border: 'none', borderRadius: 20,
-                padding: '6px 14px', marginTop: 8,
+                background: saving ? '#ddd' : '#EBEBEA', border: 'none', borderRadius: 20,
+                padding: '6px 14px',
                 fontFamily: FONT, fontSize: '0.6rem', fontWeight: 500,
-                color: '#fff', cursor: 'pointer',
+                color: saving ? '#aaa' : '#111',
+                cursor: saving ? 'not-allowed' : 'pointer',
               }}
-            >{photoMode ? '텍스트 보기' : '사진 보기'}</button>
-          )}
+            >{saving ? '저장 중…' : '이미지 저장'}</button>
+            <button
+              type="button"
+              onClick={handleCopyText}
+              style={{
+                background: copied ? '#111' : '#EBEBEA', border: 'none', borderRadius: 20,
+                padding: '6px 14px',
+                fontFamily: FONT, fontSize: '0.6rem', fontWeight: 500,
+                color: copied ? '#fff' : '#111',
+                cursor: 'pointer',
+                transition: 'all 0.2s',
+              }}
+            >{copied ? '복사됨 ✓' : '텍스트 복사'}</button>
+          </div>
         </div>
 
         {/* Content */}
@@ -237,6 +380,11 @@ export function DetailSheet({ run, open, onClose }: Props) {
             pointerEvents: 'none', zIndex: 20,
           }}>탭하면 텍스트 다시 보기</div>
         )}
+      </div>
+
+      {/* 오프스크린 ShareCard — html-to-image 캡처 전용 */}
+      <div style={{ position: 'fixed', left: -9999, top: 0, pointerEvents: 'none', zIndex: -1 }}>
+        <ShareCard ref={shareCardRef} run={run} />
       </div>
     </div>
   )

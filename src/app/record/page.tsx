@@ -13,9 +13,9 @@ export default async function RecordPage({
   searchParams: Promise<{ edit?: string }>
 }) {
   const { edit } = await searchParams
-  // TEMP: auth bypassed for testing — restore before production
   const supabase = await createServerClient()
-  const memberId = ''
+  const { data: { user } } = await supabase.auth.getUser()
+  const memberId = (user?.user_metadata?.member_id as string | undefined) ?? ''
 
   let initialData: RunLogFormInitial | undefined
   if (edit) {

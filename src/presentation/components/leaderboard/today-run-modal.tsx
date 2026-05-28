@@ -28,8 +28,7 @@ export function TodayRunModal({ memberId, memberName, open, onClose }: Props) {
     fetch('/api/today-runs')
       .then(r => r.json())
       .then((data: RunLog[]) => {
-        const memberRuns = data.filter(r => r.memberId === memberId)
-        setRuns(memberRuns.length > 0 ? memberRuns : data.slice(0, 3))
+        setRuns(data.filter(r => r.memberId === memberId))
       })
       .catch(() => setRuns([]))
       .finally(() => setLoading(false))

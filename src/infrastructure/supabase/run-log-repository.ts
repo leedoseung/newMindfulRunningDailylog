@@ -62,6 +62,17 @@ export class SupabaseRunLogRepository implements IRunLogRepository {
     return (data as unknown as RunLogRow[]).map(toRunLog)
   }
 
+  async getByDate(date: string): Promise<RunLog[]> {
+    const { data, error } = await this.supabase
+      .from('run_logs')
+      .select(SELECT_FIELDS)
+      .eq('date', date)
+      .order('created_at', { ascending: false })
+
+    if (error) throw new Error(`getByDate failed: ${error.message}`)
+    return (data as unknown as RunLogRow[]).map(toRunLog)
+  }
+
   async getByMemberId(memberId: string): Promise<RunLog[]> {
     const { data, error } = await this.supabase
       .from('run_logs')

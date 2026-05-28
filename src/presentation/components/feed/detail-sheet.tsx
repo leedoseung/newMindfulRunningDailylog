@@ -61,7 +61,7 @@ export function DetailSheet({ run, open, onClose, memberId }: Props) {
   function handleEdit() {
     if (!run) return
     onClose()
-    router.push(`/record?edit=${run.id}`)
+    router.push(`/?edit=${run.id}`)
   }
 
   async function handleDelete() {

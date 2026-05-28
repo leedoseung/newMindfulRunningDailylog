@@ -51,8 +51,8 @@ function IconPerson({ active }: { active: boolean }) {
 }
 
 const NAV_ITEMS = [
-  { href: '/',            Icon: IconHome,   label: '홈' },
-  { href: '/record',      Icon: IconPen,    label: '기록' },
+  { href: '/home',        Icon: IconHome,   label: '홈' },
+  { href: '/',            Icon: IconPen,    label: '기록' },
   { href: '/leaderboard', Icon: IconTrophy, label: '리더보드' },
   { href: '/profile',     Icon: IconPerson, label: '프로필' },
 ]
@@ -78,7 +78,7 @@ export function BottomNav() {
       boxShadow: '0 4px 32px rgba(0,0,0,0.10), 0 1px 4px rgba(0,0,0,0.06), inset 0 0 0 1px rgba(255,255,255,0.6)',
     }}>
       {NAV_ITEMS.map(({ href, Icon, label }) => {
-        const active = href === '/' ? pathname === '/' : pathname.startsWith(href)
+        const active = href === '/' ? pathname === '/' : pathname === href || pathname.startsWith(href + '/')
         return (
           <Link
             key={href}

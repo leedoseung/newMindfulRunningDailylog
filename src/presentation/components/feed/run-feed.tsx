@@ -100,8 +100,10 @@ function CommunityPulseCard({ weeklyBars, runs }: { weeklyBars: WeeklyBar[]; run
 }
 
 // 좌우 열의 높이 패턴 — 서로 어긋나게 배치해 마소리 느낌
-const HEIGHTS_L = [200, 130, 170, 115, 190, 145]
-const HEIGHTS_R = [130, 195, 115, 175, 140, 200]
+const HEIGHTS_L: number[] = [200, 130, 170, 115, 190, 145]
+const HEIGHTS_R: number[] = [130, 195, 115, 175, 140, 200]
+const hL = (i: number) => HEIGHTS_L[i % HEIGHTS_L.length]!
+const hR = (i: number) => HEIGHTS_R[i % HEIGHTS_R.length]!
 
 function GridCell({ run, height, onClick }: { run: RunLog; height: number; onClick: () => void }) {
   return (
@@ -189,7 +191,7 @@ export function PhotoGrid({ runs, weeklyBars, memberId }: { runs: RunLog[]; week
               <GridCell
                 key={run.id}
                 run={run}
-                height={HEIGHTS_L[rowIdx % HEIGHTS_L.length]}
+                height={hL(rowIdx)}
                 onClick={() => setSelected(run)}
               />
             ))}
@@ -200,7 +202,7 @@ export function PhotoGrid({ runs, weeklyBars, memberId }: { runs: RunLog[]; week
               <GridCell
                 key={run.id}
                 run={run}
-                height={HEIGHTS_R[rowIdx % HEIGHTS_R.length]}
+                height={hR(rowIdx)}
                 onClick={() => setSelected(run)}
               />
             ))}

@@ -11,6 +11,6 @@ export function getRedirectPath(
 ): string | null {
   if (isPublic(pathname)) return null
   if (!userId) return '/login'
-  if (!memberId && !pathname.startsWith('/link-member')) return '/link-member'
+  if (!memberId && !pathname.startsWith('/link-member') && !pathname.startsWith('/api/auth/')) return '/link-member'
   return null
 }

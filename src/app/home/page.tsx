@@ -67,6 +67,7 @@ export default async function HomePage() {
 
   const crew = computeCrew(crewRuns)
   const weeklyBars = computeWeeklyBars(crewRuns)
+  const weeklyTotalHours = Math.floor(crewRuns.reduce((s, r) => s + r.durationMin, 0) / 60)
   const memberName = (memberRow.data?.name as string | undefined) ?? myRuns[0]?.memberName ?? ''
   const memberAvatarUrl = (memberRow.data?.avatar_url as string | undefined) ?? myRuns[0]?.memberAvatarUrl ?? ''
   const recentRuns = initialGridRuns
@@ -81,6 +82,7 @@ export default async function HomePage() {
         memberId={memberId}
         crew={crew}
         weeklyBars={weeklyBars}
+        weeklyTotalHours={weeklyTotalHours}
       />
     </main>
   )

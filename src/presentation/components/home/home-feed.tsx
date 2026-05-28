@@ -6,6 +6,8 @@ import { DetailSheet } from '../feed/detail-sheet'
 import { AvatarImage } from '../shared/avatar-image'
 import type { RunLog } from '@/domain/entities/run-log'
 
+const FONT = "'Pretendard Variable', Pretendard, -apple-system, sans-serif"
+
 export type CrewMember = {
   memberId: string
   memberName: string
@@ -28,76 +30,136 @@ type Props = {
   memberId: string
   crew: CrewMember[]
   weeklyBars: WeeklyBar[]
+  weeklyTotalHours?: number
   initialOffset?: number
 }
 
-function CrewStrip({ crew, todayCount, onCrewClick }: { crew: CrewMember[]; todayCount: number; onCrewClick: (memberId: string) => void }) {
-  if (crew.length === 0) return null
+function CrewStrip({
+  crew, todayCount, weeklyBars, weeklyTotalRuns, weeklyParticipants, weeklyTotalHours, onCrewClick,
+}: {
+  crew: CrewMember[]
+  todayCount: number
+  weeklyBars: WeeklyBar[]
+  weeklyTotalRuns: number
+  weeklyParticipants: number
+  weeklyTotalHours: number
+  onCrewClick: (memberId: string) => void
+}) {
+  const maxCount = Math.max(...weeklyBars.map(b => b.count), 1)
+
   return (
-    <div style={{ padding: '4px 22px 0', display: 'flex', flexDirection: 'column', gap: 10 }}>
-      <div style={{
-        fontSize: '0.6rem', fontWeight: 600, color: '#999',
-        letterSpacing: '1.5px', textTransform: 'uppercase',
-      }}>
-        오늘 함께 달린 마인드풀러너 · {todayCount}명
-      </div>
-      <div style={{
-        display: 'flex', gap: 12, overflowX: 'auto',
-        scrollbarWidth: 'none', paddingTop: 6, paddingBottom: 6, paddingLeft: 6, paddingRight: 6,
-      }}>
-        {crew.map(m => (
-          <div key={m.memberId} onClick={() => onCrewClick(m.memberId)} style={{
-            display: 'flex', flexDirection: 'column',
-            alignItems: 'center', gap: 5, flexShrink: 0,
-            cursor: 'pointer',
+    <div style={{ padding: '8px 22px 0', display: 'flex', flexDirection: 'column', gap: 14 }}>
+
+      {/* 이번 주 통계 + 미니 바 차트 */}
+      <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between' }}>
+        <div>
+          <div style={{
+            fontFamily: FONT, fontSize: '0.48rem', fontWeight: 500,
+            color: '#bbb', letterSpacing: '1.8px', textTransform: 'uppercase', marginBottom: 6,
           }}>
-            {m.ranToday ? (
-              /* Instagram-style spinning gradient ring */
-              <div style={{ position: 'relative', width: 54, height: 54, flexShrink: 0 }}>
+            이번 주 마인드풀러너
+          </div>
+          <div style={{ display: 'flex', alignItems: 'baseline', gap: 6 }}>
+            <span style={{ fontFamily: FONT, fontSize: '1.7rem', fontWeight: 800, color: '#111', letterSpacing: '-1px', lineHeight: 1 }}>
+              {weeklyTotalRuns}
+            </span>
+            <span style={{ fontFamily: FONT, fontSize: '0.7rem', color: '#999', fontWeight: 400 }}>회</span>
+            <span style={{ color: '#e0e0e0', fontSize: '0.7rem' }}>·</span>
+            <span style={{ fontFamily: FONT, fontSize: '0.82rem', fontWeight: 600, color: '#444' }}>{weeklyParticipants}명</span>
+            {weeklyTotalHours > 0 && (
+              <>
+                <span style={{ color: '#e0e0e0', fontSize: '0.7rem' }}>·</span>
+                <span style={{ fontFamily: FONT, fontSize: '0.82rem', fontWeight: 500, color: '#888' }}>
+                  {weeklyTotalHours}h
+                </span>
+              </>
+            )}
+          </div>
+        </div>
+
+        {/* 미니 7일 바 차트 */}
+        <div style={{ display: 'flex', alignItems: 'flex-end', gap: 3, height: 32, paddingBottom: 2 }}>
+          {weeklyBars.map(bar => (
+            <div key={bar.label} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 3, height: '100%', justifyContent: 'flex-end' }}>
+              <div style={{
+                width: 10, borderRadius: '3px 3px 0 0',
+                height: bar.count > 0 ? `${Math.max((bar.count / maxCount) * 100, 18)}%` : 3,
+                background: bar.isToday ? '#111' : '#e0e0e0',
+                transition: 'height 0.3s',
+              }} />
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* 구분선 */}
+      <div style={{ height: 1, background: 'rgba(0,0,0,0.05)' }} />
+
+      {/* 오늘 크루 */}
+      {crew.length > 0 && (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+          <div style={{
+            fontFamily: FONT, fontSize: '0.5rem', fontWeight: 500,
+            color: '#bbb', letterSpacing: '1.5px', textTransform: 'uppercase',
+          }}>
+            오늘 달린 멤버 · {todayCount}명
+          </div>
+          <div style={{
+            display: 'flex', gap: 12, overflowX: 'auto',
+            scrollbarWidth: 'none', paddingTop: 2, paddingBottom: 6, paddingLeft: 2, paddingRight: 2,
+          }}>
+            {crew.map(m => (
+              <div key={m.memberId} onClick={() => onCrewClick(m.memberId)} style={{
+                display: 'flex', flexDirection: 'column',
+                alignItems: 'center', gap: 5, flexShrink: 0,
+                cursor: 'pointer',
+              }}>
+                {m.ranToday ? (
+                  <div style={{ position: 'relative', width: 54, height: 54, flexShrink: 0 }}>
+                    <div style={{
+                      position: 'absolute', inset: 0, borderRadius: '50%',
+                      background: 'conic-gradient(from 0deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888, #833ab4, #fd1d1d, #fcb045, #f09433)',
+                      animation: 'spin-gradient 3s linear infinite',
+                    }} />
+                    <div style={{ position: 'absolute', inset: 3, borderRadius: '50%', background: '#F7F7F5' }} />
+                    <div style={{ position: 'absolute', inset: 5 }}>
+                      <AvatarImage name={m.memberName} avatarUrl={m.avatarUrl} size={44} bg="#111" />
+                    </div>
+                  </div>
+                ) : (
+                  <AvatarImage name={m.memberName} avatarUrl={m.avatarUrl} size={46} bg="#CCC" />
+                )}
                 <div style={{
-                  position: 'absolute', inset: 0, borderRadius: '50%',
-                  background: 'conic-gradient(from 0deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888, #833ab4, #fd1d1d, #fcb045, #f09433)',
-                  animation: 'spin-gradient 3s linear infinite',
-                }} />
-                <div style={{
-                  position: 'absolute', inset: 3, borderRadius: '50%',
-                  background: '#F7F7F5',
-                }} />
-                <div style={{ position: 'absolute', inset: 5 }}>
-                  <AvatarImage name={m.memberName} avatarUrl={m.avatarUrl} size={44} bg="#111" />
+                  fontFamily: FONT, fontSize: '0.55rem', fontWeight: 500,
+                  color: m.ranToday ? '#111111' : '#bbb',
+                  maxWidth: 48, textAlign: 'center',
+                  whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',
+                }}>
+                  {m.memberName}
                 </div>
               </div>
-            ) : (
-              <AvatarImage name={m.memberName} avatarUrl={m.avatarUrl} size={46} bg="#CCC" />
-            )}
-            <div style={{
-              fontSize: '0.55rem', fontWeight: 500,
-              color: m.ranToday ? '#111111' : '#bbb',
-              maxWidth: 48, textAlign: 'center',
-              whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',
-            }}>
-              {m.memberName}
-            </div>
+            ))}
           </div>
-        ))}
-      </div>
+        </div>
+      )}
     </div>
   )
 }
 
-export function HomeFeed({ recentRuns, myRuns, memberId, crew, weeklyBars, initialOffset = 20 }: Props) {
+export function HomeFeed({ recentRuns, myRuns, memberId, crew, weeklyBars, weeklyTotalHours = 0, initialOffset = 20 }: Props) {
   const [tab, setTab] = useState<Tab>('all')
   const [triggerRun, setTriggerRun] = useState<RunLog | null>(null)
   const [autoOpenRun, setAutoOpenRun] = useState<RunLog | null>(null)
+
   const todayCount = crew.filter(c => c.ranToday).length
+  const weeklyTotalRuns = weeklyBars.reduce((s, b) => s + b.count, 0)
+  const weeklyParticipants = crew.length
 
   useEffect(() => {
     const stored = sessionStorage.getItem('openRun')
     if (!stored) return
     sessionStorage.removeItem('openRun')
-    try {
-      setAutoOpenRun(JSON.parse(stored) as RunLog)
-    } catch {}
+    try { setAutoOpenRun(JSON.parse(stored) as RunLog) } catch {}
   }, [])
 
   const handleCrewClick = useCallback((crewMemberId: string) => {
@@ -114,13 +176,21 @@ export function HomeFeed({ recentRuns, myRuns, memberId, crew, weeklyBars, initi
 
   return (
     <>
-      <CrewStrip crew={crew} todayCount={todayCount} onCrewClick={handleCrewClick} />
+      <CrewStrip
+        crew={crew}
+        todayCount={todayCount}
+        weeklyBars={weeklyBars}
+        weeklyTotalRuns={weeklyTotalRuns}
+        weeklyParticipants={weeklyParticipants}
+        weeklyTotalHours={weeklyTotalHours}
+        onCrewClick={handleCrewClick}
+      />
 
-      <div style={{ height: 1, background: 'rgba(0,0,0,0.06)', margin: '14px 22px' }} />
+      <div style={{ height: 1, background: 'rgba(0,0,0,0.06)', margin: '16px 22px 0' }} />
 
       {/* Tab switcher */}
       <div style={{
-        display: 'flex', margin: '0 22px 18px',
+        display: 'flex', margin: '14px 22px 18px',
         background: '#e4e5e6', borderRadius: '10px', padding: '3px',
       }}>
         {tabs.map(t => (
@@ -130,7 +200,7 @@ export function HomeFeed({ recentRuns, myRuns, memberId, crew, weeklyBars, initi
             onClick={() => setTab(t.key)}
             style={{
               flex: 1, textAlign: 'center', padding: '7px',
-              fontFamily: "'Pretendard Variable', Pretendard, -apple-system, sans-serif", fontSize: '0.65rem', fontWeight: 500,
+              fontFamily: FONT, fontSize: '0.65rem', fontWeight: 500,
               color: tab === t.key ? '#111111' : '#888',
               background: tab === t.key ? '#fff' : 'transparent',
               borderRadius: '8px', border: 'none', cursor: 'pointer',
@@ -146,7 +216,6 @@ export function HomeFeed({ recentRuns, myRuns, memberId, crew, weeklyBars, initi
       {tab === 'all' ? (
         <PhotoGrid
           runs={recentRuns}
-          weeklyBars={weeklyBars}
           memberId={memberId}
           triggerRun={triggerRun}
           onTriggerConsumed={() => setTriggerRun(null)}

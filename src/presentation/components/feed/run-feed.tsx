@@ -241,9 +241,8 @@ function GridCell({ run, height, onClick }: { run: RunLog; height: number; onCli
 
 const PAGE_LIMIT = 20
 
-export function PhotoGrid({ runs: initialRuns, weeklyBars, memberId, triggerRun, onTriggerConsumed, initialOffset = PAGE_LIMIT }: {
+export function PhotoGrid({ runs: initialRuns, memberId, triggerRun, onTriggerConsumed, initialOffset = PAGE_LIMIT }: {
   runs: RunLog[]
-  weeklyBars: WeeklyBar[]
   memberId?: string
   triggerRun?: RunLog | null
   onTriggerConsumed?: () => void
@@ -294,10 +293,6 @@ export function PhotoGrid({ runs: initialRuns, weeklyBars, memberId, triggerRun,
 
   return (
     <>
-      <div style={{ padding: '0 16px 12px' }}>
-        <CommunityPulseCard weeklyBars={weeklyBars} runs={runs} />
-      </div>
-
       {runs.length === 0 ? (
         <p style={{ textAlign: 'center', color: '#888', padding: '40px 0', fontSize: '0.875rem' }}>
           최근 달리기 기록이 없습니다

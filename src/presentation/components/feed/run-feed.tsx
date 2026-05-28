@@ -3,8 +3,11 @@
 import { useState, useEffect, Fragment } from 'react'
 import { RunCard } from './run-card'
 import { DetailSheet } from './detail-sheet'
+import { AvatarImage } from '../shared/avatar-image'
 import type { RunLog } from '@/domain/entities/run-log'
 import type { WeeklyBar } from '../home/home-feed'
+
+const FONT = "'Pretendard Variable', Pretendard, -apple-system, sans-serif"
 
 type Props = {
   runs: RunLog[]
@@ -12,6 +15,23 @@ type Props = {
   triggerRun?: RunLog | null
   onTriggerConsumed?: () => void
   memberId?: string
+}
+
+const GRADIENTS = [
+  'linear-gradient(135deg, #1a1a2e 0%, #16213e 100%)',
+  'linear-gradient(135deg, #2d1b69 0%, #11998e 100%)',
+  'linear-gradient(135deg, #c94b4b 0%, #4b134f 100%)',
+  'linear-gradient(135deg, #134e5e 0%, #71b280 100%)',
+  'linear-gradient(135deg, #373b44 0%, #4286f4 100%)',
+  'linear-gradient(135deg, #6a3093 0%, #a044ff 100%)',
+  'linear-gradient(135deg, #1d976c 0%, #93f9b9 100%)',
+  'linear-gradient(135deg, #e96c4c 0%, #c41818 100%)',
+]
+
+function getGradient(id: string) {
+  let hash = 0
+  for (let i = 0; i < id.length; i++) hash = ((hash << 5) - hash) + id.charCodeAt(i)
+  return GRADIENTS[Math.abs(hash) % GRADIENTS.length]
 }
 
 function CommunityPulseCard({ weeklyBars, runs }: { weeklyBars: WeeklyBar[]; runs: RunLog[] }) {
@@ -34,7 +54,7 @@ function CommunityPulseCard({ weeklyBars, runs }: { weeklyBars: WeeklyBar[]; run
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end' }}>
         <div>
           <div style={{
-            fontFamily: "'Pretendard Variable', Pretendard, -apple-system, sans-serif", fontSize: '2rem', fontWeight: 900,
+            fontFamily: FONT, fontSize: '2rem', fontWeight: 900,
             color: '#fff', lineHeight: 1, letterSpacing: '-1px',
           }}>
             {totalThisWeek}
@@ -45,9 +65,7 @@ function CommunityPulseCard({ weeklyBars, runs }: { weeklyBars: WeeklyBar[]; run
           </div>
         </div>
         <div style={{ textAlign: 'right' }}>
-          <div style={{
-            fontFamily: "'Pretendard Variable', Pretendard, -apple-system, sans-serif", fontSize: '1.3rem', fontWeight: 500, color: '#fff',
-          }}>
+          <div style={{ fontFamily: FONT, fontSize: '1.3rem', fontWeight: 500, color: '#fff' }}>
             {totalHours}
             <span style={{ fontSize: '0.75rem', fontWeight: 400, color: 'rgba(255,255,255,0.5)', marginLeft: 2 }}>h</span>
           </div>
@@ -55,7 +73,6 @@ function CommunityPulseCard({ weeklyBars, runs }: { weeklyBars: WeeklyBar[]; run
         </div>
       </div>
 
-      {/* 7-day bar chart */}
       <div style={{ marginTop: 14 }}>
         <div style={{ display: 'flex', alignItems: 'flex-end', gap: 3, height: 36 }}>
           {weeklyBars.map(bar => (
@@ -79,6 +96,104 @@ function CommunityPulseCard({ weeklyBars, runs }: { weeklyBars: WeeklyBar[]; run
         </div>
       </div>
     </div>
+  )
+}
+
+export function PhotoGrid({ runs, weeklyBars, memberId }: { runs: RunLog[]; weeklyBars: WeeklyBar[]; memberId?: string }) {
+  const [selected, setSelected] = useState<RunLog | null>(null)
+
+  return (
+    <>
+      <div style={{ padding: '0 16px 12px' }}>
+        <CommunityPulseCard weeklyBars={weeklyBars} runs={runs} />
+      </div>
+
+      {runs.length === 0 ? (
+        <p style={{ textAlign: 'center', color: '#888', padding: '40px 0', fontSize: '0.875rem' }}>
+          최근 달리기 기록이 없습니다
+        </p>
+      ) : (
+        <div style={{
+          display: 'grid', gridTemplateColumns: '1fr 1fr',
+          gap: 4, padding: '0 16px 40px',
+        }}>
+          {runs.map(run => (
+            <div
+              key={run.id}
+              onClick={() => setSelected(run)}
+              style={{
+                borderRadius: 16, overflow: 'hidden',
+                position: 'relative', aspectRatio: '1',
+                cursor: 'pointer',
+                background: run.photoUrl ? '#111' : getGradient(run.memberId),
+              }}
+            >
+              {/* Photo background */}
+              {run.photoUrl && (
+                <div style={{
+                  position: 'absolute', inset: 0,
+                  backgroundImage: `url(${run.photoUrl})`,
+                  backgroundSize: 'cover', backgroundPosition: 'center',
+                }} />
+              )}
+
+              {/* Gradient overlay */}
+              <div style={{
+                position: 'absolute', inset: 0,
+                background: 'linear-gradient(to bottom, rgba(0,0,0,0.05) 0%, rgba(0,0,0,0.72) 100%)',
+              }} />
+
+              {/* Avatar for no-photo placeholder */}
+              {!run.photoUrl && (
+                <div style={{
+                  position: 'absolute', inset: 0,
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  paddingBottom: 32,
+                }}>
+                  <AvatarImage
+                    name={run.memberName}
+                    avatarUrl={run.memberAvatarUrl}
+                    size={44}
+                    bg="rgba(255,255,255,0.2)"
+                    color="#fff"
+                  />
+                </div>
+              )}
+
+              {/* Bottom text: name + 한줄 */}
+              <div style={{
+                position: 'absolute', bottom: 0, left: 0, right: 0,
+                padding: '8px 10px',
+              }}>
+                <div style={{
+                  fontFamily: FONT, fontSize: '0.62rem', fontWeight: 600,
+                  color: '#fff', marginBottom: 2,
+                  whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',
+                }}>
+                  {run.memberName}
+                </div>
+                {run.title && (
+                  <div style={{
+                    fontFamily: FONT, fontSize: '0.52rem',
+                    color: 'rgba(255,255,255,0.78)', lineHeight: 1.35,
+                    display: '-webkit-box',
+                    WebkitLineClamp: 2,
+                    WebkitBoxOrient: 'vertical',
+                    overflow: 'hidden',
+                  }}>
+                    "{run.title}"
+                  </div>
+                )}
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {selected && (
+        <DetailSheet run={selected} open={Boolean(selected)} onClose={() => setSelected(null)} memberId={memberId} />
+      )}
+    </>
   )
 }
 

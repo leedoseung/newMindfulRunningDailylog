@@ -1,8 +1,7 @@
 'use client'
 
 import { useState, useCallback, useEffect } from 'react'
-import { RunFeed } from '../feed/run-feed'
-import { MyRecordsTab } from '../my-records/my-records-tab'
+import { RunFeed, PhotoGrid } from '../feed/run-feed'
 import { DetailSheet } from '../feed/detail-sheet'
 import { AvatarImage } from '../shared/avatar-image'
 import type { RunLog } from '@/domain/entities/run-log'
@@ -150,15 +149,9 @@ export function HomeFeed({ recentRuns, myRuns, memberId, crew, weeklyBars }: Pro
       </div>
 
       {tab === 'all' ? (
-        <RunFeed
-          runs={recentRuns}
-          weeklyBars={weeklyBars}
-          triggerRun={triggerRun}
-          onTriggerConsumed={() => setTriggerRun(null)}
-          memberId={memberId}
-        />
+        <PhotoGrid runs={recentRuns} weeklyBars={weeklyBars} memberId={memberId} />
       ) : (
-        <MyRecordsTab runs={myRuns} memberId={memberId} />
+        <RunFeed runs={myRuns} weeklyBars={weeklyBars} memberId={memberId} />
       )}
 
       <DetailSheet

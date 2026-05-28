@@ -1,6 +1,5 @@
 import { createServerClient } from '@/infrastructure/supabase/client'
 import { RunLogForm } from '@/presentation/components/form/run-log-form'
-import { redirect } from 'next/navigation'
 import Link from 'next/link'
 
 type RunLogFormInitial = {
@@ -14,15 +13,9 @@ export default async function RecordPage({
   searchParams: Promise<{ edit?: string }>
 }) {
   const { edit } = await searchParams
+  // TEMP: auth bypassed for testing — restore before production
   const supabase = await createServerClient()
-
-  const { data: { user } } = await supabase.auth.getUser()
-
-  if (!user?.id) {
-    redirect('/login')
-  }
-
-  const memberId = (user?.user_metadata?.member_id as string | undefined) ?? ''
+  const memberId = ''
 
   let initialData: RunLogFormInitial | undefined
   if (edit) {

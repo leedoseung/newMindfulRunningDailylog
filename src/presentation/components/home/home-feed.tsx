@@ -49,15 +49,25 @@ function CrewStrip({ crew, todayCount }: { crew: CrewMember[]; todayCount: numbe
             display: 'flex', flexDirection: 'column',
             alignItems: 'center', gap: 5, flexShrink: 0,
           }}>
-            <AvatarImage
-              name={m.memberName}
-              avatarUrl={m.avatarUrl}
-              size={46}
-              bg={m.ranToday ? '#111' : '#CCC'}
-              style={m.ranToday ? {
-                boxShadow: '0 0 0 2px #F7F7F5, 0 0 0 4px #111111',
-              } : undefined}
-            />
+            {m.ranToday ? (
+              /* Instagram-style spinning gradient ring */
+              <div style={{ position: 'relative', width: 54, height: 54, flexShrink: 0 }}>
+                <div style={{
+                  position: 'absolute', inset: 0, borderRadius: '50%',
+                  background: 'conic-gradient(from 0deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888, #833ab4, #fd1d1d, #fcb045, #f09433)',
+                  animation: 'spin-gradient 3s linear infinite',
+                }} />
+                <div style={{
+                  position: 'absolute', inset: 3, borderRadius: '50%',
+                  background: '#F7F7F5',
+                }} />
+                <div style={{ position: 'absolute', inset: 5 }}>
+                  <AvatarImage name={m.memberName} avatarUrl={m.avatarUrl} size={44} bg="#111" />
+                </div>
+              </div>
+            ) : (
+              <AvatarImage name={m.memberName} avatarUrl={m.avatarUrl} size={46} bg="#CCC" />
+            )}
             <div style={{
               fontSize: '0.55rem', fontWeight: 500,
               color: m.ranToday ? '#111111' : '#bbb',

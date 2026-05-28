@@ -52,7 +52,7 @@ function CrewStrip({ crew, todayCount }: { crew: CrewMember[]; todayCount: numbe
             <div style={{
               width: 52, height: 52, borderRadius: '50%', padding: 2.5,
               background: m.ranToday ? 'linear-gradient(135deg, #111111, #555)' : '#ddd',
-              flexShrink: 0,
+              flexShrink: 0, overflow: 'hidden',
             }}>
               <AvatarImage
                 name={m.memberName}

@@ -2,8 +2,13 @@
 
 import { useEffect, useRef, useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { ShareCard } from './share-card'
+import dynamic from 'next/dynamic'
 import type { RunLog } from '@/domain/entities/run-log'
+
+const ShareCard = dynamic(
+  () => import('./share-card').then(m => m.ShareCard),
+  { ssr: false }
+)
 
 type Props = {
   run: RunLog | null

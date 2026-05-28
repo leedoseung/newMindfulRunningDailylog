@@ -4,7 +4,11 @@ import { useRef, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { DetailSheet } from '../feed/detail-sheet'
 import { AvatarImage } from '../shared/avatar-image'
-import { AvatarCropModal } from './avatar-crop-modal'
+import dynamic from 'next/dynamic'
+const AvatarCropModal = dynamic(
+  () => import('./avatar-crop-modal').then(m => m.AvatarCropModal),
+  { ssr: false }
+)
 import { ProfileEditSheet } from './profile-edit-sheet'
 import { createBrowserClient } from '@/infrastructure/supabase/browser-client'
 import type { RunLog } from '@/domain/entities/run-log'

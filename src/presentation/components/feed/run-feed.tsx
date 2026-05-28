@@ -239,8 +239,20 @@ function GridCell({ run, height, onClick }: { run: RunLog; height: number; onCli
   )
 }
 
-export function PhotoGrid({ runs, weeklyBars, memberId }: { runs: RunLog[]; weeklyBars: WeeklyBar[]; memberId?: string }) {
+export function PhotoGrid({ runs, weeklyBars, memberId, triggerRun, onTriggerConsumed }: {
+  runs: RunLog[]
+  weeklyBars: WeeklyBar[]
+  memberId?: string
+  triggerRun?: RunLog | null
+  onTriggerConsumed?: () => void
+}) {
   const [selected, setSelected] = useState<RunLog | null>(null)
+
+  useEffect(() => {
+    if (!triggerRun) return
+    setSelected(triggerRun)
+    onTriggerConsumed?.()
+  }, [triggerRun])
 
   const leftRuns  = runs.filter((_, i) => i % 2 === 0)
   const rightRuns = runs.filter((_, i) => i % 2 !== 0)

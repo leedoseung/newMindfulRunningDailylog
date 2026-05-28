@@ -3,6 +3,7 @@
 import { useRef, useState } from 'react'
 import { DetailSheet } from '../feed/detail-sheet'
 import { AvatarImage } from '../shared/avatar-image'
+import { AvatarCropModal } from './avatar-crop-modal'
 import { createBrowserClient } from '@/infrastructure/supabase/browser-client'
 import type { RunLog } from '@/domain/entities/run-log'
 
@@ -20,10 +21,11 @@ type Props = {
 }
 
 export function ProfileView({ member, stats, monthlyChart, recentRuns }: Props) {
-  const [selected, setSelected]     = useState<RunLog | null>(null)
-  const [avatarUrl, setAvatarUrl]   = useState(member.avatarUrl)
-  const [uploading, setUploading]   = useState(false)
-  const fileInputRef                = useRef<HTMLInputElement>(null)
+  const [selected, setSelected]       = useState<RunLog | null>(null)
+  const [avatarUrl, setAvatarUrl]     = useState(member.avatarUrl)
+  const [cropSrc, setCropSrc]         = useState<string | null>(null)
+  const [uploading, setUploading]     = useState(false)
+  const fileInputRef                  = useRef<HTMLInputElement>(null)
 
   const maxMinutes = Math.max(...monthlyChart.map(m => m.minutes), 1)
 
@@ -40,17 +42,24 @@ export function ProfileView({ member, stats, monthlyChart, recentRuns }: Props) 
     member.instaId && `@${member.instaId}`,
   ].filter(Boolean) as string[]
 
-  async function handleAvatarChange(e: React.ChangeEvent<HTMLInputElement>) {
+  function handleFileSelect(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0]
     if (!file) return
+    const reader = new FileReader()
+    reader.onload = () => setCropSrc(reader.result as string)
+    reader.readAsDataURL(file)
+    if (fileInputRef.current) fileInputRef.current.value = ''
+  }
+
+  async function handleCropComplete(blob: Blob) {
+    setCropSrc(null)
     setUploading(true)
     try {
       const supabase = createBrowserClient()
-      const ext = file.name.split('.').pop() ?? 'jpg'
-      const path = `${Date.now()}.${ext}`
+      const path = `${Date.now()}.jpg`
       const { data: uploadData, error: uploadError } = await supabase.storage
         .from('avatars')
-        .upload(path, file, { cacheControl: '3600', upsert: false })
+        .upload(path, blob, { contentType: 'image/jpeg', cacheControl: '3600', upsert: false })
       if (uploadError) throw new Error(uploadError.message)
       const { data: urlData } = supabase.storage.from('avatars').getPublicUrl(uploadData.path)
       const newUrl = urlData.publicUrl
@@ -66,7 +75,6 @@ export function ProfileView({ member, stats, monthlyChart, recentRuns }: Props) 
       alert(err instanceof Error ? err.message : '업로드 실패')
     } finally {
       setUploading(false)
-      if (fileInputRef.current) fileInputRef.current.value = ''
     }
   }
 
@@ -108,7 +116,7 @@ export function ProfileView({ member, stats, monthlyChart, recentRuns }: Props) 
               type="file"
               accept="image/*"
               style={{ display: 'none' }}
-              onChange={handleAvatarChange}
+              onChange={handleFileSelect}
             />
           </div>
 
@@ -207,6 +215,14 @@ export function ProfileView({ member, stats, monthlyChart, recentRuns }: Props) 
 
       {selected && (
         <DetailSheet run={selected} open={Boolean(selected)} onClose={() => setSelected(null)} />
+      )}
+
+      {cropSrc && (
+        <AvatarCropModal
+          imageSrc={cropSrc}
+          onComplete={handleCropComplete}
+          onCancel={() => { setCropSrc(null); if (fileInputRef.current) fileInputRef.current.value = '' }}
+        />
       )}
     </main>
   )

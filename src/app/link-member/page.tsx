@@ -25,6 +25,7 @@ export default async function LinkMemberPage() {
     groupName: row.group_name,
     generation: row.generation,
     instaId: row.insta_id,
+    avatarUrl: '',
   }))
 
   return <LinkMemberForm members={members} />

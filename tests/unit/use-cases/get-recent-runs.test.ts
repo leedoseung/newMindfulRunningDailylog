@@ -6,7 +6,7 @@ import { vi } from 'vitest'
 const makeRun = (overrides: Partial<RunLog> = {}): RunLog => ({
   id: 'uuid-1',
   memberId: 'mem-1',
-  memberName: '이두승',
+  memberName: '이두승', memberAvatarUrl: '',
   date: '2026-05-24',
   durationMin: 30,
   title: '테스트 달리기',

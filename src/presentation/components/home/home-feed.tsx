@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { RunFeed } from '../feed/run-feed'
 import { MyRecordsTab } from '../my-records/my-records-tab'
+import { AvatarImage } from '../shared/avatar-image'
 import type { RunLog } from '@/domain/entities/run-log'
 
 export type CrewMember = {
@@ -10,6 +11,7 @@ export type CrewMember = {
   memberName: string
   ranToday: boolean
   todayMinutes: number
+  avatarUrl: string
 }
 
 export type WeeklyBar = {
@@ -49,20 +51,16 @@ function CrewStrip({ crew, todayCount }: { crew: CrewMember[]; todayCount: numbe
           }}>
             <div style={{
               width: 52, height: 52, borderRadius: '50%', padding: 2.5,
-              background: m.ranToday
-                ? 'linear-gradient(135deg, #111111, #6dd5fa)'
-                : '#ddd',
+              background: m.ranToday ? 'linear-gradient(135deg, #111111, #555)' : '#ddd',
+              flexShrink: 0,
             }}>
-              <div style={{
-                width: '100%', height: '100%', borderRadius: '50%',
-                background: m.ranToday ? '#111111' : '#bbb',
-                border: '2px solid #F7F7F5',
-                display: 'flex', alignItems: 'center', justifyContent: 'center',
-                fontFamily: "'Pretendard Variable', Pretendard, -apple-system, sans-serif", fontSize: '0.85rem',
-                fontWeight: 500, color: '#fff',
-              }}>
-                {m.memberName[0]}
-              </div>
+              <AvatarImage
+                name={m.memberName}
+                avatarUrl={m.avatarUrl}
+                size={43}
+                bg={m.ranToday ? '#111' : '#bbb'}
+                style={{ border: '2px solid #F7F7F5' }}
+              />
             </div>
             <div style={{
               fontSize: '0.55rem', fontWeight: 500,

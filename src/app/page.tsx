@@ -18,6 +18,7 @@ function computeCrew(runs: RunLog[]): CrewMember[] {
       map.set(run.memberId, {
         memberId: run.memberId,
         memberName: run.memberName,
+        avatarUrl: run.memberAvatarUrl,
         ranToday: run.date === today,
         todayMinutes: run.date === today ? run.durationMin : 0,
       })

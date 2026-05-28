@@ -40,18 +40,18 @@ export default async function ProfilePage() {
   const [memberRes, myRuns] = await Promise.all([
     supabase
       .from('members')
-      .select('name, group_name, generation, insta_id')
+      .select('name, group_name, generation, insta_id, avatar_url')
       .eq('id', memberId)
       .single(),
     new GetMemberRecordsUseCase(new SupabaseRunLogRepository(supabase)).execute(memberId),
   ])
 
   if (!memberRes.data) redirect('/')
-  const m = memberRes.data as { name: string; group_name: string; generation: string; insta_id: string }
+  const m = memberRes.data as { name: string; group_name: string; generation: string; insta_id: string; avatar_url: string | null }
 
   return (
     <ProfileView
-      member={{ name: m.name, groupName: m.group_name, generation: m.generation, instaId: m.insta_id }}
+      member={{ name: m.name, groupName: m.group_name, generation: m.generation, instaId: m.insta_id, avatarUrl: m.avatar_url ?? '' }}
       stats={computeStats(myRuns)}
       monthlyChart={computeMonthlyChart(myRuns)}
       recentRuns={myRuns.slice(0, 5)}

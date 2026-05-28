@@ -1,4 +1,5 @@
 import type { RunLog } from '@/domain/entities/run-log'
+import { AvatarImage } from '../shared/avatar-image'
 
 export type CardType = 'hero' | 'photo' | 'white'
 
@@ -57,14 +58,12 @@ export function RunCard({ run, cardType, onClick }: Props) {
     <>
       {/* Author row */}
       <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '14px 16px 0' }}>
-        <div style={{
-          width: 32, height: 32, borderRadius: '50%', background: t.av,
-          display: 'flex', alignItems: 'center', justifyContent: 'center',
-          fontFamily: "'Pretendard Variable', Pretendard, -apple-system, sans-serif", fontSize: '0.72rem', fontWeight: 500,
-          color: '#fff', flexShrink: 0,
-        }}>
-          {run.memberName[0]}
-        </div>
+        <AvatarImage
+          name={run.memberName}
+          avatarUrl={run.memberAvatarUrl}
+          size={32}
+          bg={t.av}
+        />
         <div style={{ flex: 1 }}>
           <div style={{ fontFamily: "'Pretendard Variable', Pretendard, -apple-system, sans-serif", fontSize: '0.78rem', fontWeight: 500, color: t.name }}>
             {run.memberName}

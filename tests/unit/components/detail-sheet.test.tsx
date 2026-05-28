@@ -6,7 +6,7 @@ import type { RunLog } from '@/domain/entities/run-log'
 const run: RunLog = {
   id: 'r1',
   memberId: 'm1',
-  memberName: '이두승',
+  memberName: '이두승', memberAvatarUrl: '',
   date: '2026-05-24',
   durationMin: 45,
   title: '남산 달리기',

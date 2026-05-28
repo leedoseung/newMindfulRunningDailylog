@@ -6,7 +6,7 @@ describe('RunLog entity', () => {
     const log: RunLog = {
       id: 'uuid-1',
       memberId: 'uuid-2',
-      memberName: '이두승',
+      memberName: '이두승', memberAvatarUrl: '',
       date: '2026-05-24',
       durationMin: 45,
       title: '남산 달리기',
@@ -28,7 +28,7 @@ describe('MemberStats entity', () => {
       name: '이두승',
       groupName: 'A조',
       generation: '1기',
-      instaId: 'doseu',
+      instaId: 'doseu', avatarUrl: '',
       totalCount: 100,
       totalMinutes: 4500,
       monthlyCount: 10,

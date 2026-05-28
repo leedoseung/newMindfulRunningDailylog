@@ -9,6 +9,7 @@ type MemberRow = {
   group_name: string
   generation: string
   insta_id: string
+  avatar_url: string | null
 }
 
 type MemberStatsRow = MemberRow & {
@@ -25,6 +26,7 @@ function toMember(row: MemberRow): Member {
     groupName: row.group_name,
     generation: row.generation,
     instaId: row.insta_id,
+    avatarUrl: row.avatar_url ?? '',
   }
 }
 
@@ -44,7 +46,7 @@ export class SupabaseMemberRepository implements IMemberRepository {
   async getAll(): Promise<Member[]> {
     const { data, error } = await this.supabase
       .from('members')
-      .select('id, name, group_name, generation, insta_id')
+      .select('id, name, group_name, generation, insta_id, avatar_url')
       .order('name')
 
     if (error) throw new Error(`getAll failed: ${error.message}`)
@@ -52,12 +54,25 @@ export class SupabaseMemberRepository implements IMemberRepository {
   }
 
   async getLeaderboard(): Promise<MemberStats[]> {
-    const { data, error } = await this.supabase
-      .from('member_stats')
-      .select('id, name, group_name, generation, insta_id, total_count, total_minutes, monthly_count, monthly_minutes')
-      .order('total_count', { ascending: false })
+    const [statsRes, avatarRes] = await Promise.all([
+      this.supabase
+        .from('member_stats')
+        .select('id, name, group_name, generation, insta_id, total_count, total_minutes, monthly_count, monthly_minutes')
+        .order('total_count', { ascending: false }),
+      this.supabase
+        .from('members')
+        .select('id, avatar_url'),
+    ])
 
-    if (error) throw new Error(`getLeaderboard failed: ${error.message}`)
-    return (data as MemberStatsRow[]).map(toMemberStats)
+    if (statsRes.error) throw new Error(`getLeaderboard failed: ${statsRes.error.message}`)
+
+    const avatarMap = new Map<string, string>(
+      (avatarRes.data ?? []).map(m => [m.id as string, (m.avatar_url as string | null) ?? ''])
+    )
+
+    return (statsRes.data as MemberStatsRow[]).map(row => ({
+      ...toMemberStats(row),
+      avatarUrl: avatarMap.get(row.id) ?? '',
+    }))
   }
 }

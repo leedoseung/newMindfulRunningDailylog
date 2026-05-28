@@ -8,7 +8,7 @@ const makeStats = (overrides: Partial<MemberStats> = {}): MemberStats => ({
   name: '이두승',
   groupName: 'A조',
   generation: '1기',
-  instaId: 'doseu',
+  instaId: 'doseu', avatarUrl: '',
   totalCount: 50,
   totalMinutes: 1500,
   monthlyCount: 5,

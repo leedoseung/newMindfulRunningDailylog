@@ -1,10 +1,14 @@
 'use client'
 
-import { useState } from 'react'
+import { useRef, useState } from 'react'
 import { DetailSheet } from '../feed/detail-sheet'
+import { AvatarImage } from '../shared/avatar-image'
+import { createBrowserClient } from '@/infrastructure/supabase/browser-client'
 import type { RunLog } from '@/domain/entities/run-log'
 
-type Member = { name: string; groupName: string; generation: string; instaId: string }
+const FONT = "'Pretendard Variable', Pretendard, -apple-system, sans-serif"
+
+type Member = { name: string; groupName: string; generation: string; instaId: string; avatarUrl: string }
 type Stats  = { totalHours: number; monthHours: number; totalCount: number; monthCount: number }
 type MonthEntry = { key: string; label: string; minutes: number; isCurrent: boolean }
 
@@ -16,7 +20,10 @@ type Props = {
 }
 
 export function ProfileView({ member, stats, monthlyChart, recentRuns }: Props) {
-  const [selected, setSelected] = useState<RunLog | null>(null)
+  const [selected, setSelected]     = useState<RunLog | null>(null)
+  const [avatarUrl, setAvatarUrl]   = useState(member.avatarUrl)
+  const [uploading, setUploading]   = useState(false)
+  const fileInputRef                = useRef<HTMLInputElement>(null)
 
   const maxMinutes = Math.max(...monthlyChart.map(m => m.minutes), 1)
 
@@ -33,6 +40,36 @@ export function ProfileView({ member, stats, monthlyChart, recentRuns }: Props) 
     member.instaId && `@${member.instaId}`,
   ].filter(Boolean) as string[]
 
+  async function handleAvatarChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0]
+    if (!file) return
+    setUploading(true)
+    try {
+      const supabase = createBrowserClient()
+      const ext = file.name.split('.').pop() ?? 'jpg'
+      const path = `${Date.now()}.${ext}`
+      const { data: uploadData, error: uploadError } = await supabase.storage
+        .from('avatars')
+        .upload(path, file, { cacheControl: '3600', upsert: false })
+      if (uploadError) throw new Error(uploadError.message)
+      const { data: urlData } = supabase.storage.from('avatars').getPublicUrl(uploadData.path)
+      const newUrl = urlData.publicUrl
+
+      const res = await fetch('/api/profile/avatar', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ avatarUrl: newUrl }),
+      })
+      if (!res.ok) throw new Error('저장 실패')
+      setAvatarUrl(newUrl)
+    } catch (err) {
+      alert(err instanceof Error ? err.message : '업로드 실패')
+    } finally {
+      setUploading(false)
+      if (fileInputRef.current) fileInputRef.current.value = ''
+    }
+  }
+
   return (
     <main style={{ minHeight: '100vh', background: '#F7F7F5' }}>
       {/* Hero */}
@@ -41,16 +78,54 @@ export function ProfileView({ member, stats, monthlyChart, recentRuns }: Props) 
           position: 'absolute', right: -10, bottom: -10,
           fontSize: '8rem', opacity: 0.06, pointerEvents: 'none', userSelect: 'none',
         }}>🏃</div>
-        <div style={{
-          fontFamily: "'Pretendard Variable', Pretendard, -apple-system, sans-serif", fontSize: '2rem', fontWeight: 500,
-          color: '#fff', letterSpacing: '-0.5px', lineHeight: 1.1, marginBottom: 4,
-        }}>
-          {member.name}<br />
-          <em style={{ fontStyle: 'italic', fontWeight: 400, color: '#555' }}>의 기록</em>
+
+        {/* Avatar + name row */}
+        <div style={{ display: 'flex', alignItems: 'flex-end', gap: 16, marginBottom: 14 }}>
+          {/* Tappable avatar */}
+          <div style={{ position: 'relative', flexShrink: 0 }}>
+            <AvatarImage
+              name={member.name}
+              avatarUrl={avatarUrl}
+              size={72}
+              bg="#333"
+              style={{ border: '2px solid rgba(255,255,255,0.15)' }}
+            />
+            <button
+              type="button"
+              onClick={() => fileInputRef.current?.click()}
+              disabled={uploading}
+              style={{
+                position: 'absolute', bottom: 0, right: 0,
+                width: 24, height: 24, borderRadius: '50%',
+                background: uploading ? '#555' : '#fff',
+                border: 'none', cursor: uploading ? 'not-allowed' : 'pointer',
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                fontSize: '0.7rem', boxShadow: '0 1px 4px rgba(0,0,0,0.3)',
+              }}
+            >{uploading ? '···' : '📷'}</button>
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept="image/*"
+              style={{ display: 'none' }}
+              onChange={handleAvatarChange}
+            />
+          </div>
+
+          <div>
+            <div style={{
+              fontFamily: FONT, fontSize: '1.8rem', fontWeight: 500,
+              color: '#fff', letterSpacing: '-0.5px', lineHeight: 1.1, marginBottom: 4,
+            }}>
+              {member.name}<br />
+              <em style={{ fontStyle: 'italic', fontWeight: 400, color: '#555' }}>의 기록</em>
+            </div>
+            <div style={{ fontSize: '0.72rem', color: '#555' }}>
+              마인드풀러닝 · {member.generation}기 · {member.groupName}
+            </div>
+          </div>
         </div>
-        <div style={{ fontSize: '0.72rem', color: '#555', marginBottom: 16 }}>
-          마인드풀러닝 · {member.generation}기 · {member.groupName}
-        </div>
+
         <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
           {chips.map(chip => (
             <div key={chip} style={{
@@ -66,14 +141,14 @@ export function ProfileView({ member, stats, monthlyChart, recentRuns }: Props) 
         {statBoxes.map(({ label, value }) => (
           <div key={label} style={{ background: '#fff', borderRadius: 16, padding: 16 }}>
             <span style={{
-              fontFamily: "'Pretendard Variable', Pretendard, -apple-system, sans-serif", fontSize: '1.6rem', fontWeight: 500,
+              fontFamily: FONT, fontSize: '1.6rem', fontWeight: 500,
               color: '#111111', display: 'block', marginBottom: 3,
             }}>{value}</span>
             <span style={{ fontSize: '0.62rem', color: '#888' }}>{label}</span>
           </div>
         ))}
 
-        {/* Monthly bar chart (wide) */}
+        {/* Monthly bar chart */}
         <div style={{ gridColumn: '1 / -1', background: '#fff', borderRadius: 16, padding: 16 }}>
           <span style={{ fontSize: '0.62rem', color: '#888', display: 'block', marginBottom: 4 }}>
             월별 달린 시간
@@ -96,15 +171,14 @@ export function ProfileView({ member, stats, monthlyChart, recentRuns }: Props) 
         </div>
       </div>
 
-      {/* Recent runs header */}
+      {/* Recent runs */}
       <div style={{ padding: '18px 22px 12px' }}>
         <div style={{
-          fontFamily: "'Pretendard Variable', Pretendard, -apple-system, sans-serif", fontSize: '0.65rem', fontWeight: 500,
+          fontFamily: FONT, fontSize: '0.65rem', fontWeight: 500,
           color: '#888', letterSpacing: '1.8px', textTransform: 'uppercase',
         }}>최근 기록</div>
       </div>
 
-      {/* Mini cards horizontal scroll */}
       <div style={{ display: 'flex', gap: 8, padding: '0 22px 40px', overflowX: 'auto', scrollbarWidth: 'none' }}>
         {recentRuns.length === 0 ? (
           <p style={{ fontSize: '0.875rem', color: '#888', padding: '20px 0' }}>아직 기록이 없습니다</p>
@@ -118,21 +192,13 @@ export function ProfileView({ member, stats, monthlyChart, recentRuns }: Props) 
                 padding: '14px 12px', boxShadow: '0 1px 6px rgba(0,0,0,0.05)', cursor: 'pointer',
               }}
             >
-              <div style={{
-                fontSize: '0.55rem', fontWeight: 500, color: '#888',
-                marginBottom: 6, textTransform: 'uppercase', letterSpacing: '0.5px',
-              }}>
+              <div style={{ fontSize: '0.55rem', fontWeight: 500, color: '#888', marginBottom: 6 }}>
                 {run.date}
               </div>
-              <div style={{
-                fontFamily: "'Pretendard Variable', Pretendard, -apple-system, sans-serif", fontSize: '0.76rem', fontWeight: 500,
-                color: '#111111', marginBottom: 8, lineHeight: 1.3,
-              }}>
+              <div style={{ fontFamily: FONT, fontSize: '0.76rem', fontWeight: 500, color: '#111', marginBottom: 8, lineHeight: 1.3 }}>
                 {run.title || '달리기'}
               </div>
-              <span style={{ fontFamily: "'Pretendard Variable', Pretendard, -apple-system, sans-serif", fontSize: '1.3rem', fontWeight: 500, color: '#111111' }}>
-                {run.durationMin}
-              </span>
+              <span style={{ fontFamily: FONT, fontSize: '1.3rem', fontWeight: 300, color: '#111' }}>{run.durationMin}</span>
               <span style={{ fontSize: '0.6rem', color: '#888' }}> 분</span>
             </div>
           ))
@@ -140,11 +206,7 @@ export function ProfileView({ member, stats, monthlyChart, recentRuns }: Props) 
       </div>
 
       {selected && (
-        <DetailSheet
-          run={selected}
-          open={Boolean(selected)}
-          onClose={() => setSelected(null)}
-        />
+        <DetailSheet run={selected} open={Boolean(selected)} onClose={() => setSelected(null)} />
       )}
     </main>
   )

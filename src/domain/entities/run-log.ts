@@ -2,6 +2,7 @@ export type RunLog = {
   id: string
   memberId: string
   memberName: string
+  memberAvatarUrl: string
   date: string // 'YYYY-MM-DD'
   durationMin: number
   title: string

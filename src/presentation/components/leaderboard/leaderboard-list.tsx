@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { MemberRankRow } from './member-rank-row'
 import { TodayRunModal } from './today-run-modal'
 import { DiaryModal } from './diary-modal'
+import { AvatarImage } from '../shared/avatar-image'
 import type { MemberStats } from '@/domain/entities/member'
 
 type Tab = 'total-time' | 'monthly' | 'count'
@@ -52,14 +53,7 @@ function PodItem({ s, rank, tab }: { s: MemberStats; rank: PodRank; tab: Tab }) 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '5px', flex: 1, paddingBottom: rank !== 1 ? 0 : undefined }}>
       {rank === 1 && <div style={{ fontSize: '1rem', marginBottom: '2px' }}>🏆</div>}
-      <div style={{
-        width: avatarSize, height: avatarSize, borderRadius: '50%',
-        background: avatarBg,
-        display: 'flex', alignItems: 'center', justifyContent: 'center',
-        fontFamily: "'Pretendard Variable', Pretendard, -apple-system, sans-serif", fontWeight: 500, color: '#fff', fontSize,
-      }}>
-        {s.name.charAt(0)}
-      </div>
+      <AvatarImage name={s.name} avatarUrl={s.avatarUrl} size={avatarSize} bg={avatarBg} />
       <div style={{ fontFamily: "'Pretendard Variable', Pretendard, -apple-system, sans-serif", fontSize: '0.68rem', fontWeight: 500, color: '#111111', textAlign: 'center' }}>
         {s.name}
       </div>

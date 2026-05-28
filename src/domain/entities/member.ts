@@ -4,6 +4,7 @@ export type Member = {
   groupName: string
   generation: string
   instaId: string
+  avatarUrl: string
 }
 
 export type MemberStats = Member & {

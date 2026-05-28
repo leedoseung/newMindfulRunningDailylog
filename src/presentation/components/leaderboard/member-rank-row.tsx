@@ -1,4 +1,5 @@
 import type { MemberStats } from '@/domain/entities/member'
+import { AvatarImage } from '../shared/avatar-image'
 
 type Props = {
   stats: MemberStats
@@ -38,15 +39,12 @@ export function MemberRankRow({ stats, rank, statValue, statUnit, statSub, onTod
       }}>
         {rank}
       </span>
-      <div style={{
-        width: '36px', height: '36px', borderRadius: '50%',
-        background: getAvatarBg(rank),
-        display: 'flex', alignItems: 'center', justifyContent: 'center',
-        fontFamily: "'Pretendard Variable', Pretendard, -apple-system, sans-serif", fontSize: '0.75rem', fontWeight: 500, color: '#fff',
-        flexShrink: 0,
-      }}>
-        {stats.name.charAt(0)}
-      </div>
+      <AvatarImage
+        name={stats.name}
+        avatarUrl={stats.avatarUrl}
+        size={36}
+        bg={getAvatarBg(rank)}
+      />
       <div style={{ flex: 1 }}>
         <button
           type="button"

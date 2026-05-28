@@ -99,8 +99,77 @@ function CommunityPulseCard({ weeklyBars, runs }: { weeklyBars: WeeklyBar[]; run
   )
 }
 
+// 좌우 열의 높이 패턴 — 서로 어긋나게 배치해 마소리 느낌
+const HEIGHTS_L = [200, 130, 170, 115, 190, 145]
+const HEIGHTS_R = [130, 195, 115, 175, 140, 200]
+
+function GridCell({ run, height, onClick }: { run: RunLog; height: number; onClick: () => void }) {
+  return (
+    <div
+      onClick={onClick}
+      style={{
+        borderRadius: 16, overflow: 'hidden',
+        position: 'relative', height,
+        cursor: 'pointer', flexShrink: 0,
+        background: run.photoUrl ? '#111' : getGradient(run.memberId),
+      }}
+    >
+      {run.photoUrl && (
+        <div style={{
+          position: 'absolute', inset: 0,
+          backgroundImage: `url(${run.photoUrl})`,
+          backgroundSize: 'cover', backgroundPosition: 'center',
+        }} />
+      )}
+      <div style={{
+        position: 'absolute', inset: 0,
+        background: 'linear-gradient(to bottom, rgba(0,0,0,0.05) 0%, rgba(0,0,0,0.72) 100%)',
+      }} />
+      {!run.photoUrl && (
+        <div style={{
+          position: 'absolute', inset: 0,
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
+          paddingBottom: 36,
+        }}>
+          <AvatarImage
+            name={run.memberName}
+            avatarUrl={run.memberAvatarUrl}
+            size={44}
+            bg="rgba(255,255,255,0.2)"
+            color="#fff"
+          />
+        </div>
+      )}
+      <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, padding: '8px 10px' }}>
+        <div style={{
+          fontFamily: FONT, fontSize: '0.62rem', fontWeight: 600,
+          color: '#fff', marginBottom: 2,
+          whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',
+        }}>
+          {run.memberName}
+        </div>
+        {run.title && (
+          <div style={{
+            fontFamily: FONT, fontSize: '0.52rem',
+            color: 'rgba(255,255,255,0.78)', lineHeight: 1.35,
+            display: '-webkit-box',
+            WebkitLineClamp: 2,
+            WebkitBoxOrient: 'vertical',
+            overflow: 'hidden',
+          }}>
+            "{run.title}"
+          </div>
+        )}
+      </div>
+    </div>
+  )
+}
+
 export function PhotoGrid({ runs, weeklyBars, memberId }: { runs: RunLog[]; weeklyBars: WeeklyBar[]; memberId?: string }) {
   const [selected, setSelected] = useState<RunLog | null>(null)
+
+  const leftRuns  = runs.filter((_, i) => i % 2 === 0)
+  const rightRuns = runs.filter((_, i) => i % 2 !== 0)
 
   return (
     <>
@@ -113,80 +182,29 @@ export function PhotoGrid({ runs, weeklyBars, memberId }: { runs: RunLog[]; week
           최근 달리기 기록이 없습니다
         </p>
       ) : (
-        <div style={{
-          display: 'grid', gridTemplateColumns: '1fr 1fr',
-          gap: 4, padding: '0 16px 40px',
-        }}>
-          {runs.map(run => (
-            <div
-              key={run.id}
-              onClick={() => setSelected(run)}
-              style={{
-                borderRadius: 16, overflow: 'hidden',
-                position: 'relative', aspectRatio: '1',
-                cursor: 'pointer',
-                background: run.photoUrl ? '#111' : getGradient(run.memberId),
-              }}
-            >
-              {/* Photo background */}
-              {run.photoUrl && (
-                <div style={{
-                  position: 'absolute', inset: 0,
-                  backgroundImage: `url(${run.photoUrl})`,
-                  backgroundSize: 'cover', backgroundPosition: 'center',
-                }} />
-              )}
-
-              {/* Gradient overlay */}
-              <div style={{
-                position: 'absolute', inset: 0,
-                background: 'linear-gradient(to bottom, rgba(0,0,0,0.05) 0%, rgba(0,0,0,0.72) 100%)',
-              }} />
-
-              {/* Avatar for no-photo placeholder */}
-              {!run.photoUrl && (
-                <div style={{
-                  position: 'absolute', inset: 0,
-                  display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  paddingBottom: 32,
-                }}>
-                  <AvatarImage
-                    name={run.memberName}
-                    avatarUrl={run.memberAvatarUrl}
-                    size={44}
-                    bg="rgba(255,255,255,0.2)"
-                    color="#fff"
-                  />
-                </div>
-              )}
-
-              {/* Bottom text: name + 한줄 */}
-              <div style={{
-                position: 'absolute', bottom: 0, left: 0, right: 0,
-                padding: '8px 10px',
-              }}>
-                <div style={{
-                  fontFamily: FONT, fontSize: '0.62rem', fontWeight: 600,
-                  color: '#fff', marginBottom: 2,
-                  whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',
-                }}>
-                  {run.memberName}
-                </div>
-                {run.title && (
-                  <div style={{
-                    fontFamily: FONT, fontSize: '0.52rem',
-                    color: 'rgba(255,255,255,0.78)', lineHeight: 1.35,
-                    display: '-webkit-box',
-                    WebkitLineClamp: 2,
-                    WebkitBoxOrient: 'vertical',
-                    overflow: 'hidden',
-                  }}>
-                    "{run.title}"
-                  </div>
-                )}
-              </div>
-            </div>
-          ))}
+        <div style={{ display: 'flex', gap: 4, padding: '0 16px 40px' }}>
+          {/* 왼쪽 열 */}
+          <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 4 }}>
+            {leftRuns.map((run, rowIdx) => (
+              <GridCell
+                key={run.id}
+                run={run}
+                height={HEIGHTS_L[rowIdx % HEIGHTS_L.length]}
+                onClick={() => setSelected(run)}
+              />
+            ))}
+          </div>
+          {/* 오른쪽 열 */}
+          <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 4 }}>
+            {rightRuns.map((run, rowIdx) => (
+              <GridCell
+                key={run.id}
+                run={run}
+                height={HEIGHTS_R[rowIdx % HEIGHTS_R.length]}
+                onClick={() => setSelected(run)}
+              />
+            ))}
+          </div>
         </div>
       )}
 

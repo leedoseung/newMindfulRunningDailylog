@@ -39,15 +39,18 @@ function getStackPos(fromTop: number) {
 type Props = {
   todayRuns: RunLog[]
   memberId?: string
+  onRunClick: (run: RunLog) => void
 }
 
-export function TodayCardDeck({ todayRuns, memberId }: Props) {
+export function TodayCardDeck({ todayRuns, memberId, onRunClick }: Props) {
   const [currentIdx, setCurrentIdx] = useState(0)
 
   const deckRef = useRef<HTMLDivElement>(null)
   const cardRefs = useRef<(HTMLDivElement | null)[]>([])
   const orderRef = useRef<number[]>([])
-  const isFlippedRef = useRef(false)
+  const onRunClickRef = useRef(onRunClick)
+  onRunClickRef.current = onRunClick
+
   const drag = useRef({ active: false, sx: 0, sy: 0, vx: 0, px: 0, pt: 0, moved: false })
 
   const runs = todayRuns.slice(0, 8)
@@ -60,7 +63,7 @@ export function TodayCardDeck({ todayRuns, memberId }: Props) {
       const el = cardRefs.current[runIdx]
       if (!el) return
       const fromTop = count - 1 - orderPos
-      gsap.set(el, { ...getStackPos(fromTop), rotationY: 0 })
+      gsap.set(el, getStackPos(fromTop))
       el.style.pointerEvents = fromTop === 0 ? 'auto' : 'none'
     })
   }, [runs.length])
@@ -84,18 +87,6 @@ export function TodayCardDeck({ todayRuns, memberId }: Props) {
     })
   }
 
-  function flipCard() {
-    const top = topEl()
-    if (!top) return
-    if (!isFlippedRef.current) {
-      gsap.to(top, { rotationY: 180, duration: 0.5, ease: 'power2.inOut' })
-      isFlippedRef.current = true
-    } else {
-      gsap.to(top, { rotationY: 0, duration: 0.45, ease: 'power2.inOut' })
-      isFlippedRef.current = false
-    }
-  }
-
   function throwCard(dir: 1 | -1) {
     const top = topEl()
     if (!top) return
@@ -115,8 +106,7 @@ export function TodayCardDeck({ todayRuns, memberId }: Props) {
         if (gone === undefined) return
         orderRef.current.unshift(gone)
         const el = cardRefs.current[gone]
-        if (el) gsap.set(el, { ...getStackPos(orderRef.current.length - 1), rotationY: 0 })
-        isFlippedRef.current = false
+        if (el) gsap.set(el, getStackPos(orderRef.current.length - 1))
         applyStack(null, true)
         setCurrentIdx(prev => (prev + 1) % runs.length)
       },
@@ -128,13 +118,12 @@ export function TodayCardDeck({ todayRuns, memberId }: Props) {
     if (!deckEl || runs.length === 0) return
 
     function onStart(x: number, y: number) {
-      if (!isFlippedRef.current) gsap.killTweensOf(topEl())
+      gsap.killTweensOf(topEl())
       drag.current = { active: true, sx: x, sy: y, vx: 0, px: x, pt: Date.now(), moved: false }
     }
 
     function onMove(x: number, y: number) {
       if (!drag.current.active) return
-      if (isFlippedRef.current) return
       const dx = x - drag.current.sx, dy = y - drag.current.sy
       if (Math.abs(dx) > 6 || Math.abs(dy) > 6) drag.current.moved = true
       const now = Date.now(), dt = now - drag.current.pt
@@ -164,7 +153,14 @@ export function TodayCardDeck({ todayRuns, memberId }: Props) {
       if (!drag.current.active) return
       const moved = drag.current.moved
       drag.current.active = false
-      if (!moved) { flipCard(); return }
+      if (!moved) {
+        const topIdx = orderRef.current[orderRef.current.length - 1]
+        if (topIdx !== undefined) {
+          const run = runs[topIdx]
+          if (run) onRunClickRef.current(run)
+        }
+        return
+      }
       const dx = x - drag.current.sx
       const top = topEl(); if (!top) return
       if (Math.abs(dx) > 75 || Math.abs(drag.current.vx) > 0.3) {
@@ -221,16 +217,16 @@ export function TodayCardDeck({ todayRuns, memberId }: Props) {
 
   return (
     <>
-      <div style={{ padding: '0 22px', marginBottom: 8, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-        <div style={{ fontFamily: FONT, fontSize: '0.48rem', fontWeight: 500, color: '#bbb', letterSpacing: '1.5px', textTransform: 'uppercase' }}>
+      <div style={{ padding: '0 22px', marginBottom: 10, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+        <div style={{ fontFamily: FONT, fontSize: '0.52rem', fontWeight: 600, color: '#666', letterSpacing: '1.5px', textTransform: 'uppercase' }}>
           오늘의 달리기
         </div>
-        <div style={{ fontFamily: FONT, fontSize: '0.48rem', fontWeight: 500, color: '#ccc', background: 'rgba(0,0,0,0.05)', borderRadius: 8, padding: '2px 8px' }}>
-          탭하면 일기 보기
+        <div style={{ fontFamily: FONT, fontSize: '0.5rem', fontWeight: 500, color: '#999' }}>
+          {runs.length}명 · 탭하면 상세보기
         </div>
       </div>
 
-      <div ref={deckRef} style={{ position: 'relative', height: 188, margin: '0 16px', perspective: 1200 }}>
+      <div ref={deckRef} style={{ position: 'relative', height: 248, margin: '0 16px' }}>
         {runs.map((run, i) => {
           const [c1, c2] = getGradient(run.memberId)
           return (
@@ -245,85 +241,34 @@ export function TodayCardDeck({ todayRuns, memberId }: Props) {
                 userSelect: 'none',
                 willChange: 'transform',
                 touchAction: 'none',
-                transformStyle: 'preserve-3d',
-                WebkitTransformStyle: 'preserve-3d',
               }}
             >
-              {/* 앞면 */}
               <div style={{
                 position: 'absolute', inset: 0, borderRadius: 20,
-                backfaceVisibility: 'hidden', WebkitBackfaceVisibility: 'hidden',
                 background: `linear-gradient(135deg, ${c1} 0%, ${c2} 100%)`,
                 boxShadow: '0 8px 28px rgba(0,0,0,0.18), 0 2px 8px rgba(0,0,0,0.10)',
               }}>
                 {run.photoUrl && (
                   <div style={{ position: 'absolute', inset: 0, borderRadius: 20, backgroundImage: `url(${run.photoUrl})`, backgroundSize: 'cover', backgroundPosition: 'center' }} />
                 )}
-                <div style={{ position: 'absolute', inset: 0, borderRadius: 20, background: 'linear-gradient(to bottom, rgba(0,0,0,0.05) 0%, rgba(0,0,0,0.65) 100%)' }} />
-                <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: '42%', background: 'linear-gradient(to bottom, rgba(255,255,255,0.07), transparent)', borderRadius: '20px 20px 0 0', pointerEvents: 'none' }} />
-                <div style={{ position: 'absolute', top: 12, right: 12, background: 'rgba(255,255,255,0.13)', backdropFilter: 'blur(6px)', WebkitBackdropFilter: 'blur(6px)', border: '1px solid rgba(255,255,255,0.15)', borderRadius: 10, padding: '3px 8px', fontFamily: FONT, fontSize: '0.48rem', fontWeight: 600, color: 'rgba(255,255,255,0.7)' }}>
-                  일기 보기 ↗
-                </div>
-                <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'flex-end', padding: '14px 16px', gap: 12 }}>
-                  <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', background: 'rgba(255,255,255,0.12)', border: '1px solid rgba(255,255,255,0.15)', borderRadius: 14, padding: '8px 12px', backdropFilter: 'blur(8px)', WebkitBackdropFilter: 'blur(8px)', flexShrink: 0 }}>
-                    <span style={{ fontFamily: FONT, fontSize: '1.4rem', fontWeight: 800, color: '#fff', letterSpacing: '-1px', lineHeight: 1 }}>{run.durationMin}</span>
-                    <span style={{ fontFamily: FONT, fontSize: '0.55rem', color: 'rgba(255,255,255,0.55)', marginTop: 1 }}>분</span>
+                <div style={{ position: 'absolute', inset: 0, borderRadius: 20, background: 'linear-gradient(to bottom, rgba(0,0,0,0.02) 0%, rgba(0,0,0,0.68) 100%)' }} />
+                <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: '45%', background: 'linear-gradient(to bottom, rgba(255,255,255,0.07), transparent)', borderRadius: '20px 20px 0 0', pointerEvents: 'none' }} />
+                <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'flex-end', padding: '18px 18px', gap: 14 }}>
+                  <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', background: 'rgba(255,255,255,0.12)', border: '1px solid rgba(255,255,255,0.15)', borderRadius: 14, padding: '10px 14px', backdropFilter: 'blur(8px)', WebkitBackdropFilter: 'blur(8px)', flexShrink: 0 }}>
+                    <span style={{ fontFamily: FONT, fontSize: '1.6rem', fontWeight: 800, color: '#fff', letterSpacing: '-1px', lineHeight: 1 }}>{run.durationMin}</span>
+                    <span style={{ fontFamily: FONT, fontSize: '0.58rem', color: 'rgba(255,255,255,0.55)', marginTop: 2 }}>분</span>
                   </div>
-                  <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 4 }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-                      <AvatarImage name={run.memberName} avatarUrl={run.memberAvatarUrl} size={20} bg="rgba(255,255,255,0.2)" color="#fff" />
-                      <span style={{ fontFamily: FONT, fontSize: '0.62rem', fontWeight: 600, color: 'rgba(255,255,255,0.85)' }}>{run.memberName}</span>
+                  <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 5 }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 7 }}>
+                      <AvatarImage name={run.memberName} avatarUrl={run.memberAvatarUrl} size={22} bg="rgba(255,255,255,0.2)" color="#fff" />
+                      <span style={{ fontFamily: FONT, fontSize: '0.7rem', fontWeight: 600, color: 'rgba(255,255,255,0.9)' }}>{run.memberName}</span>
                     </div>
                     {run.title && (
-                      <div style={{ fontFamily: FONT, fontSize: '0.75rem', fontWeight: 700, color: '#fff', lineHeight: 1.3, display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
+                      <div style={{ fontFamily: FONT, fontSize: '0.82rem', fontWeight: 700, color: '#fff', lineHeight: 1.35, display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
                         {run.title}
                       </div>
                     )}
-                    <div style={{ fontFamily: FONT, fontSize: '0.5rem', color: 'rgba(255,255,255,0.45)' }}>{run.date}</div>
-                  </div>
-                </div>
-              </div>
-
-              {/* 뒷면 */}
-              <div style={{
-                position: 'absolute', inset: 0, borderRadius: 20,
-                backfaceVisibility: 'hidden', WebkitBackfaceVisibility: 'hidden',
-                transform: 'rotateY(180deg)',
-                background: `linear-gradient(135deg, ${c1} 0%, ${c2} 100%)`,
-                boxShadow: '0 8px 28px rgba(0,0,0,0.22), 0 2px 8px rgba(0,0,0,0.12)',
-              }}>
-                <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: '35%', background: 'linear-gradient(to bottom, rgba(255,255,255,0.07), transparent)', borderRadius: '20px 20px 0 0', pointerEvents: 'none' }} />
-                <div style={{ position: 'absolute', inset: 0, display: 'flex', flexDirection: 'column', padding: '14px 16px' }}>
-                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 10 }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-                      <AvatarImage name={run.memberName} avatarUrl={run.memberAvatarUrl} size={20} bg="rgba(255,255,255,0.2)" color="#fff" />
-                      <span style={{ fontFamily: FONT, fontSize: '0.62rem', fontWeight: 700, color: '#fff' }}>{run.memberName}</span>
-                    </div>
-                    <span style={{ fontFamily: FONT, fontSize: '0.48rem', color: 'rgba(255,255,255,0.4)' }}>{run.date} · {run.durationMin}분</span>
-                  </div>
-                  <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 0 }}>
-                    {[
-                      { label: '달리기 전', text: run.thoughtBefore, icon: '🌅' },
-                      { label: '달리기 중', text: run.thoughtDuring, icon: '🏃' },
-                      { label: '달리기 후', text: run.thoughtAfter,  icon: '✨' },
-                    ].map((row, ri, arr) => (
-                      <div key={row.label} style={{ display: 'flex', alignItems: 'flex-start', gap: 8, padding: '7px 0', borderBottom: ri < arr.length - 1 ? '1px solid rgba(255,255,255,0.07)' : 'none' }}>
-                        <div style={{ width: 22, height: 22, borderRadius: 8, background: 'rgba(255,255,255,0.10)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 11, flexShrink: 0 }}>
-                          {row.icon}
-                        </div>
-                        <div style={{ flex: 1 }}>
-                          <div style={{ fontFamily: FONT, fontSize: '0.43rem', fontWeight: 700, color: 'rgba(255,255,255,0.4)', letterSpacing: '1px', textTransform: 'uppercase', marginBottom: 2 }}>
-                            {row.label}
-                          </div>
-                          <div style={{ fontFamily: FONT, fontSize: '0.65rem', fontWeight: 500, color: 'rgba(255,255,255,0.88)', lineHeight: 1.4, display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
-                            {row.text || '—'}
-                          </div>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                  <div style={{ textAlign: 'center', fontFamily: FONT, fontSize: '0.45rem', color: 'rgba(255,255,255,0.22)', letterSpacing: '1px', marginTop: 4 }}>
-                    탭하면 닫힘
+                    <div style={{ fontFamily: FONT, fontSize: '0.52rem', color: 'rgba(255,255,255,0.45)' }}>{run.date}</div>
                   </div>
                 </div>
               </div>
@@ -332,18 +277,17 @@ export function TodayCardDeck({ todayRuns, memberId }: Props) {
         })}
       </div>
 
-      <div style={{ display: 'flex', gap: 5, alignItems: 'center', justifyContent: 'center', marginTop: 10, marginBottom: 4 }}>
+      <div style={{ display: 'flex', gap: 5, alignItems: 'center', justifyContent: 'center', marginTop: 12, marginBottom: 4 }}>
         {runs.map((_, i) => (
           <div key={i} style={{
             width: i === currentIdx ? 18 : 4,
             height: 4, borderRadius: 3,
-            background: i === currentIdx ? 'rgba(0,0,0,0.45)' : 'rgba(0,0,0,0.12)',
+            background: i === currentIdx ? 'rgba(0,0,0,0.4)' : 'rgba(0,0,0,0.1)',
             transition: 'all 0.35s cubic-bezier(0.34,1.56,0.64,1)',
             flexShrink: 0,
           }} />
         ))}
       </div>
-
     </>
   )
 }

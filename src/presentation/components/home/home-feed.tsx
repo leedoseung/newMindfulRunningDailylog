@@ -95,8 +95,8 @@ function StatsHeader({
       <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between' }}>
         <div>
           <div style={{
-            fontFamily: FONT, fontSize: '0.48rem', fontWeight: 500,
-            color: '#bbb', letterSpacing: '1.8px', textTransform: 'uppercase', marginBottom: 6,
+            fontFamily: FONT, fontSize: '0.52rem', fontWeight: 600,
+            color: '#777', letterSpacing: '1.5px', textTransform: 'uppercase', marginBottom: 6,
             transition: 'opacity 0.2s',
           }}>
             {isMine ? '이번 주 나의 기록' : '이번 주 마인드풀러너'}
@@ -147,8 +147,8 @@ function StatsHeader({
       {!isMine && crew.length > 0 && (
         <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
           <div style={{
-            fontFamily: FONT, fontSize: '0.5rem', fontWeight: 500,
-            color: '#bbb', letterSpacing: '1.5px', textTransform: 'uppercase',
+            fontFamily: FONT, fontSize: '0.52rem', fontWeight: 600,
+            color: '#777', letterSpacing: '1.2px', textTransform: 'uppercase',
           }}>
             오늘 달린 멤버 · {todayCount}명
           </div>
@@ -267,7 +267,7 @@ export function HomeFeed({ recentRuns, myRuns, memberId, crew, weeklyBars, weekl
 
       {todayRuns.length > 0 && (
         <>
-          <TodayCardDeck todayRuns={todayRuns} memberId={memberId} />
+          <TodayCardDeck todayRuns={todayRuns} memberId={memberId} onRunClick={run => setAutoOpenRun(run)} />
           <div style={{ height: 1, background: 'rgba(0,0,0,0.06)', margin: '12px 22px 0' }} />
         </>
       )}

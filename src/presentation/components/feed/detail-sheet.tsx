@@ -55,7 +55,25 @@ export function DetailSheet({ run, open, onClose, memberId }: Props) {
   const [copied, setCopied] = useState(false)
   const [overlay, setOverlay] = useState<{ success: boolean; message: string } | null>(null)
   const shareCardRef = useRef<HTMLDivElement>(null)
+  const photoDataUrlRef = useRef<string | null>(null)
   const count = useCountUp(run?.durationMin ?? 0, open)
+
+  // 사진 URL이 바뀔 때마다 data URL로 프리패치 (이미지 저장 속도 향상)
+  useEffect(() => {
+    if (!run?.photoUrl) { photoDataUrlRef.current = null; return }
+    let cancelled = false
+    fetch(run.photoUrl)
+      .then(r => r.blob())
+      .then(blob => new Promise<string>((res, rej) => {
+        const reader = new FileReader()
+        reader.onload = () => res(reader.result as string)
+        reader.onerror = rej
+        reader.readAsDataURL(blob)
+      }))
+      .then(url => { if (!cancelled) photoDataUrlRef.current = url })
+      .catch(() => {})
+    return () => { cancelled = true }
+  }, [run?.photoUrl])
 
   const isOwner = Boolean(memberId && run && run.memberId === memberId)
   const hasPhoto = Boolean(run?.photoUrl)
@@ -118,35 +136,40 @@ ${run.thoughtAfter}`
     setSaving(true)
     setOverlay({ success: false, message: '이미지 저장 중...' })
     try {
-      // 1) 사진 있으면 data URL로 프리패치 — CORS 재fetch 문제 방지
-      if (run.photoUrl) {
-        const photoImg = shareCardRef.current.querySelector<HTMLImageElement>('img[data-photo]')
-        if (photoImg) {
+      // 1) html-to-image 모듈 먼저 로드 (첫 호출 시 async → React 리렌더 허용 구간)
+      const { toPng } = await import('html-to-image')
+
+      // 2) 사진 data URL 확보 (프리패치 완료됐으면 사용, 아니면 지금 fetch)
+      let photoDataUrl = photoDataUrlRef.current
+      if (run.photoUrl && !photoDataUrl) {
+        try {
           const blob = await fetch(run.photoUrl).then(r => r.blob())
-          const dataUrlPhoto = await new Promise<string>((res, rej) => {
+          photoDataUrl = await new Promise<string>((res, rej) => {
             const reader = new FileReader()
             reader.onload = () => res(reader.result as string)
             reader.onerror = rej
             reader.readAsDataURL(blob)
           })
-          photoImg.src = dataUrlPhoto
-        }
+        } catch { /* 실패 시 원래 URL로 진행 */ }
       }
 
-      // 2) 모든 img 로드 완료 대기
-      const imgs = Array.from(shareCardRef.current.querySelectorAll('img'))
-      await Promise.all(
-        imgs.map(img =>
-          new Promise<void>(resolve => {
-            if (img.complete && img.naturalWidth > 0) { resolve(); return }
-            img.addEventListener('load', () => resolve(), { once: true })
-            img.addEventListener('error', () => resolve(), { once: true })
-            setTimeout(resolve, 10_000)
-          })
-        )
+      // 3) 아이콘 이미지 로드 대기 (photo 제외 — photo는 data URL로 대체할 것)
+      const iconImgs = Array.from(
+        shareCardRef.current.querySelectorAll<HTMLImageElement>('img:not([data-photo])')
       )
+      await Promise.all(iconImgs.map(img => new Promise<void>(resolve => {
+        if (img.complete && img.naturalWidth > 0) { resolve(); return }
+        img.addEventListener('load', () => resolve(), { once: true })
+        img.addEventListener('error', () => resolve(), { once: true })
+        setTimeout(resolve, 10_000)
+      })))
 
-      const { toPng } = await import('html-to-image')
+      // 4) src 설정 → toPng 사이에 async 없음 (React 리렌더 개입 불가)
+      if (photoDataUrl) {
+        const photoImg = shareCardRef.current.querySelector<HTMLImageElement>('img[data-photo]')
+        if (photoImg) photoImg.src = photoDataUrl
+      }
+
       const dataUrl = await toPng(shareCardRef.current, {
         pixelRatio: 2,
         cacheBust: false,

@@ -2,6 +2,7 @@
 
 import { useState, useCallback, useEffect, useMemo } from 'react'
 import { RunFeed, PhotoGrid } from '../feed/run-feed'
+import { TodayCardDeck } from '../feed/today-card-deck'
 import { DetailSheet } from '../feed/detail-sheet'
 import { AvatarImage } from '../shared/avatar-image'
 import type { RunLog } from '@/domain/entities/run-log'
@@ -198,6 +199,8 @@ export function HomeFeed({ recentRuns, myRuns, memberId, crew, weeklyBars, weekl
   const [autoOpenRun, setAutoOpenRun] = useState<RunLog | null>(null)
 
   const todayCount = crew.filter(c => c.ranToday).length
+  const todayStr = new Date().toISOString().split('T')[0]!
+  const todayRuns = recentRuns.filter(r => r.date === todayStr)
   const weeklyTotalRuns = weeklyBars.reduce((s, b) => s + b.count, 0)
   const weeklyParticipants = crew.length
 
@@ -261,6 +264,13 @@ export function HomeFeed({ recentRuns, myRuns, memberId, crew, weeklyBars, weekl
       />
 
       <div style={{ height: 1, background: 'rgba(0,0,0,0.06)', margin: '16px 22px 0' }} />
+
+      {todayRuns.length > 0 && (
+        <>
+          <TodayCardDeck todayRuns={todayRuns} memberId={memberId} />
+          <div style={{ height: 1, background: 'rgba(0,0,0,0.06)', margin: '12px 22px 0' }} />
+        </>
+      )}
 
       {/* Tab switcher */}
       <div style={{

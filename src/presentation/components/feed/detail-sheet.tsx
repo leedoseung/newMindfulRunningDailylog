@@ -118,10 +118,38 @@ ${run.thoughtAfter}`
     setSaving(true)
     setOverlay({ success: false, message: '이미지 저장 중...' })
     try {
+      // 1) 사진 있으면 data URL로 프리패치 — CORS 재fetch 문제 방지
+      if (run.photoUrl) {
+        const photoImg = shareCardRef.current.querySelector<HTMLImageElement>('img[data-photo]')
+        if (photoImg) {
+          const blob = await fetch(run.photoUrl).then(r => r.blob())
+          const dataUrlPhoto = await new Promise<string>((res, rej) => {
+            const reader = new FileReader()
+            reader.onload = () => res(reader.result as string)
+            reader.onerror = rej
+            reader.readAsDataURL(blob)
+          })
+          photoImg.src = dataUrlPhoto
+        }
+      }
+
+      // 2) 모든 img 로드 완료 대기
+      const imgs = Array.from(shareCardRef.current.querySelectorAll('img'))
+      await Promise.all(
+        imgs.map(img =>
+          new Promise<void>(resolve => {
+            if (img.complete && img.naturalWidth > 0) { resolve(); return }
+            img.addEventListener('load', () => resolve(), { once: true })
+            img.addEventListener('error', () => resolve(), { once: true })
+            setTimeout(resolve, 10_000)
+          })
+        )
+      )
+
       const { toPng } = await import('html-to-image')
       const dataUrl = await toPng(shareCardRef.current, {
         pixelRatio: 2,
-        cacheBust: true,
+        cacheBust: false,
         skipFonts: true,
       })
 

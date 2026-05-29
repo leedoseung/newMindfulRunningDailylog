@@ -29,6 +29,7 @@ function PhotoCard({ run }: Props) {
         <img
           src={run.photoUrl}
           alt=""
+          data-photo
           crossOrigin="anonymous"
           style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
         />

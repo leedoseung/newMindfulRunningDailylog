@@ -76,17 +76,10 @@ function GridCell({ run, height, onClick }: { run: RunLog; height: number; onCli
         </div>
       )}
       <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, padding: '8px 10px' }}>
-        <div style={{
-          fontFamily: FONT, fontSize: '0.62rem', fontWeight: 600,
-          color: '#fff', marginBottom: 2,
-          whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',
-        }}>
-          {run.memberName}
-        </div>
         {run.title && (
           <div style={{
-            fontFamily: FONT, fontSize: '0.52rem',
-            color: 'rgba(255,255,255,0.78)', lineHeight: 1.35,
+            fontFamily: FONT, fontSize: '0.68rem', fontWeight: 500,
+            color: '#fff', lineHeight: 1.35, marginBottom: 4,
             display: '-webkit-box',
             WebkitLineClamp: 2,
             WebkitBoxOrient: 'vertical',
@@ -95,6 +88,13 @@ function GridCell({ run, height, onClick }: { run: RunLog; height: number; onCli
             "{run.title}"
           </div>
         )}
+        <div style={{
+          fontFamily: FONT, fontSize: '0.55rem', fontWeight: 500,
+          color: 'rgba(255,255,255,0.65)',
+          whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',
+        }}>
+          {run.memberName}
+        </div>
       </div>
     </div>
   )

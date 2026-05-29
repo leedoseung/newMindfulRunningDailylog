@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import './globals.css'
 import { BottomNav } from '@/presentation/components/layout/bottom-nav'
+import { PageTransition } from '@/presentation/components/layout/page-transition'
 
 export const metadata: Metadata = {
   title: '마인드풀러닝',
@@ -21,7 +22,7 @@ export default function RootLayout({
         />
       </head>
       <body style={{ paddingBottom: '80px' }}>
-        {children}
+        <PageTransition>{children}</PageTransition>
         <BottomNav />
       </body>
     </html>

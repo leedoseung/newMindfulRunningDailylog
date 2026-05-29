@@ -2,6 +2,7 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
+import { useState, useEffect, useRef } from 'react'
 
 const FONT = "'Pretendard Variable', Pretendard, -apple-system, sans-serif"
 
@@ -61,10 +62,41 @@ const HIDDEN_PATHS = ['/login', '/link-member', '/auth']
 
 export function BottomNav() {
   const pathname = usePathname()
+  const [navBarKey, setNavBarKey] = useState(0)
+  const [navigating, setNavigating] = useState(false)
+  const prevPathRef = useRef(pathname)
+
+  useEffect(() => {
+    if (pathname !== prevPathRef.current) {
+      prevPathRef.current = pathname
+      setNavigating(false)
+    }
+  }, [pathname])
+
+  function startNav(href: string) {
+    const isActive = href === '/' ? pathname === '/' : pathname === href || pathname.startsWith(href + '/')
+    if (!isActive) {
+      setNavigating(true)
+      setNavBarKey(k => k + 1)
+    }
+  }
 
   if (HIDDEN_PATHS.some(p => pathname.startsWith(p))) return null
 
   return (
+    <>
+      {/* 상단 progress bar */}
+      <div
+        key={navBarKey}
+        style={{
+          position: 'fixed', top: 0, left: 0, right: 0,
+          height: 2, zIndex: 9998,
+          background: '#111',
+          opacity: navigating ? 1 : 0,
+          transition: navigating ? 'none' : 'opacity 0.3s ease',
+          animation: navigating ? 'nav-progress 1.4s cubic-bezier(0.1,0.5,0.5,1) forwards' : 'none',
+        }}
+      />
     <nav style={{
       position: 'fixed', bottom: 20, left: '50%', transform: 'translateX(-50%)',
       zIndex: 100,
@@ -83,6 +115,7 @@ export function BottomNav() {
           <Link
             key={href}
             href={href}
+            onClick={() => startNav(href)}
             style={{
               display: 'flex', flexDirection: 'column',
               alignItems: 'center', justifyContent: 'center',
@@ -108,5 +141,6 @@ export function BottomNav() {
         )
       })}
     </nav>
+    </>
   )
 }

@@ -95,6 +95,17 @@
   to   { transform: rotate(360deg); }
 }
 
+@keyframes page-enter {
+  from { opacity: 0; transform: translateY(7px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes nav-progress {
+  0%   { width: 0%; }
+  60%  { width: 72%; }
+  100% { width: 88%; }
+}
+
 @layer base {
   * {
     @apply border-border outline-ring/50;

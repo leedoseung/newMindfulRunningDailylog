@@ -60,7 +60,7 @@ export function TodayCardDeck({ todayRuns, memberId }: Props) {
       const el = cardRefs.current[runIdx]
       if (!el) return
       const fromTop = count - 1 - orderPos
-      gsap.set(el, { ...getStackPos(fromTop), transformPerspective: 1200, rotationY: 0 })
+      gsap.set(el, { ...getStackPos(fromTop), rotationY: 0 })
       el.style.pointerEvents = fromTop === 0 ? 'auto' : 'none'
     })
   }, [runs.length])
@@ -190,6 +190,13 @@ export function TodayCardDeck({ todayRuns, memberId }: Props) {
       if (drag.current.active) { e.preventDefault(); onMove(e.touches[0]!.clientX, e.touches[0]!.clientY) }
     }
     function onTouchEnd(e: TouchEvent) { onEnd(e.changedTouches[0]!.clientX) }
+    function onTouchCancel() {
+      if (!drag.current.active) return
+      drag.current.active = false
+      const top = topEl()
+      if (top) gsap.to(top, { x: 0, y: 0, rotation: 0, duration: 0.5, ease: 'elastic.out(1,0.62)', overwrite: 'auto' })
+      applyStack(top, true)
+    }
 
     deckEl.addEventListener('mousedown', onMouseDown)
     document.addEventListener('mousemove', onMouseMove)
@@ -197,6 +204,7 @@ export function TodayCardDeck({ todayRuns, memberId }: Props) {
     deckEl.addEventListener('touchstart', onTouchStart, { passive: false })
     document.addEventListener('touchmove', onTouchMove, { passive: false })
     document.addEventListener('touchend', onTouchEnd)
+    document.addEventListener('touchcancel', onTouchCancel)
     return () => {
       cardRefs.current.forEach(el => { if (el) gsap.killTweensOf(el) })
       deckEl.removeEventListener('mousedown', onMouseDown)
@@ -205,6 +213,7 @@ export function TodayCardDeck({ todayRuns, memberId }: Props) {
       deckEl.removeEventListener('touchstart', onTouchStart)
       document.removeEventListener('touchmove', onTouchMove)
       document.removeEventListener('touchend', onTouchEnd)
+      document.removeEventListener('touchcancel', onTouchCancel)
     }
   }, [runs.length])
 
@@ -237,19 +246,20 @@ export function TodayCardDeck({ todayRuns, memberId }: Props) {
                 willChange: 'transform',
                 touchAction: 'none',
                 transformStyle: 'preserve-3d',
+                WebkitTransformStyle: 'preserve-3d',
               }}
             >
               {/* 앞면 */}
               <div style={{
-                position: 'absolute', inset: 0, borderRadius: 20, overflow: 'hidden',
+                position: 'absolute', inset: 0, borderRadius: 20,
                 backfaceVisibility: 'hidden', WebkitBackfaceVisibility: 'hidden',
                 background: `linear-gradient(135deg, ${c1} 0%, ${c2} 100%)`,
                 boxShadow: '0 8px 28px rgba(0,0,0,0.18), 0 2px 8px rgba(0,0,0,0.10)',
               }}>
                 {run.photoUrl && (
-                  <div style={{ position: 'absolute', inset: 0, backgroundImage: `url(${run.photoUrl})`, backgroundSize: 'cover', backgroundPosition: 'center' }} />
+                  <div style={{ position: 'absolute', inset: 0, borderRadius: 20, backgroundImage: `url(${run.photoUrl})`, backgroundSize: 'cover', backgroundPosition: 'center' }} />
                 )}
-                <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to bottom, rgba(0,0,0,0.05) 0%, rgba(0,0,0,0.65) 100%)' }} />
+                <div style={{ position: 'absolute', inset: 0, borderRadius: 20, background: 'linear-gradient(to bottom, rgba(0,0,0,0.05) 0%, rgba(0,0,0,0.65) 100%)' }} />
                 <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: '42%', background: 'linear-gradient(to bottom, rgba(255,255,255,0.07), transparent)', borderRadius: '20px 20px 0 0', pointerEvents: 'none' }} />
                 <div style={{ position: 'absolute', top: 12, right: 12, background: 'rgba(255,255,255,0.13)', backdropFilter: 'blur(6px)', WebkitBackdropFilter: 'blur(6px)', border: '1px solid rgba(255,255,255,0.15)', borderRadius: 10, padding: '3px 8px', fontFamily: FONT, fontSize: '0.48rem', fontWeight: 600, color: 'rgba(255,255,255,0.7)' }}>
                   일기 보기 ↗
@@ -276,7 +286,7 @@ export function TodayCardDeck({ todayRuns, memberId }: Props) {
 
               {/* 뒷면 */}
               <div style={{
-                position: 'absolute', inset: 0, borderRadius: 20, overflow: 'hidden',
+                position: 'absolute', inset: 0, borderRadius: 20,
                 backfaceVisibility: 'hidden', WebkitBackfaceVisibility: 'hidden',
                 transform: 'rotateY(180deg)',
                 background: `linear-gradient(135deg, ${c1} 0%, ${c2} 100%)`,

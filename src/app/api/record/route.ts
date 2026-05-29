@@ -5,14 +5,31 @@ import { createServerClient } from '@/infrastructure/supabase/client'
 import type { RunLogInput } from '@/domain/entities/run-log-input'
 
 export async function POST(req: Request) {
+  const supabase = await createServerClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+
+  const body: RunLogInput = await req.json()
+
+  // JWT metadata의 member_id와 요청 body의 memberId가 일치해야 함
+  const linkedMemberId = user.user_metadata?.member_id as string | undefined
+  if (!linkedMemberId || linkedMemberId !== body.memberId) {
+    return NextResponse.json({ error: '권한이 없습니다' }, { status: 403 })
+  }
+
   try {
-    const body: RunLogInput = await req.json()
-    const supabase = await createServerClient()
     const repo = new SupabaseRunLogRepository(supabase)
     const useCase = new SaveRunLogUseCase(repo)
     const runLog = await useCase.execute(body)
     return NextResponse.json(runLog, { status: 201 })
   } catch (err) {
-    return NextResponse.json({ error: String(err) }, { status: 500 })
+    const msg = String(err)
+    if (msg.includes('row-level security') || msg.includes('violates')) {
+      return NextResponse.json(
+        { error: '계정 연결 오류입니다. 로그아웃 후 다시 로그인해주세요.' },
+        { status: 403 }
+      )
+    }
+    return NextResponse.json({ error: msg }, { status: 500 })
   }
 }

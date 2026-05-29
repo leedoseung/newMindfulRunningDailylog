@@ -136,13 +136,18 @@ export function DetailSheet({ run, open, onClose, memberId, onDeleted }: Props) 
   useEffect(() => {
     if (open) {
       document.body.style.overflow = 'hidden'
+      document.body.classList.add('detail-open')
     } else {
       document.body.style.overflow = ''
+      document.body.classList.remove('detail-open')
       setPhotoFull(false)
       setDragY(0)
       setIsDragging(false)
     }
-    return () => { document.body.style.overflow = '' }
+    return () => {
+      document.body.style.overflow = ''
+      document.body.classList.remove('detail-open')
+    }
   }, [open])
 
   async function handleCopyText() {

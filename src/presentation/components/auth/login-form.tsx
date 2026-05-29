@@ -62,8 +62,8 @@ export function LoginForm({ error }: Props) {
           <Image
             src="/icon-512.png"
             alt="Mindful Running"
-            width={80}
-            height={80}
+            width={120}
+            height={120}
             style={{ filter: 'brightness(0) invert(1)', opacity: 0.92 }}
           />
         </div>
@@ -74,8 +74,8 @@ export function LoginForm({ error }: Props) {
           lineHeight: 1.8, maxWidth: '255px',
         }}>
           "할 수 있는 달리기를 하다보면<br />
-          <strong style={{ fontStyle: 'normal', fontWeight: 500, color: '#fff' }}>
-            할 수 없는 달리기를
+          <strong style={{ fontStyle: 'normal', fontWeight: 700, color: '#ffffff' }}>
+            할 수 없던 달리기를
           </strong>
           <br />하게된다"
         </div>

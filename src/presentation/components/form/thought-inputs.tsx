@@ -1,3 +1,7 @@
+'use client'
+
+import { useRef, useEffect } from 'react'
+
 type ThoughtKey = 'before' | 'during' | 'after'
 
 const CONFIG: Record<ThoughtKey, { dot: string; label: string; placeholder: string }> = {
@@ -11,6 +15,38 @@ type Props = {
   during: string
   after: string
   onChange: (key: ThoughtKey, value: string) => void
+}
+
+function AutoGrowTextarea({ value, onChange, placeholder }: {
+  value: string
+  onChange: (v: string) => void
+  placeholder: string
+}) {
+  const ref = useRef<HTMLTextAreaElement>(null)
+
+  useEffect(() => {
+    const el = ref.current
+    if (!el) return
+    el.style.height = 'auto'
+    el.style.height = `${el.scrollHeight}px`
+  }, [value])
+
+  return (
+    <textarea
+      ref={ref}
+      value={value}
+      onChange={e => onChange(e.target.value)}
+      placeholder={placeholder}
+      rows={2}
+      style={{
+        width: '100%', border: 'none', outline: 'none',
+        fontFamily: "'Pretendard Variable', Pretendard, -apple-system, sans-serif",
+        fontSize: '0.82rem', color: '#333',
+        lineHeight: 1.6, resize: 'none', background: 'transparent',
+        boxSizing: 'border-box', overflow: 'hidden',
+      }}
+    />
+  )
 }
 
 export function ThoughtInputs({ before, during, after, onChange }: Props) {
@@ -31,17 +67,10 @@ export function ThoughtInputs({ before, during, after, onChange }: Props) {
                 {c.label}
               </div>
             </div>
-            <textarea
+            <AutoGrowTextarea
               value={values[key]}
-              onChange={e => onChange(key, e.target.value)}
+              onChange={v => onChange(key, v)}
               placeholder={c.placeholder}
-              rows={2}
-              style={{
-                width: '100%', border: 'none', outline: 'none',
-                fontFamily: "'Pretendard Variable', Pretendard, -apple-system, sans-serif", fontSize: '0.82rem', color: '#333',
-                lineHeight: 1.6, resize: 'none', background: 'transparent',
-                boxSizing: 'border-box',
-              }}
             />
           </div>
         )

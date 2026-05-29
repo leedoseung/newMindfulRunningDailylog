@@ -132,7 +132,15 @@ export function DetailSheet({ run, open, onClose, memberId }: Props) {
   }
 
   useEffect(() => {
-    if (!open) { setPhotoFull(false); setDragY(0); setIsDragging(false) }
+    if (open) {
+      document.body.style.overflow = 'hidden'
+    } else {
+      document.body.style.overflow = ''
+      setPhotoFull(false)
+      setDragY(0)
+      setIsDragging(false)
+    }
+    return () => { document.body.style.overflow = '' }
   }, [open])
 
   async function handleCopyText() {

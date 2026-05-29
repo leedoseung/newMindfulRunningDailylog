@@ -16,6 +16,7 @@ type Props = {
   open: boolean
   onClose: () => void
   memberId?: string
+  onDeleted?: (id: string) => void
 }
 
 function useCountUp(target: number, active: boolean) {
@@ -47,7 +48,7 @@ function useCountUp(target: number, active: boolean) {
 
 const FONT = "'Pretendard Variable', Pretendard, -apple-system, sans-serif"
 
-export function DetailSheet({ run, open, onClose, memberId }: Props) {
+export function DetailSheet({ run, open, onClose, memberId, onDeleted }: Props) {
   const router = useRouter()
   const [photoFull, setPhotoFull] = useState(false)
   const [saving, setSaving] = useState(false)
@@ -121,6 +122,7 @@ export function DetailSheet({ run, open, onClose, memberId }: Props) {
       setOverlay({ success: true, message: '삭제됐어요' })
       await new Promise<void>(r => setTimeout(r, 1100))
       setOverlay(null)
+      onDeleted?.(run.id)
       onClose()
       router.refresh()
     } catch {

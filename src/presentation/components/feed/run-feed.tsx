@@ -199,7 +199,16 @@ export function PhotoGrid({ runs: initialRuns, memberId, triggerRun, onTriggerCo
       )}
 
       {selected && (
-        <DetailSheet run={selected} open={Boolean(selected)} onClose={() => setSelected(null)} memberId={memberId} />
+        <DetailSheet
+          run={selected}
+          open={Boolean(selected)}
+          onClose={() => setSelected(null)}
+          memberId={memberId}
+          onDeleted={(id) => {
+            setSelected(null)
+            setRuns(prev => prev.filter(r => r.id !== id))
+          }}
+        />
       )}
     </>
   )
@@ -243,7 +252,13 @@ export function RunFeed({ runs, triggerRun, onTriggerConsumed, memberId }: Props
       </div>
 
       {selected && (
-        <DetailSheet run={selected} open={Boolean(selected)} onClose={() => setSelected(null)} memberId={memberId} />
+        <DetailSheet
+          run={selected}
+          open={Boolean(selected)}
+          onClose={() => setSelected(null)}
+          memberId={memberId}
+          onDeleted={() => setSelected(null)}
+        />
       )}
     </>
   )

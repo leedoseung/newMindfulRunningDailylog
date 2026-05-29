@@ -11,7 +11,7 @@ vi.mock('next/navigation', () => ({
 const run: RunLog = {
   id: 'r1',
   memberId: 'm1',
-  memberName: '이두승', memberAvatarUrl: '',
+  memberName: '이두승', memberAvatarUrl: '', memberInstaId: '',
   date: '2026-05-24',
   durationMin: 45,
   title: '남산 달리기',

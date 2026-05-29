@@ -3,6 +3,7 @@ export type RunLog = {
   memberId: string
   memberName: string
   memberAvatarUrl: string
+  memberInstaId: string  // '' if not set
   date: string // 'YYYY-MM-DD'
   durationMin: number
   title: string

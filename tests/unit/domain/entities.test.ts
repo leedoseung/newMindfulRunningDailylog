@@ -6,7 +6,7 @@ describe('RunLog entity', () => {
     const log: RunLog = {
       id: 'uuid-1',
       memberId: 'uuid-2',
-      memberName: '이두승', memberAvatarUrl: '',
+      memberName: '이두승', memberAvatarUrl: '', memberInstaId: '',
       date: '2026-05-24',
       durationMin: 45,
       title: '남산 달리기',

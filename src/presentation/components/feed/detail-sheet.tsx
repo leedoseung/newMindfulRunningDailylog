@@ -408,8 +408,30 @@ ${run.thoughtAfter}`
             <span style={{ fontFamily: FONT, fontSize: '1rem', fontWeight: 400, color: unitColor }}>분</span>
           </div>
 
-          <div style={{ fontFamily: FONT, fontSize: '0.78rem', fontWeight: 400, color: nameColor, marginBottom: 16 }}>
-            {run.memberName}
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 16 }}>
+            <div style={{ fontFamily: FONT, fontSize: '0.78rem', fontWeight: 400, color: nameColor }}>
+              {run.memberName}
+            </div>
+            {run.memberInstaId && (
+              <a
+                href={`https://instagram.com/${run.memberInstaId.replace(/^@/, '')}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                style={{
+                  display: 'flex', alignItems: 'center', gap: 4,
+                  background: chipBg, borderRadius: 20, padding: '3px 10px',
+                  fontFamily: FONT, fontSize: '0.58rem', fontWeight: 500,
+                  color: chipColor, textDecoration: 'none',
+                }}
+              >
+                <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                  <rect x="2" y="2" width="20" height="20" rx="5" ry="5"/>
+                  <circle cx="12" cy="12" r="4"/>
+                  <circle cx="17.5" cy="6.5" r="0.8" fill="currentColor" stroke="none"/>
+                </svg>
+                @{run.memberInstaId.replace(/^@/, '')}
+              </a>
+            )}
           </div>
 
           {run.location && (

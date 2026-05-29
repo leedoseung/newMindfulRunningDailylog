@@ -180,14 +180,42 @@ export function ProfileView({ member, stats, monthlyChart, recentRuns, memberId 
         {/* 칩 + 버튼 하단 한 줄 */}
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8, flexWrap: 'wrap' }}>
           <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', flex: 1 }}>
-            {chips.map(chip => (
-              <div key={chip} style={{
-                background: 'rgba(255,255,255,0.1)', border: '1px solid rgba(255,255,255,0.14)',
-                borderRadius: 20, padding: '5px 12px',
-                fontSize: '0.65rem', fontWeight: 500,
-                color: 'rgba(255,255,255,0.75)',
-              }}>{chip}</div>
-            ))}
+            {chips.map(chip => {
+              const isInsta = chip.startsWith('@')
+              const handle = isInsta ? chip.slice(1) : ''
+              if (isInsta) {
+                return (
+                  <a
+                    key={chip}
+                    href={`https://instagram.com/${handle}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    style={{
+                      display: 'flex', alignItems: 'center', gap: 5,
+                      background: 'rgba(255,255,255,0.1)', border: '1px solid rgba(255,255,255,0.14)',
+                      borderRadius: 20, padding: '5px 12px',
+                      fontSize: '0.65rem', fontWeight: 500,
+                      color: 'rgba(255,255,255,0.85)', textDecoration: 'none',
+                    }}
+                  >
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <rect x="2" y="2" width="20" height="20" rx="5" ry="5"/>
+                      <circle cx="12" cy="12" r="4"/>
+                      <circle cx="17.5" cy="6.5" r="0.8" fill="currentColor" stroke="none"/>
+                    </svg>
+                    {chip}
+                  </a>
+                )
+              }
+              return (
+                <div key={chip} style={{
+                  background: 'rgba(255,255,255,0.1)', border: '1px solid rgba(255,255,255,0.14)',
+                  borderRadius: 20, padding: '5px 12px',
+                  fontSize: '0.65rem', fontWeight: 500,
+                  color: 'rgba(255,255,255,0.75)',
+                }}>{chip}</div>
+              )
+            })}
           </div>
           <div style={{ display: 'flex', gap: 8, flexShrink: 0 }}>
             <button

@@ -64,7 +64,9 @@ export function BottomNav() {
   const pathname = usePathname()
   const [navBarKey, setNavBarKey] = useState(0)
   const [navigating, setNavigating] = useState(false)
+  const [scrollHidden, setScrollHidden] = useState(false)
   const prevPathRef = useRef(pathname)
+  const scrollTimerRef = useRef<ReturnType<typeof setTimeout>>(undefined)
 
   useEffect(() => {
     if (pathname !== prevPathRef.current) {
@@ -72,6 +74,19 @@ export function BottomNav() {
       setNavigating(false)
     }
   }, [pathname])
+
+  useEffect(() => {
+    function onScroll() {
+      setScrollHidden(true)
+      clearTimeout(scrollTimerRef.current)
+      scrollTimerRef.current = setTimeout(() => setScrollHidden(false), 600)
+    }
+    window.addEventListener('scroll', onScroll, { passive: true })
+    return () => {
+      window.removeEventListener('scroll', onScroll)
+      clearTimeout(scrollTimerRef.current)
+    }
+  }, [])
 
   function startNav(href: string) {
     const isActive = href === '/' ? pathname === '/' : pathname === href || pathname.startsWith(href + '/')
@@ -98,7 +113,12 @@ export function BottomNav() {
         }}
       />
     <nav style={{
-      position: 'fixed', bottom: 20, left: '50%', transform: 'translateX(-50%)',
+      position: 'fixed', bottom: 20, left: '50%',
+      transform: scrollHidden ? 'translateX(-50%) translateY(80px)' : 'translateX(-50%)',
+      opacity: scrollHidden ? 0 : 1,
+      transition: scrollHidden
+        ? 'transform 0.25s cubic-bezier(0.4,0,1,1), opacity 0.2s ease'
+        : 'transform 0.35s cubic-bezier(0,0,0.2,1), opacity 0.3s ease',
       zIndex: 100,
       display: 'flex', alignItems: 'center',
       background: 'rgba(255,255,255,0.88)',

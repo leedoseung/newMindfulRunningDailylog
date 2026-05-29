@@ -107,10 +107,10 @@
 }
 
 body.detail-open nav {
-  opacity: 0;
-  pointer-events: none;
-  transform: translateX(-50%) translateY(20px);
-  transition: opacity 0.25s ease, transform 0.25s ease;
+  opacity: 0 !important;
+  pointer-events: none !important;
+  transform: translateX(-50%) translateY(20px) !important;
+  transition: opacity 0.25s ease, transform 0.25s ease !important;
 }
 
 @layer base {

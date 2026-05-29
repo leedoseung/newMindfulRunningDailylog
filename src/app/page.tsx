@@ -53,6 +53,8 @@ export default async function RootPage({
       <AppHeader memberName={memberName} memberAvatarUrl={memberAvatarUrl} />
       <RunLogForm
         memberId={memberId}
+        memberName={memberName}
+        memberAvatarUrl={memberAvatarUrl}
         mode={edit ? 'edit' : 'create'}
         recordId={edit}
         initialData={initialData}

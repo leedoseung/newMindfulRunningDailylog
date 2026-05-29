@@ -1,10 +1,11 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { useRouter } from 'next/navigation'
 import { DurationPicker } from './duration-picker'
 import { ThoughtInputs } from './thought-inputs'
 import { PhotoUpload } from './photo-upload'
+import { DetailSheet } from '../feed/detail-sheet'
 import { createBrowserClient } from '@/infrastructure/supabase/browser-client'
 import { LoadingOverlay } from '../shared/loading-overlay'
 
@@ -23,6 +24,8 @@ type RunLogFormInitial = {
 
 type Props = {
   memberId: string
+  memberName?: string
+  memberAvatarUrl?: string
   mode?: 'create' | 'edit'
   recordId?: string
   initialData?: RunLogFormInitial
@@ -42,7 +45,7 @@ const TEXT_INPUT_STYLE: React.CSSProperties = {
   boxSizing: 'border-box',
 }
 
-export function RunLogForm({ memberId, mode = 'create', recordId, initialData }: Props) {
+export function RunLogForm({ memberId, memberName = '', memberAvatarUrl = '', mode = 'create', recordId, initialData }: Props) {
   const router = useRouter()
   const [date, setDate]                   = useState(() => initialData?.date ?? new Date().toISOString().split('T')[0]!)
   const [durationMin, setDurationMin]     = useState(initialData?.durationMin ?? 30)
@@ -54,6 +57,34 @@ export function RunLogForm({ memberId, mode = 'create', recordId, initialData }:
   const [photoFile, setPhotoFile]         = useState<File | null>(null)
   const [submitting, setSubmitting]       = useState(false)
   const [error, setError]                 = useState('')
+  const [previewOpen, setPreviewOpen]     = useState(false)
+  const photoObjectUrlRef                 = useRef<string | null>(null)
+
+  // photoFile이 바뀔 때 object URL 생성/해제
+  useEffect(() => {
+    if (photoObjectUrlRef.current) URL.revokeObjectURL(photoObjectUrlRef.current)
+    photoObjectUrlRef.current = photoFile ? URL.createObjectURL(photoFile) : null
+    return () => {
+      if (photoObjectUrlRef.current) URL.revokeObjectURL(photoObjectUrlRef.current)
+    }
+  }, [photoFile])
+
+  const previewRun = {
+    id: 'preview',
+    memberId,
+    memberName: memberName || '나',
+    memberAvatarUrl,
+    memberInstaId: '',
+    date,
+    durationMin,
+    title,
+    thoughtBefore,
+    thoughtDuring,
+    thoughtAfter,
+    location,
+    photoUrl: photoObjectUrlRef.current ?? initialData?.photoUrl ?? '',
+    createdAt: new Date().toISOString(),
+  }
 
   function handleThoughtChange(key: ThoughtKey, value: string) {
     if (key === 'before') setThoughtBefore(value)
@@ -181,7 +212,20 @@ export function RunLogForm({ memberId, mode = 'create', recordId, initialData }:
         <div style={{ padding: '0 22px 10px', color: '#ef4444', fontSize: '0.8rem' }}>{error}</div>
       )}
 
-      <div style={{ padding: '0 22px' }}>
+      <div style={{ padding: '0 22px', display: 'flex', flexDirection: 'column', gap: 10 }}>
+        <button
+          type="button"
+          onClick={() => setPreviewOpen(true)}
+          style={{
+            width: '100%', padding: '15px',
+            background: 'transparent',
+            border: '1.5px solid #ddd', borderRadius: '16px',
+            fontFamily: "'Pretendard Variable', Pretendard, -apple-system, sans-serif", fontSize: '0.9rem', fontWeight: 500,
+            color: '#555', cursor: 'pointer',
+          }}
+        >
+          미리보기
+        </button>
         <button
           type="submit"
           disabled={submitting}
@@ -198,6 +242,12 @@ export function RunLogForm({ memberId, mode = 'create', recordId, initialData }:
         </button>
       </div>
     </form>
+
+    <DetailSheet
+      run={previewRun}
+      open={previewOpen}
+      onClose={() => setPreviewOpen(false)}
+    />
     </>
   )
 }

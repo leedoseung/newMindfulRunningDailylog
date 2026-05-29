@@ -54,9 +54,35 @@ export function DetailSheet({ run, open, onClose, memberId }: Props) {
   const [deleting, setDeleting] = useState(false)
   const [copied, setCopied] = useState(false)
   const [overlay, setOverlay] = useState<{ success: boolean; message: string } | null>(null)
+  const [dragY, setDragY] = useState(0)
+  const [isDragging, setIsDragging] = useState(false)
+  const dragStartYRef = useRef(0)
   const shareCardRef = useRef<HTMLDivElement>(null)
   const photoDataUrlRef = useRef<string | null>(null)
   const count = useCountUp(run?.durationMin ?? 0, open)
+
+  function handleDragStart(e: React.TouchEvent) {
+    const touch = e.touches[0]
+    if (touch) dragStartYRef.current = touch.clientY
+    setIsDragging(true)
+  }
+
+  function handleDragMove(e: React.TouchEvent) {
+    const touch = e.touches[0]
+    if (!touch) return
+    const delta = touch.clientY - dragStartYRef.current
+    if (delta > 0) setDragY(delta)
+  }
+
+  function handleDragEnd() {
+    setIsDragging(false)
+    if (dragY > 120) {
+      onClose()
+      setTimeout(() => setDragY(0), 520)
+    } else {
+      setDragY(0)
+    }
+  }
 
   // 사진 URL이 바뀔 때마다 data URL로 프리패치 (이미지 저장 속도 향상)
   useEffect(() => {
@@ -106,7 +132,7 @@ export function DetailSheet({ run, open, onClose, memberId }: Props) {
   }
 
   useEffect(() => {
-    if (!open) setPhotoFull(false)
+    if (!open) { setPhotoFull(false); setDragY(0); setIsDragging(false) }
   }, [open])
 
   async function handleCopyText() {
@@ -262,8 +288,8 @@ ${run.thoughtAfter}`
           position: 'relative', width: '100%', height: '88vh',
           background: hasPhoto ? '#111' : '#F7F7F5',
           borderRadius: '28px 28px 0 0',
-          transform: open ? 'translateY(0)' : 'translateY(110%)',
-          transition: 'transform 0.52s cubic-bezier(0.32,0.72,0,1)',
+          transform: !open ? 'translateY(110%)' : dragY > 0 ? `translateY(${dragY}px)` : 'translateY(0)',
+          transition: isDragging ? 'none' : 'transform 0.52s cubic-bezier(0.32,0.72,0,1)',
           overflow: 'hidden', zIndex: 201,
           display: 'flex', flexDirection: 'column',
         }}
@@ -296,20 +322,31 @@ ${run.thoughtAfter}`
           }} />
         )}
 
+        {/* Drag handle zone — full-width touch target */}
+        <div
+          onTouchStart={handleDragStart}
+          onTouchMove={handleDragMove}
+          onTouchEnd={handleDragEnd}
+          style={{
+            position: 'relative', width: '100%', height: 28, flexShrink: 0,
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            zIndex: 20, touchAction: 'none', cursor: 'grab',
+          }}
+        >
+          <div style={{
+            width: 32, height: 3, background: handleColor, borderRadius: 2,
+          }} />
+        </div>
+
         {/* Top bar */}
         <div style={{
           display: 'flex', justifyContent: 'space-between', alignItems: 'center',
-          padding: '16px 20px 0', flexShrink: 0,
+          padding: '0 20px 0', flexShrink: 0,
           position: 'relative', zIndex: 20,
           opacity: photoFull ? 0 : 1,
           transition: 'opacity 0.25s',
           pointerEvents: photoFull ? 'none' : 'auto',
         }}>
-          {/* Handle */}
-          <div style={{
-            position: 'absolute', top: 10, left: '50%', transform: 'translateX(-50%)',
-            width: 32, height: 3, background: handleColor, borderRadius: 2,
-          }} />
 
           <button
             type="button"

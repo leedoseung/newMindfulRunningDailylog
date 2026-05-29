@@ -116,8 +116,7 @@ export function ProfileView({ member, allRuns, memberId }: Props) {
     const days = new Set(filteredRuns.map(r => r.date)).size
     return {
       count: filteredRuns.length,
-      hours: Math.floor(totalMin / 60),
-      remMin: totalMin % 60,
+      totalMin,
       days,
       avgMin: filteredRuns.length > 0 ? Math.round(totalMin / filteredRuns.length) : 0,
     }
@@ -177,28 +176,10 @@ export function ProfileView({ member, allRuns, memberId }: Props) {
   ]
 
   const statBoxes = [
-    {
-      label: '달린 횟수',
-      value: String(filteredStats.count),
-      unit: '회',
-    },
-    {
-      label: '달린 시간',
-      value: filteredStats.hours > 0
-        ? `${filteredStats.hours}h ${filteredStats.remMin}m`
-        : `${filteredStats.remMin}m`,
-      unit: '',
-    },
-    {
-      label: '달린 날',
-      value: String(filteredStats.days),
-      unit: '일',
-    },
-    {
-      label: '평균 시간',
-      value: String(filteredStats.avgMin),
-      unit: '분/회',
-    },
+    { label: '달린 횟수', value: String(filteredStats.count), unit: '회' },
+    { label: '달린 시간', value: String(filteredStats.totalMin), unit: '분' },
+    { label: '달린 날',   value: String(filteredStats.days),    unit: '일' },
+    { label: '평균 시간', value: String(filteredStats.avgMin),  unit: '분/회' },
   ]
 
   return (

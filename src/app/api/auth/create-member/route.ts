@@ -1,7 +1,9 @@
 import { NextResponse } from 'next/server'
 import { createServerClient } from '@/infrastructure/supabase/client'
+import { createAdminClient } from '@/infrastructure/supabase/admin-client'
 
 export async function POST() {
+  // 1. auth 검증은 cookie 기반 클라이언트로
   const supabase = await createServerClient()
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
@@ -14,7 +16,9 @@ export async function POST() {
   const avatarUrl: string =
     (user.user_metadata?.avatar_url as string | undefined) ?? ''
 
-  const { data, error } = await supabase
+  // 2. INSERT는 service_role로 RLS 우회 (auth는 위에서 이미 검증)
+  const admin = createAdminClient()
+  const { data, error } = await admin
     .from('members')
     .insert({ name, avatar_url: avatarUrl, auth_user_id: user.id })
     .select('id')

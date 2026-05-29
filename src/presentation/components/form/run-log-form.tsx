@@ -6,6 +6,7 @@ import { DurationPicker } from './duration-picker'
 import { ThoughtInputs } from './thought-inputs'
 import { PhotoUpload } from './photo-upload'
 import { createBrowserClient } from '@/infrastructure/supabase/browser-client'
+import { LoadingOverlay } from '../shared/loading-overlay'
 
 type ThoughtKey = 'before' | 'during' | 'after'
 
@@ -104,6 +105,11 @@ export function RunLogForm({ memberId, mode = 'create', recordId, initialData }:
   }
 
   return (
+    <>
+    <LoadingOverlay
+      show={submitting}
+      message={mode === 'edit' ? '수정 중...' : '저장 중...'}
+    />
     <form onSubmit={handleSubmit} style={{ paddingBottom: '40px' }}>
 
       {/* 날짜 */}
@@ -191,5 +197,6 @@ export function RunLogForm({ memberId, mode = 'create', recordId, initialData }:
         </button>
       </div>
     </form>
+    </>
   )
 }

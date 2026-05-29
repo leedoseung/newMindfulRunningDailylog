@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import dynamic from 'next/dynamic'
 import type { RunLog } from '@/domain/entities/run-log'
+import { LoadingOverlay } from '../shared/loading-overlay'
 
 const ShareCard = dynamic(
   () => import('./share-card').then(m => m.ShareCard),
@@ -52,6 +53,7 @@ export function DetailSheet({ run, open, onClose, memberId }: Props) {
   const [saving, setSaving] = useState(false)
   const [deleting, setDeleting] = useState(false)
   const [copied, setCopied] = useState(false)
+  const [overlay, setOverlay] = useState<{ success: boolean; message: string } | null>(null)
   const shareCardRef = useRef<HTMLDivElement>(null)
   const count = useCountUp(run?.durationMin ?? 0, open)
 
@@ -68,12 +70,17 @@ export function DetailSheet({ run, open, onClose, memberId }: Props) {
     if (!run) return
     if (!confirm('이 기록을 삭제할까요?')) return
     setDeleting(true)
+    setOverlay({ success: false, message: '삭제 중...' })
     try {
       const res = await fetch(`/api/record/${run.id}`, { method: 'DELETE' })
       if (!res.ok) throw new Error('삭제 실패')
+      setOverlay({ success: true, message: '삭제됐어요' })
+      await new Promise<void>(r => setTimeout(r, 1100))
+      setOverlay(null)
       onClose()
       router.refresh()
     } catch {
+      setOverlay(null)
       alert('삭제에 실패했습니다')
     } finally {
       setDeleting(false)
@@ -109,6 +116,7 @@ ${run.thoughtAfter}`
   async function handleSaveImage() {
     if (!shareCardRef.current || !run) return
     setSaving(true)
+    setOverlay({ success: false, message: '이미지 저장 중...' })
     try {
       const { toPng } = await import('html-to-image')
       const dataUrl = await toPng(shareCardRef.current, {
@@ -122,6 +130,7 @@ ${run.thoughtAfter}`
       const blob = await (await fetch(dataUrl)).blob()
       const file = new File([blob], fileName, { type: 'image/png' })
       if (navigator.canShare?.({ files: [file] })) {
+        setOverlay(null)
         await navigator.share({ files: [file] })
         return
       }
@@ -130,7 +139,11 @@ ${run.thoughtAfter}`
       link.download = fileName
       link.href = dataUrl
       link.click()
+      setOverlay({ success: true, message: '저장됐어요' })
+      await new Promise<void>(r => setTimeout(r, 1100))
+      setOverlay(null)
     } catch (err) {
+      setOverlay(null)
       if (err instanceof Error && err.name !== 'AbortError') {
         alert('이미지 저장에 실패했습니다')
       }
@@ -169,6 +182,12 @@ ${run.thoughtAfter}`
   const btnColor    = onPhoto ? '#fff' : '#111'
 
   return (
+    <>
+    <LoadingOverlay
+      show={overlay !== null}
+      success={overlay?.success ?? false}
+      message={overlay?.message}
+    />
     <div style={{
       position: 'fixed', inset: 0, zIndex: 200,
       pointerEvents: open ? 'all' : 'none',
@@ -410,5 +429,6 @@ ${run.thoughtAfter}`
         <ShareCard ref={shareCardRef} run={run} />
       </div>
     </div>
+    </>
   )
 }

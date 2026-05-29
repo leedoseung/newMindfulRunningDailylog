@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 import { MyRecordCard } from './my-record-card'
 import { CalendarView } from './calendar-view'
 import type { RunLog } from '@/domain/entities/run-log'
+import { LoadingOverlay } from '../shared/loading-overlay'
 
 type Props = {
   runs: RunLog[]
@@ -27,16 +28,22 @@ export function MyRecordsTab({ runs, memberId: _memberId }: Props) {
   const router = useRouter()
   const [deleting, setDeleting] = useState<string | null>(null)
   const [subView, setSubView]   = useState<SubView>('feed')
+  const [overlay, setOverlay]   = useState<{ success: boolean; message: string } | null>(null)
   const stats = computeStats(runs)
 
   async function handleDelete(id: string) {
     if (!confirm('이 기록을 삭제할까요?')) return
     setDeleting(id)
+    setOverlay({ success: false, message: '삭제 중...' })
     try {
       const res = await fetch(`/api/record/${id}`, { method: 'DELETE' })
       if (!res.ok) throw new Error('삭제 실패')
+      setOverlay({ success: true, message: '삭제됐어요' })
+      await new Promise<void>(r => setTimeout(r, 1100))
+      setOverlay(null)
       router.refresh()
     } catch (err: unknown) {
+      setOverlay(null)
       alert(err instanceof Error ? err.message : '삭제 실패')
     } finally {
       setDeleting(null)
@@ -44,6 +51,12 @@ export function MyRecordsTab({ runs, memberId: _memberId }: Props) {
   }
 
   return (
+    <>
+    <LoadingOverlay
+      show={overlay !== null}
+      success={overlay?.success ?? false}
+      message={overlay?.message}
+    />
     <div style={{ paddingBottom: 40 }}>
       {/* Stats summary card */}
       <div style={{
@@ -119,5 +132,6 @@ export function MyRecordsTab({ runs, memberId: _memberId }: Props) {
         <CalendarView runs={runs} />
       )}
     </div>
+    </>
   )
 }

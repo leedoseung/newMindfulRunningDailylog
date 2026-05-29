@@ -283,34 +283,36 @@ ${run.thoughtAfter}`
             )}
           </div>
 
-          <div style={{ display: 'flex', gap: 6, marginTop: 8, flexWrap: 'wrap' }}>
-            <button
-              type="button"
-              onClick={handleSaveImage}
-              disabled={saving}
-              style={{
-                background: saving ? 'rgba(0,0,0,0.2)' : btnBg,
-                border: onPhoto ? '1px solid rgba(255,255,255,0.2)' : 'none',
-                borderRadius: 20, padding: '6px 14px',
-                fontFamily: FONT, fontSize: '0.6rem', fontWeight: 500,
-                color: saving ? '#aaa' : btnColor,
-                cursor: saving ? 'not-allowed' : 'pointer',
-              }}
-            >{saving ? '저장 중…' : '이미지 저장'}</button>
-            <button
-              type="button"
-              onClick={handleCopyText}
-              style={{
-                background: copied ? (onPhoto ? 'rgba(255,255,255,0.9)' : '#111') : btnBg,
-                border: onPhoto ? '1px solid rgba(255,255,255,0.2)' : 'none',
-                borderRadius: 20, padding: '6px 14px',
-                fontFamily: FONT, fontSize: '0.6rem', fontWeight: 500,
-                color: copied ? (onPhoto ? '#111' : '#fff') : btnColor,
-                cursor: 'pointer',
-                transition: 'all 0.2s',
-              }}
-            >{copied ? '복사됨 ✓' : '텍스트 복사'}</button>
-          </div>
+          {isOwner && (
+            <div style={{ display: 'flex', gap: 6, marginTop: 8, flexWrap: 'wrap' }}>
+              <button
+                type="button"
+                onClick={handleSaveImage}
+                disabled={saving}
+                style={{
+                  background: saving ? 'rgba(0,0,0,0.2)' : btnBg,
+                  border: onPhoto ? '1px solid rgba(255,255,255,0.2)' : 'none',
+                  borderRadius: 20, padding: '6px 14px',
+                  fontFamily: FONT, fontSize: '0.6rem', fontWeight: 500,
+                  color: saving ? '#aaa' : btnColor,
+                  cursor: saving ? 'not-allowed' : 'pointer',
+                }}
+              >{saving ? '저장 중…' : '이미지 저장'}</button>
+              <button
+                type="button"
+                onClick={handleCopyText}
+                style={{
+                  background: copied ? (onPhoto ? 'rgba(255,255,255,0.9)' : '#111') : btnBg,
+                  border: onPhoto ? '1px solid rgba(255,255,255,0.2)' : 'none',
+                  borderRadius: 20, padding: '6px 14px',
+                  fontFamily: FONT, fontSize: '0.6rem', fontWeight: 500,
+                  color: copied ? (onPhoto ? '#111' : '#fff') : btnColor,
+                  cursor: 'pointer',
+                  transition: 'all 0.2s',
+                }}
+              >{copied ? '복사됨 ✓' : '텍스트 복사'}</button>
+            </div>
+          )}
         </div>
 
         {/* Content */}

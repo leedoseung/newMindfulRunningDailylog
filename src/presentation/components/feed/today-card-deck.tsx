@@ -2,7 +2,6 @@
 
 import { useState, useEffect, useRef } from 'react'
 import gsap from 'gsap'
-import { DetailSheet } from './detail-sheet'
 import { AvatarImage } from '../shared/avatar-image'
 import type { RunLog } from '@/domain/entities/run-log'
 
@@ -44,7 +43,6 @@ type Props = {
 
 export function TodayCardDeck({ todayRuns, memberId }: Props) {
   const [currentIdx, setCurrentIdx] = useState(0)
-  const [selected, setSelected] = useState<RunLog | null>(null)
 
   const deckRef = useRef<HTMLDivElement>(null)
   const cardRefs = useRef<(HTMLDivElement | null)[]>([])
@@ -113,7 +111,8 @@ export function TodayCardDeck({ todayRuns, memberId }: Props) {
       x: dir * 520, y: 50, rotation: dir * 35, opacity: 0,
       duration: 0.38, ease: 'power2.in',
       onComplete: () => {
-        const gone = orderRef.current.pop()!
+        const gone = orderRef.current.pop()
+        if (gone === undefined) return
         orderRef.current.unshift(gone)
         const el = cardRefs.current[gone]
         if (el) gsap.set(el, { ...getStackPos(orderRef.current.length - 1), rotationY: 0 })
@@ -199,6 +198,7 @@ export function TodayCardDeck({ todayRuns, memberId }: Props) {
     document.addEventListener('touchmove', onTouchMove, { passive: false })
     document.addEventListener('touchend', onTouchEnd)
     return () => {
+      cardRefs.current.forEach(el => { if (el) gsap.killTweensOf(el) })
       deckEl.removeEventListener('mousedown', onMouseDown)
       document.removeEventListener('mousemove', onMouseMove)
       document.removeEventListener('mouseup', onMouseUp)
@@ -334,9 +334,6 @@ export function TodayCardDeck({ todayRuns, memberId }: Props) {
         ))}
       </div>
 
-      {selected && (
-        <DetailSheet run={selected} open memberId={memberId} onClose={() => setSelected(null)} />
-      )}
     </>
   )
 }

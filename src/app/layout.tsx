@@ -6,6 +6,15 @@ import { PageTransition } from '@/presentation/components/layout/page-transition
 export const metadata: Metadata = {
   title: '마인드풀러닝',
   description: '함께 달리는 마음챙김 러닝 기록',
+  manifest: '/manifest.webmanifest',
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: 'default',
+    title: '마인드풀러닝',
+  },
+  icons: {
+    apple: '/apple-touch-icon.png',
+  },
 }
 
 export default function RootLayout({

@@ -267,6 +267,7 @@ export function HomeFeed({ recentRuns, myRuns, memberId, crew, weeklyBars, weekl
 
       {todayRuns.length > 0 && (
         <>
+          <div style={{ height: 16 }} />
           <TodayCardDeck todayRuns={todayRuns} memberId={memberId} onRunClick={run => setAutoOpenRun(run)} />
           <div style={{ height: 1, background: 'rgba(0,0,0,0.06)', margin: '12px 22px 0' }} />
         </>

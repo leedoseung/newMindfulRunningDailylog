@@ -5,6 +5,8 @@ import { useRouter } from 'next/navigation'
 import dynamic from 'next/dynamic'
 import type { RunLog } from '@/domain/entities/run-log'
 import { LoadingOverlay } from '../shared/loading-overlay'
+import { LikeCommentBar } from './like-comment-bar'
+import { CommentsSheet } from './comments-sheet'
 
 const ShareCard = dynamic(
   () => import('./share-card').then(m => m.ShareCard),
@@ -16,6 +18,8 @@ type Props = {
   open: boolean
   onClose: () => void
   memberId?: string
+  memberName?: string
+  memberAvatarUrl?: string
   onDeleted?: (id: string) => void
 }
 
@@ -48,7 +52,7 @@ function useCountUp(target: number, active: boolean) {
 
 const FONT = "'Pretendard Variable', Pretendard, -apple-system, sans-serif"
 
-export function DetailSheet({ run, open, onClose, memberId, onDeleted }: Props) {
+export function DetailSheet({ run, open, onClose, memberId, memberName = '', memberAvatarUrl = '', onDeleted }: Props) {
   const router = useRouter()
   const [photoFull, setPhotoFull] = useState(false)
   const [saving, setSaving] = useState(false)
@@ -57,6 +61,7 @@ export function DetailSheet({ run, open, onClose, memberId, onDeleted }: Props) 
   const [overlay, setOverlay] = useState<{ success: boolean; message: string } | null>(null)
   const [dragY, setDragY] = useState(0)
   const [isDragging, setIsDragging] = useState(false)
+  const [commentsOpen, setCommentsOpen] = useState(false)
   const dragStartYRef = useRef(0)
   const shareCardRef = useRef<HTMLDivElement>(null)
   const photoDataUrlRef = useRef<string | null>(null)
@@ -143,6 +148,7 @@ export function DetailSheet({ run, open, onClose, memberId, onDeleted }: Props) 
       setPhotoFull(false)
       setDragY(0)
       setIsDragging(false)
+      setCommentsOpen(false)
     }
     return () => {
       document.body.style.overflow = ''
@@ -554,6 +560,26 @@ ${run.thoughtAfter}`
         <ShareCard ref={shareCardRef} run={run} />
       </div>
     </div>
+
+      {/* Like / Comment action bar */}
+      <LikeCommentBar
+        runId={run.id}
+        likeCount={run.likeCount}
+        commentCount={run.commentCount}
+        memberId={memberId}
+        hasPhoto={hasPhoto}
+        onCommentOpen={() => setCommentsOpen(true)}
+      />
+
+      {/* Comments sheet — layered above the detail sheet */}
+      <CommentsSheet
+        runId={run.id}
+        open={commentsOpen}
+        onClose={() => setCommentsOpen(false)}
+        memberId={memberId}
+        memberName={memberName}
+        memberAvatarUrl={memberAvatarUrl}
+      />
     </>
   )
 }

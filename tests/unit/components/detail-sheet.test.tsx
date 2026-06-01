@@ -8,6 +8,14 @@ vi.mock('next/navigation', () => ({
   useRouter: () => ({ push: vi.fn(), refresh: vi.fn() }),
 }))
 
+vi.mock('@/presentation/components/feed/like-comment-bar', () => ({
+  LikeCommentBar: () => <div data-testid="like-comment-bar" />,
+}))
+
+vi.mock('@/presentation/components/feed/comments-sheet', () => ({
+  CommentsSheet: () => <div data-testid="comments-sheet" />,
+}))
+
 const run: RunLog = {
   id: 'r1',
   memberId: 'm1',
@@ -45,5 +53,10 @@ describe('DetailSheet', () => {
     const { container } = render(<DetailSheet run={run} open={false} onClose={() => {}} />)
     const sheet = container.querySelector('[data-testid="detail-sheet"]') as HTMLElement
     expect(sheet.style.transform).toContain('translateY(110%)')
+  })
+
+  it('renders LikeCommentBar when open', () => {
+    render(<DetailSheet run={run} open onClose={() => {}} memberId="m1" />)
+    expect(screen.getByTestId('like-comment-bar')).toBeDefined()
   })
 })

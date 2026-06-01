@@ -17,6 +17,8 @@ type RunLogRow = {
   photo_url: string
   created_at: string
   members: { name: string; avatar_url: string | null; insta_id: string | null } | null
+  likes: [{ count: number }] | null
+  comments: [{ count: number }] | null
 }
 
 function toRunLog(row: RunLogRow): RunLog {
@@ -35,8 +37,8 @@ function toRunLog(row: RunLogRow): RunLog {
     location: row.location,
     photoUrl: row.photo_url,
     createdAt: row.created_at,
-    likeCount: 0,
-    commentCount: 0,
+    likeCount: (row.likes?.[0]?.count as number) ?? 0,
+    commentCount: (row.comments?.[0]?.count as number) ?? 0,
   }
 }
 
@@ -44,7 +46,9 @@ const SELECT_FIELDS = `
   id, member_id, date, duration_min,
   title, thought_before, thought_during, thought_after,
   location, photo_url, created_at,
-  members!inner(name, avatar_url, insta_id)
+  members!inner(name, avatar_url, insta_id),
+  likes(count),
+  comments(count)
 `
 
 export class SupabaseRunLogRepository implements IRunLogRepository {

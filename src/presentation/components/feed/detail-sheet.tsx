@@ -100,8 +100,8 @@ export function DetailSheet({ run, open, onClose, memberId, memberName = '', mem
   useEffect(() => {
     if (!run?.photoUrl) { photoDataUrlRef.current = null; return }
     let cancelled = false
-    fetch(run.photoUrl)
-      .then(r => r.blob())
+    fetch(run.photoUrl, { cache: 'no-store' })
+      .then(r => r.ok ? r.blob() : Promise.reject(r.status))
       .then(blob => new Promise<string>((res, rej) => {
         const reader = new FileReader()
         reader.onload = () => res(reader.result as string)
@@ -192,21 +192,30 @@ ${run.thoughtAfter}`
       // 1) html-to-image 모듈 먼저 로드 (첫 호출 시 async → React 리렌더 허용 구간)
       const { toPng } = await import('html-to-image')
 
-      // 2) 사진 data URL 확보 (우선순위: 프리패치 캐시 → Canvas 추출 → fetch 폴백)
+      // 2) 사진 data URL 확보
+      // iOS Safari는 CSS background-image로 로드된 이미지가 CORS 없이 캐시돼
+      // 이후 fetch()가 opaque 응답을 반환할 수 있음 → cache:'no-store'로 우회
       let photoDataUrl = photoDataUrlRef.current
 
       if (run.photoUrl && !photoDataUrl) {
-        // 2a) ShareCard img 요소가 이미 로드돼 있으면 Canvas로 추출 (네트워크 불필요)
-        const shareImg = shareCardRef.current.querySelector<HTMLImageElement>('img[data-photo]')
-        if (shareImg) {
-          if (!(shareImg.complete && shareImg.naturalWidth > 0)) {
-            await new Promise<void>(resolve => {
-              shareImg.addEventListener('load', () => resolve(), { once: true })
-              shareImg.addEventListener('error', () => resolve(), { once: true })
-              setTimeout(resolve, 8000)
+        // 2a) fetch-first (iOS CORS 캐시 오염 우회)
+        try {
+          const resp = await fetch(run.photoUrl, { cache: 'no-store' })
+          if (resp.ok) {
+            const blob = await resp.blob()
+            photoDataUrl = await new Promise<string>((res, rej) => {
+              const reader = new FileReader()
+              reader.onload = () => res(reader.result as string)
+              reader.onerror = rej
+              reader.readAsDataURL(blob)
             })
           }
-          if (shareImg.naturalWidth > 0) {
+        } catch { /* canvas 폴백으로 */ }
+
+        // 2b) canvas 폴백 (fetch 실패 시)
+        if (!photoDataUrl) {
+          const shareImg = shareCardRef.current.querySelector<HTMLImageElement>('img[data-photo]')
+          if (shareImg && shareImg.naturalWidth > 0) {
             try {
               const canvas = document.createElement('canvas')
               canvas.width = shareImg.naturalWidth
@@ -216,34 +225,31 @@ ${run.thoughtAfter}`
                 ctx.drawImage(shareImg, 0, 0)
                 photoDataUrl = canvas.toDataURL('image/jpeg', 0.92)
               }
-            } catch { /* canvas tainted → fetch 폴백 */ }
+            } catch { /* canvas tainted */ }
           }
         }
-        // 2b) Canvas 실패 시 fetch 폴백
-        if (!photoDataUrl) {
-          try {
-            const blob = await fetch(run.photoUrl).then(r => r.blob())
-            photoDataUrl = await new Promise<string>((res, rej) => {
-              const reader = new FileReader()
-              reader.onload = () => res(reader.result as string)
-              reader.onerror = rej
-              reader.readAsDataURL(blob)
-            })
-          } catch { /* 실패 시 원래 URL로 진행 */ }
+      }
+
+      // 3) photo img.src → data URL 교체 후 로드 완료 대기
+      if (photoDataUrl) {
+        const photoImg = shareCardRef.current.querySelector<HTMLImageElement>('img[data-photo]')
+        if (photoImg) {
+          await new Promise<void>(resolve => {
+            const done = () => resolve()
+            photoImg.addEventListener('load', done, { once: true })
+            photoImg.addEventListener('error', done, { once: true })
+            setTimeout(resolve, 5000)
+            photoImg.src = photoDataUrl!
+            if (photoImg.complete) resolve()
+          })
         }
       }
 
-      // 3) photo src 교체 (data URL 확보된 경우)
-      if (photoDataUrl) {
-        const photoImg = shareCardRef.current.querySelector<HTMLImageElement>('img[data-photo]')
-        if (photoImg) photoImg.src = photoDataUrl
-      }
-
-      // 4) 모든 이미지(photo 포함) 로드 완료 대기
-      const allImgs = Array.from(
-        shareCardRef.current.querySelectorAll<HTMLImageElement>('img')
+      // 4) 나머지 이미지 로드 완료 대기
+      const otherImgs = Array.from(
+        shareCardRef.current.querySelectorAll<HTMLImageElement>('img:not([data-photo])')
       )
-      await Promise.all(allImgs.map(img => new Promise<void>(resolve => {
+      await Promise.all(otherImgs.map(img => new Promise<void>(resolve => {
         if (img.complete && img.naturalWidth > 0) { resolve(); return }
         img.addEventListener('load', () => resolve(), { once: true })
         img.addEventListener('error', () => resolve(), { once: true })

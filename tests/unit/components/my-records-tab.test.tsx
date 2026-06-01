@@ -12,6 +12,8 @@ const makeRun = (overrides: Partial<RunLog> = {}): RunLog => ({
   date: '2026-05-26', durationMin: 45, title: '남산',
   thoughtBefore: '', thoughtDuring: '', thoughtAfter: '',
   location: '남산', photoUrl: '', createdAt: '2026-05-26T00:00:00Z',
+  likeCount: 0,
+  commentCount: 0,
   ...overrides,
 })
 

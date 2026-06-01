@@ -13,4 +13,6 @@ export type RunLog = {
   location: string
   photoUrl: string // '' if no photo
   createdAt: string
+  likeCount: number
+  commentCount: number
 }

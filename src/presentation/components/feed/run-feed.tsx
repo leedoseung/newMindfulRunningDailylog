@@ -90,12 +90,23 @@ function GridCell({ run, height, onClick }: { run: RunLog; height: number; onCli
             "{run.title}"
           </div>
         )}
-        <div style={{
-          fontFamily: FONT, fontSize: '0.55rem', fontWeight: 500,
-          color: 'rgba(255,255,255,0.65)',
-          whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',
-        }}>
-          {run.memberName}
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 4 }}>
+          <div style={{
+            fontFamily: FONT, fontSize: '0.55rem', fontWeight: 500,
+            color: 'rgba(255,255,255,0.65)',
+            whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',
+            flex: 1, minWidth: 0,
+          }}>
+            {run.memberName}
+          </div>
+          {run.likeCount > 0 && (
+            <span style={{
+              fontFamily: FONT, fontSize: '0.5rem', color: 'rgba(255,255,255,0.7)',
+              display: 'flex', alignItems: 'center', gap: 2, flexShrink: 0,
+            }}>
+              ♥ {run.likeCount}
+            </span>
+          )}
         </div>
       </div>
     </div>

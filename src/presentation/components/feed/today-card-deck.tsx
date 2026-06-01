@@ -268,7 +268,12 @@ export function TodayCardDeck({ todayRuns, memberId, onRunClick }: Props) {
                         {run.title}
                       </div>
                     )}
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                     <div style={{ fontFamily: FONT, fontSize: '0.52rem', color: 'rgba(255,255,255,0.45)' }}>{run.date}</div>
+                    {run.likeCount > 0 && (
+                      <div style={{ fontFamily: FONT, fontSize: '0.52rem', color: 'rgba(255,255,255,0.5)' }}>♥ {run.likeCount}</div>
+                    )}
+                  </div>
                   </div>
                 </div>
               </div>

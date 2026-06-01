@@ -18,10 +18,10 @@ describe('LikeCommentBar', () => {
     expect(screen.getByText('3')).toBeInTheDocument()
   })
 
-  it('hides count when zero', () => {
+  it('shows zero counts', () => {
     fetchMock.mockResolvedValue({ ok: true, json: () => Promise.resolve({ liked: false, likeCount: 0 }) })
     render(<LikeCommentBar runId="r1" likeCount={0} commentCount={0} memberId="m1" onCommentOpen={() => {}} />)
-    expect(screen.queryByText('0')).not.toBeInTheDocument()
+    expect(screen.getAllByText('0').length).toBeGreaterThanOrEqual(2)
   })
 
   it('calls onCommentOpen when chat button is clicked', async () => {

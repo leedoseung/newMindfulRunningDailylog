@@ -190,7 +190,7 @@ export function CommentsSheet({ runId, open, onClose, memberId, memberName = '',
               style={{
                 flex: 1, background: 'rgba(255,255,255,0.08)', border: 'none',
                 borderRadius: 20, padding: '8px 14px',
-                fontFamily: FONT, fontSize: '0.85rem', color: '#fff', outline: 'none',
+                fontFamily: FONT, fontSize: 16, color: '#fff', outline: 'none',
               }}
             />
             <button

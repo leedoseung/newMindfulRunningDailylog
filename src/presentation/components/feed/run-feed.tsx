@@ -226,14 +226,22 @@ export function PhotoGrid({ runs: initialRuns, memberId, memberName = '', member
             setSelected(null)
             setRuns(prev => prev.filter(r => r.id !== id))
           }}
+          onRunUpdate={(id, patch) => {
+            const update = (r: RunLog) => r.id === id ? { ...r, ...patch } : r
+            setRuns(prev => prev.map(update))
+            setSelected(prev => prev?.id === id ? { ...prev, ...patch } : prev)
+          }}
         />
       )}
     </>
   )
 }
 
-export function RunFeed({ runs, triggerRun, onTriggerConsumed, memberId, memberName = '', memberAvatarUrl = '' }: Props) {
+export function RunFeed({ runs: initialRuns, triggerRun, onTriggerConsumed, memberId, memberName = '', memberAvatarUrl = '' }: Props) {
+  const [runs, setRuns] = useState<RunLog[]>(initialRuns)
   const [selected, setSelected] = useState<RunLog | null>(null)
+
+  useEffect(() => { setRuns(initialRuns) }, [initialRuns])
 
   useEffect(() => {
     if (!triggerRun) return
@@ -278,6 +286,11 @@ export function RunFeed({ runs, triggerRun, onTriggerConsumed, memberId, memberN
           memberName={memberName}
           memberAvatarUrl={memberAvatarUrl}
           onDeleted={() => setSelected(null)}
+          onRunUpdate={(id, patch) => {
+            const update = (r: RunLog) => r.id === id ? { ...r, ...patch } : r
+            setRuns(prev => prev.map(update))
+            setSelected(prev => prev?.id === id ? { ...prev, ...patch } : prev)
+          }}
         />
       )}
     </>

@@ -21,6 +21,7 @@ type Props = {
   memberName?: string
   memberAvatarUrl?: string
   onDeleted?: (id: string) => void
+  onRunUpdate?: (id: string, patch: { likeCount?: number; commentCount?: number }) => void
 }
 
 function useCountUp(target: number, active: boolean) {
@@ -52,7 +53,7 @@ function useCountUp(target: number, active: boolean) {
 
 const FONT = "'Pretendard Variable', Pretendard, -apple-system, sans-serif"
 
-export function DetailSheet({ run, open, onClose, memberId, memberName = '', memberAvatarUrl = '', onDeleted }: Props) {
+export function DetailSheet({ run, open, onClose, memberId, memberName = '', memberAvatarUrl = '', onDeleted, onRunUpdate }: Props) {
   const router = useRouter()
   const [photoFull, setPhotoFull] = useState(false)
   const [saving, setSaving] = useState(false)
@@ -62,6 +63,11 @@ export function DetailSheet({ run, open, onClose, memberId, memberName = '', mem
   const [dragY, setDragY] = useState(0)
   const [isDragging, setIsDragging] = useState(false)
   const [commentsOpen, setCommentsOpen] = useState(false)
+  const [localCommentCount, setLocalCommentCount] = useState(run?.commentCount ?? 0)
+
+  useEffect(() => {
+    setLocalCommentCount(run?.commentCount ?? 0)
+  }, [run?.id])
   const dragStartYRef = useRef(0)
   const shareCardRef = useRef<HTMLDivElement>(null)
   const photoDataUrlRef = useRef<string | null>(null)
@@ -585,10 +591,11 @@ ${run.thoughtAfter}`
         <LikeCommentBar
           runId={run.id}
           likeCount={run.likeCount}
-          commentCount={run.commentCount}
+          commentCount={localCommentCount}
           memberId={memberId}
           hasPhoto={hasPhoto}
           onCommentOpen={() => setCommentsOpen(true)}
+          onLikeCountChange={(n) => onRunUpdate?.(run.id, { likeCount: n })}
         />
       </div>
 
@@ -606,6 +613,10 @@ ${run.thoughtAfter}`
         memberId={memberId}
         memberName={memberName}
         memberAvatarUrl={memberAvatarUrl}
+        onCountChange={(n) => {
+          setLocalCommentCount(n)
+          onRunUpdate?.(run.id, { commentCount: n })
+        }}
       />
     </>
   )

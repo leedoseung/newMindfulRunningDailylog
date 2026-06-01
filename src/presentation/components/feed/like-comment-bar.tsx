@@ -11,9 +11,10 @@ type Props = {
   memberId?: string
   hasPhoto?: boolean
   onCommentOpen: () => void
+  onLikeCountChange?: (count: number) => void
 }
 
-export function LikeCommentBar({ runId, likeCount, commentCount, memberId, hasPhoto = true, onCommentOpen }: Props) {
+export function LikeCommentBar({ runId, likeCount, commentCount, memberId, hasPhoto = true, onCommentOpen, onLikeCountChange }: Props) {
   const [liked, setLiked] = useState(false)
   const [count, setCount] = useState(likeCount)
   const [pending, setPending] = useState(false)
@@ -39,6 +40,7 @@ export function LikeCommentBar({ runId, likeCount, commentCount, memberId, hasPh
       const d = await res.json()
       setLiked(d.liked)
       setCount(d.likeCount)
+      onLikeCountChange?.(d.likeCount)
     } catch {
       setLiked(prev.liked)
       setCount(prev.count)

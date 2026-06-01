@@ -13,6 +13,7 @@ type Props = {
   memberId?: string
   memberName?: string
   memberAvatarUrl?: string
+  onCountChange?: (count: number) => void
 }
 
 function timeAgo(dateStr: string): string {
@@ -23,7 +24,7 @@ function timeAgo(dateStr: string): string {
   return `${Math.floor(diff / 86400)}일 전`
 }
 
-export function CommentsSheet({ runId, open, onClose, memberId, memberName = '', memberAvatarUrl = '' }: Props) {
+export function CommentsSheet({ runId, open, onClose, memberId, memberName = '', memberAvatarUrl = '', onCountChange }: Props) {
   const [comments, setComments] = useState<Comment[]>([])
   const [body, setBody] = useState('')
   const [loading, setLoading] = useState(false)
@@ -34,7 +35,11 @@ export function CommentsSheet({ runId, open, onClose, memberId, memberName = '',
     setLoading(true)
     fetch(`/api/record/${runId}/comments`)
       .then(r => r.json())
-      .then(d => setComments(d.comments ?? []))
+      .then(d => {
+        const cs: Comment[] = d.comments ?? []
+        setComments(cs)
+        onCountChange?.(cs.length)
+      })
       .catch(() => {})
       .finally(() => setLoading(false))
   }, [open, runId])
@@ -51,7 +56,11 @@ export function CommentsSheet({ runId, open, onClose, memberId, memberName = '',
       body: trimmed,
       createdAt: new Date().toISOString(),
     }
-    setComments(prev => [...prev, optimistic])
+    setComments(prev => {
+      const next = [...prev, optimistic]
+      onCountChange?.(next.length)
+      return next
+    })
     setBody('')
     try {
       const res = await fetch(`/api/record/${runId}/comments`, {
@@ -70,7 +79,11 @@ export function CommentsSheet({ runId, open, onClose, memberId, memberName = '',
   }
 
   async function handleDelete(commentId: string) {
-    setComments(prev => prev.filter(c => c.id !== commentId))
+    setComments(prev => {
+      const next = prev.filter(c => c.id !== commentId)
+      onCountChange?.(next.length)
+      return next
+    })
     try {
       const res = await fetch(`/api/comments/${commentId}`, { method: 'DELETE' })
       if (!res.ok) throw new Error('failed')

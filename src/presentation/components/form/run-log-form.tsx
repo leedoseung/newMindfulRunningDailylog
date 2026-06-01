@@ -47,7 +47,11 @@ const TEXT_INPUT_STYLE: React.CSSProperties = {
 
 export function RunLogForm({ memberId, memberName = '', memberAvatarUrl = '', mode = 'create', recordId, initialData }: Props) {
   const router = useRouter()
-  const [date, setDate]                   = useState(() => initialData?.date ?? new Date().toISOString().split('T')[0]!)
+  const [date, setDate]                   = useState(() => {
+    if (initialData?.date) return initialData.date
+    const d = new Date()
+    return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`
+  })
   const [durationMin, setDurationMin]     = useState(initialData?.durationMin ?? 30)
   const [title, setTitle]                 = useState(initialData?.title ?? '')
   const [location, setLocation]           = useState(initialData?.location ?? '')

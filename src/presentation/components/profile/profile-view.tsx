@@ -10,6 +10,7 @@ const AvatarCropModal = dynamic(
   { ssr: false }
 )
 import { ProfileEditSheet } from './profile-edit-sheet'
+import { DonationCard } from './donation-card'
 import { createBrowserClient } from '@/infrastructure/supabase/browser-client'
 import type { RunLog } from '@/domain/entities/run-log'
 
@@ -27,11 +28,13 @@ type Props = {
   recentRuns: RunLog[]
   allRuns: RunLog[]
   memberId: string
+  memberName?: string
+  memberAvatarUrl?: string
 }
 
 const fmt = (d: Date) => d.toISOString().split('T')[0]!
 
-export function ProfileView({ member, allRuns, memberId }: Props) {
+export function ProfileView({ member, allRuns, memberId, memberName, memberAvatarUrl }: Props) {
   const router = useRouter()
   const [selected, setSelected]     = useState<RunLog | null>(null)
   const [avatarUrl, setAvatarUrl]   = useState(member.avatarUrl)
@@ -538,6 +541,13 @@ export function ProfileView({ member, allRuns, memberId }: Props) {
         instaId={memberInfo.instaId}
         onClose={() => setEditOpen(false)}
         onSaved={(updated) => { setMemberInfo(updated); setEditOpen(false) }}
+      />
+
+      <DonationCard
+        allRuns={allRuns}
+        memberId={memberId}
+        memberName={memberName ?? member.name}
+        memberAvatarUrl={memberAvatarUrl ?? member.avatarUrl}
       />
     </main>
   )

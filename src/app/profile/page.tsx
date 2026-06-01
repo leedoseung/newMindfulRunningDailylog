@@ -57,6 +57,8 @@ export default async function ProfilePage() {
       recentRuns={myRuns.slice(0, 5)}
       allRuns={myRuns}
       memberId={memberId}
+      memberName={m.name}
+      memberAvatarUrl={m.avatar_url ?? ''}
     />
   )
 }

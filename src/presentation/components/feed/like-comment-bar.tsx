@@ -29,11 +29,13 @@ export function LikeCommentBar({ runId, likeCount, commentCount, memberId, hasPh
   async function handleLike() {
     if (!memberId || pending) return
     const prev = { liked, count }
+    const newLiked = !liked
     setPending(true)
-    setLiked(l => !l)
-    setCount(c => liked ? c - 1 : c + 1)
+    setLiked(newLiked)
+    setCount(c => newLiked ? c + 1 : c - 1)
     try {
       const res = await fetch(`/api/record/${runId}/like`, { method: 'POST' })
+      if (!res.ok) throw new Error('like failed')
       const d = await res.json()
       setLiked(d.liked)
       setCount(d.likeCount)

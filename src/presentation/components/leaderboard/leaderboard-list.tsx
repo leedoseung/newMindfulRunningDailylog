@@ -11,6 +11,9 @@ type Tab = 'total-time' | 'monthly' | 'count'
 
 type Props = {
   stats: MemberStats[]
+  currentMemberId?: string
+  currentMemberName?: string
+  currentMemberAvatarUrl?: string
 }
 
 type ModalState = { memberId: string; memberName: string } | null
@@ -78,7 +81,7 @@ function Podium({ top3, tab }: { top3: MemberStats[]; tab: Tab }) {
   )
 }
 
-export function LeaderboardList({ stats }: Props) {
+export function LeaderboardList({ stats, currentMemberId = '', currentMemberName = '', currentMemberAvatarUrl = '' }: Props) {
   const [activeTab, setActiveTab] = useState<Tab>('total-time')
   const [todayRunTarget, setTodayRunTarget] = useState<ModalState>(null)
   const [diaryTarget, setDiaryTarget]       = useState<ModalState>(null)
@@ -147,6 +150,9 @@ export function LeaderboardList({ stats }: Props) {
         memberName={diaryTarget?.memberName ?? ''}
         open={Boolean(diaryTarget)}
         onClose={() => setDiaryTarget(null)}
+        currentMemberId={currentMemberId}
+        currentMemberName={currentMemberName}
+        currentMemberAvatarUrl={currentMemberAvatarUrl}
       />
     </>
   )

@@ -7,6 +7,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog'
+import { DetailSheet } from '../feed/detail-sheet'
 import type { RunLog } from '@/domain/entities/run-log'
 
 const FONT = "'Pretendard Variable', Pretendard, -apple-system, sans-serif"
@@ -16,11 +17,15 @@ type Props = {
   memberName: string
   open: boolean
   onClose: () => void
+  currentMemberId?: string
+  currentMemberName?: string
+  currentMemberAvatarUrl?: string
 }
 
-export function DiaryModal({ memberId, memberName, open, onClose }: Props) {
+export function DiaryModal({ memberId, memberName, open, onClose, currentMemberId = '', currentMemberName = '', currentMemberAvatarUrl = '' }: Props) {
   const [records, setRecords] = useState<RunLog[]>([])
   const [loading, setLoading] = useState(false)
+  const [selectedRun, setSelectedRun] = useState<RunLog | null>(null)
 
   useEffect(() => {
     if (!open || !memberId) return
@@ -33,6 +38,15 @@ export function DiaryModal({ memberId, memberName, open, onClose }: Props) {
   }, [open, memberId])
 
   return (
+    <>
+    <DetailSheet
+      run={selectedRun}
+      open={Boolean(selectedRun)}
+      onClose={() => setSelectedRun(null)}
+      memberId={currentMemberId}
+      memberName={currentMemberName}
+      memberAvatarUrl={currentMemberAvatarUrl}
+    />
     <Dialog open={open} onOpenChange={v => !v && onClose()}>
       <DialogContent
         className="max-w-sm"
@@ -57,9 +71,17 @@ export function DiaryModal({ memberId, memberName, open, onClose }: Props) {
         ) : (
           <div style={{ display: 'flex', flexDirection: 'column', gap: 8, marginTop: 8 }}>
             {records.map(run => (
-              <div
+              <button
                 key={run.id}
-                style={{ background: '#F7F7F5', borderRadius: 14, padding: '14px 16px' }}
+                type="button"
+                onClick={() => setSelectedRun(run)}
+                style={{
+                  background: '#F7F7F5', borderRadius: 14, padding: '14px 16px',
+                  border: 'none', cursor: 'pointer', textAlign: 'left', width: '100%',
+                  transition: 'background 0.15s',
+                }}
+                onMouseEnter={e => (e.currentTarget.style.background = '#EFEFED')}
+                onMouseLeave={e => (e.currentTarget.style.background = '#F7F7F5')}
               >
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
                   <span style={{ fontFamily: FONT, fontSize: '1.4rem', fontWeight: 300, color: '#111', lineHeight: 1 }}>
@@ -76,14 +98,15 @@ export function DiaryModal({ memberId, memberName, open, onClose }: Props) {
                   <p style={{
                     fontFamily: FONT, fontSize: '0.72rem', color: '#888', marginTop: 5,
                     lineHeight: 1.55, display: '-webkit-box', WebkitLineClamp: 2,
-                    WebkitBoxOrient: 'vertical', overflow: 'hidden',
+                    WebkitBoxOrient: 'vertical', overflow: 'hidden', margin: '5px 0 0',
                   }}>{run.thoughtAfter}</p>
                 )}
-              </div>
+              </button>
             ))}
           </div>
         )}
       </DialogContent>
     </Dialog>
+    </>
   )
 }

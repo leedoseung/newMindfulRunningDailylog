@@ -30,7 +30,12 @@ export default async function LeaderboardPage() {
           이달의<br /><em style={{ fontStyle: 'italic', fontWeight: 400, color: '#111111' }}>달리기 챔피언</em>
         </div>
       </div>
-      <LeaderboardList stats={stats} />
+      <LeaderboardList
+        stats={stats}
+        currentMemberId={memberId}
+        currentMemberName={memberName}
+        currentMemberAvatarUrl={memberAvatarUrl}
+      />
     </main>
   )
 }

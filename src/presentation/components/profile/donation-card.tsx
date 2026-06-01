@@ -60,10 +60,10 @@ export function DonationCard({ allRuns, memberId, memberName = '', memberAvatarU
   const loadDonors = useCallback(async (month: string) => {
     try {
       const res = await fetch(`/api/donations?month=${month}`)
-      if (!res.ok) return
+      if (!res.ok) { setDonors([]); return }
       const data = await res.json() as { donations: DonationRecord[] }
       setDonors(data.donations)
-    } catch { /* ignore */ }
+    } catch { setDonors([]) }
   }, [])
 
   useEffect(() => { loadDonors(selectedMonth) }, [selectedMonth, loadDonors])
@@ -78,7 +78,7 @@ export function DonationCard({ allRuns, memberId, memberName = '', memberAvatarU
   }
 
   function handleToss() {
-    window.location.href = `supertoss://send?amount=${donationAmount}&bank=${BANK_CODE}&accountNo=${ACCOUNT_NO}`
+    window.location.href = `supertoss://send?amount=${donationAmount}&bank=${encodeURIComponent(BANK_NAMES[BANK_CODE] ?? BANK_CODE)}&accountNo=${ACCOUNT_NO}`
   }
 
   async function handleCopy() {

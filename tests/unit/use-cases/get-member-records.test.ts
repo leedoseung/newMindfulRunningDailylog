@@ -16,6 +16,8 @@ const makeRun = (id: string): RunLog => ({
   location: '',
   photoUrl: '',
   createdAt: '2026-05-24T09:00:00Z',
+  likeCount: 0,
+  commentCount: 0,
 })
 
 describe('GetMemberRecordsUseCase', () => {

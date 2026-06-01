@@ -35,6 +35,8 @@ function toRunLog(row: RunLogRow): RunLog {
     location: row.location,
     photoUrl: row.photo_url,
     createdAt: row.created_at,
+    likeCount: 0,
+    commentCount: 0,
   }
 }
 

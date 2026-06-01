@@ -84,6 +84,8 @@ export function RunLogForm({ memberId, memberName = '', memberAvatarUrl = '', mo
     location,
     photoUrl: photoObjectUrlRef.current ?? initialData?.photoUrl ?? '',
     createdAt: new Date().toISOString(),
+    likeCount: 0,
+    commentCount: 0,
   }
 
   function handleThoughtChange(key: ThoughtKey, value: string) {

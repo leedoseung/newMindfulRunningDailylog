@@ -62,6 +62,18 @@ function GridCell({ run, height, onClick }: { run: RunLog; height: number; onCli
         position: 'absolute', inset: 0,
         background: 'linear-gradient(to bottom, rgba(0,0,0,0.05) 0%, rgba(0,0,0,0.72) 100%)',
       }} />
+      {run.likeCount > 0 && (
+        <div style={{
+          position: 'absolute', top: 8, right: 8, zIndex: 2,
+          background: 'rgba(0,0,0,0.38)', backdropFilter: 'blur(6px)',
+          borderRadius: 20, padding: '4px 9px',
+          display: 'flex', alignItems: 'center', gap: 4,
+          fontFamily: FONT, fontSize: '0.72rem', fontWeight: 700,
+          color: '#ff3b5c',
+        }}>
+          ♥ {run.likeCount}
+        </div>
+      )}
       {!run.photoUrl && (
         <div style={{
           position: 'absolute', inset: 0,
@@ -90,23 +102,12 @@ function GridCell({ run, height, onClick }: { run: RunLog; height: number; onCli
             "{run.title}"
           </div>
         )}
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 4 }}>
-          <div style={{
-            fontFamily: FONT, fontSize: '0.55rem', fontWeight: 500,
-            color: 'rgba(255,255,255,0.65)',
-            whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',
-            flex: 1, minWidth: 0,
-          }}>
-            {run.memberName}
-          </div>
-          {run.likeCount > 0 && (
-            <span style={{
-              fontFamily: FONT, fontSize: '0.5rem', color: 'rgba(255,255,255,0.7)',
-              display: 'flex', alignItems: 'center', gap: 2, flexShrink: 0,
-            }}>
-              ♥ {run.likeCount}
-            </span>
-          )}
+        <div style={{
+          fontFamily: FONT, fontSize: '0.55rem', fontWeight: 500,
+          color: 'rgba(255,255,255,0.65)',
+          whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',
+        }}>
+          {run.memberName}
         </div>
       </div>
     </div>

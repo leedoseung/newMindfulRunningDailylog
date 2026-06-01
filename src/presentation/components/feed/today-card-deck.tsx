@@ -253,6 +253,18 @@ export function TodayCardDeck({ todayRuns, memberId, onRunClick }: Props) {
                 )}
                 <div style={{ position: 'absolute', inset: 0, borderRadius: 20, background: 'linear-gradient(to bottom, rgba(0,0,0,0.02) 0%, rgba(0,0,0,0.68) 100%)' }} />
                 <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: '45%', background: 'linear-gradient(to bottom, rgba(255,255,255,0.07), transparent)', borderRadius: '20px 20px 0 0', pointerEvents: 'none' }} />
+                {run.likeCount > 0 && (
+                  <div style={{
+                    position: 'absolute', top: 12, right: 12, zIndex: 2,
+                    background: 'rgba(0,0,0,0.38)', backdropFilter: 'blur(6px)',
+                    borderRadius: 20, padding: '4px 10px',
+                    display: 'flex', alignItems: 'center', gap: 4,
+                    fontFamily: FONT, fontSize: '0.72rem', fontWeight: 700,
+                    color: '#ff3b5c',
+                  }}>
+                    ♥ {run.likeCount}
+                  </div>
+                )}
                 <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'flex-end', padding: '18px 18px', gap: 14 }}>
                   <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', background: 'rgba(255,255,255,0.12)', border: '1px solid rgba(255,255,255,0.15)', borderRadius: 14, padding: '10px 14px', backdropFilter: 'blur(8px)', WebkitBackdropFilter: 'blur(8px)', flexShrink: 0 }}>
                     <span style={{ fontFamily: FONT, fontSize: '1.6rem', fontWeight: 800, color: '#fff', letterSpacing: '-1px', lineHeight: 1 }}>{run.durationMin}</span>
@@ -268,12 +280,7 @@ export function TodayCardDeck({ todayRuns, memberId, onRunClick }: Props) {
                         {run.title}
                       </div>
                     )}
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                     <div style={{ fontFamily: FONT, fontSize: '0.52rem', color: 'rgba(255,255,255,0.45)' }}>{run.date}</div>
-                    {run.likeCount > 0 && (
-                      <div style={{ fontFamily: FONT, fontSize: '0.52rem', color: 'rgba(255,255,255,0.5)' }}>♥ {run.likeCount}</div>
-                    )}
-                  </div>
                   </div>
                 </div>
               </div>

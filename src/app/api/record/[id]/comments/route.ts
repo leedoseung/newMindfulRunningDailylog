@@ -49,7 +49,13 @@ export async function POST(
   const memberId = (user.user_metadata?.member_id as string | undefined) ?? null
   if (!memberId) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
-  const { body } = await req.json() as { body: string }
+  let parsed: { body?: unknown }
+  try {
+    parsed = await req.json()
+  } catch {
+    return NextResponse.json({ error: '잘못된 요청 형식입니다' }, { status: 400 })
+  }
+  const body = typeof parsed.body === 'string' ? parsed.body : ''
   if (!body || body.trim().length < 1 || body.trim().length > 500) {
     return NextResponse.json({ error: '댓글은 1자 이상 500자 이하여야 합니다' }, { status: 400 })
   }

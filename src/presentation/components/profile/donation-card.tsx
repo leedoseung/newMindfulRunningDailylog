@@ -60,10 +60,10 @@ export function DonationCard({ allRuns, memberId, memberName = '', memberAvatarU
   const loadDonors = useCallback(async (month: string) => {
     try {
       const res = await fetch(`/api/donations?month=${month}`)
-      if (!res.ok) { setDonors([]); return }
+      if (!res.ok) return
       const data = await res.json() as { donations: DonationRecord[] }
       setDonors(data.donations)
-    } catch { setDonors([]) }
+    } catch { /* leave existing state intact */ }
   }, [])
 
   useEffect(() => { loadDonors(selectedMonth) }, [selectedMonth, loadDonors])

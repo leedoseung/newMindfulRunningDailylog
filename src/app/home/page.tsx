@@ -83,6 +83,8 @@ export default async function HomePage() {
         crew={crew}
         weeklyBars={weeklyBars}
         weeklyTotalHours={weeklyTotalHours}
+        memberName={memberName}
+        memberAvatarUrl={memberAvatarUrl}
       />
     </main>
   )

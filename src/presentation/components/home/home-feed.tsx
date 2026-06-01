@@ -34,6 +34,8 @@ type Props = {
   weeklyBars: WeeklyBar[]
   weeklyTotalHours?: number
   initialOffset?: number
+  memberName?: string
+  memberAvatarUrl?: string
 }
 
 function MiniBarChart({ bars }: { bars: WeeklyBar[] }) {
@@ -193,7 +195,7 @@ function StatsHeader({
   )
 }
 
-export function HomeFeed({ recentRuns, myRuns, memberId, crew, weeklyBars, weeklyTotalHours = 0, initialOffset = 20 }: Props) {
+export function HomeFeed({ recentRuns, myRuns, memberId, crew, weeklyBars, weeklyTotalHours = 0, initialOffset = 20, memberName = '', memberAvatarUrl = '' }: Props) {
   const [tab, setTab] = useState<Tab>('all')
   const [triggerRun, setTriggerRun] = useState<RunLog | null>(null)
   const [autoOpenRun, setAutoOpenRun] = useState<RunLog | null>(null)
@@ -302,12 +304,14 @@ export function HomeFeed({ recentRuns, myRuns, memberId, crew, weeklyBars, weekl
         <PhotoGrid
           runs={recentRuns}
           memberId={memberId}
+          memberName={memberName}
+          memberAvatarUrl={memberAvatarUrl}
           triggerRun={triggerRun}
           onTriggerConsumed={() => setTriggerRun(null)}
           initialOffset={initialOffset}
         />
       ) : (
-        <RunFeed runs={myRuns} memberId={memberId} />
+        <RunFeed runs={myRuns} memberId={memberId} memberName={memberName} memberAvatarUrl={memberAvatarUrl} />
       )}
 
       <DetailSheet

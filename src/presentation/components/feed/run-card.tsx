@@ -122,6 +122,15 @@ export function RunCard({ run, cardType, onClick }: Props) {
 
       {/* Chips */}
       <div style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '10px 16px 14px', flexWrap: 'wrap' }}>
+        {run.likeCount > 0 && (
+          <div style={{
+            background: t.chip, borderRadius: 20, padding: '4px 10px',
+            fontSize: '0.6rem', fontWeight: 500, color: t.chipText,
+            display: 'flex', alignItems: 'center', gap: 4,
+          }}>
+            ❤ {run.likeCount}
+          </div>
+        )}
         {chips.length > 0 ? chips.map(c => (
           <div key={c} style={{
             background: t.chip, borderRadius: 20, padding: '4px 10px',

@@ -13,6 +13,8 @@ type Props = {
   triggerRun?: RunLog | null
   onTriggerConsumed?: () => void
   memberId?: string
+  memberName?: string
+  memberAvatarUrl?: string
 }
 
 const GRADIENTS = [
@@ -102,9 +104,11 @@ function GridCell({ run, height, onClick }: { run: RunLog; height: number; onCli
 
 const PAGE_LIMIT = 20
 
-export function PhotoGrid({ runs: initialRuns, memberId, triggerRun, onTriggerConsumed, initialOffset = PAGE_LIMIT }: {
+export function PhotoGrid({ runs: initialRuns, memberId, memberName = '', memberAvatarUrl = '', triggerRun, onTriggerConsumed, initialOffset = PAGE_LIMIT }: {
   runs: RunLog[]
   memberId?: string
+  memberName?: string
+  memberAvatarUrl?: string
   triggerRun?: RunLog | null
   onTriggerConsumed?: () => void
   initialOffset?: number
@@ -204,6 +208,8 @@ export function PhotoGrid({ runs: initialRuns, memberId, triggerRun, onTriggerCo
           open={Boolean(selected)}
           onClose={() => setSelected(null)}
           memberId={memberId}
+          memberName={memberName}
+          memberAvatarUrl={memberAvatarUrl}
           onDeleted={(id) => {
             setSelected(null)
             setRuns(prev => prev.filter(r => r.id !== id))
@@ -214,7 +220,7 @@ export function PhotoGrid({ runs: initialRuns, memberId, triggerRun, onTriggerCo
   )
 }
 
-export function RunFeed({ runs, triggerRun, onTriggerConsumed, memberId }: Props) {
+export function RunFeed({ runs, triggerRun, onTriggerConsumed, memberId, memberName = '', memberAvatarUrl = '' }: Props) {
   const [selected, setSelected] = useState<RunLog | null>(null)
 
   useEffect(() => {
@@ -257,6 +263,8 @@ export function RunFeed({ runs, triggerRun, onTriggerConsumed, memberId }: Props
           open={Boolean(selected)}
           onClose={() => setSelected(null)}
           memberId={memberId}
+          memberName={memberName}
+          memberAvatarUrl={memberAvatarUrl}
           onDeleted={() => setSelected(null)}
         />
       )}

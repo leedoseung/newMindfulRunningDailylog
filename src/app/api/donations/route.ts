@@ -45,7 +45,8 @@ export async function GET(req: NextRequest) {
 
 export async function POST(req: Request) {
   const supabase = await createServerClient()
-  const { data: { user } } = await supabase.auth.getUser()
+  const { data: { user }, error: authError } = await supabase.auth.getUser()
+  if (authError) return NextResponse.json({ error: authError.message }, { status: 500 })
   if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   const memberId = (user.user_metadata?.member_id as string | undefined) ?? null
   if (!memberId) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
@@ -78,7 +79,8 @@ export async function POST(req: Request) {
         .eq('member_id', memberId)
         .eq('year_month', yearMonth)
         .single()
-      if (fetchError || !existing) return NextResponse.json({ error: '조회 실패' }, { status: 500 })
+      if (fetchError) return NextResponse.json({ error: fetchError.message }, { status: 500 })
+      if (!existing) return NextResponse.json({ error: '조회 실패' }, { status: 500 })
       return NextResponse.json(toDonationRecord(existing as unknown as DonationRow))
     }
     return NextResponse.json({ error: insertError.message }, { status: 500 })

@@ -18,12 +18,15 @@ export async function GET(
   if (!memberId) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
   const admin = createAdminClient()
-  const [existingRow, { count }] = await Promise.all([
+  const [existingRow, countResult] = await Promise.all([
     admin.from('likes').select('id').eq('run_log_id', runLogId).eq('member_id', memberId).maybeSingle(),
     admin.from('likes').select('*', { count: 'exact', head: true }).eq('run_log_id', runLogId),
   ])
 
-  return NextResponse.json({ liked: Boolean(existingRow.data), likeCount: count ?? 0 })
+  if (existingRow.error) return NextResponse.json({ error: existingRow.error.message }, { status: 500 })
+  if (countResult.error) return NextResponse.json({ error: countResult.error.message }, { status: 500 })
+
+  return NextResponse.json({ liked: Boolean(existingRow.data), likeCount: countResult.count ?? 0 })
 }
 
 export async function POST(
@@ -43,15 +46,22 @@ export async function POST(
     .maybeSingle()
 
   if (existing) {
-    await admin.from('likes').delete().eq('id', existing.id)
+    const { error } = await admin.from('likes').delete().eq('id', existing.id)
+    if (error) return NextResponse.json({ error: error.message }, { status: 500 })
   } else {
-    await admin.from('likes').insert({ run_log_id: runLogId, member_id: memberId })
+    const { error } = await admin.from('likes').upsert(
+      { run_log_id: runLogId, member_id: memberId },
+      { onConflict: 'run_log_id,member_id', ignoreDuplicates: true }
+    )
+    if (error) return NextResponse.json({ error: error.message }, { status: 500 })
   }
 
-  const { count } = await admin
+  const { count, error: countError } = await admin
     .from('likes')
     .select('*', { count: 'exact', head: true })
     .eq('run_log_id', runLogId)
+
+  if (countError) return NextResponse.json({ error: countError.message }, { status: 500 })
 
   return NextResponse.json({ liked: !existing, likeCount: count ?? 0 })
 }

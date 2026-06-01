@@ -194,22 +194,22 @@ ${run.thoughtAfter}`
         } catch { /* 실패 시 원래 URL로 진행 */ }
       }
 
-      // 3) 아이콘 이미지 로드 대기 (photo 제외 — photo는 data URL로 대체할 것)
-      const iconImgs = Array.from(
-        shareCardRef.current.querySelectorAll<HTMLImageElement>('img:not([data-photo])')
+      // 3) photo src 교체 (data URL 확보된 경우)
+      if (photoDataUrl) {
+        const photoImg = shareCardRef.current.querySelector<HTMLImageElement>('img[data-photo]')
+        if (photoImg) photoImg.src = photoDataUrl
+      }
+
+      // 4) 모든 이미지(photo 포함) 로드 완료 대기
+      const allImgs = Array.from(
+        shareCardRef.current.querySelectorAll<HTMLImageElement>('img')
       )
-      await Promise.all(iconImgs.map(img => new Promise<void>(resolve => {
+      await Promise.all(allImgs.map(img => new Promise<void>(resolve => {
         if (img.complete && img.naturalWidth > 0) { resolve(); return }
         img.addEventListener('load', () => resolve(), { once: true })
         img.addEventListener('error', () => resolve(), { once: true })
         setTimeout(resolve, 10_000)
       })))
-
-      // 4) src 설정 → toPng 사이에 async 없음 (React 리렌더 개입 불가)
-      if (photoDataUrl) {
-        const photoImg = shareCardRef.current.querySelector<HTMLImageElement>('img[data-photo]')
-        if (photoImg) photoImg.src = photoDataUrl
-      }
 
       const dataUrl = await toPng(shareCardRef.current, {
         pixelRatio: 2,

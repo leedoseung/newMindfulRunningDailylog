@@ -69,7 +69,7 @@ function GridCell({ run, height, onClick }: { run: RunLog; height: number; onCli
           borderRadius: 20, padding: '4px 9px',
           display: 'flex', alignItems: 'center', gap: 4,
           fontFamily: FONT, fontSize: '0.72rem', fontWeight: 700,
-          color: '#ff3b5c',
+          color: '#fff',
         }}>
           ♥ {run.likeCount}
         </div>

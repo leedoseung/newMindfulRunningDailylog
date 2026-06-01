@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
+import { createPortal } from 'react-dom'
 import {
   Dialog,
   DialogContent,
@@ -39,14 +40,17 @@ export function DiaryModal({ memberId, memberName, open, onClose, currentMemberI
 
   return (
     <>
-    <DetailSheet
-      run={selectedRun}
-      open={Boolean(selectedRun)}
-      onClose={() => setSelectedRun(null)}
-      memberId={currentMemberId}
-      memberName={currentMemberName}
-      memberAvatarUrl={currentMemberAvatarUrl}
-    />
+    {typeof document !== 'undefined' && createPortal(
+      <DetailSheet
+        run={selectedRun}
+        open={Boolean(selectedRun)}
+        onClose={() => setSelectedRun(null)}
+        memberId={currentMemberId}
+        memberName={currentMemberName}
+        memberAvatarUrl={currentMemberAvatarUrl}
+      />,
+      document.body
+    )}
     <Dialog open={open} onOpenChange={v => !v && onClose()}>
       <DialogContent
         className="max-w-sm"

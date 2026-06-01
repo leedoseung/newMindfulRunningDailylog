@@ -62,16 +62,17 @@ function GridCell({ run, height, onClick }: { run: RunLog; height: number; onCli
         position: 'absolute', inset: 0,
         background: 'linear-gradient(to bottom, rgba(0,0,0,0.05) 0%, rgba(0,0,0,0.72) 100%)',
       }} />
-      {run.likeCount > 0 && (
+      {(run.likeCount > 0 || run.commentCount > 0) && (
         <div style={{
           position: 'absolute', top: 8, right: 8, zIndex: 2,
           background: 'rgba(0,0,0,0.38)', backdropFilter: 'blur(6px)',
           borderRadius: 20, padding: '4px 9px',
-          display: 'flex', alignItems: 'center', gap: 4,
-          fontFamily: FONT, fontSize: '0.72rem', fontWeight: 700,
+          display: 'flex', alignItems: 'center', gap: 7,
+          fontFamily: FONT, fontSize: '0.65rem', fontWeight: 700,
           color: '#fff',
         }}>
-          ♥ {run.likeCount}
+          <span style={{ display: 'flex', alignItems: 'center', gap: 3 }}>♥ {run.likeCount}</span>
+          <span style={{ display: 'flex', alignItems: 'center', gap: 3 }}>💬 {run.commentCount}</span>
         </div>
       )}
       {!run.photoUrl && (

@@ -253,16 +253,17 @@ export function TodayCardDeck({ todayRuns, memberId, onRunClick }: Props) {
                 )}
                 <div style={{ position: 'absolute', inset: 0, borderRadius: 20, background: 'linear-gradient(to bottom, rgba(0,0,0,0.02) 0%, rgba(0,0,0,0.68) 100%)' }} />
                 <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: '45%', background: 'linear-gradient(to bottom, rgba(255,255,255,0.07), transparent)', borderRadius: '20px 20px 0 0', pointerEvents: 'none' }} />
-                {run.likeCount > 0 && (
+                {(run.likeCount > 0 || run.commentCount > 0) && (
                   <div style={{
                     position: 'absolute', top: 12, right: 12, zIndex: 2,
                     background: 'rgba(0,0,0,0.38)', backdropFilter: 'blur(6px)',
                     borderRadius: 20, padding: '4px 10px',
-                    display: 'flex', alignItems: 'center', gap: 4,
-                    fontFamily: FONT, fontSize: '0.72rem', fontWeight: 700,
+                    display: 'flex', alignItems: 'center', gap: 7,
+                    fontFamily: FONT, fontSize: '0.65rem', fontWeight: 700,
                     color: '#fff',
                   }}>
-                    ♥ {run.likeCount}
+                    <span style={{ display: 'flex', alignItems: 'center', gap: 3 }}>♥ {run.likeCount}</span>
+                    <span style={{ display: 'flex', alignItems: 'center', gap: 3 }}>💬 {run.commentCount}</span>
                   </div>
                 )}
                 <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'flex-end', padding: '18px 18px', gap: 14 }}>

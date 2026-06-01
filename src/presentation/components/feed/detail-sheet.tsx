@@ -553,6 +553,16 @@ ${run.thoughtAfter}`
             pointerEvents: 'none', zIndex: 20,
           }}>탭하면 텍스트 다시 보기</div>
         )}
+
+        {/* Like / Comment action bar */}
+        <LikeCommentBar
+          runId={run.id}
+          likeCount={run.likeCount}
+          commentCount={run.commentCount}
+          memberId={memberId}
+          hasPhoto={hasPhoto}
+          onCommentOpen={() => setCommentsOpen(true)}
+        />
       </div>
 
       {/* 오프스크린 ShareCard — html-to-image 캡처 전용 */}
@@ -560,16 +570,6 @@ ${run.thoughtAfter}`
         <ShareCard ref={shareCardRef} run={run} />
       </div>
     </div>
-
-      {/* Like / Comment action bar */}
-      <LikeCommentBar
-        runId={run.id}
-        likeCount={run.likeCount}
-        commentCount={run.commentCount}
-        memberId={memberId}
-        hasPhoto={hasPhoto}
-        onCommentOpen={() => setCommentsOpen(true)}
-      />
 
       {/* Comments sheet — layered above the detail sheet */}
       <CommentsSheet

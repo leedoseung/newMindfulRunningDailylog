@@ -41,10 +41,11 @@ describe('DonationCard', () => {
   })
 
   it('calculates amount from allRuns for selected month', () => {
+    // 75분 = 1시간 → 1,000원 (시간 × 1000)
     const runs = [makeRun({ durationMin: 45 }), makeRun({ durationMin: 30 })]
     render(<DonationCard allRuns={runs} />)
-    expect(screen.getByText('75')).toBeInTheDocument()      // 분
-    expect(screen.getByText('75,000')).toBeInTheDocument()  // 원
+    expect(screen.getByText('1')).toBeInTheDocument()       // 시간
+    expect(screen.getByText('1,000')).toBeInTheDocument()   // 원
   })
 
   it('shows empty state when no runs for selected month', () => {

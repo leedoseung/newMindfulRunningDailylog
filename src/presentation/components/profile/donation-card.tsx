@@ -54,7 +54,7 @@ export function DonationCard({ allRuns, memberId, memberName = '', memberAvatarU
   const monthDurationMin = allRuns
     .filter(r => r.date.startsWith(selectedMonth))
     .reduce((sum, r) => sum + r.durationMin, 0)
-  const donationAmount = monthDurationMin * 1000
+  const donationAmount = Math.floor(monthDurationMin / 60) * 1000
   const alreadyDonated = Boolean(memberId && donors.some(d => d.memberId === memberId))
 
   const loadDonors = useCallback(async (month: string) => {
@@ -144,7 +144,7 @@ export function DonationCard({ allRuns, memberId, memberName = '', memberAvatarU
         <div style={{ flex: 1, background: '#F7F7F5', borderRadius: 12, padding: '12px 14px' }}>
           <div style={{ fontFamily: FONT, fontSize: '0.58rem', color: '#aaa', marginBottom: 4 }}>달린 시간</div>
           <div style={{ fontFamily: FONT, fontSize: '1.1rem', fontWeight: 600, color: '#111' }}>
-            {monthDurationMin}<span style={{ fontSize: '0.7rem', fontWeight: 400, color: '#999', marginLeft: 2 }}>분</span>
+            {Math.floor(monthDurationMin / 60)}<span style={{ fontSize: '0.7rem', fontWeight: 400, color: '#999', marginLeft: 2 }}>시간</span>
           </div>
         </div>
         <div style={{ flex: 1, background: '#F7F7F5', borderRadius: 12, padding: '12px 14px' }}>

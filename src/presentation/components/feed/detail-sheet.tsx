@@ -186,18 +186,45 @@ ${run.thoughtAfter}`
       // 1) html-to-image 모듈 먼저 로드 (첫 호출 시 async → React 리렌더 허용 구간)
       const { toPng } = await import('html-to-image')
 
-      // 2) 사진 data URL 확보 (프리패치 완료됐으면 사용, 아니면 지금 fetch)
+      // 2) 사진 data URL 확보 (우선순위: 프리패치 캐시 → Canvas 추출 → fetch 폴백)
       let photoDataUrl = photoDataUrlRef.current
+
       if (run.photoUrl && !photoDataUrl) {
-        try {
-          const blob = await fetch(run.photoUrl).then(r => r.blob())
-          photoDataUrl = await new Promise<string>((res, rej) => {
-            const reader = new FileReader()
-            reader.onload = () => res(reader.result as string)
-            reader.onerror = rej
-            reader.readAsDataURL(blob)
-          })
-        } catch { /* 실패 시 원래 URL로 진행 */ }
+        // 2a) ShareCard img 요소가 이미 로드돼 있으면 Canvas로 추출 (네트워크 불필요)
+        const shareImg = shareCardRef.current.querySelector<HTMLImageElement>('img[data-photo]')
+        if (shareImg) {
+          if (!(shareImg.complete && shareImg.naturalWidth > 0)) {
+            await new Promise<void>(resolve => {
+              shareImg.addEventListener('load', () => resolve(), { once: true })
+              shareImg.addEventListener('error', () => resolve(), { once: true })
+              setTimeout(resolve, 8000)
+            })
+          }
+          if (shareImg.naturalWidth > 0) {
+            try {
+              const canvas = document.createElement('canvas')
+              canvas.width = shareImg.naturalWidth
+              canvas.height = shareImg.naturalHeight
+              const ctx = canvas.getContext('2d')
+              if (ctx) {
+                ctx.drawImage(shareImg, 0, 0)
+                photoDataUrl = canvas.toDataURL('image/jpeg', 0.92)
+              }
+            } catch { /* canvas tainted → fetch 폴백 */ }
+          }
+        }
+        // 2b) Canvas 실패 시 fetch 폴백
+        if (!photoDataUrl) {
+          try {
+            const blob = await fetch(run.photoUrl).then(r => r.blob())
+            photoDataUrl = await new Promise<string>((res, rej) => {
+              const reader = new FileReader()
+              reader.onload = () => res(reader.result as string)
+              reader.onerror = rej
+              reader.readAsDataURL(blob)
+            })
+          } catch { /* 실패 시 원래 URL로 진행 */ }
+        }
       }
 
       // 3) photo src 교체 (data URL 확보된 경우)

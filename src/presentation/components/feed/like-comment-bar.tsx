@@ -12,9 +12,10 @@ type Props = {
   hasPhoto?: boolean
   onCommentOpen: () => void
   onLikeCountChange?: (count: number) => void
+  onLikersTap?: () => void
 }
 
-export function LikeCommentBar({ runId, likeCount, commentCount, memberId, hasPhoto = true, onCommentOpen, onLikeCountChange }: Props) {
+export function LikeCommentBar({ runId, likeCount, commentCount, memberId, hasPhoto = true, onCommentOpen, onLikeCountChange, onLikersTap }: Props) {
   const [liked, setLiked] = useState(false)
   const [count, setCount] = useState(likeCount)
   const [pending, setPending] = useState(false)
@@ -63,35 +64,47 @@ export function LikeCommentBar({ runId, likeCount, commentCount, memberId, hasPh
       display: 'flex', alignItems: 'center', gap: 20,
       position: 'relative', zIndex: 20,
     }}>
-      <button
-        type="button"
-        aria-label={liked ? '좋아요 취소' : '좋아요'}
-        onClick={handleLike}
-        disabled={!memberId || pending}
-        style={{
-          background: 'none', border: 'none', padding: 0,
-          cursor: memberId ? 'pointer' : 'default',
-          display: 'flex', alignItems: 'center', gap: 6,
-        }}
-      >
-        <span style={{
-          display: 'flex',
-          transition: 'transform 0.15s cubic-bezier(0.34,1.5,0.64,1)',
-          transform: liked ? 'scale(1.25)' : 'scale(1)',
-          color: liked ? '#ed4956' : (hasPhoto ? 'rgba(255,255,255,0.85)' : '#444'),
-        }}>
-          {liked ? (
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
-            </svg>
-          ) : (
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
-            </svg>
-          )}
-        </span>
-        <span style={{ fontFamily: FONT, fontSize: '0.82rem', color: textColor }}>{count}</span>
-      </button>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+        <button
+          type="button"
+          aria-label={liked ? '좋아요 취소' : '좋아요'}
+          onClick={handleLike}
+          disabled={!memberId || pending}
+          style={{
+            background: 'none', border: 'none', padding: 0,
+            cursor: memberId ? 'pointer' : 'default',
+            display: 'flex', alignItems: 'center',
+          }}
+        >
+          <span style={{
+            display: 'flex',
+            transition: 'transform 0.15s cubic-bezier(0.34,1.5,0.64,1)',
+            transform: liked ? 'scale(1.25)' : 'scale(1)',
+            color: liked ? '#ed4956' : (hasPhoto ? 'rgba(255,255,255,0.85)' : '#444'),
+          }}>
+            {liked ? (
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+              </svg>
+            ) : (
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+              </svg>
+            )}
+          </span>
+        </button>
+        <button
+          type="button"
+          aria-label="좋아요 누른 사람 보기"
+          onClick={onLikersTap}
+          disabled={!onLikersTap}
+          style={{
+            background: 'none', border: 'none', padding: 0,
+            cursor: onLikersTap ? 'pointer' : 'default',
+            fontFamily: FONT, fontSize: '0.82rem', color: textColor,
+          }}
+        >{count}</button>
+      </div>
 
       <button
         type="button"

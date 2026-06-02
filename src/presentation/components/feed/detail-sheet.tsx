@@ -7,6 +7,7 @@ import type { RunLog } from '@/domain/entities/run-log'
 import { LoadingOverlay } from '../shared/loading-overlay'
 import { LikeCommentBar } from './like-comment-bar'
 import { CommentsSheet } from './comments-sheet'
+import { LikersSheet } from './likers-sheet'
 
 const ShareCard = dynamic(
   () => import('./share-card').then(m => m.ShareCard),
@@ -63,6 +64,7 @@ export function DetailSheet({ run, open, onClose, memberId, memberName = '', mem
   const [dragY, setDragY] = useState(0)
   const [isDragging, setIsDragging] = useState(false)
   const [commentsOpen, setCommentsOpen] = useState(false)
+  const [likersOpen, setLikersOpen] = useState(false)
   const [localCommentCount, setLocalCommentCount] = useState(run?.commentCount ?? 0)
 
   useEffect(() => {
@@ -602,6 +604,7 @@ ${run.thoughtAfter}`
           hasPhoto={hasPhoto}
           onCommentOpen={() => setCommentsOpen(true)}
           onLikeCountChange={(n) => onRunUpdate?.(run.id, { likeCount: n })}
+          onLikersTap={() => setLikersOpen(true)}
         />
       </div>
 
@@ -623,6 +626,11 @@ ${run.thoughtAfter}`
           setLocalCommentCount(n)
           onRunUpdate?.(run.id, { commentCount: n })
         }}
+      />
+      <LikersSheet
+        runId={run.id}
+        open={likersOpen}
+        onClose={() => setLikersOpen(false)}
       />
     </>
   )

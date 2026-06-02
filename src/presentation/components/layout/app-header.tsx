@@ -1,13 +1,15 @@
 import Image from 'next/image'
 import Link from 'next/link'
 import { AvatarImage } from '../shared/avatar-image'
+import { NotificationBell } from './notification-bell'
 
 type Props = {
   memberName?: string
   memberAvatarUrl?: string
+  memberId?: string
 }
 
-export function AppHeader({ memberName, memberAvatarUrl }: Props) {
+export function AppHeader({ memberName, memberAvatarUrl, memberId = '' }: Props) {
   return (
     <header style={{
       display: 'flex', alignItems: 'center', justifyContent: 'space-between',
@@ -58,27 +60,36 @@ export function AppHeader({ memberName, memberAvatarUrl }: Props) {
         </div>
       </div>
 
-      {/* Profile avatar */}
-      {memberName ? (
-        <Link
-          href="/profile"
-          style={{
-            display: 'block', borderRadius: '50%', flexShrink: 0,
-            textDecoration: 'none',
-            boxShadow: '0 0 0 2px rgba(0,0,0,0.08)',
-          }}
-        >
-          <AvatarImage
-            name={memberName}
-            avatarUrl={memberAvatarUrl ?? ''}
-            size={34}
-            bg="#111111"
-            color="#fff"
+      {/* 알림 벨 + 프로필 아바타 */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+        {memberId && (
+          <NotificationBell
+            memberId={memberId}
+            memberName={memberName ?? ''}
+            memberAvatarUrl={memberAvatarUrl ?? ''}
           />
-        </Link>
-      ) : (
-        <div style={{ width: 34 }} />
-      )}
+        )}
+        {memberName ? (
+          <Link
+            href="/profile"
+            style={{
+              display: 'block', borderRadius: '50%', flexShrink: 0,
+              textDecoration: 'none',
+              boxShadow: '0 0 0 2px rgba(0,0,0,0.08)',
+            }}
+          >
+            <AvatarImage
+              name={memberName}
+              avatarUrl={memberAvatarUrl ?? ''}
+              size={34}
+              bg="#111111"
+              color="#fff"
+            />
+          </Link>
+        ) : (
+          <div style={{ width: 34 }} />
+        )}
+      </div>
     </header>
   )
 }

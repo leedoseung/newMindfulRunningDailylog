@@ -54,6 +54,33 @@ export async function POST(
       { onConflict: 'run_log_id,member_id', ignoreDuplicates: true }
     )
     if (error) return NextResponse.json({ error: error.message }, { status: 500 })
+
+    // 좋아요 알림 생성 (자신의 글 제외, fire-and-forget)
+    void (async () => {
+      try {
+        const [runRow, actorRow] = await Promise.all([
+          admin.from('run_logs').select('member_id, title').eq('id', runLogId).single(),
+          admin.from('members').select('name, avatar_url').eq('id', memberId).single(),
+        ])
+        const owner = runRow.data?.member_id
+        if (!owner || owner === memberId) return
+        // partial unique index handles dedup
+        await admin.from('notifications').upsert(
+          {
+            recipient_member_id: owner,
+            actor_member_id: memberId,
+            actor_name: actorRow.data?.name ?? '',
+            actor_avatar_url: actorRow.data?.avatar_url ?? null,
+            type: 'like',
+            run_log_id: runLogId,
+            run_title: runRow.data?.title ?? null,
+            comment_body: null,
+            is_read: false,
+          },
+          { onConflict: 'recipient_member_id,actor_member_id,run_log_id', ignoreDuplicates: false }
+        )
+      } catch { /* non-critical */ }
+    })()
   }
 
   const { count, error: countError } = await admin

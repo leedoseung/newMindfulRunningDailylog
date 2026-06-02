@@ -50,7 +50,7 @@ export default async function RootPage({
 
   return (
     <main style={{ minHeight: '100vh', background: '#F7F7F5' }}>
-      <AppHeader memberName={memberName} memberAvatarUrl={memberAvatarUrl} />
+      <AppHeader memberName={memberName} memberAvatarUrl={memberAvatarUrl} memberId={memberId} />
       <RunLogForm
         memberId={memberId}
         memberName={memberName}

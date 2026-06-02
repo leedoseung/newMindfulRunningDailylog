@@ -74,7 +74,7 @@ export default async function HomePage() {
 
   return (
     <main style={{ minHeight: '100vh', background: '#F7F7F5', position: 'relative' }}>
-      <AppHeader memberName={memberName || '?'} memberAvatarUrl={memberAvatarUrl} />
+      <AppHeader memberName={memberName || '?'} memberAvatarUrl={memberAvatarUrl} memberId={memberId} />
 
       <HomeFeed
         recentRuns={recentRuns}

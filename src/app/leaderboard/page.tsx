@@ -21,7 +21,7 @@ export default async function LeaderboardPage() {
 
   return (
     <main style={{ minHeight: '100vh', background: '#F7F7F5' }}>
-      <AppHeader memberName={memberName} memberAvatarUrl={memberAvatarUrl} />
+      <AppHeader memberName={memberName} memberAvatarUrl={memberAvatarUrl} memberId={memberId} />
       <div style={{ padding: '20px 22px 0' }}>
         <div style={{ fontSize: '0.7rem', color: '#888', marginBottom: '4px' }}>
           {stats.length}명 참여중

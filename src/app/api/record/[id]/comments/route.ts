@@ -68,5 +68,29 @@ export async function POST(
     .single()
 
   if (error) return NextResponse.json({ error: error.message }, { status: 500 })
+
+  // 댓글 알림 생성 (자신의 글 제외, fire-and-forget)
+  void (async () => {
+    try {
+      const [runRow, actorRow] = await Promise.all([
+        admin.from('run_logs').select('member_id, title').eq('id', runLogId).single(),
+        admin.from('members').select('name, avatar_url').eq('id', memberId).single(),
+      ])
+      const owner = runRow.data?.member_id
+      if (!owner || owner === memberId) return
+      await admin.from('notifications').insert({
+        recipient_member_id: owner,
+        actor_member_id: memberId,
+        actor_name: actorRow.data?.name ?? '',
+        actor_avatar_url: actorRow.data?.avatar_url ?? null,
+        type: 'comment',
+        run_log_id: runLogId,
+        run_title: runRow.data?.title ?? null,
+        comment_body: body.trim().slice(0, 100),
+        is_read: false,
+      })
+    } catch { /* non-critical */ }
+  })()
+
   return NextResponse.json(toComment(data as unknown as CommentRow), { status: 201 })
 }

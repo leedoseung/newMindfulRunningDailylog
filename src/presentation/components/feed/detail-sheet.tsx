@@ -259,6 +259,29 @@ ${run.thoughtAfter}`
         allowTaint: false,
         logging: false,
         backgroundColor: null,
+        // html2canvas v1.4.1 doesn't parse oklch() — inject hex fallbacks so
+        // inherited CSS variables (e.g. body color, border-color) don't throw
+        onclone: (_doc: Document) => {
+          const s = _doc.createElement('style')
+          s.textContent = `:root{
+            --background:#f5f5f5;--foreground:#202020;
+            --card:#ffffff;--card-foreground:#202020;
+            --popover:#ffffff;--popover-foreground:#202020;
+            --primary:#202020;--primary-foreground:#fafafa;
+            --secondary:#f5f5f5;--secondary-foreground:#202020;
+            --muted:#f5f5f5;--muted-foreground:#737373;
+            --accent:#f5f5f5;--accent-foreground:#202020;
+            --destructive:#e53935;
+            --border:#e8e8e8;--input:#e8e8e8;--ring:#aaaaaa;
+            --chart-1:#202020;--chart-2:#737373;--chart-3:#595959;
+            --chart-4:#474747;--chart-5:#313131;
+            --sidebar:#fafafa;--sidebar-foreground:#202020;
+            --sidebar-primary:#202020;--sidebar-primary-foreground:#fafafa;
+            --sidebar-accent:#f5f5f5;--sidebar-accent-foreground:#202020;
+            --sidebar-border:#e8e8e8;--sidebar-ring:#aaaaaa;
+          }`
+          _doc.head.appendChild(s)
+        },
       })
       const dataUrl = canvas.toDataURL('image/png')
 

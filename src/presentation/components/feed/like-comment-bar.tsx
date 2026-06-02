@@ -64,14 +64,14 @@ export function LikeCommentBar({ runId, likeCount, commentCount, memberId, hasPh
       display: 'flex', alignItems: 'center', gap: 20,
       position: 'relative', zIndex: 20,
     }}>
-      <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 2 }}>
         <button
           type="button"
           aria-label={liked ? '좋아요 취소' : '좋아요'}
           onClick={handleLike}
           disabled={!memberId || pending}
           style={{
-            background: 'none', border: 'none', padding: 0,
+            background: 'none', border: 'none', padding: '4px 6px 4px 0',
             cursor: memberId ? 'pointer' : 'default',
             display: 'flex', alignItems: 'center',
           }}
@@ -99,7 +99,7 @@ export function LikeCommentBar({ runId, likeCount, commentCount, memberId, hasPh
           onClick={onLikersTap}
           disabled={!onLikersTap}
           style={{
-            background: 'none', border: 'none', padding: 0,
+            background: 'none', border: 'none', padding: '4px 8px 4px 6px',
             cursor: onLikersTap ? 'pointer' : 'default',
             fontFamily: FONT, fontSize: '0.82rem', color: textColor,
           }}

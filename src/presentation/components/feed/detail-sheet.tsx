@@ -200,9 +200,13 @@ ${run.thoughtAfter}`
       let photoDataUrl = photoDataUrlRef.current
 
       if (run.photoUrl && !photoDataUrl) {
+        // 캐시 버스팅 URL: CSS background-image가 CORS 없이 캐시된 후
+        // fetch()가 오페이크 응답을 반환하는 Safari 버그 우회
+        const bustUrl = `${run.photoUrl}${run.photoUrl.includes('?') ? '&' : '?'}_t=${Date.now()}`
+
         // 2a) fetch-first (iOS CORS 캐시 오염 우회)
         try {
-          const resp = await fetch(run.photoUrl, { cache: 'no-store' })
+          const resp = await fetch(bustUrl, { cache: 'no-store', mode: 'cors' })
           if (resp.ok) {
             const blob = await resp.blob()
             photoDataUrl = await new Promise<string>((res, rej) => {
@@ -214,21 +218,27 @@ ${run.thoughtAfter}`
           }
         } catch { /* canvas 폴백으로 */ }
 
-        // 2b) canvas 폴백 (fetch 실패 시)
+        // 2b) canvas 폴백 — 새 Image 요소 사용 (기존 img 재사용 시 tainted canvas 발생)
         if (!photoDataUrl) {
-          const shareImg = shareCardRef.current.querySelector<HTMLImageElement>('img[data-photo]')
-          if (shareImg && shareImg.naturalWidth > 0) {
-            try {
-              const canvas = document.createElement('canvas')
-              canvas.width = shareImg.naturalWidth
-              canvas.height = shareImg.naturalHeight
-              const ctx = canvas.getContext('2d')
-              if (ctx) {
-                ctx.drawImage(shareImg, 0, 0)
-                photoDataUrl = canvas.toDataURL('image/jpeg', 0.92)
-              }
-            } catch { /* canvas tainted */ }
-          }
+          await new Promise<void>(resolve => {
+            const tempImg = new Image()
+            tempImg.crossOrigin = 'anonymous'
+            tempImg.onload = () => {
+              try {
+                const canvas = document.createElement('canvas')
+                canvas.width = tempImg.naturalWidth
+                canvas.height = tempImg.naturalHeight
+                const ctx = canvas.getContext('2d')
+                if (ctx) {
+                  ctx.drawImage(tempImg, 0, 0)
+                  photoDataUrl = canvas.toDataURL('image/jpeg', 0.92)
+                }
+              } catch { /* canvas tainted */ }
+              resolve()
+            }
+            tempImg.onerror = () => resolve()
+            tempImg.src = bustUrl
+          })
         }
       }
 

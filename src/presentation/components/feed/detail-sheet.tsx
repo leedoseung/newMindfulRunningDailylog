@@ -102,7 +102,7 @@ export function DetailSheet({ run, open, onClose, memberId, memberName = '', mem
   useEffect(() => {
     if (!run?.photoUrl) { photoDataUrlRef.current = null; return }
     let cancelled = false
-    fetch(run.photoUrl, { cache: 'no-store' })
+    fetch(run.photoUrl, { cache: 'no-store', mode: 'cors' })
       .then(r => r.ok ? r.blob() : Promise.reject(r.status))
       .then(blob => new Promise<string>((res, rej) => {
         const reader = new FileReader()
@@ -191,88 +191,76 @@ ${run.thoughtAfter}`
     setSaving(true)
     setOverlay({ success: false, message: '이미지 저장 중...' })
     try {
-      // 1) html-to-image 모듈 먼저 로드 (첫 호출 시 async → React 리렌더 허용 구간)
-      const { toPng } = await import('html-to-image')
+      // html2canvas: html-to-image(SVG foreignObject)와 달리 canvas 2D API 직접 사용
+      // Safari는 SVG foreignObject 안 <img> 렌더링 거부 → html2canvas로 해결
+      const html2canvas = (await import('html2canvas')).default
 
-      // 2) 사진 data URL 확보
-      // iOS Safari는 CSS background-image로 로드된 이미지가 CORS 없이 캐시돼
-      // 이후 fetch()가 opaque 응답을 반환할 수 있음 → cache:'no-store'로 우회
-      let photoDataUrl = photoDataUrlRef.current
+      // 사진 있을 때: img[data-photo] src를 data URL로 교체해야 html2canvas가 캡처 가능
+      // (html2canvas useCORS:true도 Safari opaque-cache 문제로 실패할 수 있음)
+      if (run.photoUrl) {
+        let photoDataUrl = photoDataUrlRef.current
 
-      if (run.photoUrl && !photoDataUrl) {
-        // 캐시 버스팅 URL: CSS background-image가 CORS 없이 캐시된 후
-        // fetch()가 오페이크 응답을 반환하는 Safari 버그 우회
-        const bustUrl = `${run.photoUrl}${run.photoUrl.includes('?') ? '&' : '?'}_t=${Date.now()}`
+        if (!photoDataUrl) {
+          // 캐시 버스팅 URL로 Safari opaque-cache 우회
+          const bustUrl = `${run.photoUrl}${run.photoUrl.includes('?') ? '&' : '?'}_t=${Date.now()}`
+          try {
+            const resp = await fetch(bustUrl, { cache: 'no-store', mode: 'cors' })
+            if (resp.ok) {
+              const blob = await resp.blob()
+              photoDataUrl = await new Promise<string>((res, rej) => {
+                const reader = new FileReader()
+                reader.onload = () => res(reader.result as string)
+                reader.onerror = rej
+                reader.readAsDataURL(blob)
+              })
+            }
+          } catch { /* canvas 폴백으로 */ }
 
-        // 2a) fetch-first (iOS CORS 캐시 오염 우회)
-        try {
-          const resp = await fetch(bustUrl, { cache: 'no-store', mode: 'cors' })
-          if (resp.ok) {
-            const blob = await resp.blob()
-            photoDataUrl = await new Promise<string>((res, rej) => {
-              const reader = new FileReader()
-              reader.onload = () => res(reader.result as string)
-              reader.onerror = rej
-              reader.readAsDataURL(blob)
+          if (!photoDataUrl) {
+            await new Promise<void>(resolve => {
+              const tempImg = new Image()
+              tempImg.crossOrigin = 'anonymous'
+              tempImg.onload = () => {
+                try {
+                  const canvas = document.createElement('canvas')
+                  canvas.width = tempImg.naturalWidth
+                  canvas.height = tempImg.naturalHeight
+                  const ctx = canvas.getContext('2d')
+                  if (ctx) {
+                    ctx.drawImage(tempImg, 0, 0)
+                    photoDataUrl = canvas.toDataURL('image/jpeg', 0.92)
+                  }
+                } catch { /* tainted */ }
+                resolve()
+              }
+              tempImg.onerror = () => resolve()
+              tempImg.src = `${run.photoUrl}${run.photoUrl.includes('?') ? '&' : '?'}_t=${Date.now()}`
             })
           }
-        } catch { /* canvas 폴백으로 */ }
+        }
 
-        // 2b) canvas 폴백 — 새 Image 요소 사용 (기존 img 재사용 시 tainted canvas 발생)
-        if (!photoDataUrl) {
-          await new Promise<void>(resolve => {
-            const tempImg = new Image()
-            tempImg.crossOrigin = 'anonymous'
-            tempImg.onload = () => {
-              try {
-                const canvas = document.createElement('canvas')
-                canvas.width = tempImg.naturalWidth
-                canvas.height = tempImg.naturalHeight
-                const ctx = canvas.getContext('2d')
-                if (ctx) {
-                  ctx.drawImage(tempImg, 0, 0)
-                  photoDataUrl = canvas.toDataURL('image/jpeg', 0.92)
-                }
-              } catch { /* canvas tainted */ }
-              resolve()
-            }
-            tempImg.onerror = () => resolve()
-            tempImg.src = bustUrl
-          })
+        if (photoDataUrl) {
+          const photoImg = shareCardRef.current.querySelector<HTMLImageElement>('img[data-photo]')
+          if (photoImg) {
+            await new Promise<void>(resolve => {
+              photoImg.addEventListener('load', () => resolve(), { once: true })
+              photoImg.addEventListener('error', () => resolve(), { once: true })
+              setTimeout(resolve, 5000)
+              photoImg.src = photoDataUrl!
+              if (photoImg.complete) resolve()
+            })
+          }
         }
       }
 
-      // 3) photo img.src → data URL 교체 후 로드 완료 대기
-      if (photoDataUrl) {
-        const photoImg = shareCardRef.current.querySelector<HTMLImageElement>('img[data-photo]')
-        if (photoImg) {
-          await new Promise<void>(resolve => {
-            const done = () => resolve()
-            photoImg.addEventListener('load', done, { once: true })
-            photoImg.addEventListener('error', done, { once: true })
-            setTimeout(resolve, 5000)
-            photoImg.src = photoDataUrl!
-            if (photoImg.complete) resolve()
-          })
-        }
-      }
-
-      // 4) 나머지 이미지 로드 완료 대기
-      const otherImgs = Array.from(
-        shareCardRef.current.querySelectorAll<HTMLImageElement>('img:not([data-photo])')
-      )
-      await Promise.all(otherImgs.map(img => new Promise<void>(resolve => {
-        if (img.complete && img.naturalWidth > 0) { resolve(); return }
-        img.addEventListener('load', () => resolve(), { once: true })
-        img.addEventListener('error', () => resolve(), { once: true })
-        setTimeout(resolve, 10_000)
-      })))
-
-      const dataUrl = await toPng(shareCardRef.current, {
-        pixelRatio: 2,
-        cacheBust: false,
-        skipFonts: true,
+      const canvas = await html2canvas(shareCardRef.current, {
+        scale: 2,
+        useCORS: true,
+        allowTaint: false,
+        logging: false,
+        backgroundColor: null,
       })
+      const dataUrl = canvas.toDataURL('image/png')
 
       const fileName = `mindful-run-${run.date}.png`
 
@@ -618,7 +606,7 @@ ${run.thoughtAfter}`
         />
       </div>
 
-      {/* 오프스크린 ShareCard — html-to-image 캡처 전용 */}
+      {/* 오프스크린 ShareCard — html2canvas 캡처 전용 */}
       <div style={{ position: 'fixed', left: -9999, top: 0, pointerEvents: 'none', zIndex: -1 }}>
         <ShareCard ref={shareCardRef} run={run} />
       </div>

@@ -1,13 +1,15 @@
 import { NextResponse } from 'next/server'
-import { createAdminClient } from '@/lib/supabase/admin'
-import { getAuthMemberId } from '@/lib/auth/get-auth-member-id'
+import { createServerClient } from '@/infrastructure/supabase/client'
+import { createAdminClient } from '@/infrastructure/supabase/admin-client'
 
 export async function GET(
   _req: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
   const { id: runLogId } = await params
-  const memberId = await getAuthMemberId()
+  const supabase = await createServerClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  const memberId = (user?.user_metadata?.member_id as string | undefined) ?? null
   if (!memberId) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
   const admin = createAdminClient()

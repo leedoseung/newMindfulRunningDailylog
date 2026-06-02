@@ -55,20 +55,23 @@ export function LikeCommentBar({ runId, likeCount, commentCount, memberId, hasPh
   const textColor = hasPhoto ? 'rgba(255,255,255,0.55)' : '#888'
 
   return (
-    <div style={{
-      flexShrink: 0,
-      background: barBg,
-      backdropFilter: 'blur(12px)',
-      borderTop: `1px solid ${borderColor}`,
-      padding: '12px 20px',
-      display: 'flex', alignItems: 'center', gap: 20,
-      position: 'relative', zIndex: 20,
-    }}>
+    <div
+      onClick={e => e.stopPropagation()}
+      style={{
+        flexShrink: 0,
+        background: barBg,
+        backdropFilter: 'blur(12px)',
+        borderTop: `1px solid ${borderColor}`,
+        padding: '12px 20px',
+        display: 'flex', alignItems: 'center', gap: 20,
+        position: 'relative', zIndex: 20,
+      }}
+    >
       <div style={{ display: 'flex', alignItems: 'center', gap: 0 }}>
         <button
           type="button"
           aria-label={liked ? '좋아요 취소' : '좋아요'}
-          onClick={handleLike}
+          onClick={e => { e.stopPropagation(); handleLike() }}
           disabled={!memberId || pending}
           style={{
             background: 'none', border: 'none', padding: '10px 4px 10px 0',
@@ -98,7 +101,7 @@ export function LikeCommentBar({ runId, likeCount, commentCount, memberId, hasPh
         <button
           type="button"
           aria-label="좋아요 누른 사람 보기"
-          onClick={onLikersTap}
+          onClick={e => { e.stopPropagation(); onLikersTap?.() }}
           disabled={!onLikersTap}
           style={{
             background: 'none', border: 'none', padding: '10px 12px 10px 8px',
@@ -114,7 +117,7 @@ export function LikeCommentBar({ runId, likeCount, commentCount, memberId, hasPh
       <button
         type="button"
         aria-label="댓글 보기"
-        onClick={onCommentOpen}
+        onClick={e => { e.stopPropagation(); onCommentOpen() }}
         style={{
           background: 'none', border: 'none', padding: 0, cursor: 'pointer',
           display: 'flex', alignItems: 'center', gap: 6,

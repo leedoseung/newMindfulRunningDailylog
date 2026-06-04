@@ -304,9 +304,8 @@ ${run.thoughtAfter}`
       setOverlay(null)
     } catch (err) {
       setOverlay(null)
-      console.error('[handleSaveImage]', err)
       if (err instanceof Error && err.name !== 'AbortError') {
-        alert('이미지 저장에 실패했습니다: ' + err.message)
+        alert('이미지 저장에 실패했습니다')
       }
     } finally {
       setSaving(false)

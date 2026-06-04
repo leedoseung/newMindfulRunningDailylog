@@ -66,7 +66,6 @@ export function DetailSheet({ run, open, onClose, memberId, memberName = '', mem
   const [commentsOpen, setCommentsOpen] = useState(false)
   const [likersOpen, setLikersOpen] = useState(false)
   const [localCommentCount, setLocalCommentCount] = useState(run?.commentCount ?? 0)
-  const [isDarkPhoto, setIsDarkPhoto] = useState(true)
 
   useEffect(() => {
     setLocalCommentCount(run?.commentCount ?? 0)
@@ -99,9 +98,9 @@ export function DetailSheet({ run, open, onClose, memberId, memberName = '', mem
     }
   }
 
-  // 사진 URL이 바뀔 때마다 data URL로 프리패치 + 밝기 분석
+  // 사진 URL이 바뀔 때마다 data URL로 프리패치
   useEffect(() => {
-    if (!run?.photoUrl) { photoDataUrlRef.current = null; setIsDarkPhoto(true); return }
+    if (!run?.photoUrl) { photoDataUrlRef.current = null; return }
     let cancelled = false
     fetch(run.photoUrl, { cache: 'no-store', mode: 'cors' })
       .then(r => r.ok ? r.blob() : Promise.reject(r.status))
@@ -111,30 +110,7 @@ export function DetailSheet({ run, open, onClose, memberId, memberName = '', mem
         reader.onerror = rej
         reader.readAsDataURL(blob)
       }))
-      .then(dataUrl => {
-        if (cancelled) return
-        photoDataUrlRef.current = dataUrl
-        // 16×16 canvas로 평균 밝기 계산
-        const img = new Image()
-        img.onload = () => {
-          if (cancelled) return
-          const SIZE = 16
-          const canvas = document.createElement('canvas')
-          canvas.width = SIZE; canvas.height = SIZE
-          const ctx = canvas.getContext('2d')
-          if (!ctx) return
-          ctx.drawImage(img, 0, 0, SIZE, SIZE)
-          const { data } = ctx.getImageData(0, 0, SIZE, SIZE)
-          let total = 0
-          for (let i = 0; i < data.length; i += 4) {
-            // sRGB relative luminance
-            total += (data[i]! * 0.2126 + data[i+1]! * 0.7152 + data[i+2]! * 0.0722) / 255
-          }
-          const avg = total / (SIZE * SIZE)
-          setIsDarkPhoto(avg < 0.5)
-        }
-        img.src = dataUrl
-      })
+      .then(dataUrl => { if (!cancelled) photoDataUrlRef.current = dataUrl })
       .catch(() => {})
     return () => { cancelled = true }
   }, [run?.photoUrl])
@@ -345,27 +321,26 @@ ${run.thoughtAfter}`
   ].filter(t => t.text)
 
   // 사진 있을 때 UI 색상
-  const onPhoto  = hasPhoto
-  // 밝은 사진이면 어두운 텍스트, 어두운 사진이면 흰 텍스트
-  const lightText = !hasPhoto || isDarkPhoto
-  const labelColor  = lightText ? (onPhoto ? 'rgba(255,255,255,0.55)' : '#888') : 'rgba(0,0,0,0.45)'
-  const bigNumColor = lightText ? (onPhoto ? '#ffffff' : '#111') : '#111'
-  const unitColor   = lightText ? (onPhoto ? 'rgba(255,255,255,0.7)' : '#555') : '#444'
-  const nameColor   = lightText ? (onPhoto ? 'rgba(255,255,255,0.75)' : '#666') : '#444'
-  const chipBg      = lightText ? (onPhoto ? 'rgba(255,255,255,0.15)' : '#EBEBEA') : 'rgba(0,0,0,0.12)'
-  const chipColor   = lightText ? (onPhoto ? 'rgba(255,255,255,0.85)' : '#555') : '#222'
-  const dividerBg   = lightText ? (onPhoto ? 'rgba(255,255,255,0.12)' : 'rgba(0,0,0,0.06)') : 'rgba(0,0,0,0.1)'
-  const dateColor   = lightText ? (onPhoto ? 'rgba(255,255,255,0.5)' : '#999') : 'rgba(0,0,0,0.4)'
-  const titleColor  = lightText ? (onPhoto ? '#ffffff' : '#111') : '#111'
-  const bdaColor    = lightText ? (onPhoto ? 'rgba(255,255,255,0.45)' : '#999') : 'rgba(0,0,0,0.4)'
-  const stepColor   = lightText ? (onPhoto ? 'rgba(255,255,255,0.55)' : '#888') : '#444'
-  const bodyColor   = lightText ? (onPhoto ? 'rgba(255,255,255,0.9)' : '#333') : '#111'
-  const rowBorder   = lightText ? (onPhoto ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.07)') : 'rgba(0,0,0,0.08)'
-  const handleColor = lightText ? (onPhoto ? 'rgba(255,255,255,0.25)' : 'rgba(0,0,0,0.12)') : 'rgba(0,0,0,0.2)'
-  const closeBg     = onPhoto ? 'rgba(0,0,0,0.35)' : '#EBEBEA'
-  const closeColor  = lightText ? (onPhoto ? '#fff' : '#111') : '#111'
-  const btnBg       = onPhoto ? 'rgba(0,0,0,0.35)' : '#EBEBEA'
-  const btnColor    = lightText ? (onPhoto ? '#fff' : '#111') : '#111'
+  const onPhoto     = hasPhoto
+  const txtShadow   = onPhoto ? '0 1px 4px rgba(0,0,0,0.55)' : 'none'
+  const labelColor  = onPhoto ? 'rgba(255,255,255,0.7)' : '#888'
+  const bigNumColor = onPhoto ? '#ffffff' : '#111'
+  const unitColor   = onPhoto ? 'rgba(255,255,255,0.85)' : '#555'
+  const nameColor   = onPhoto ? 'rgba(255,255,255,0.9)' : '#666'
+  const chipBg      = onPhoto ? 'rgba(0,0,0,0.35)' : '#EBEBEA'
+  const chipColor   = onPhoto ? '#fff' : '#555'
+  const dividerBg   = onPhoto ? 'rgba(255,255,255,0.15)' : 'rgba(0,0,0,0.06)'
+  const dateColor   = onPhoto ? 'rgba(255,255,255,0.65)' : '#999'
+  const titleColor  = onPhoto ? '#ffffff' : '#111'
+  const bdaColor    = onPhoto ? 'rgba(255,255,255,0.6)' : '#999'
+  const stepColor   = onPhoto ? 'rgba(255,255,255,0.7)' : '#888'
+  const bodyColor   = onPhoto ? '#ffffff' : '#333'
+  const rowBorder   = onPhoto ? 'rgba(255,255,255,0.12)' : 'rgba(0,0,0,0.07)'
+  const handleColor = onPhoto ? 'rgba(255,255,255,0.3)' : 'rgba(0,0,0,0.12)'
+  const closeBg     = onPhoto ? 'rgba(0,0,0,0.4)' : '#EBEBEA'
+  const closeColor  = onPhoto ? '#fff' : '#111'
+  const btnBg       = onPhoto ? 'rgba(0,0,0,0.4)' : '#EBEBEA'
+  const btnColor    = onPhoto ? '#fff' : '#111'
 
   return (
     <>
@@ -549,7 +524,7 @@ ${run.thoughtAfter}`
           <div style={{ display: 'flex', alignItems: 'baseline', gap: 4, marginBottom: 4 }}>
             <span style={{
               fontFamily: FONT, fontSize: '4.2rem', fontWeight: 300,
-              color: bigNumColor, lineHeight: 1, letterSpacing: '-2px',
+              color: bigNumColor, lineHeight: 1, letterSpacing: '-2px', textShadow: txtShadow,
             }}>{count}</span>
             <span style={{ fontFamily: FONT, fontSize: '1rem', fontWeight: 400, color: unitColor }}>분</span>
           </div>
@@ -597,7 +572,7 @@ ${run.thoughtAfter}`
           {run.title && (
             <div style={{
               fontFamily: FONT, fontSize: '1.15rem', fontWeight: 500,
-              color: titleColor, lineHeight: 1.35, marginBottom: 24,
+              color: titleColor, lineHeight: 1.35, marginBottom: 24, textShadow: txtShadow,
             }}>"{run.title}"</div>
           )}
 
@@ -621,7 +596,7 @@ ${run.thoughtAfter}`
                   }}>{step}</div>
                   <div style={{
                     fontFamily: FONT, fontSize: '0.88rem', fontWeight: 400,
-                    color: bodyColor, lineHeight: 1.7,
+                    color: bodyColor, lineHeight: 1.7, textShadow: txtShadow,
                   }}>{text}</div>
                 </div>
               ))}

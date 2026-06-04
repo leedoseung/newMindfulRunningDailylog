@@ -7,7 +7,7 @@ describe('RunLog entity', () => {
       id: 'uuid-1',
       memberId: 'uuid-2',
       memberName: '이두승', memberAvatarUrl: '', memberInstaId: '',
-      date: '2026-05-24',
+      date: '2026-05-24', runTime: null,
       durationMin: 45,
       title: '남산 달리기',
       thoughtBefore: '오늘은 가볍게',

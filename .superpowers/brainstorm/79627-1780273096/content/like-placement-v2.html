@@ -1,0 +1,463 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>좋아요·댓글 배치 비교</title>
+<script src="/helper.js"></script>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: #0f0f0f;
+    font-family: -apple-system, BlinkMacSystemFont, 'Helvetica Neue', sans-serif;
+    color: #fff;
+    min-height: 100vh;
+    padding: 24px 16px 40px;
+  }
+
+  h2 { font-size: 1.1rem; font-weight: 600; text-align: center; margin-bottom: 6px; color: #fff; }
+  .subtitle { font-size: 0.78rem; color: rgba(255,255,255,0.45); text-align: center; margin-bottom: 28px; }
+
+  .phones-row {
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+
+  .phone-wrap {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    cursor: pointer;
+  }
+
+  .phone-label {
+    font-size: 0.72rem;
+    font-weight: 600;
+    color: rgba(255,255,255,0.5);
+    letter-spacing: 1px;
+    text-transform: uppercase;
+  }
+
+  .phone-wrap.selected .phone-label { color: #60a5fa; }
+  .phone-wrap.selected .phone-frame { outline: 2.5px solid #60a5fa; }
+
+  .phone-desc {
+    font-size: 0.68rem;
+    color: rgba(255,255,255,0.38);
+    text-align: center;
+    max-width: 160px;
+    line-height: 1.5;
+  }
+  .phone-wrap.selected .phone-desc { color: rgba(255,255,255,0.65); }
+
+  /* ── 폰 프레임 ── */
+  .phone-frame {
+    width: 200px;
+    height: 420px;
+    border-radius: 28px;
+    overflow: hidden;
+    position: relative;
+    background: #111;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.7);
+    flex-shrink: 0;
+    transition: outline 0.15s;
+  }
+
+  /* 배경 사진 (그라디언트로 시뮬레이션) */
+  .photo-bg {
+    position: absolute; inset: 0;
+    background: linear-gradient(160deg, #2c3e50 0%, #1a1a2e 40%, #0d0d1a 100%);
+    z-index: 0;
+  }
+  .photo-overlay {
+    position: absolute; inset: 0;
+    background: linear-gradient(to bottom, rgba(0,0,0,0.38) 0%, rgba(0,0,0,0.55) 40%, rgba(0,0,0,0.72) 100%);
+    z-index: 1;
+  }
+
+  /* 시트 내용 */
+  .sheet-inner {
+    position: relative;
+    z-index: 10;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+  }
+
+  /* 드래그 핸들 */
+  .handle-zone {
+    height: 22px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+  .handle-bar {
+    width: 28px; height: 3px;
+    background: rgba(255,255,255,0.25);
+    border-radius: 2px;
+  }
+
+  /* 상단 버튼바 */
+  .top-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 14px;
+    flex-shrink: 0;
+    gap: 4px;
+  }
+  .close-btn {
+    width: 26px; height: 26px;
+    border-radius: 50%;
+    background: rgba(0,0,0,0.35);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 10px; color: #fff;
+    flex-shrink: 0;
+  }
+  .btn-group { display: flex; gap: 4px; align-items: center; flex-wrap: wrap; justify-content: flex-end; }
+  .pill-btn {
+    background: rgba(255,255,255,0.12);
+    border: 1px solid rgba(255,255,255,0.2);
+    border-radius: 20px;
+    padding: 4px 9px;
+    font-size: 8px;
+    font-weight: 500;
+    color: #fff;
+    white-space: nowrap;
+  }
+  .pill-btn.red { background: rgba(239,68,68,0.2); border-color: rgba(239,68,68,0.4); color: #ef4444; }
+
+  /* 스크롤 콘텐츠 */
+  .content-area {
+    flex: 1;
+    overflow: hidden;
+    padding: 14px 14px 10px;
+  }
+  .label-xs {
+    font-size: 7px; font-weight: 500;
+    color: rgba(255,255,255,0.45);
+    letter-spacing: 2px; text-transform: uppercase;
+    margin-bottom: 2px;
+  }
+  .big-num {
+    font-size: 44px; font-weight: 200;
+    color: #fff; line-height: 1;
+    letter-spacing: -2px;
+    display: flex; align-items: baseline; gap: 3px;
+  }
+  .big-num span { font-size: 13px; font-weight: 300; color: rgba(255,255,255,0.6); }
+  .member-row {
+    display: flex; align-items: center; gap: 6px;
+    margin: 5px 0 8px;
+  }
+  .member-name { font-size: 10px; color: rgba(255,255,255,0.7); }
+  .insta-chip {
+    background: rgba(255,255,255,0.12);
+    border-radius: 20px; padding: 2px 7px;
+    font-size: 7.5px; color: rgba(255,255,255,0.7);
+  }
+  .divider { height: 1px; background: rgba(255,255,255,0.1); margin: 8px 0; }
+  .date-text { font-size: 8px; color: rgba(255,255,255,0.4); margin-bottom: 5px; }
+  .title-text {
+    font-size: 13px; font-weight: 500;
+    color: #fff; line-height: 1.35;
+    margin-bottom: 10px;
+  }
+  .bda-label {
+    font-size: 6.5px; font-weight: 500;
+    color: rgba(255,255,255,0.35);
+    letter-spacing: 2px; text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+  .thought-row {
+    display: flex; gap: 8px;
+    padding-bottom: 8px; margin-bottom: 8px;
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+  }
+  .thought-step {
+    font-size: 7px; font-weight: 500;
+    color: rgba(255,255,255,0.45);
+    text-transform: uppercase; min-width: 14px;
+    padding-top: 2px;
+  }
+  .thought-body { font-size: 9px; color: rgba(255,255,255,0.8); line-height: 1.6; }
+
+  /* ── 배치 변형 ── */
+
+  /* A: 하단 고정 액션바 */
+  .bottom-bar {
+    flex-shrink: 0;
+    background: rgba(0,0,0,0.4);
+    backdrop-filter: blur(12px);
+    border-top: 1px solid rgba(255,255,255,0.08);
+    padding: 10px 14px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+  .action-icon {
+    display: flex; align-items: center; gap: 4px;
+    font-size: 16px; color: rgba(255,255,255,0.75);
+  }
+  .action-count { font-size: 9px; color: rgba(255,255,255,0.5); }
+  .action-icon.liked { color: #ef4444; }
+
+  /* B: 상단 버튼과 함께 */
+  .like-pill {
+    background: rgba(255,255,255,0.12);
+    border: 1px solid rgba(255,255,255,0.2);
+    border-radius: 20px;
+    padding: 4px 9px;
+    font-size: 8px;
+    color: #fff;
+    display: flex; align-items: center; gap: 3px;
+  }
+
+  /* C: 콘텐츠 내 인라인 */
+  .inline-actions {
+    display: flex; gap: 16px;
+    padding: 8px 0 4px;
+    border-top: 1px solid rgba(255,255,255,0.08);
+    margin-top: 4px;
+  }
+  .inline-action {
+    display: flex; align-items: center; gap: 4px;
+    font-size: 13px; color: rgba(255,255,255,0.6);
+  }
+  .inline-action-text { font-size: 8.5px; color: rgba(255,255,255,0.45); }
+
+  /* 선택 표시 */
+  .selected-badge {
+    display: none;
+    position: absolute; top: 10px; right: 10px;
+    background: #60a5fa; color: #000;
+    font-size: 9px; font-weight: 700;
+    border-radius: 20px; padding: 2px 8px;
+    z-index: 20;
+  }
+  .phone-wrap.selected .selected-badge { display: block; }
+
+  /* 하단 설명 */
+  .desc-box {
+    text-align: center;
+    padding: 6px 8px;
+  }
+  .desc-title { font-size: 0.8rem; font-weight: 600; color: #fff; margin-bottom: 4px; }
+  .desc-body { font-size: 0.65rem; color: rgba(255,255,255,0.45); line-height: 1.5; }
+
+  .selection-bar {
+    position: fixed; bottom: 0; left: 0; right: 0;
+    background: rgba(20,20,20,0.95);
+    backdrop-filter: blur(10px);
+    border-top: 1px solid rgba(255,255,255,0.08);
+    padding: 14px 20px;
+    text-align: center;
+    font-size: 0.75rem;
+    color: rgba(255,255,255,0.4);
+    display: none;
+    z-index: 100;
+  }
+  .selection-bar.show { display: block; }
+  .selection-bar strong { color: #60a5fa; }
+</style>
+</head>
+<body>
+
+<h2>좋아요 · 댓글 버튼 위치</h2>
+<p class="subtitle">실제 디테일 화면 기준으로 3가지 배치를 비교해보세요</p>
+
+<div class="phones-row">
+
+  <!-- ── A: 하단 고정 액션바 ── -->
+  <div class="phone-wrap" id="opt-a" onclick="select('a')">
+    <div class="phone-label">A</div>
+    <div class="phone-frame">
+      <div class="selected-badge">✓ 선택됨</div>
+      <div class="photo-bg"></div>
+      <div class="photo-overlay"></div>
+      <div class="sheet-inner">
+        <div class="handle-zone"><div class="handle-bar"></div></div>
+        <div class="top-bar">
+          <div class="close-btn">✕</div>
+          <div class="btn-group">
+            <div class="pill-btn">수정</div>
+            <div class="pill-btn red">삭제</div>
+          </div>
+          <div class="btn-group">
+            <div class="pill-btn">이미지 저장</div>
+            <div class="pill-btn">텍스트 복사</div>
+          </div>
+        </div>
+        <div class="content-area">
+          <div class="label-xs">달린 시간</div>
+          <div class="big-num">42<span>분</span></div>
+          <div class="member-row">
+            <div class="member-name">홍길동</div>
+            <div class="insta-chip">@hong_run</div>
+          </div>
+          <div class="divider"></div>
+          <div class="date-text">2026-05-28</div>
+          <div class="title-text">"오늘도 한 걸음씩 앞으로"</div>
+          <div class="bda-label">Before · During · After</div>
+          <div class="thought-row">
+            <div class="thought-step">전</div>
+            <div class="thought-body">몸이 무겁지만 나가보자 마음먹었다</div>
+          </div>
+          <div class="thought-row">
+            <div class="thought-step">중</div>
+            <div class="thought-body">힘들지만 한 걸음씩, 호흡에 집중</div>
+          </div>
+          <div class="thought-row" style="border-bottom:none;">
+            <div class="thought-step">후</div>
+            <div class="thought-body">달리고 나니 머리가 맑아졌다</div>
+          </div>
+        </div>
+        <!-- 하단 고정 액션바 -->
+        <div class="bottom-bar">
+          <div class="action-icon liked">❤️ <span class="action-count">12</span></div>
+          <div class="action-icon">💬 <span class="action-count">3</span></div>
+        </div>
+      </div>
+    </div>
+    <div class="desc-box">
+      <div class="desc-title">하단 고정 액션바</div>
+      <div class="desc-body">항상 보임 · Instagram 스타일<br>콘텐츠와 구분 명확</div>
+    </div>
+  </div>
+
+  <!-- ── B: 상단 버튼 그룹 ── -->
+  <div class="phone-wrap" id="opt-b" onclick="select('b')">
+    <div class="phone-label">B</div>
+    <div class="phone-frame">
+      <div class="selected-badge">✓ 선택됨</div>
+      <div class="photo-bg"></div>
+      <div class="photo-overlay"></div>
+      <div class="sheet-inner">
+        <div class="handle-zone"><div class="handle-bar"></div></div>
+        <div class="top-bar" style="flex-wrap:wrap; row-gap:5px; padding-bottom:6px;">
+          <div class="close-btn">✕</div>
+          <div class="btn-group">
+            <div class="pill-btn">수정</div>
+            <div class="pill-btn red">삭제</div>
+          </div>
+          <div class="btn-group" style="width:100%; justify-content:flex-end;">
+            <!-- 좋아요/댓글 + 이미지저장/텍스트복사 -->
+            <div class="like-pill">❤️ <span>12</span></div>
+            <div class="like-pill">💬 <span>3</span></div>
+            <div class="pill-btn">이미지 저장</div>
+            <div class="pill-btn">텍스트 복사</div>
+          </div>
+        </div>
+        <div class="content-area">
+          <div class="label-xs">달린 시간</div>
+          <div class="big-num">42<span>분</span></div>
+          <div class="member-row">
+            <div class="member-name">홍길동</div>
+            <div class="insta-chip">@hong_run</div>
+          </div>
+          <div class="divider"></div>
+          <div class="date-text">2026-05-28</div>
+          <div class="title-text">"오늘도 한 걸음씩 앞으로"</div>
+          <div class="bda-label">Before · During · After</div>
+          <div class="thought-row">
+            <div class="thought-step">전</div>
+            <div class="thought-body">몸이 무겁지만 나가보자 마음먹었다</div>
+          </div>
+          <div class="thought-row">
+            <div class="thought-step">중</div>
+            <div class="thought-body">힘들지만 한 걸음씩, 호흡에 집중</div>
+          </div>
+          <div class="thought-row" style="border-bottom:none;">
+            <div class="thought-step">후</div>
+            <div class="thought-body">달리고 나니 머리가 맑아졌다</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="desc-box">
+      <div class="desc-title">상단 버튼 그룹</div>
+      <div class="desc-body">기존 버튼과 통합<br>버튼이 많아져 줄바꿈 발생</div>
+    </div>
+  </div>
+
+  <!-- ── C: 콘텐츠 내 인라인 ── -->
+  <div class="phone-wrap" id="opt-c" onclick="select('c')">
+    <div class="phone-label">C</div>
+    <div class="phone-frame">
+      <div class="selected-badge">✓ 선택됨</div>
+      <div class="photo-bg"></div>
+      <div class="photo-overlay"></div>
+      <div class="sheet-inner">
+        <div class="handle-zone"><div class="handle-bar"></div></div>
+        <div class="top-bar">
+          <div class="close-btn">✕</div>
+          <div class="btn-group">
+            <div class="pill-btn">수정</div>
+            <div class="pill-btn red">삭제</div>
+          </div>
+          <div class="btn-group">
+            <div class="pill-btn">이미지 저장</div>
+            <div class="pill-btn">텍스트 복사</div>
+          </div>
+        </div>
+        <div class="content-area" style="overflow:hidden;">
+          <div class="label-xs">달린 시간</div>
+          <div class="big-num">42<span>분</span></div>
+          <div class="member-row">
+            <div class="member-name">홍길동</div>
+            <div class="insta-chip">@hong_run</div>
+          </div>
+          <div class="divider"></div>
+          <div class="date-text">2026-05-28</div>
+          <div class="title-text">"오늘도 한 걸음씩 앞으로"</div>
+          <div class="bda-label">Before · During · After</div>
+          <div class="thought-row">
+            <div class="thought-step">전</div>
+            <div class="thought-body">몸이 무겁지만 나가보자 마음먹었다</div>
+          </div>
+          <div class="thought-row">
+            <div class="thought-step">중</div>
+            <div class="thought-body">힘들지만 한 걸음씩, 호흡에 집중</div>
+          </div>
+          <div class="thought-row" style="border-bottom:none;">
+            <div class="thought-step">후</div>
+            <div class="thought-body">달리고 나니 머리가 맑아졌다</div>
+          </div>
+          <!-- 인라인 액션 -->
+          <div class="inline-actions">
+            <div class="inline-action">❤️ <span class="inline-action-text">12</span></div>
+            <div class="inline-action">💬 <span class="inline-action-text">댓글 3개 보기</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="desc-box">
+      <div class="desc-title">콘텐츠 내 인라인</div>
+      <div class="desc-body">기록 흐름 자연스럽게 연결<br>스크롤해야 보임</div>
+    </div>
+  </div>
+
+</div>
+
+<div class="selection-bar" id="sel-bar"></div>
+
+<script>
+var selected = null;
+function select(opt) {
+  if (selected) document.getElementById('opt-' + selected).classList.remove('selected');
+  selected = opt;
+  document.getElementById('opt-' + opt).classList.add('selected');
+  var labels = { a: 'A — 하단 고정 액션바', b: 'B — 상단 버튼 그룹', c: 'C — 콘텐츠 내 인라인' };
+  var bar = document.getElementById('sel-bar');
+  bar.innerHTML = '선택: <strong>' + labels[opt] + '</strong>';
+  bar.classList.add('show');
+  if (window.recordChoice) window.recordChoice(opt, labels[opt]);
+}
+</script>
+
+</body>
+</html>

@@ -4,7 +4,8 @@ export type RunLog = {
   memberName: string
   memberAvatarUrl: string
   memberInstaId: string  // '' if not set
-  date: string // 'YYYY-MM-DD'
+  date: string    // 'YYYY-MM-DD'
+  runTime: string | null // 'HH:MM' or null
   durationMin: number
   title: string
   thoughtBefore: string

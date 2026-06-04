@@ -13,6 +13,7 @@ type ThoughtKey = 'before' | 'during' | 'after'
 
 type RunLogFormInitial = {
   date: string
+  runTime?: string | null
   durationMin: number
   title: string
   location: string
@@ -54,6 +55,7 @@ export function RunLogForm({ memberId, memberName = '', memberAvatarUrl = '', mo
     const d = new Date()
     return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`
   })
+  const [runTime, setRunTime]             = useState<string>(initialData?.runTime ?? '')
   const [durationMin, setDurationMin]     = useState(initialData?.durationMin ?? 30)
   const [title, setTitle]                 = useState(initialData?.title ?? '')
   const [location, setLocation]           = useState(initialData?.location ?? '')
@@ -78,6 +80,7 @@ export function RunLogForm({ memberId, memberName = '', memberAvatarUrl = '', mo
       const hasContent = d.title || d.thoughtBefore || d.thoughtDuring || d.thoughtAfter || d.location
       if (!hasContent) return
       if (typeof d.date === 'string') setDate(d.date)
+      if (typeof d.runTime === 'string') setRunTime(d.runTime)
       if (typeof d.durationMin === 'number') setDurationMin(d.durationMin)
       if (typeof d.title === 'string') setTitle(d.title)
       if (typeof d.location === 'string') setLocation(d.location)
@@ -97,12 +100,12 @@ export function RunLogForm({ memberId, memberName = '', memberAvatarUrl = '', mo
     draftTimerRef.current = setTimeout(() => {
       try {
         localStorage.setItem(draftKey, JSON.stringify(
-          { date, durationMin, title, location, thoughtBefore, thoughtDuring, thoughtAfter }
+          { date, runTime, durationMin, title, location, thoughtBefore, thoughtDuring, thoughtAfter }
         ))
       } catch { /* storage quota 초과 무시 */ }
     }, 800)
     return () => clearTimeout(draftTimerRef.current)
-  }, [mode, draftKey, date, durationMin, title, location, thoughtBefore, thoughtDuring, thoughtAfter])
+  }, [mode, draftKey, date, runTime, durationMin, title, location, thoughtBefore, thoughtDuring, thoughtAfter])
 
   // photoFile이 바뀔 때 object URL 생성/해제
   useEffect(() => {
@@ -120,6 +123,7 @@ export function RunLogForm({ memberId, memberName = '', memberAvatarUrl = '', mo
     memberAvatarUrl,
     memberInstaId: '',
     date,
+    runTime: runTime || null,
     durationMin,
     title,
     thoughtBefore,
@@ -157,7 +161,7 @@ export function RunLogForm({ memberId, memberName = '', memberAvatarUrl = '', mo
         photoUrl = urlData.publicUrl
       }
 
-      const payload = { memberId, date, durationMin, title, thoughtBefore, thoughtDuring, thoughtAfter, location, photoUrl }
+      const payload = { memberId, date, runTime: runTime || null, durationMin, title, thoughtBefore, thoughtDuring, thoughtAfter, location, photoUrl }
 
       const url    = mode === 'edit' ? `/api/record/${recordId}` : '/api/record'
       const method = mode === 'edit' ? 'PUT' : 'POST'
@@ -203,17 +207,29 @@ export function RunLogForm({ memberId, memberName = '', memberAvatarUrl = '', mo
     )}
     <form onSubmit={handleSubmit} style={{ paddingBottom: '40px' }}>
 
-      {/* 날짜 */}
+      {/* 날짜 + 시간 */}
       <div style={SECTION_STYLE}>
-        <div style={LABEL_STYLE}>날짜</div>
-        <div style={{ background: '#fff', borderRadius: '14px', padding: '14px 16px', boxShadow: '0 1px 6px rgba(0,0,0,0.05)' }}>
-          <div style={{ fontSize: '0.57rem', fontWeight: 500, color: '#888', marginBottom: '3px' }}>날짜</div>
-          <input
-            type="date"
-            value={date}
-            onChange={e => setDate(e.target.value)}
-            style={{ fontFamily: "'Pretendard Variable', Pretendard, -apple-system, sans-serif", fontSize: '1rem', fontWeight: 500, color: '#111111', border: 'none', background: 'transparent', outline: 'none', width: '100%' }}
-          />
+        <div style={LABEL_STYLE}>날짜 · 시간</div>
+        <div style={{ background: '#fff', borderRadius: '14px', padding: '14px 16px', boxShadow: '0 1px 6px rgba(0,0,0,0.05)', display: 'flex', gap: 16 }}>
+          <div style={{ flex: 1 }}>
+            <div style={{ fontSize: '0.57rem', fontWeight: 500, color: '#888', marginBottom: '3px' }}>날짜</div>
+            <input
+              type="date"
+              value={date}
+              onChange={e => setDate(e.target.value)}
+              style={{ fontFamily: "'Pretendard Variable', Pretendard, -apple-system, sans-serif", fontSize: '1rem', fontWeight: 500, color: '#111111', border: 'none', background: 'transparent', outline: 'none', width: '100%' }}
+            />
+          </div>
+          <div style={{ width: 1, background: '#f0f0f0', flexShrink: 0 }} />
+          <div style={{ flex: 1 }}>
+            <div style={{ fontSize: '0.57rem', fontWeight: 500, color: '#888', marginBottom: '3px' }}>시작 시간 (선택)</div>
+            <input
+              type="time"
+              value={runTime}
+              onChange={e => setRunTime(e.target.value)}
+              style={{ fontFamily: "'Pretendard Variable', Pretendard, -apple-system, sans-serif", fontSize: '1rem', fontWeight: 500, color: runTime ? '#111111' : '#bbb', border: 'none', background: 'transparent', outline: 'none', width: '100%' }}
+            />
+          </div>
         </div>
       </div>
 

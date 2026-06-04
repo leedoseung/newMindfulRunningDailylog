@@ -1,0 +1,99 @@
+<h2>좋아요 · 댓글 버튼 위치</h2>
+<p class="subtitle">디테일 시트에서 좋아요/댓글 버튼을 어디에 배치할까요?</p>
+
+<div class="cards">
+
+  <!-- Option A: 하단 고정 액션바 -->
+  <div class="card" data-choice="a" onclick="toggleSelect(this)">
+    <div class="card-image" style="background:#111;border-radius:12px;overflow:hidden;padding:0;">
+      <!-- 시트 목업 -->
+      <div style="background:#111;color:#fff;font-family:sans-serif;font-size:11px;padding:10px 14px 0;display:flex;justify-content:space-between;align-items:center;">
+        <span style="opacity:0.5">✕</span>
+        <span style="opacity:0.5;font-size:9px">수정 · 삭제</span>
+        <span style="opacity:0.5;font-size:9px">이미지저장</span>
+      </div>
+      <div style="background:#111;color:#fff;padding:12px 14px 8px;">
+        <div style="font-size:9px;opacity:0.4;letter-spacing:2px;">달린 시간</div>
+        <div style="font-size:32px;font-weight:200;line-height:1;letter-spacing:-2px;">42<span style="font-size:12px;opacity:0.5">분</span></div>
+        <div style="font-size:9px;opacity:0.5;margin-top:4px;">홍길동</div>
+        <div style="height:1px;background:rgba(255,255,255,0.08);margin:10px 0;"></div>
+        <div style="font-size:10px;font-weight:500;line-height:1.5;">"오늘도 한 걸음씩"</div>
+        <div style="font-size:8px;opacity:0.45;margin-top:4px;line-height:1.6;">달리기 전: 오늘도 무사히...<br/>달리기 중: 힘들지만 계속...</div>
+      </div>
+      <!-- 하단 고정 액션바 -->
+      <div style="background:#1a1a1a;border-top:1px solid rgba(255,255,255,0.08);padding:10px 14px;display:flex;align-items:center;gap:16px;margin-top:8px;">
+        <div style="display:flex;align-items:center;gap:5px;color:#fff;">
+          <span style="font-size:18px;">🤍</span>
+          <span style="font-size:10px;opacity:0.6;">12</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:5px;color:#fff;">
+          <span style="font-size:16px;">💬</span>
+          <span style="font-size:10px;opacity:0.6;">3</span>
+        </div>
+        <div style="flex:1;"></div>
+        <span style="font-size:8px;opacity:0.3;">공유</span>
+      </div>
+    </div>
+    <div class="card-body">
+      <h3>A — 하단 고정 액션바</h3>
+      <p>Instagram/Twitter 스타일. 하트 + 댓글 아이콘이 항상 보이고 콘텐츠 스크롤과 분리. 카운트 표시.</p>
+    </div>
+  </div>
+
+  <!-- Option B: 상단 버튼 그룹 -->
+  <div class="card" data-choice="b" onclick="toggleSelect(this)">
+    <div class="card-image" style="background:#111;border-radius:12px;overflow:hidden;padding:0;">
+      <div style="background:#111;color:#fff;font-family:sans-serif;font-size:11px;padding:10px 14px 0;display:flex;justify-content:space-between;align-items:center;">
+        <span style="opacity:0.5">✕</span>
+        <div style="display:flex;gap:6px;align-items:center;">
+          <span style="background:rgba(255,255,255,0.12);border-radius:20px;padding:4px 10px;font-size:9px;display:flex;align-items:center;gap:4px;">🤍 <span style="opacity:0.7">12</span></span>
+          <span style="background:rgba(255,255,255,0.12);border-radius:20px;padding:4px 10px;font-size:9px;display:flex;align-items:center;gap:4px;">💬 <span style="opacity:0.7">3</span></span>
+        </div>
+        <span style="opacity:0.5;font-size:9px">이미지저장</span>
+      </div>
+      <div style="background:#111;color:#fff;padding:12px 14px 8px;">
+        <div style="font-size:9px;opacity:0.4;letter-spacing:2px;">달린 시간</div>
+        <div style="font-size:32px;font-weight:200;line-height:1;letter-spacing:-2px;">42<span style="font-size:12px;opacity:0.5">분</span></div>
+        <div style="font-size:9px;opacity:0.5;margin-top:4px;">홍길동</div>
+        <div style="height:1px;background:rgba(255,255,255,0.08);margin:10px 0;"></div>
+        <div style="font-size:10px;font-weight:500;line-height:1.5;">"오늘도 한 걸음씩"</div>
+        <div style="font-size:8px;opacity:0.45;margin-top:4px;line-height:1.6;">달리기 전: 오늘도 무사히...<br/>달리기 중: 힘들지만 계속...</div>
+      </div>
+      <div style="height:40px;background:#111;"></div>
+    </div>
+    <div class="card-body">
+      <h3>B — 상단 버튼 그룹</h3>
+      <p>기존 이미지저장·텍스트복사와 같은 줄에 배치. 현재 UI 패턴과 일관성. 스크롤 없이 항상 접근.</p>
+    </div>
+  </div>
+
+  <!-- Option C: 콘텐츠 하단 인라인 -->
+  <div class="card" data-choice="c" onclick="toggleSelect(this)">
+    <div class="card-image" style="background:#111;border-radius:12px;overflow:hidden;padding:0;">
+      <div style="background:#111;color:#fff;font-family:sans-serif;font-size:11px;padding:10px 14px 0;display:flex;justify-content:space-between;align-items:center;">
+        <span style="opacity:0.5">✕</span>
+        <span style="opacity:0.5;font-size:9px">수정 · 삭제</span>
+        <span style="opacity:0.5;font-size:9px">이미지저장</span>
+      </div>
+      <div style="background:#111;color:#fff;padding:12px 14px 8px;">
+        <div style="font-size:9px;opacity:0.4;letter-spacing:2px;">달린 시간</div>
+        <div style="font-size:32px;font-weight:200;line-height:1;letter-spacing:-2px;">42<span style="font-size:12px;opacity:0.5">분</span></div>
+        <div style="font-size:9px;opacity:0.5;margin-top:4px;">홍길동</div>
+        <div style="height:1px;background:rgba(255,255,255,0.08);margin:10px 0;"></div>
+        <div style="font-size:10px;font-weight:500;line-height:1.5;">"오늘도 한 걸음씩"</div>
+        <div style="font-size:8px;opacity:0.45;margin-top:4px;line-height:1.6;">달리기 전: 오늘도 무사히...<br/>달리기 중: 힘들지만 계속...</div>
+        <!-- 인라인 액션 -->
+        <div style="height:1px;background:rgba(255,255,255,0.08);margin:10px 0;"></div>
+        <div style="display:flex;gap:14px;padding:2px 0;">
+          <span style="font-size:11px;display:flex;align-items:center;gap:4px;opacity:0.75;">🤍 <span style="font-size:9px;">12</span></span>
+          <span style="font-size:11px;display:flex;align-items:center;gap:4px;opacity:0.75;">💬 <span style="font-size:9px;">댓글 3개 보기</span></span>
+        </div>
+      </div>
+    </div>
+    <div class="card-body">
+      <h3>C — 콘텐츠 하단 인라인</h3>
+      <p>스크롤하면 기록 내용 아래에 좋아요/댓글이 보임. 가장 자연스러운 읽기 흐름. 스크롤 필요.</p>
+    </div>
+  </div>
+
+</div>

@@ -8,6 +8,7 @@ type RunLogRow = {
   id: string
   member_id: string
   date: string
+  run_time: string | null
   duration_min: number
   title: string
   thought_before: string
@@ -29,6 +30,7 @@ function toRunLog(row: RunLogRow): RunLog {
     memberAvatarUrl: row.members?.avatar_url ?? '',
     memberInstaId: row.members?.insta_id ?? '',
     date: row.date,
+    runTime: row.run_time ?? null,
     durationMin: row.duration_min,
     title: row.title,
     thoughtBefore: row.thought_before,
@@ -43,7 +45,7 @@ function toRunLog(row: RunLogRow): RunLog {
 }
 
 const SELECT_FIELDS = `
-  id, member_id, date, duration_min,
+  id, member_id, date, run_time, duration_min,
   title, thought_before, thought_during, thought_after,
   location, photo_url, created_at,
   members!inner(name, avatar_url, insta_id),
@@ -110,6 +112,7 @@ export class SupabaseRunLogRepository implements IRunLogRepository {
       .insert({
         member_id: input.memberId,
         date: input.date,
+        run_time: input.runTime ?? null,
         duration_min: input.durationMin,
         title: input.title,
         thought_before: input.thoughtBefore,

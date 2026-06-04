@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>댓글창 방식 비교</title>
+<script src="/helper.js"></script>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: #0f0f0f;
+    font-family: -apple-system, BlinkMacSystemFont, 'Helvetica Neue', sans-serif;
+    color: #fff;
+    min-height: 100vh;
+    padding: 24px 16px 60px;
+  }
+  h2 { font-size: 1.1rem; font-weight: 600; text-align: center; margin-bottom: 6px; }
+  .subtitle { font-size: 0.78rem; color: rgba(255,255,255,0.4); text-align: center; margin-bottom: 28px; line-height: 1.5; }
+
+  .phones-row { display: flex; gap: 16px; justify-content: center; flex-wrap: wrap; }
+
+  .phone-wrap {
+    display: flex; flex-direction: column; align-items: center; gap: 10px;
+    cursor: pointer;
+  }
+  .phone-label { font-size: 0.72rem; font-weight: 600; color: rgba(255,255,255,0.4); letter-spacing: 1px; text-transform: uppercase; }
+  .phone-wrap.selected .phone-label { color: #60a5fa; }
+  .phone-wrap.selected .phone-frame { outline: 2.5px solid #60a5fa; }
+
+  .phone-frame {
+    width: 200px; height: 440px;
+    border-radius: 28px; overflow: hidden;
+    position: relative; background: #111;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.7);
+    flex-shrink: 0;
+  }
+
+  /* 디테일 시트 배경 */
+  .photo-bg { position: absolute; inset: 0; background: linear-gradient(160deg,#2c3e50 0%,#1a1a2e 40%,#0d0d1a 100%); z-index:0; }
+  .photo-overlay { position: absolute; inset: 0; background: linear-gradient(to bottom,rgba(0,0,0,0.38) 0%,rgba(0,0,0,0.55) 40%,rgba(0,0,0,0.72) 100%); z-index:1; pointer-events:none; }
+
+  /* 공통 시트 요소 */
+  .sheet-inner { position:relative; z-index:10; display:flex; flex-direction:column; height:100%; }
+  .handle-zone { height:22px; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+  .handle-bar { width:28px; height:3px; background:rgba(255,255,255,0.25); border-radius:2px; }
+  .top-bar { display:flex; justify-content:space-between; align-items:center; padding:0 14px; flex-shrink:0; }
+  .close-btn { width:26px; height:26px; border-radius:50%; background:rgba(0,0,0,0.35); display:flex; align-items:center; justify-content:center; font-size:10px; color:#fff; }
+  .btn-group { display:flex; gap:4px; align-items:center; }
+  .pill-btn { background:rgba(255,255,255,0.12); border:1px solid rgba(255,255,255,0.2); border-radius:20px; padding:4px 9px; font-size:7.5px; font-weight:500; color:#fff; }
+  .pill-btn.red { background:rgba(239,68,68,0.2); border-color:rgba(239,68,68,0.4); color:#ef4444; }
+  .content-area { flex:1; padding:12px 14px 8px; overflow:hidden; }
+  .label-xs { font-size:7px; font-weight:500; color:rgba(255,255,255,0.4); letter-spacing:2px; text-transform:uppercase; margin-bottom:2px; }
+  .big-num { font-size:40px; font-weight:200; color:#fff; line-height:1; letter-spacing:-2px; display:flex; align-items:baseline; gap:3px; }
+  .big-num span { font-size:12px; font-weight:300; color:rgba(255,255,255,0.5); }
+  .member-row { display:flex; align-items:center; gap:6px; margin:4px 0 6px; }
+  .member-name { font-size:10px; color:rgba(255,255,255,0.65); }
+  .insta-chip { background:rgba(255,255,255,0.1); border-radius:20px; padding:2px 7px; font-size:7px; color:rgba(255,255,255,0.6); }
+  .divider { height:1px; background:rgba(255,255,255,0.09); margin:7px 0; }
+  .title-text { font-size:12px; font-weight:500; color:#fff; line-height:1.35; margin-bottom:8px; }
+  .thought-row { display:flex; gap:8px; padding-bottom:7px; margin-bottom:7px; border-bottom:1px solid rgba(255,255,255,0.07); }
+  .thought-step { font-size:7px; font-weight:500; color:rgba(255,255,255,0.4); text-transform:uppercase; min-width:14px; padding-top:2px; }
+  .thought-body { font-size:9px; color:rgba(255,255,255,0.75); line-height:1.55; }
+
+  /* 하단 액션바 (공통) */
+  .bottom-bar {
+    flex-shrink:0; background:rgba(0,0,0,0.45); backdrop-filter:blur(12px);
+    border-top:1px solid rgba(255,255,255,0.08);
+    padding:9px 14px; display:flex; align-items:center; gap:14px;
+  }
+  .action-icon { display:flex; align-items:center; gap:4px; font-size:15px; color:rgba(255,255,255,0.7); cursor:pointer; }
+  .action-count { font-size:9px; color:rgba(255,255,255,0.45); }
+
+  /* ── A: 새 바텀시트 위에 ── */
+  .comment-sheet-overlay {
+    position:absolute; inset:0; z-index:30;
+    background:rgba(0,0,0,0.5);
+    display:flex; align-items:flex-end;
+  }
+  .comment-sheet {
+    width:100%; background:#1a1a1a;
+    border-radius:22px 22px 0 0;
+    overflow:hidden;
+    box-shadow:0 -4px 24px rgba(0,0,0,0.5);
+  }
+  .cs-handle { height:20px; display:flex; align-items:center; justify-content:center; }
+  .cs-handle-bar { width:24px; height:3px; background:rgba(255,255,255,0.2); border-radius:2px; }
+  .cs-header { padding:6px 14px 8px; display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid rgba(255,255,255,0.06); }
+  .cs-title { font-size:11px; font-weight:600; color:#fff; }
+  .cs-close { font-size:10px; color:rgba(255,255,255,0.4); }
+  .comment-item { display:flex; gap:8px; padding:8px 14px; }
+  .avatar { width:22px; height:22px; border-radius:50%; background:rgba(255,255,255,0.12); flex-shrink:0; display:flex; align-items:center; justify-content:center; font-size:8px; color:rgba(255,255,255,0.5); }
+  .comment-body { flex:1; }
+  .comment-author { font-size:8px; font-weight:600; color:rgba(255,255,255,0.7); margin-bottom:2px; }
+  .comment-text { font-size:9px; color:rgba(255,255,255,0.6); line-height:1.5; }
+  .comment-time { font-size:7px; color:rgba(255,255,255,0.25); margin-top:2px; }
+  .cs-input-row { padding:8px 14px 10px; border-top:1px solid rgba(255,255,255,0.06); display:flex; gap:6px; align-items:center; }
+  .cs-input { flex:1; background:rgba(255,255,255,0.08); border:none; border-radius:20px; padding:6px 12px; font-size:9px; color:rgba(255,255,255,0.8); outline:none; }
+  .cs-send { font-size:9px; font-weight:600; color:#60a5fa; white-space:nowrap; }
+
+  /* ── B: 디테일 시트가 위로 슬라이드 ── */
+  .detail-slide-up {
+    transform: translateY(-55px);
+    transition: transform 0.3s;
+  }
+  .comment-panel-slide {
+    position:absolute; bottom:0; left:0; right:0; z-index:25;
+    background:#1a1a1a;
+    border-radius:22px 22px 0 0;
+    height:220px;
+    padding:0;
+  }
+
+  /* ── C: 같은 시트 안에서 전환 ── */
+  .in-sheet-comments {
+    position:absolute; inset:0; z-index:20;
+    background:#111;
+    display:flex; flex-direction:column;
+    border-radius:28px;
+  }
+  .isc-header { display:flex; align-items:center; gap:8px; padding:12px 14px 10px; border-bottom:1px solid rgba(255,255,255,0.07); flex-shrink:0; }
+  .isc-back { width:24px; height:24px; border-radius:50%; background:rgba(255,255,255,0.1); display:flex; align-items:center; justify-content:center; font-size:10px; color:#fff; }
+  .isc-title { font-size:12px; font-weight:600; color:#fff; }
+  .isc-list { flex:1; overflow:hidden; padding:4px 0; }
+
+  /* 설명 */
+  .desc-box { text-align:center; padding:6px 8px; max-width:200px; }
+  .desc-title { font-size:0.8rem; font-weight:600; color:#fff; margin-bottom:4px; }
+  .desc-body { font-size:0.65rem; color:rgba(255,255,255,0.4); line-height:1.5; }
+  .phone-wrap.selected .desc-title { color:#60a5fa; }
+  .phone-wrap.selected .desc-body { color:rgba(255,255,255,0.6); }
+
+  .selected-badge { display:none; position:absolute; top:10px; right:10px; background:#60a5fa; color:#000; font-size:9px; font-weight:700; border-radius:20px; padding:2px 8px; z-index:40; }
+  .phone-wrap.selected .selected-badge { display:block; }
+
+  .selection-bar { position:fixed; bottom:0; left:0; right:0; background:rgba(20,20,20,0.95); backdrop-filter:blur(10px); border-top:1px solid rgba(255,255,255,0.08); padding:14px 20px; text-align:center; font-size:0.75rem; color:rgba(255,255,255,0.4); display:none; z-index:100; }
+  .selection-bar.show { display:block; }
+  .selection-bar strong { color:#60a5fa; }
+</style>
+</head>
+<body>
+
+<h2>댓글창 방식</h2>
+<p class="subtitle">💬 아이콘을 누르면 댓글이 어떻게 나타날까요?</p>
+
+<div class="phones-row">
+
+  <!-- ── A: 새 바텀시트가 위에 올라옴 ── -->
+  <div class="phone-wrap" id="opt-a" onclick="select('a')">
+    <div class="phone-label">A</div>
+    <div class="phone-frame">
+      <div class="selected-badge">✓ 선택됨</div>
+      <div class="photo-bg"></div>
+      <div class="photo-overlay"></div>
+      <!-- 디테일 시트 (뒤에) -->
+      <div class="sheet-inner" style="filter:brightness(0.5);">
+        <div class="handle-zone"><div class="handle-bar"></div></div>
+        <div class="top-bar">
+          <div class="close-btn">✕</div>
+          <div class="btn-group"><div class="pill-btn">수정</div><div class="pill-btn red">삭제</div></div>
+          <div class="btn-group"><div class="pill-btn">이미지 저장</div></div>
+        </div>
+        <div class="content-area">
+          <div class="label-xs">달린 시간</div>
+          <div class="big-num">42<span>분</span></div>
+          <div class="member-row"><div class="member-name">홍길동</div></div>
+          <div class="divider"></div>
+          <div class="title-text">"오늘도 한 걸음씩"</div>
+          <div class="thought-row"><div class="thought-step">전</div><div class="thought-body">몸이 무겁지만 나가보자</div></div>
+          <div class="thought-row"><div class="thought-step">중</div><div class="thought-body">호흡에 집중하며 달렸다</div></div>
+        </div>
+        <div class="bottom-bar">
+          <div class="action-icon">❤️ <span class="action-count">12</span></div>
+          <div class="action-icon" style="color:#60a5fa;">💬 <span class="action-count" style="color:#60a5fa;">3</span></div>
+        </div>
+      </div>
+      <!-- 댓글 시트가 위에 올라옴 -->
+      <div class="comment-sheet-overlay">
+        <div class="comment-sheet">
+          <div class="cs-handle"><div class="cs-handle-bar"></div></div>
+          <div class="cs-header">
+            <div class="cs-title">댓글 3개</div>
+            <div class="cs-close">✕</div>
+          </div>
+          <div class="comment-item">
+            <div class="avatar">김</div>
+            <div class="comment-body">
+              <div class="comment-author">김민지</div>
+              <div class="comment-text">오늘도 멋지게 달리셨네요! 👏</div>
+              <div class="comment-time">5분 전</div>
+            </div>
+          </div>
+          <div class="comment-item">
+            <div class="avatar">이</div>
+            <div class="comment-body">
+              <div class="comment-author">이지훈</div>
+              <div class="comment-text">42분 대단해요 저도 자극받았어요</div>
+              <div class="comment-time">12분 전</div>
+            </div>
+          </div>
+          <div class="cs-input-row">
+            <div class="avatar" style="background:rgba(255,255,255,0.08);">나</div>
+            <div class="cs-input" style="color:rgba(255,255,255,0.3);">댓글 달기...</div>
+            <div class="cs-send">게시</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="desc-box">
+      <div class="desc-title">새 시트가 위로 올라옴</div>
+      <div class="desc-body">Instagram 스타일<br>디테일 시트는 뒤에 유지<br>자연스럽고 친숙한 패턴</div>
+    </div>
+  </div>
+
+  <!-- ── B: 디테일 시트가 올라가고 댓글 패널 슬라이드 ── -->
+  <div class="phone-wrap" id="opt-b" onclick="select('b')">
+    <div class="phone-label">B</div>
+    <div class="phone-frame">
+      <div class="selected-badge">✓ 선택됨</div>
+      <div class="photo-bg"></div>
+      <div class="photo-overlay"></div>
+      <!-- 디테일 시트 (위로 밀림) -->
+      <div class="sheet-inner detail-slide-up">
+        <div class="handle-zone"><div class="handle-bar"></div></div>
+        <div class="top-bar">
+          <div class="close-btn">✕</div>
+          <div class="btn-group"><div class="pill-btn">수정</div></div>
+          <div class="btn-group"><div class="pill-btn">이미지 저장</div></div>
+        </div>
+        <div class="content-area">
+          <div class="label-xs">달린 시간</div>
+          <div class="big-num">42<span>분</span></div>
+          <div class="member-row"><div class="member-name">홍길동</div></div>
+          <div class="divider"></div>
+          <div class="title-text">"오늘도 한 걸음씩"</div>
+          <div class="thought-row"><div class="thought-step">전</div><div class="thought-body">몸이 무겁지만 나가보자</div></div>
+        </div>
+        <div class="bottom-bar">
+          <div class="action-icon">❤️ <span class="action-count">12</span></div>
+          <div class="action-icon" style="color:#60a5fa;">💬 <span class="action-count" style="color:#60a5fa;">3</span></div>
+        </div>
+      </div>
+      <!-- 하단에서 댓글 패널이 밀고 올라옴 -->
+      <div class="comment-panel-slide">
+        <div class="cs-handle"><div class="cs-handle-bar"></div></div>
+        <div class="cs-header">
+          <div class="cs-title">댓글 3개</div>
+          <div class="cs-close">✕</div>
+        </div>
+        <div class="comment-item">
+          <div class="avatar">김</div>
+          <div class="comment-body">
+            <div class="comment-author">김민지</div>
+            <div class="comment-text">오늘도 멋지게 달리셨네요! 👏</div>
+            <div class="comment-time">5분 전</div>
+          </div>
+        </div>
+        <div class="comment-item">
+          <div class="avatar">이</div>
+          <div class="comment-body">
+            <div class="comment-author">이지훈</div>
+            <div class="comment-text">42분 대단해요!</div>
+            <div class="comment-time">12분 전</div>
+          </div>
+        </div>
+        <div class="cs-input-row">
+          <div class="avatar" style="background:rgba(255,255,255,0.08);">나</div>
+          <div class="cs-input" style="color:rgba(255,255,255,0.3);">댓글 달기...</div>
+          <div class="cs-send">게시</div>
+        </div>
+      </div>
+    </div>
+    <div class="desc-box">
+      <div class="desc-title">디테일 시트가 위로 밀림</div>
+      <div class="desc-body">디테일 내용이 살짝 올라가고<br>댓글 패널이 아래서 올라옴<br>공간 분할 명확</div>
+    </div>
+  </div>
+
+  <!-- ── C: 시트 내부에서 화면 전환 ── -->
+  <div class="phone-wrap" id="opt-c" onclick="select('c')">
+    <div class="phone-label">C</div>
+    <div class="phone-frame">
+      <div class="selected-badge">✓ 선택됨</div>
+      <div class="photo-bg"></div>
+      <div class="photo-overlay"></div>
+      <!-- 디테일 시트 (배경) -->
+      <div class="sheet-inner" style="filter:brightness(0.3);">
+        <div class="handle-zone"><div class="handle-bar"></div></div>
+        <div class="top-bar">
+          <div class="close-btn">✕</div>
+          <div class="btn-group"><div class="pill-btn">이미지 저장</div></div>
+        </div>
+        <div class="content-area">
+          <div class="big-num">42<span>분</span></div>
+          <div class="title-text">"오늘도 한 걸음씩"</div>
+        </div>
+        <div class="bottom-bar">
+          <div class="action-icon">❤️</div>
+          <div class="action-icon">💬</div>
+        </div>
+      </div>
+      <!-- 시트 안에서 댓글 화면으로 전환 -->
+      <div class="in-sheet-comments">
+        <div class="isc-header">
+          <div class="isc-back">←</div>
+          <div class="isc-title">댓글 3개</div>
+        </div>
+        <div class="isc-list">
+          <div class="comment-item">
+            <div class="avatar">김</div>
+            <div class="comment-body">
+              <div class="comment-author">김민지</div>
+              <div class="comment-text">오늘도 멋지게 달리셨네요! 👏</div>
+              <div class="comment-time">5분 전</div>
+            </div>
+          </div>
+          <div class="comment-item">
+            <div class="avatar">이</div>
+            <div class="comment-body">
+              <div class="comment-author">이지훈</div>
+              <div class="comment-text">42분 대단해요 저도 자극받았어요</div>
+              <div class="comment-time">12분 전</div>
+            </div>
+          </div>
+          <div class="comment-item">
+            <div class="avatar">박</div>
+            <div class="comment-body">
+              <div class="comment-author">박서연</div>
+              <div class="comment-text">화이팅! 내일도 함께 달려요 🏃</div>
+              <div class="comment-time">20분 전</div>
+            </div>
+          </div>
+          <div class="comment-item" style="opacity:0.35; border-top:1px solid rgba(255,255,255,0.05); padding-top:8px;">
+            <div style="font-size:8px; color:rgba(255,255,255,0.3); padding-left:30px;">댓글이 없습니다</div>
+          </div>
+        </div>
+        <div class="cs-input-row" style="background:#1a1a1a; border-top:1px solid rgba(255,255,255,0.07);">
+          <div class="avatar" style="background:rgba(255,255,255,0.08);">나</div>
+          <div class="cs-input" style="color:rgba(255,255,255,0.3);">댓글 달기...</div>
+          <div class="cs-send">게시</div>
+        </div>
+      </div>
+    </div>
+    <div class="desc-box">
+      <div class="desc-title">시트 내에서 화면 전환</div>
+      <div class="desc-body">← 뒤로가기로 디테일로 복귀<br>전체 화면을 댓글에 활용<br>구현 단순, 공간 최대</div>
+    </div>
+  </div>
+
+</div>
+
+<div class="selection-bar" id="sel-bar"></div>
+
+<script>
+var selected = null;
+function select(opt) {
+  if (selected) document.getElementById('opt-' + selected).classList.remove('selected');
+  selected = opt;
+  document.getElementById('opt-' + opt).classList.add('selected');
+  var labels = { a:'A — 새 시트가 위로', b:'B — 디테일 시트가 위로 밀림', c:'C — 시트 내 화면 전환' };
+  var bar = document.getElementById('sel-bar');
+  bar.innerHTML = '선택: <strong>' + labels[opt] + '</strong>';
+  bar.classList.add('show');
+  if (window.recordChoice) window.recordChoice(opt, labels[opt]);
+}
+</script>
+
+</body>
+</html>

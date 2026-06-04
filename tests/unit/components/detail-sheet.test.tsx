@@ -20,7 +20,7 @@ const run: RunLog = {
   id: 'r1',
   memberId: 'm1',
   memberName: '이두승', memberAvatarUrl: '', memberInstaId: '',
-  date: '2026-05-24',
+  date: '2026-05-24', runTime: null,
   durationMin: 45,
   title: '남산 달리기',
   thoughtBefore: '가볍게 달릴 예정',

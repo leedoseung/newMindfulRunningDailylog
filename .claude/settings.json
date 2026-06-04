@@ -1,0 +1,31 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(bash /Users/duvis/.claude/plugins/cache/claude-plugins-official/superpowers/5.1.0/skills/brainstorming/scripts/start-server.sh --project-dir /Users/duvis/DuvisProject/newDailyMindfulRunningApp)",
+      "Bash(npm test *)",
+      "Bash(npx tsc *)",
+      "Bash(mkdir -p /Users/duvis/DuvisProject/newDailyMindfulRunningApp/src/app/api/record/\\\\[id\\\\]/like)",
+      "Bash(mkdir -p \"/Users/duvis/DuvisProject/newDailyMindfulRunningApp/src/app/api/record/[id]/comments\")",
+      "Bash(mkdir -p \"/Users/duvis/DuvisProject/newDailyMindfulRunningApp/src/app/api/comments/[commentId]\")",
+      "Read(//tmp/**)",
+      "Bash(npx vitest *)",
+      "Bash(sed -i '' 's|<AppHeader memberName={memberName || '\\\\''?'\\\\''} memberAvatarUrl={memberAvatarUrl} />|<AppHeader memberName={memberName || '\\\\''?'\\\\''} memberAvatarUrl={memberAvatarUrl} memberId={memberId} />|g' /Users/duvis/DuvisProject/newDailyMindfulRunningApp/src/app/home/page.tsx)",
+      "Bash(sed -i '' 's|<AppHeader memberName={memberName} memberAvatarUrl={memberAvatarUrl} />|<AppHeader memberName={memberName} memberAvatarUrl={memberAvatarUrl} memberId={memberId} />|g' /Users/duvis/DuvisProject/newDailyMindfulRunningApp/src/app/leaderboard/page.tsx /Users/duvis/DuvisProject/newDailyMindfulRunningApp/src/app/page.tsx)",
+      "Bash(gh api *)",
+      "Bash(bash)",
+      "Bash(python3 -c \"import json,sys; d=json.load\\(sys.stdin\\); print\\(json.dumps\\(d.get\\('hooks', {}\\), indent=2\\)\\)\")",
+      "Bash(ls ~/.claude/hooks/ 2>/dev/null && echo \"---\" && ls ~/.local/bin/codebase-memory-mcp 2>/dev/null)",
+      "Read(//Users/duvis/.local/bin/**)",
+      "Bash(command -v jq)",
+      "Bash(jq --version)",
+      "Bash(chmod +x ~/.claude/hooks/cbm-code-discovery-gate ~/.claude/hooks/cbm-mcp-marker)",
+      "Bash(python3 -m json.tool ~/.claude/settings.json)",
+      "Bash(python3 -c \"import json,sys; d=json.load\\(sys.stdin\\); h=d['hooks']; print\\('PreToolUse matcher:', h['PreToolUse'][0]['matcher']\\); print\\('PostToolUse matcher:', h['PostToolUse'][0]['matcher']\\)\")"
+    ],
+    "additionalDirectories": [
+      "/Users/duvis/DuvisProject/newDailyMindfulRunningApp/src/app/api/record/[id]",
+      "/Users/duvis/.claude/hooks",
+      "/Users/duvis/.claude"
+    ]
+  }
+}

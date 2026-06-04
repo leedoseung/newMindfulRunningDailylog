@@ -3,7 +3,7 @@ import { RunLogForm } from '@/presentation/components/form/run-log-form'
 import { AppHeader } from '@/presentation/components/layout/app-header'
 
 type RunLogFormInitial = {
-  date: string; durationMin: number; title: string; location: string
+  date: string; runTime: string | null; durationMin: number; title: string; location: string
   thoughtBefore: string; thoughtDuring: string; thoughtAfter: string; photoUrl: string
 }
 
@@ -24,7 +24,7 @@ export default async function RootPage({
     edit
       ? supabase
           .from('run_logs')
-          .select('date, duration_min, title, location, thought_before, thought_during, thought_after, photo_url')
+          .select('date, run_time, duration_min, title, location, thought_before, thought_during, thought_after, photo_url')
           .eq('id', edit)
           .single()
       : Promise.resolve({ data: null }),
@@ -38,6 +38,7 @@ export default async function RootPage({
     const d = editData.data
     initialData = {
       date: d.date as string,
+      runTime: (d.run_time as string | null) ?? null,
       durationMin: d.duration_min as number,
       title: d.title as string,
       location: d.location as string,

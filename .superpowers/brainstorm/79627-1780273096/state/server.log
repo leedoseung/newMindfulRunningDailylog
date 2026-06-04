@@ -1,0 +1,6 @@
+{"type":"server-started","port":61886,"host":"127.0.0.1","url_host":"localhost","url":"http://localhost:61886","screen_dir":"/Users/duvis/DuvisProject/newDailyMindfulRunningApp/.superpowers/brainstorm/79627-1780273096/content","state_dir":"/Users/duvis/DuvisProject/newDailyMindfulRunningApp/.superpowers/brainstorm/79627-1780273096/state"}
+{"type":"screen-added","file":"/Users/duvis/DuvisProject/newDailyMindfulRunningApp/.superpowers/brainstorm/79627-1780273096/content/like-comment-placement.html"}
+{"type":"screen-added","file":"/Users/duvis/DuvisProject/newDailyMindfulRunningApp/.superpowers/brainstorm/79627-1780273096/content/like-placement-v2.html"}
+{"type":"screen-added","file":"/Users/duvis/DuvisProject/newDailyMindfulRunningApp/.superpowers/brainstorm/79627-1780273096/content/comment-sheet.html"}
+{"type":"screen-added","file":"/Users/duvis/DuvisProject/newDailyMindfulRunningApp/.superpowers/brainstorm/79627-1780273096/content/waiting-1.html"}
+{"type":"server-stopped","reason":"idle timeout"}

@@ -13,7 +13,7 @@ vi.setSystemTime(FIXED_DATE)
 
 const makeRun = (overrides: Partial<RunLog> = {}): RunLog => ({
   id: 'r1', memberId: 'm1', memberName: '이두승', memberAvatarUrl: '',
-  memberInstaId: '', date: '2026-05-15', durationMin: 30,
+  memberInstaId: '', date: '2026-05-15', runTime: null, durationMin: 30,
   title: '', thoughtBefore: '', thoughtDuring: '', thoughtAfter: '',
   location: '', photoUrl: '', createdAt: '2026-05-15T00:00:00Z',
   likeCount: 0, commentCount: 0,

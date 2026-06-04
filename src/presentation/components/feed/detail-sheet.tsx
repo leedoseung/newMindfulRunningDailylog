@@ -567,7 +567,7 @@ ${run.thoughtAfter}`
           <div style={{ height: 1, background: dividerBg, marginBottom: 20 }} />
 
           <div style={{ fontFamily: FONT, fontSize: '0.62rem', fontWeight: 400, color: dateColor, marginBottom: 8 }}>
-            {run.date}
+            {run.date}{run.runTime ? ` · ${run.runTime}` : ''}
           </div>
           {run.title && (
             <div style={{

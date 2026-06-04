@@ -32,7 +32,7 @@ export async function GET(
   const { data, error } = await admin
     .from('run_logs')
     .select(`
-      id, member_id, date, duration_min,
+      id, member_id, date, run_time, duration_min,
       title, thought_before, thought_during, thought_after,
       location, photo_url, created_at,
       members!inner(name, avatar_url, insta_id),
@@ -54,6 +54,7 @@ export async function GET(
     memberAvatarUrl: row.members?.avatar_url ?? '',
     memberInstaId: row.members?.insta_id ?? '',
     date: row.date as string,
+    runTime: (row.run_time as string | null) ?? null,
     durationMin: row.duration_min as number,
     title: row.title as string,
     thoughtBefore: row.thought_before as string,
@@ -103,6 +104,7 @@ export async function PUT(
     .from('run_logs')
     .update({
       date: body.date,
+      run_time: body.runTime ?? null,
       duration_min: body.durationMin,
       title: body.title,
       thought_before: body.thoughtBefore,
@@ -112,7 +114,7 @@ export async function PUT(
       photo_url: body.photoUrl,
     })
     .eq('id', id)
-    .select('id, member_id, date, duration_min, title, thought_before, thought_during, thought_after, location, photo_url, created_at')
+    .select('id, member_id, date, run_time, duration_min, title, thought_before, thought_during, thought_after, location, photo_url, created_at')
     .single()
 
   if (error) return NextResponse.json({ error: error.message }, { status: 500 })

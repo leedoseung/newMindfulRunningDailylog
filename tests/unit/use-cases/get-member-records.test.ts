@@ -7,7 +7,7 @@ const makeRun = (id: string): RunLog => ({
   id,
   memberId: 'mem-1',
   memberName: '이두승', memberAvatarUrl: '', memberInstaId: '',
-  date: '2026-05-24',
+  date: '2026-05-24', runTime: null,
   durationMin: 30,
   title: '달리기',
   thoughtBefore: '',

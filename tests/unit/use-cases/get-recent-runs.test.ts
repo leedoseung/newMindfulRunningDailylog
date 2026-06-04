@@ -7,7 +7,7 @@ const makeRun = (overrides: Partial<RunLog> = {}): RunLog => ({
   id: 'uuid-1',
   memberId: 'mem-1',
   memberName: '이두승', memberAvatarUrl: '', memberInstaId: '',
-  date: '2026-05-24',
+  date: '2026-05-24', runTime: null,
   durationMin: 30,
   title: '테스트 달리기',
   thoughtBefore: '',

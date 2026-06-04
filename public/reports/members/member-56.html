@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="ko"><head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>정남C님의 달리기 리포트 — MFRS 5기</title>
+<style>
+:root{
+  --bg:#faf8f3; --ink:#2b2a26; --muted:#6f6a60; --line:#e7e1d6;
+  --green:#2f6b4f; --green-d:#1f4a37; --green-l:#e6f0ea;
+  --amber:#d98e3e; --amber-l:#fbeede; --sky:#5b8aa6; --rose:#c97b86;
+  --card:#fffdf9; --shadow:0 1px 3px rgba(60,50,30,.06),0 6px 24px rgba(60,50,30,.05);
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);
+  font-family:"Pretendard","Apple SD Gothic Neo","Noto Sans KR",-apple-system,BlinkMacSystemFont,sans-serif;
+  line-height:1.7;-webkit-font-smoothing:antialiased}
+.wrap{max-width:920px;margin:0 auto;padding:0 20px 80px}
+a{color:var(--green);text-decoration:none}
+a:hover{text-decoration:underline}
+.hero{background:linear-gradient(135deg,var(--green-d),var(--green));color:#fff;
+  border-radius:0 0 28px 28px;padding:48px 28px 40px;margin-bottom:8px}
+.hero .wrap{padding-bottom:0}
+.hero .eyebrow{font-size:.82rem;letter-spacing:.12em;opacity:.85;text-transform:uppercase;margin:0 0 10px}
+.hero h1{font-size:2.1rem;line-height:1.25;margin:0 0 12px;font-weight:800;letter-spacing:-.01em}
+.hero p.sub{font-size:1.02rem;opacity:.92;margin:0;max-width:680px}
+.hero .period{margin-top:18px;font-size:.9rem;opacity:.8}
+section{margin-top:44px}
+h2{font-size:1.42rem;font-weight:800;letter-spacing:-.01em;margin:0 0 6px;
+  display:flex;align-items:center;gap:.5rem}
+h2 .em{font-size:1.3rem}
+.lede{color:var(--muted);margin:0 0 20px;font-size:.98rem}
+.cardrow{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:14px}
+.stat{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:20px;box-shadow:var(--shadow)}
+.stat .v{font-size:2rem;font-weight:800;color:var(--green-d);line-height:1.1}
+.stat .v small{font-size:.95rem;font-weight:700;color:var(--muted)}
+.stat .l{font-size:.86rem;color:var(--muted);margin-top:6px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:24px;box-shadow:var(--shadow)}
+.bar{display:flex;align-items:center;gap:12px;margin:10px 0}
+.bar .name{width:96px;flex:none;font-size:.9rem;color:var(--ink);font-weight:600}
+.bar .track{flex:1;background:#efe9dd;border-radius:999px;height:22px;position:relative;overflow:hidden}
+.bar .fill{height:100%;border-radius:999px;background:linear-gradient(90deg,var(--green),var(--green-d));
+  display:flex;align-items:center;justify-content:flex-end;padding-right:9px;color:#fff;font-size:.76rem;font-weight:700;min-width:34px}
+.bar .fill.amber{background:linear-gradient(90deg,var(--amber),#b9701f)}
+.bar .fill.sky{background:linear-gradient(90deg,#7aa6bd,var(--sky))}
+.bar .fill.rose{background:linear-gradient(90deg,#d99aa3,var(--rose))}
+.season-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+.season{border-radius:18px;padding:22px;color:#fff;position:relative;overflow:hidden}
+.season.winter{background:linear-gradient(150deg,#5b7fa6,#3d5d80)}
+.season.spring{background:linear-gradient(150deg,#5fa06f,#2f6b4f)}
+.season.summer{background:linear-gradient(150deg,#e0a85b,#c47b2f)}
+.season .se{font-size:1.6rem}
+.season h3{margin:6px 0 2px;font-size:1.2rem}
+.season .range{font-size:.78rem;opacity:.85}
+.season .big{font-size:1.8rem;font-weight:800;margin-top:12px;line-height:1}
+.season .sub{font-size:.84rem;opacity:.9;margin-top:4px}
+.season.upcoming{opacity:.96;border:2px dashed rgba(255,255,255,.5)}
+.arc{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+.arc .col{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:18px}
+.arc .col h4{margin:0 0 4px;font-size:1rem;color:var(--green-d)}
+.arc .col .ph{font-size:.78rem;color:var(--muted);margin-bottom:12px}
+.kw{display:flex;align-items:center;gap:8px;margin:7px 0;font-size:.88rem}
+.kw .dot{width:9px;height:9px;border-radius:50%;flex:none}
+.kw .kwbar{flex:1;height:8px;background:#efe9dd;border-radius:999px;overflow:hidden}
+.kw .kwbar i{display:block;height:100%;border-radius:999px}
+.kw .n{width:34px;text-align:right;color:var(--muted);font-size:.78rem;font-variant-numeric:tabular-nums}
+.coachnote{background:var(--green-l);border-left:4px solid var(--green);border-radius:0 14px 14px 0;
+  padding:18px 22px;margin-top:18px}
+.coachnote .tag{font-size:.78rem;font-weight:800;color:var(--green-d);letter-spacing:.04em;margin-bottom:6px}
+.coachnote p{margin:.4rem 0;font-size:.96rem}
+.loclist{columns:2;column-gap:28px}
+.loclist .li{display:flex;justify-content:space-between;padding:7px 0;border-bottom:1px dotted var(--line);
+  break-inside:avoid;font-size:.92rem}
+.loclist .li b{color:var(--muted);font-weight:600}
+.membergrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px}
+.mcard{display:block;background:var(--card);border:1px solid var(--line);border-radius:14px;
+  padding:16px;box-shadow:var(--shadow);transition:transform .12s,box-shadow .12s}
+.mcard:hover{transform:translateY(-2px);box-shadow:0 6px 22px rgba(60,50,30,.1);text-decoration:none}
+.mcard .mn{font-weight:800;color:var(--green-d);font-size:1.02rem}
+.mcard .ms{font-size:.8rem;color:var(--muted);margin-top:4px}
+.mcard .chips{margin-top:8px;display:flex;flex-wrap:wrap;gap:4px}
+.chip{font-size:.72rem;background:var(--green-l);color:var(--green-d);border-radius:999px;padding:2px 9px}
+.runbox{border:1px solid var(--line);border-radius:14px;padding:18px;margin-top:14px;background:#fffdf9}
+.runbox .meta{font-size:.82rem;color:var(--muted);margin-bottom:8px}
+.runbox .title{font-weight:700;margin-bottom:10px}
+.runbox .phase{margin:10px 0}
+.runbox .phase .pl{font-size:.76rem;font-weight:800;color:var(--amber);letter-spacing:.03em}
+.runbox .phase .pt{font-size:.92rem;color:var(--ink);white-space:pre-wrap}
+.nav{display:flex;gap:16px;flex-wrap:wrap;margin-top:16px;font-size:.92rem}
+.backlink{display:inline-block;margin:24px 0 0;font-size:.9rem}
+footer{margin-top:60px;padding-top:24px;border-top:1px solid var(--line);
+  font-size:.82rem;color:var(--muted)}
+.note{font-size:.82rem;color:var(--muted);background:#f3efe6;border-radius:10px;padding:12px 16px;margin-top:14px}
+.russell{position:relative;padding:30px 26px 30px 30px}
+.rgrid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.rq{border-radius:14px;padding:18px 16px;text-align:center;color:#33312c;
+  background:#efe9dd}
+.rq.hp{background:rgba(224,162,62,var(--op))}
+.rq.lp{background:rgba(79,140,94,var(--op))}
+.rq.hn{background:rgba(201,123,134,var(--op))}
+.rq.ln{background:rgba(91,107,122,var(--op))}
+.rq.dom{box-shadow:0 0 0 3px var(--green);font-weight:800}
+.rq .rqv{font-size:1.5rem;font-weight:800;line-height:1}
+.rq .rql{font-size:.84rem;margin-top:5px;opacity:.95}
+.rax{position:absolute;font-size:.72rem;color:var(--muted);font-weight:600}
+.rax-top{top:8px;left:50%;transform:translateX(-50%)}
+.rax-bot{bottom:8px;left:50%;transform:translateX(-50%)}
+.rax-l{left:-2px;top:50%;transform:translateY(-50%) rotate(-90deg);transform-origin:left}
+.rax-r{right:-8px;top:50%;transform:translateY(-50%) rotate(90deg);transform-origin:right}
+.psy{display:grid;grid-template-columns:repeat(2,1fr);gap:14px}
+.psy .pcard{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:20px;box-shadow:var(--shadow)}
+.psy .pcard .pt{font-size:.78rem;font-weight:800;letter-spacing:.04em;color:var(--green-d);margin-bottom:4px}
+.psy .pcard .pv{font-size:1.7rem;font-weight:800;color:var(--green-d);line-height:1.1}
+.psy .pcard .pd{font-size:.86rem;color:var(--ink);margin-top:6px}
+.psy .pcard .cite{font-size:.72rem;color:var(--muted);margin-top:8px;font-style:italic}
+.tag2{display:inline-block;font-size:.7rem;font-weight:700;border-radius:999px;padding:2px 9px;margin:2px 3px 2px 0}
+.tag2.s{background:var(--green-l);color:var(--green-d)}
+.tag2.q{background:#f0ece3;color:#8a8576}
+.dnastrip{display:flex;flex-wrap:wrap;gap:5px;margin-top:6px}
+.dnastrip .k{font-size:.72rem;background:#fff;border:1px solid var(--line);border-radius:999px;padding:3px 10px;color:var(--green-d)}
+.roomcards{display:grid;grid-template-columns:repeat(auto-fit,minmax(155px,1fr));gap:12px}
+.roomcard{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px;box-shadow:var(--shadow)}
+.roomcard .rn{font-weight:800;color:var(--green-d);font-size:1.02rem}
+.roomcard .rd{font-size:.76rem;color:var(--muted);margin:3px 0 8px}
+.roomcard .rv{font-size:1.5rem;font-weight:800;color:var(--green-d);line-height:1}
+.roomcard .rm{font-size:.78rem;color:var(--muted);margin-top:4px}
+.heat{border-collapse:separate;border-spacing:3px;width:100%;font-size:.8rem}
+.heat th{font-weight:700;color:var(--muted);font-size:.76rem;padding:3px 5px;text-align:center}
+.heat td.lbl{text-align:left;font-weight:700;white-space:nowrap;padding-right:8px}
+.heat td.c{text-align:center;border-radius:6px;color:#2b2a26;font-variant-numeric:tabular-nums;padding:6px 4px;min-width:38px}
+.topicrow{display:flex;align-items:center;gap:8px;margin:6px 0;font-size:.88rem}
+.topicrow .tn{width:108px;flex:none}
+.topicrow .tb{flex:1;height:14px;background:#efe9dd;border-radius:999px;overflow:hidden}
+.topicrow .tb i{display:block;height:100%;border-radius:999px;background:linear-gradient(90deg,var(--amber),#b9701f)}
+.topicrow .tv{width:42px;text-align:right;color:var(--muted);font-size:.78rem}
+.histgrid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.histroom{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:16px 18px;box-shadow:var(--shadow)}
+.histroom .hrh{font-weight:800;color:var(--green-d);font-size:1rem;margin-bottom:8px;display:flex;justify-content:space-between;align-items:baseline}
+.histroom .hrn{font-size:.76rem;color:var(--muted);font-weight:600}
+.hli{display:flex;gap:10px;padding:7px 0;border-top:1px dotted var(--line)}
+.hli .hmon{flex:none;width:30px;font-size:.78rem;font-weight:800;color:var(--amber);padding-top:1px}
+.hli .hbody{flex:1;min-width:0}
+.hli .hauth{font-size:.74rem;font-weight:700;color:var(--green);margin-right:6px}
+.htag{font-size:.68rem;background:var(--amber-l);color:#9a5a13;border-radius:999px;padding:1px 7px}
+.hli .hex{font-size:.84rem;color:var(--ink);margin-top:3px;line-height:1.5}
+.kakao-mine{display:flex;flex-wrap:wrap;gap:8px;margin-top:4px}
+.kakao-mine .km{background:var(--green-l);color:var(--green-d);border-radius:10px;padding:6px 12px;font-size:.86rem;font-weight:600}
+.kakao-mine .km b{font-weight:800}
+a.rclick{display:block;text-decoration:none}
+a.rclick:hover{text-decoration:none;transform:translateY(-2px);box-shadow:0 6px 22px rgba(60,50,30,.1)}
+.rarrow{color:var(--amber);font-weight:800}
+.heat td.lbl a{text-decoration:none}
+.navm{display:inline-flex;gap:10px;margin-left:14px}
+.navm a{font-size:.85rem;background:var(--green-l);border-radius:999px;padding:2px 10px}
+.monthcard{margin-top:14px}
+.mc-h{font-size:1.15rem;font-weight:800;color:var(--green-d);display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.mc-n{font-size:.82rem;color:var(--muted);font-weight:700}
+.mc-auto{font-size:.7rem;background:#f0ece3;color:#8a8576;border-radius:999px;padding:2px 9px}
+.mc-cur{font-size:.74rem;background:var(--amber-l);color:#9a5a13;border-radius:999px;padding:2px 10px;font-weight:700}
+.mc-sub{font-size:.84rem;color:var(--muted);margin:8px 0 12px;display:flex;flex-wrap:wrap;gap:5px;align-items:center}
+.mc-grid{display:grid;grid-template-columns:1.3fr 1fr;gap:18px}
+.mc-lbl{font-size:.82rem;font-weight:800;color:var(--amber);margin-bottom:6px}
+.mdbody h3{font-size:1.05rem;color:var(--green-d);margin:18px 0 6px;border-bottom:1px solid var(--line);padding-bottom:4px}
+.mdbody h4{font-size:.95rem;color:var(--ink);margin:12px 0 4px}
+.mdbody p{font-size:.9rem;margin:.4rem 0;line-height:1.7}
+.mdbody .mdul{margin:.3rem 0 .6rem;padding-left:1.1rem}
+.mdbody .mdul li{font-size:.88rem;margin:.25rem 0;line-height:1.6}
+.mdbody blockquote{border-left:3px solid var(--amber);background:var(--amber-l);margin:.5rem 0;padding:8px 14px;border-radius:0 8px 8px 0;font-size:.9rem}
+.mdbody .mdt{border-collapse:collapse;width:100%;font-size:.82rem;margin:8px 0}
+.mdbody .mdt th{background:var(--green-l);text-align:left;padding:6px 8px;font-weight:700}
+.mdbody .mdt td{border-top:1px solid var(--line);padding:6px 8px;vertical-align:top}
+.mdbody hr{border:none;border-top:1px dashed var(--line);margin:14px 0}
+.mdbody code{background:#f0ece3;padding:1px 5px;border-radius:5px;font-size:.86em}
+.otherrooms{display:flex;flex-wrap:wrap;gap:10px}
+.otherroom{background:var(--card);border:1px solid var(--line);border-radius:999px;padding:8px 16px;font-weight:600;box-shadow:var(--shadow)}
+@media(max-width:680px){
+  .season-grid,.arc,.psy,.histgrid,.mc-grid{grid-template-columns:1fr}
+  .hero h1{font-size:1.7rem}.loclist{columns:1}
+  .heat{font-size:.68rem}.heat td.c{min-width:26px;padding:5px 2px}
+}
+</style>
+</head><body>
+
+<div class="hero"><div class="wrap">
+  <p class="eyebrow">마인드풀러닝 어드밴스 5기 · 개인 러닝 일지</p>
+  <h1>정남C님의 봄 ~ 여름 달리기</h1>
+  <p class="sub">2026-02-01 첫 기록부터 2026-05-31까지,
+  정남C님이 마을길 위에 남긴 발자국입니다.</p>
+</div></div>
+<div class="wrap">
+  <div class="nav"><a href="member-55.html">← 이전</a><a href="index.html">회원 목록</a><a href="member-57.html">다음 →</a></div>
+
+  <section>
+    <h2><span class="em">🌿</span> 나의 누적</h2>
+    <div class="cardrow">
+      <div class="stat"><div class="v">76<small>번</small></div><div class="l">달리기 일지</div></div>
+      <div class="stat"><div class="v">56<small>시간</small> 37<small>분</small></div><div class="l">함께 쌓은 시간</div></div>
+      <div class="stat"><div class="v">76<small>일</small></div><div class="l">문밖으로 나선 날</div></div>
+      <div class="stat"><div class="v">45<small>분</small></div><div class="l">한 번의 평균</div></div>
+    </div>
+  </section>
+
+  <section>
+    <h2><span class="em">🍃</span> 시즌별 나의 발자취</h2>
+    <div class="card">
+      <div class="bar"><div class="name">❄️ 겨울</div><div class="track"><div class="fill sky" style="width:24.6%">15번</div></div></div>
+      <div class="bar"><div class="name">🌸 봄</div><div class="track"><div class="fill " style="width:100.0%">61번</div></div></div>
+      <div style="font-size:.84rem;color:var(--muted);margin-top:10px">
+        겨울 8시간 37분 · 봄 48시간 0분
+        · 여름은 이제 시작입니다 ☀️</div>
+    </div>
+  </section>
+
+  <section>
+    <h2><span class="em">💭</span> 나의 전 · 중 · 후 키워드</h2>
+    <p class="lede">정남C님이 달리기 전·중·후에 가장 자주 떠올린 마음입니다.</p>
+    <div class="arc"><div class="col"><h4>달리기 전</h4><div class="ph">&nbsp;</div><div class="kw"><span class="dot" style="background:#7aa6bd"></span><span style="width:96px;flex:none">날씨·계절감</span><span class="kwbar"><i style="width:100%;background:#7aa6bd"></i></span><span class="n">29</span></div><div class="kw"><span class="dot" style="background:#6f9c8a"></span><span style="width:96px;flex:none">마음챙김·평온</span><span class="kwbar"><i style="width:72%;background:#6f9c8a"></i></span><span class="n">21</span></div><div class="kw"><span class="dot" style="background:#4f8c5e"></span><span style="width:96px;flex:none">자연·풍경</span><span class="kwbar"><i style="width:69%;background:#4f8c5e"></i></span><span class="n">20</span></div><div class="kw"><span class="dot" style="background:#5b8aa6"></span><span style="width:96px;flex:none">함께·공동체</span><span class="kwbar"><i style="width:59%;background:#5b8aa6"></i></span><span class="n">17</span></div><div class="kw"><span class="dot" style="background:#8a8576"></span><span style="width:96px;flex:none">몸·컨디션</span><span class="kwbar"><i style="width:52%;background:#8a8576"></i></span><span class="n">15</span></div></div><div class="col"><h4>달리기 중</h4><div class="ph">&nbsp;</div><div class="kw"><span class="dot" style="background:#8a8576"></span><span style="width:96px;flex:none">몸·컨디션</span><span class="kwbar"><i style="width:100%;background:#8a8576"></i></span><span class="n">72</span></div><div class="kw"><span class="dot" style="background:#6f9c8a"></span><span style="width:96px;flex:none">마음챙김·평온</span><span class="kwbar"><i style="width:78%;background:#6f9c8a"></i></span><span class="n">56</span></div><div class="kw"><span class="dot" style="background:#4f8c5e"></span><span style="width:96px;flex:none">자연·풍경</span><span class="kwbar"><i style="width:56%;background:#4f8c5e"></i></span><span class="n">40</span></div><div class="kw"><span class="dot" style="background:#7aa6bd"></span><span style="width:96px;flex:none">날씨·계절감</span><span class="kwbar"><i style="width:53%;background:#7aa6bd"></i></span><span class="n">38</span></div><div class="kw"><span class="dot" style="background:#5b8aa6"></span><span style="width:96px;flex:none">함께·공동체</span><span class="kwbar"><i style="width:49%;background:#5b8aa6"></i></span><span class="n">35</span></div></div><div class="col"><h4>달리기 후</h4><div class="ph">&nbsp;</div><div class="kw"><span class="dot" style="background:#6f9c8a"></span><span style="width:96px;flex:none">마음챙김·평온</span><span class="kwbar"><i style="width:100%;background:#6f9c8a"></i></span><span class="n">29</span></div><div class="kw"><span class="dot" style="background:#8a8576"></span><span style="width:96px;flex:none">몸·컨디션</span><span class="kwbar"><i style="width:83%;background:#8a8576"></i></span><span class="n">24</span></div><div class="kw"><span class="dot" style="background:#5b8aa6"></span><span style="width:96px;flex:none">함께·공동체</span><span class="kwbar"><i style="width:76%;background:#5b8aa6"></i></span><span class="n">22</span></div><div class="kw"><span class="dot" style="background:#4f8c5e"></span><span style="width:96px;flex:none">자연·풍경</span><span class="kwbar"><i style="width:72%;background:#4f8c5e"></i></span><span class="n">21</span></div><div class="kw"><span class="dot" style="background:#c97b86"></span><span style="width:96px;flex:none">감사</span><span class="kwbar"><i style="width:55%;background:#c97b86"></i></span><span class="n">16</span></div></div></div>
+  </section>
+
+  <section>
+    <h2><span class="em">🧭</span> 나의 감정 지도 (Russell 4분면)</h2>
+    <div class="card"><div class="russell"><div class="rax rax-top">▲ 에너지 높음 (각성↑)</div><div class="rgrid"><div class="rq hn" style="--op:0.52"><div class="rqv">27</div><div class="rql">답답·불안·긴장</div></div><div class="rq hp" style="--op:0.56"><div class="rqv">33</div><div class="rql">활력·기쁨·호기심</div></div><div class="rq ln" style="--op:0.46"><div class="rqv">17</div><div class="rql">우울·외로움·무력</div></div><div class="rq lp dom" style="--op:1.00"><div class="rqv">102 ★</div><div class="rql">평온·감사·만족</div></div></div><div class="rax rax-bot">에너지 낮음 (각성↓) ▼</div><div class="rax rax-l">◀ 불편한 마음</div><div class="rax rax-r">편안한 마음 ▶</div></div></div>
+    <div style="font-size:.82rem;color:var(--muted);margin-top:8px">감정 입자도(표현한 분면 수): <b>4/4</b> · 여러 결의 감정을 알아차릴수록 마음이 단단해집니다 (Barrett 2017).</div>
+  </section>
+
+  <section>
+    <h2><span class="em">🧬</span> 온톨로지로 본 나의 결</h2>
+    <p class="lede">MFRS 5층 온톨로지로 정남C님의 일지를 비춰 본 거예요. 남과 비교가 아니라, <b>내 안에서</b> 무성한 결과 조용한 결입니다.</p>
+    <div class="cardrow">
+      <div class="card" style="grid-column:span 2">
+        <div style="font-weight:800;color:var(--green-d);margin-bottom:6px">🌳 무성하게 자란 결</div>
+        <div class="dnastrip"><span class="tag2 s">CONTEXT 5.1 환경</span><span class="tag2 s">MIND 1.1 기분</span><span class="tag2 s">MIND 1.4 알아차림</span></div>
+      </div>
+      <div class="card" style="grid-column:span 2">
+        <div style="font-weight:800;color:#8a8576;margin-bottom:6px">🌱 아직 조용한 결</div>
+        <div class="dnastrip"><span class="tag2 q">RUN 3.2 코호흡</span></div>
+        <p style="font-size:.82rem;color:var(--muted);margin:8px 0 0">조용한 건 부족함이 아니에요. 앞으로 더 알아차려 볼 여백입니다.</p>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="coachnote" style="background:#f3f6f4">
+      <div class="tag">🔬 나의 마음 시그니처</div>
+      <p>😌 자기자비 — 친절 27 : 비난 17 (자신에게 친절이 우세해요)　·
+      🧘 알아차림 표현 123회　·　🫁 코호흡 언급 10회　·　🌿 자연 속 달림 55회</p>
+    </div>
+  </section>
+
+
+  <section>
+    <h2><span class="em">⭐</span> 기억에 남는 달리기</h2>
+    <div class="runbox"><div style="font-weight:800;color:var(--green-d);margin-bottom:4px">가장 길게 달린 날 (160분)</div><div class="meta">2026-03-15 · 160분 · 이기대공원-광안리-해운대</div><div class="title">“부산 마인드풀코스”</div><div class="phase"><div class="pl">달리기 전</div><div class="pt">내가 이미 알고 있는 것을 뇌는 미처 알지 못하는 일들이 있습니다. 일요일 새벽3시에 일어나 서울역에서 부산으로 떠나는 두번째 기차를 타고 달리기를 하러 가는 일도 그렇습니다. 뇌는 도무지 이런 내가 납득이 되지 않지만, 설득할 의지도 없이 움직이는 팔다리를 따르지 않을 방법도 마땅치 않습니다. 더군다나 북한산을 돌아 동승자를 태우고 간다는 점에서, 그렇지 않아도 주름진 표면이 한층 더 찌푸려지기만 합니다. <br><br>텅 빈 제1순환고속도로를 타고 가속하는 엔진소리를 따라 온 몸이 설렘으로 가득 찹니다. 어둠 속 본능의 질주로 합리의 세계를 비추다 보니 그늘진 뇌에도 슬며시 볕이 드는 모양입니다. 약속 장소에 조금 먼저 도착해 요즘 푹 빠져있는 노래를 다시 한 번 재생합니다. 추억은 한 편의 산문집되어 길 잃은 맘을 위로하는 노래가 된다는 가삿말처럼 오늘 함께 만들 추억에는 어떤 가삿말이 붙여질지 벌써부터 기대되는 마음입니다. <br><br>잠시 졸았다가 책을 펼쳤다가 찌뿌둥한 몸을 어루고 지루해 하는 뇌를 달래다 보니 잿빛으로 깨어난 남쪽의 도시입니다. 여전한 것들과 변해버린 것들 사이에서 지난날의 나와 지금의 내가 방황하듯 공존합니다. 잘 있었나요 그 시절, 잘 지내나요 그 사람들. 보고싶은 마음과 그리운 마음을 번갈아 내딛으며 뽀얀 돼지국밥으로 여정을 시작합니다. 다대기가 아니라 전구지로 간을 맞추고 퍽퍽한 살코기가 가득한 맑은 국물을 한숟가락 가득 먹으니 아 정말로 부산에 왔습니다.<br><br>전국에서 도착한 사람들이 부산에서 출발한 사람들을 기다립니다. 친한 척 하기는 민망하고 가만히 있기도 어색해서, 이틀 전부터 시작한 스트레칭으로 지극히 부자연스러운 이 상황을 대체로 자연스럽게 넘어가봅니다. 조용히 몸이나 풀고 있을 의도와 달리 요상한 동작에 사람들의 이목이 집중되어 매우 곤란한 입장에 처하고 맙니다. 닥치는 상황에 닥치는 대로 대응해보건만 뇌는 벌써부터 안절부절 몸둘 바를 모릅니다. 이왕 이렇게 된 거 얼씨구나 몸이 알아서 움직이고 절씨구나 뇌는 뒷짐지고 빠져 있습니다. 그러나저러나 똑같은 자세를 취하는데 어제보다 훨씬 더 편안합니다. 벌써부터 원래 있었던 힘을 회복한 것처럼 자연스러운 느낌입니다.</div></div><div class="phase"><div class="pl">달리는 중</div><div class="pt">첫 코스인 이기대 공원을 빠져나오니 햇살이 머리 위로 꼿꼿이 서 있습니다. 산과 바다 사이로 가늘게 난 길과 함께 아스라히 펼쳐진 풍광에 시간가는 줄 몰랐습니다. 길가에 핀 잡초처럼 무더기로 서서 한 마음으로 챙겨오신 따뜻한 마음을 달콤하게 나눠먹습니다. 배가 부르니 커피 한 잔 있으면 진짜 좋겠다는 생각이 목구멍까지 차오르지만, 눈치껏 카스테라로 꾹꾹 눌러 담습니다. 주차장 길목에 동그렇게 모여 스트레칭을 하다가 태국 관광객들이 가득 찬 관광버스를 배웅하면서 광안리를 향해 우루루 발걸음을 옮겨봅니다.<br><br>구름으로 덮힌 하늘이 서산에서 불어온 바람을 타고 수평선 멀리 밀려난 모양입니다. 따뜻한 햇살과 시원한 바람이 발걸음을 채촉하고 길과 함께 이어지는 바다를 눈부시게 함께합니다. 달림에 익숙해 진 덕분에 어떤 말도 스스로가 자연스럽습니다. 몸이 이끄는대로 사는 것이 뇌가 계획한대로 사는 삶보다 편안한 이유는 불명확하지만, 이 편안함에 존재할 수 있음에 감사합니다. 함께 하는 즐거운으로 저절로 닿은 광안리 해변에서 자연스럽게 신발을 벗고 달리고 싶은 마음입니다. 그러면 그렇게 하자고 선선히 신발을 벗는 사람들이 있어 더 없이 기쁩니다. 이 행복함을 말로는 전할 길이 없어 우리가 함께 한 청춘의 시간을 떠올리길 바랄 뿐입니다. 그 시절 그 때처럼 모래사장을 달리면서 벌써부터 지금이 그리워지는데, 발 끝에서 느껴지는 원초적 감각만 지금의 지금을 다시 일깨워줍니다. 그 감각과 바람과 파도를 타고 온 몸은 춤을 추 듯 달려봅니다.<br><br>광안리에서 잠시의 휴식을 마치고 다시 해운대까지 가는 길에서는 그저 충분한 마음입니다. 이 여정을 준비해주신 분들, 함께하는 사람들, 그리고 이 시간을 온전히 보내고 있는 나까지의 영혼을 다하고 더하고 곱한 것 만큼의 감사함을 느낍니다. 원래 계획대로 되지는 못했지만, 계획보다 우리가 함께하는 시간이 더 없이 소중하다는 것을 새삼느낍니다. 더해서 그 소중함을 소중한 줄 알아가고 있는 내가 무척이나 대견스럽습니다. 예전보다 훨씬 편해진 것 같다는 당신의 그 말이 마흔 살 몸뚱이에 고이 숨었있던 스무살 청년을 조심스럽게 또 일으켜 세웁니다. 네, 덕분에 이만큼 편해졌습니다. 그러니 무척이나 실례지만 앞으로도 잘 부탁드리겠습니다.</div></div><div class="phase"><div class="pl">달린 후</div><div class="pt">해운대에서는 다같이 해변을 달려 갑니다. 신발과 함께 걱정을 떨치고 양말을 벗으며 두려움을 걷어 내 봅니다. 두려움에 올라타면 두려움이 보이지 않는다는 말을 좋아합니다. 그러면 내가 두려워한 대상이 이끌어주는 새로운 세계를 만나게 되곤 합니다. 조심스러운 한 걸음에서 시작해 거침없는 달리기로 한 마음 한 뜻으로 내달립니다. 봄을 맞으러 간 부산에서 이상하게도 새해를 맞이하는 기분입니다. 이제서야 비로소 너와 나의 마인드풀한 달리기 시즌이 시작 된 기분입니다. 부디 다치지도 말고 무리하지도 말고 애씀없이 코호흡과 시간에 기대어 편안한 모습으로 달리다 자연스럽게 다시 만나길 기원합니다.</div></div></div>
+    <div class="runbox"><div style="font-weight:800;color:var(--green-d);margin-bottom:4px">이야기가 가장 많이 남은 날</div><div class="meta">2026-05-31 · 120분 · 대치유수지</div><div class="title">“달리면 비로소 보이는 것들”</div><div class="phase"><div class="pl">달리기 전</div><div class="pt">무거운 마음이 몸을 짓누릅니다. 자책은 해결책도 해방책도 아님을 알면서도 습관처럼 나를 탓하고 나무라면서 괴로워합니다.  그리고 가까운 사람들에게 그 책임을 전가하면서 스스로를 정당화하려는 수작만 부리는 꼴이 차마 눈뜨고 보기 어려울 지경이라 자꾸만 숨어버리고 싶은 마음입니다.</div></div><div class="phase"><div class="pl">달리는 중</div><div class="pt">그럼에도 불구하고 한 번 또 한 번 눈이 떠집니다. 지금이라도 가면 완전히 늦지는 않을 것 같습니다. 데우스 엑스 마키나. 이유는 모르겠지만 갑자기 몸이 가볍습니다. 부리나케 준비해서 겨우겨우 도착하니 이제 막 몸을 풀고 있는 사람들이 보입니다. 아무렇지 않은 표정이 아무렇지 않게 보일까 어떨까 괜시리 나만 어색합니다. <br><br>깊은 준비운동을 마치고 마지막 수업의 주제인 2시간 롱런이 시작됩니다. 어쩌겠다는 의지 어쩌고싶다는 욕심 다 모르겠고, 그냥 흐름에 몸을 맡겨봅니다. 나는 지금 여기 온 것으로 이미 대단합니다. <br><br>지나간 일을 붙잡으려는 생각도 후회 투성이의 마음도 달릴 수록 점차 사그라듭니다. 비정한 달리기는 달리기에 도움이 되지 않는 것들에 무관심합니다. 스스로 하지 못하는 일을 달리기는 능히 해냅니다. <br><br>발걸음을 맞추며 함께 달리는 사람들에게 자백하듯이 마음을 고백해봅니다. 마음을 주고 받으면서 한참을 달려갑니다. 같은 장소를 뺑글뺑글 도는 것은 생각만 해도 싫은 마음이었는데 달릴수록 오히려 편안한 마음입니다. <br><br>가까이에 여기저기 보이는 모습들도 반갑고 적당한 거리에서 함께 존재하는 느낌도 즐겁습니다. 이 시간과 공간 속에서 어쩌다 우연히 만나 같이 달리다가 다시 또 헤어지는 상황도 재밌습니다. 삶의 축소판 같았달까요. 그 모습 자채가 왜 그렇게 위로가 되었는지 아직은 잘 모르겠습니다. <br><br>그러다가 어쩌다 승헌이랑도 어떻게 같이 달리게 되었습니다. 말을 높이는 건 좀 아닌 것 같아(?) 그냥 당당하게 말을 깠습니다. 청하지 않은 말을 상대방에게 하는 것이 여전히 나에게도 부담이지만 그래도 뭐에 사로잡힌 사람처럼 이 말 저 말 쓸모와 쓸데가 없을 말들을 늘여놓습니다. 그래도 다행인 건 승헌이가 들어주는 느낌과 중간중간에 대답하는 목소리였습니다. <br><br>대학생이 된다고, 직장을 얻는다고, 어른이 된다고 달라지는 게 아닌 것 같더라. 상황은 그저 계속 변할 뿐인데, 내가 나의 속도와 방향을 찾을 수 있는 지가 관건인 것 같더라. 지금 달리는 사람들 밖에 안 보이겠지, 저 사람들 처럼 달리고 싶겠지, 그래서 무리하게 달릴 수도 있고 그러다 쉴 수도 있고 뭐 다 이해한다. 그럴 수 있다. 힘들면 걸어도 좋은 거 같다. 그런데 그렇다고 내가 얼만큼 달릴 수 있는지 어떻게 달리고 싶은지를 생각하지 않으면 저절로 그렇게 될 수는 없는 것 같더라. 비단 달리기뿐만이 아니라 삶이 다 그런 거 같더라. 힘들지 않는 속도 네가 할 수 있는 속도로 달려보면 좋겠다. 그렇게 계속 할 수 있는 그 힘으로 계속 가보면 좋겠다. 나도 그냥 그렇게 하고 있는 것 뿐이라, 너도 할 수 있을거다.<br><br>같은 주절주절 잔소리를 남기고 또 다시 서로 갈 길을 갑니다. 마음은 대체 어디서 와서 어디로 가는걸까요? 이 순간 내가 그토록 원망했던 스스로에 대한 마음은 어디에 있는 걸까요? 위로해주겠다는 아저씨가 위로만 받고 가도 되는 걸까요? 이런 일도 있는 걸까요?</div></div><div class="phase"><div class="pl">달린 후</div><div class="pt">맨발로 달리기를 마무리하고 발을 씻으면서 자책의 끝에서 선배들을 만납니다. 스스로 전하지 못한 위로의 말에 비로소 나 자신을 해방시켜줍니다. 네 잘못이 아니야. 그럴 수도 있었어. 그만하길 천만다행이야. 그의 입에서 나온 말이 나의 마음을 나를 대신해 어루만져줍니다. 나를 대신해 내 괴로울을 끝내 준 이들에게 감사를 전한 방법이 요원합니다. 내가 가진 것과 내가 할 수 있는 것들에 대한 감사만이 남아 괜찮고 또 괜찮습니다.</div></div></div>
+  </section>
+
+  <section><h2><span class='em'>🗺️</span> 내가 자주 달린 곳</h2><div class='card'><div class='loclist'><div class="li"><span>회사 근처</span><b>8회</b></div><div class="li"><span>천보산</span><b>7회</b></div><div class="li"><span>회사 옆산</span><b>6회</b></div><div class="li"><span>회사 앞산</span><b>5회</b></div><div class="li"><span>맑은물수목원</span><b>4회</b></div></div></div></section>
+
+  <section>
+    <div class="coachnote">
+      <div class="tag">🌱 코치의 한마디</div>
+      <p>정남C님, 넉 달 동안 <b>76번</b> 문밖으로 나서 주셨어요. 그 발걸음들이 모여 <b>56시간 37분</b>이 되었습니다.</p><p>정남C님의 일지에는 <b>몸·컨디션·마음챙김·평온·날씨·계절감</b>의 마음이 자주 비쳤어요. 그게 정남C님이 달리기와 맺은 고유한 관계입니다.</p><p>일지를 보면 정남C님은 자신에게 <b>친절한 말</b>을 건넬 줄 아세요. '괜찮아, 잘했어' 같은 한마디 — 그게 오래 달리는 사람의 진짜 힘입니다.</p><p>거의 매일 같은 자리에 있어 주셨네요. 화려하지 않아도 끊기지 않는 것 — 그게 가장 어려운 일이에요.</p><p>이제 여름이에요. 더위 속에서는 '더 빨리'보다 '천천히, 안전하게'가 좋을 것 같아요. 새벽이나 저녁의 선선한 시간, 코로 호흡이 편한 속도로 — 내가 할 수 있는 달리기를 이어가 보시면 어떨까요.</p>
+    </div>
+  </section>
+
+  <div class="nav"><a href="member-55.html">← 이전</a><a href="index.html">회원 목록</a><a href="member-57.html">다음 →</a></div>
+  <footer>
+    <p><b>정남C님의 달리기 리포트</b> · 마인드풀러닝 어드밴스 5기 · 생성 2026-06-04</p>
+    <p>내부 커뮤니티용 · <a href="../community-report.html">← 마을 전체 리포트</a></p>
+  </footer>
+</div>
+
+</body></html>

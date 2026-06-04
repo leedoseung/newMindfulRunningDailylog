@@ -1,0 +1,607 @@
+<!DOCTYPE html>
+<html lang="ko"><head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>제주 단톡방 월별 이력 — MFRS 5기</title>
+<style>
+:root{
+  --bg:#faf8f3; --ink:#2b2a26; --muted:#6f6a60; --line:#e7e1d6;
+  --green:#2f6b4f; --green-d:#1f4a37; --green-l:#e6f0ea;
+  --amber:#d98e3e; --amber-l:#fbeede; --sky:#5b8aa6; --rose:#c97b86;
+  --card:#fffdf9; --shadow:0 1px 3px rgba(60,50,30,.06),0 6px 24px rgba(60,50,30,.05);
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);
+  font-family:"Pretendard","Apple SD Gothic Neo","Noto Sans KR",-apple-system,BlinkMacSystemFont,sans-serif;
+  line-height:1.7;-webkit-font-smoothing:antialiased}
+.wrap{max-width:920px;margin:0 auto;padding:0 20px 80px}
+a{color:var(--green);text-decoration:none}
+a:hover{text-decoration:underline}
+.hero{background:linear-gradient(135deg,var(--green-d),var(--green));color:#fff;
+  border-radius:0 0 28px 28px;padding:48px 28px 40px;margin-bottom:8px}
+.hero .wrap{padding-bottom:0}
+.hero .eyebrow{font-size:.82rem;letter-spacing:.12em;opacity:.85;text-transform:uppercase;margin:0 0 10px}
+.hero h1{font-size:2.1rem;line-height:1.25;margin:0 0 12px;font-weight:800;letter-spacing:-.01em}
+.hero p.sub{font-size:1.02rem;opacity:.92;margin:0;max-width:680px}
+.hero .period{margin-top:18px;font-size:.9rem;opacity:.8}
+section{margin-top:44px}
+h2{font-size:1.42rem;font-weight:800;letter-spacing:-.01em;margin:0 0 6px;
+  display:flex;align-items:center;gap:.5rem}
+h2 .em{font-size:1.3rem}
+.lede{color:var(--muted);margin:0 0 20px;font-size:.98rem}
+.cardrow{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:14px}
+.stat{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:20px;box-shadow:var(--shadow)}
+.stat .v{font-size:2rem;font-weight:800;color:var(--green-d);line-height:1.1}
+.stat .v small{font-size:.95rem;font-weight:700;color:var(--muted)}
+.stat .l{font-size:.86rem;color:var(--muted);margin-top:6px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:24px;box-shadow:var(--shadow)}
+.bar{display:flex;align-items:center;gap:12px;margin:10px 0}
+.bar .name{width:96px;flex:none;font-size:.9rem;color:var(--ink);font-weight:600}
+.bar .track{flex:1;background:#efe9dd;border-radius:999px;height:22px;position:relative;overflow:hidden}
+.bar .fill{height:100%;border-radius:999px;background:linear-gradient(90deg,var(--green),var(--green-d));
+  display:flex;align-items:center;justify-content:flex-end;padding-right:9px;color:#fff;font-size:.76rem;font-weight:700;min-width:34px}
+.bar .fill.amber{background:linear-gradient(90deg,var(--amber),#b9701f)}
+.bar .fill.sky{background:linear-gradient(90deg,#7aa6bd,var(--sky))}
+.bar .fill.rose{background:linear-gradient(90deg,#d99aa3,var(--rose))}
+.season-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+.season{border-radius:18px;padding:22px;color:#fff;position:relative;overflow:hidden}
+.season.winter{background:linear-gradient(150deg,#5b7fa6,#3d5d80)}
+.season.spring{background:linear-gradient(150deg,#5fa06f,#2f6b4f)}
+.season.summer{background:linear-gradient(150deg,#e0a85b,#c47b2f)}
+.season .se{font-size:1.6rem}
+.season h3{margin:6px 0 2px;font-size:1.2rem}
+.season .range{font-size:.78rem;opacity:.85}
+.season .big{font-size:1.8rem;font-weight:800;margin-top:12px;line-height:1}
+.season .sub{font-size:.84rem;opacity:.9;margin-top:4px}
+.season.upcoming{opacity:.96;border:2px dashed rgba(255,255,255,.5)}
+.arc{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+.arc .col{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:18px}
+.arc .col h4{margin:0 0 4px;font-size:1rem;color:var(--green-d)}
+.arc .col .ph{font-size:.78rem;color:var(--muted);margin-bottom:12px}
+.kw{display:flex;align-items:center;gap:8px;margin:7px 0;font-size:.88rem}
+.kw .dot{width:9px;height:9px;border-radius:50%;flex:none}
+.kw .kwbar{flex:1;height:8px;background:#efe9dd;border-radius:999px;overflow:hidden}
+.kw .kwbar i{display:block;height:100%;border-radius:999px}
+.kw .n{width:34px;text-align:right;color:var(--muted);font-size:.78rem;font-variant-numeric:tabular-nums}
+.coachnote{background:var(--green-l);border-left:4px solid var(--green);border-radius:0 14px 14px 0;
+  padding:18px 22px;margin-top:18px}
+.coachnote .tag{font-size:.78rem;font-weight:800;color:var(--green-d);letter-spacing:.04em;margin-bottom:6px}
+.coachnote p{margin:.4rem 0;font-size:.96rem}
+.loclist{columns:2;column-gap:28px}
+.loclist .li{display:flex;justify-content:space-between;padding:7px 0;border-bottom:1px dotted var(--line);
+  break-inside:avoid;font-size:.92rem}
+.loclist .li b{color:var(--muted);font-weight:600}
+.membergrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px}
+.mcard{display:block;background:var(--card);border:1px solid var(--line);border-radius:14px;
+  padding:16px;box-shadow:var(--shadow);transition:transform .12s,box-shadow .12s}
+.mcard:hover{transform:translateY(-2px);box-shadow:0 6px 22px rgba(60,50,30,.1);text-decoration:none}
+.mcard .mn{font-weight:800;color:var(--green-d);font-size:1.02rem}
+.mcard .ms{font-size:.8rem;color:var(--muted);margin-top:4px}
+.mcard .chips{margin-top:8px;display:flex;flex-wrap:wrap;gap:4px}
+.chip{font-size:.72rem;background:var(--green-l);color:var(--green-d);border-radius:999px;padding:2px 9px}
+.runbox{border:1px solid var(--line);border-radius:14px;padding:18px;margin-top:14px;background:#fffdf9}
+.runbox .meta{font-size:.82rem;color:var(--muted);margin-bottom:8px}
+.runbox .title{font-weight:700;margin-bottom:10px}
+.runbox .phase{margin:10px 0}
+.runbox .phase .pl{font-size:.76rem;font-weight:800;color:var(--amber);letter-spacing:.03em}
+.runbox .phase .pt{font-size:.92rem;color:var(--ink);white-space:pre-wrap}
+.nav{display:flex;gap:16px;flex-wrap:wrap;margin-top:16px;font-size:.92rem}
+.backlink{display:inline-block;margin:24px 0 0;font-size:.9rem}
+footer{margin-top:60px;padding-top:24px;border-top:1px solid var(--line);
+  font-size:.82rem;color:var(--muted)}
+.note{font-size:.82rem;color:var(--muted);background:#f3efe6;border-radius:10px;padding:12px 16px;margin-top:14px}
+.russell{position:relative;padding:30px 26px 30px 30px}
+.rgrid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.rq{border-radius:14px;padding:18px 16px;text-align:center;color:#33312c;
+  background:#efe9dd}
+.rq.hp{background:rgba(224,162,62,var(--op))}
+.rq.lp{background:rgba(79,140,94,var(--op))}
+.rq.hn{background:rgba(201,123,134,var(--op))}
+.rq.ln{background:rgba(91,107,122,var(--op))}
+.rq.dom{box-shadow:0 0 0 3px var(--green);font-weight:800}
+.rq .rqv{font-size:1.5rem;font-weight:800;line-height:1}
+.rq .rql{font-size:.84rem;margin-top:5px;opacity:.95}
+.rax{position:absolute;font-size:.72rem;color:var(--muted);font-weight:600}
+.rax-top{top:8px;left:50%;transform:translateX(-50%)}
+.rax-bot{bottom:8px;left:50%;transform:translateX(-50%)}
+.rax-l{left:-2px;top:50%;transform:translateY(-50%) rotate(-90deg);transform-origin:left}
+.rax-r{right:-8px;top:50%;transform:translateY(-50%) rotate(90deg);transform-origin:right}
+.psy{display:grid;grid-template-columns:repeat(2,1fr);gap:14px}
+.psy .pcard{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:20px;box-shadow:var(--shadow)}
+.psy .pcard .pt{font-size:.78rem;font-weight:800;letter-spacing:.04em;color:var(--green-d);margin-bottom:4px}
+.psy .pcard .pv{font-size:1.7rem;font-weight:800;color:var(--green-d);line-height:1.1}
+.psy .pcard .pd{font-size:.86rem;color:var(--ink);margin-top:6px}
+.psy .pcard .cite{font-size:.72rem;color:var(--muted);margin-top:8px;font-style:italic}
+.tag2{display:inline-block;font-size:.7rem;font-weight:700;border-radius:999px;padding:2px 9px;margin:2px 3px 2px 0}
+.tag2.s{background:var(--green-l);color:var(--green-d)}
+.tag2.q{background:#f0ece3;color:#8a8576}
+.dnastrip{display:flex;flex-wrap:wrap;gap:5px;margin-top:6px}
+.dnastrip .k{font-size:.72rem;background:#fff;border:1px solid var(--line);border-radius:999px;padding:3px 10px;color:var(--green-d)}
+.roomcards{display:grid;grid-template-columns:repeat(auto-fit,minmax(155px,1fr));gap:12px}
+.roomcard{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px;box-shadow:var(--shadow)}
+.roomcard .rn{font-weight:800;color:var(--green-d);font-size:1.02rem}
+.roomcard .rd{font-size:.76rem;color:var(--muted);margin:3px 0 8px}
+.roomcard .rv{font-size:1.5rem;font-weight:800;color:var(--green-d);line-height:1}
+.roomcard .rm{font-size:.78rem;color:var(--muted);margin-top:4px}
+.heat{border-collapse:separate;border-spacing:3px;width:100%;font-size:.8rem}
+.heat th{font-weight:700;color:var(--muted);font-size:.76rem;padding:3px 5px;text-align:center}
+.heat td.lbl{text-align:left;font-weight:700;white-space:nowrap;padding-right:8px}
+.heat td.c{text-align:center;border-radius:6px;color:#2b2a26;font-variant-numeric:tabular-nums;padding:6px 4px;min-width:38px}
+.topicrow{display:flex;align-items:center;gap:8px;margin:6px 0;font-size:.88rem}
+.topicrow .tn{width:108px;flex:none}
+.topicrow .tb{flex:1;height:14px;background:#efe9dd;border-radius:999px;overflow:hidden}
+.topicrow .tb i{display:block;height:100%;border-radius:999px;background:linear-gradient(90deg,var(--amber),#b9701f)}
+.topicrow .tv{width:42px;text-align:right;color:var(--muted);font-size:.78rem}
+.histgrid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.histroom{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:16px 18px;box-shadow:var(--shadow)}
+.histroom .hrh{font-weight:800;color:var(--green-d);font-size:1rem;margin-bottom:8px;display:flex;justify-content:space-between;align-items:baseline}
+.histroom .hrn{font-size:.76rem;color:var(--muted);font-weight:600}
+.hli{display:flex;gap:10px;padding:7px 0;border-top:1px dotted var(--line)}
+.hli .hmon{flex:none;width:30px;font-size:.78rem;font-weight:800;color:var(--amber);padding-top:1px}
+.hli .hbody{flex:1;min-width:0}
+.hli .hauth{font-size:.74rem;font-weight:700;color:var(--green);margin-right:6px}
+.htag{font-size:.68rem;background:var(--amber-l);color:#9a5a13;border-radius:999px;padding:1px 7px}
+.hli .hex{font-size:.84rem;color:var(--ink);margin-top:3px;line-height:1.5}
+.kakao-mine{display:flex;flex-wrap:wrap;gap:8px;margin-top:4px}
+.kakao-mine .km{background:var(--green-l);color:var(--green-d);border-radius:10px;padding:6px 12px;font-size:.86rem;font-weight:600}
+.kakao-mine .km b{font-weight:800}
+a.rclick{display:block;text-decoration:none}
+a.rclick:hover{text-decoration:none;transform:translateY(-2px);box-shadow:0 6px 22px rgba(60,50,30,.1)}
+.rarrow{color:var(--amber);font-weight:800}
+.heat td.lbl a{text-decoration:none}
+.navm{display:inline-flex;gap:10px;margin-left:14px}
+.navm a{font-size:.85rem;background:var(--green-l);border-radius:999px;padding:2px 10px}
+.monthcard{margin-top:14px}
+.mc-h{font-size:1.15rem;font-weight:800;color:var(--green-d);display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.mc-n{font-size:.82rem;color:var(--muted);font-weight:700}
+.mc-auto{font-size:.7rem;background:#f0ece3;color:#8a8576;border-radius:999px;padding:2px 9px}
+.mc-cur{font-size:.74rem;background:var(--amber-l);color:#9a5a13;border-radius:999px;padding:2px 10px;font-weight:700}
+.mc-sub{font-size:.84rem;color:var(--muted);margin:8px 0 12px;display:flex;flex-wrap:wrap;gap:5px;align-items:center}
+.mc-grid{display:grid;grid-template-columns:1.3fr 1fr;gap:18px}
+.mc-lbl{font-size:.82rem;font-weight:800;color:var(--amber);margin-bottom:6px}
+.mdbody h3{font-size:1.05rem;color:var(--green-d);margin:18px 0 6px;border-bottom:1px solid var(--line);padding-bottom:4px}
+.mdbody h4{font-size:.95rem;color:var(--ink);margin:12px 0 4px}
+.mdbody p{font-size:.9rem;margin:.4rem 0;line-height:1.7}
+.mdbody .mdul{margin:.3rem 0 .6rem;padding-left:1.1rem}
+.mdbody .mdul li{font-size:.88rem;margin:.25rem 0;line-height:1.6}
+.mdbody blockquote{border-left:3px solid var(--amber);background:var(--amber-l);margin:.5rem 0;padding:8px 14px;border-radius:0 8px 8px 0;font-size:.9rem}
+.mdbody .mdt{border-collapse:collapse;width:100%;font-size:.82rem;margin:8px 0}
+.mdbody .mdt th{background:var(--green-l);text-align:left;padding:6px 8px;font-weight:700}
+.mdbody .mdt td{border-top:1px solid var(--line);padding:6px 8px;vertical-align:top}
+.mdbody hr{border:none;border-top:1px dashed var(--line);margin:14px 0}
+.mdbody code{background:#f0ece3;padding:1px 5px;border-radius:5px;font-size:.86em}
+.otherrooms{display:flex;flex-wrap:wrap;gap:10px}
+.otherroom{background:var(--card);border:1px solid var(--line);border-radius:999px;padding:8px 16px;font-weight:600;box-shadow:var(--shadow)}
+@media(max-width:680px){
+  .season-grid,.arc,.psy,.histgrid,.mc-grid{grid-template-columns:1fr}
+  .hero h1{font-size:1.7rem}.loclist{columns:1}
+  .heat{font-size:.68rem}.heat td.c{min-width:26px;padding:5px 2px}
+}
+</style>
+</head><body>
+
+<div class="hero"><div class="wrap">
+  <p class="eyebrow">마인드풀러닝 어드밴스 5기 · 단톡방 월별 이력</p>
+  <h1>🏝️ 제주 단톡방</h1>
+  <p class="sub">제주 올레·100마일 운영 · 올해 3,204건 · 60명 참여 (2026-01-14~2026-05-30)</p>
+</div></div>
+<div class="wrap">
+  <div class="nav"><a href="../community-report.html">← 마을 전체 대시보드</a><span class="navm"><a href="#m01">1월</a><a href="#m02">2월</a><a href="#m03">3월</a><a href="#m04">4월</a><a href="#m05">5월</a></span></div>
+  <section>
+    <h2><span class="em">📈</span> 월별 대화량</h2>
+    <div class="card"><div class="bar"><div class="name">1월</div><div class="track"><div class="fill " style="width:3.0%">9건</div></div></div><div class="bar"><div class="name">2월</div><div class="track"><div class="fill " style="width:17.1%">280건</div></div></div><div class="bar"><div class="name">3월</div><div class="track"><div class="fill " style="width:41.7%">684건</div></div></div><div class="bar"><div class="name">4월</div><div class="track"><div class="fill amber" style="width:100.0%">1639건</div></div></div><div class="bar"><div class="name">5월</div><div class="track"><div class="fill " style="width:36.1%">592건</div></div></div></div>
+  </section>
+  <section>
+    <h2><span class="em">📜</span> 월별 주요 대화 이력</h2>
+    <p class="lede">최신 달부터 거슬러, 매월 핵심 대화·결정·이벤트를 정리했습니다. '큐레이션' 표시는 심층 분석, '자동 요약'은 원천 집계 기반입니다.</p>
+    <div id="m05"></div>
+    <div class="card monthcard curated">
+      <div class="mc-h">5월 <span class="mc-cur">📋 상세 분석 (큐레이션)</span></div>
+      <div class="mdbody"><p>2026.06.03</p>
+<h3>📌 핵심 성과 요약 (Executive Summary)</h3>
+<p><strong>&quot;비를 피하지 않고 숲으로 — 우중 교래 백야드로 완성된 Stage#7, 그리고 독일·남산까지 이어진 한 달&quot;</strong></p>
+<p>5월 제주방은 <strong>정규 올레 Stage#7(5/26)을 향한 항공권 확보 → 우천 대응 → 교래자연휴양림 우중 백야드로의 전환</strong>이라는 단일 사이클이 큰 줄기를 이루되, 그 사이에 이재군 제주 남북종주(5/12)·유기상 트랜스제주 100마일 결정(5/18)·이새롭(독일) 한국 방문 남산 번개(5/30)가 곁가지로 엮인 달입니다. 메시지 607건·44명·활동 20일로 4개 방 중 가장 활발했으며, <strong>5/26 Stage#7 당일(94건)·5/6 새롭님 등장+순대국 수다(69건)·5/30 남산 번개(60건)</strong>가 3대 분기점입니다. 핵심 의사결정은 5/25 D-1에 비 예보를 받고 <strong>취소 대신 교래자연휴양림 원두막 백야드로 코스를 전환</strong>한 것으로, &quot;취소·연기는 없습니다 — 마풀런은 비 오는 날도 운치 있게 달려요&quot;라는 운영 철학이 그대로 실행되었습니다. 운영 축은 <strong>Peter Kim(피터, 10%)·박기영(9%)·김윤진(9%)·유기상(7%)·도민 안홍휘/강승현</strong>이 분담했습니다.</p>
+<hr>
+<h3>1. Stage#7 항공권 사전 확보 (5/1 ~ 5/16)</h3>
+<ul class="mdul">
+<li>- <strong>5월 결산 + 항공권 스레드 개시(5/1, 김소영·한채원)</strong>: &quot;제주 항공표 구하기가 쉽지 않네요 … 미리 확보하시고 댓글 이어주세요.&quot; 초기 8명(채원·로함·용임·연선·승진·기영·소영·Sonia) 도착/출발 시각 정리.</li>
+<li>- <strong>걷뛰 환영 정책 재확인(5/1)</strong>: 장기수·박기영 &quot;10km가 멕시멈&quot; → 김소영 &quot;걸어도 됩니다. 저도 걷뛰 수준.&quot; 완주 강박 없는 3트랙(Full 34km/Half 17km/마풀워킹) 운영 원칙.</li>
+<li>- <strong>6월 이후 미정 사유 공유(5/9, 피터)</strong>: &quot;항공 유류세 급등(왕복 25만원, 기존 10만원선) … 유류세 1만원 이하로 내려가야.&quot; → 추후 6/23로 확정(5/27).</li>
+</ul>
+<hr>
+<h3>2. 번외 — 이재군 제주 남북종주 (5/9 ~ 5/12)</h3>
+<ul class="mdul">
+<li>- <strong>남북종주 코스 공유(5/9, 이재군)</strong>: 서귀항 → 치유의숲 → 영실 → 윗세오름 → 어리목 → 관음사 → 제주항(탑동광장).</li>
+<li>- <strong>도민 협업</strong>: 안홍휘 &quot;치유의숲 옆 샛길은 예약 없이 가능&quot;(주민 루트), 이선영 &quot;담당자에 8시 입장 재확인&quot;. 강승현 &quot;영실/윗세오름 합류, 튀김우동 보급&quot;. 피터 &quot;시간제약 없는 시오름 샛길 지도 직접 표기&quot;.</li>
+<li>- <strong>5/12 실행(우중)</strong>: 일행 중탈 후 단독 진행, 강승현 합류 &quot;데이트 중&quot;, 18:20 탑동공원 도착. 피터 — &quot;Sea to Summit / 우정언 멋집니다.&quot;</li>
+</ul>
+<hr>
+<h3>3. 번외 — 유기상 트랜스제주 100마일 결정 (5/18)</h3>
+<ul class="mdul">
+<li>- <strong>충동 신청 대서사</strong>: 유기상 &quot;트제 100마일이 살아있네요 … 못 볼 걸 본 듯&quot; → 이두승 &quot;참가 누르세요 마음이 편안해집니다 … 춘천남자 가즈아.&quot; 결국 신청.</li>
+<li>- <strong>&#x27;하나님(아내) 설득&#x27; 스토리</strong>: 아내 화법 분석, Sonia &quot;물결(~)의 의미는 준비 안 하고 아프면 혼나실 것&quot;, 정연훈 &quot;75km CP에서 만나요&quot;.</li>
+<li>- <strong>🔑 김윤진의 책임 있는 만류</strong>: &quot;백마일은 말리고 싶습니다 … 고도·거리가 아니라 돌 때문에 발바닥이 아파요. 날아다니는 분이 고통스러워하는 걸 보고 손만 잡아드렸네요. 도전은 응원하지만 백마일은 함부로 응원하는 거 아닙니다. 더군다나 제주는.&quot; → 안전 우선의 진심 어린 동료 피드백 사례.</li>
+</ul>
+<hr>
+<h3>4. Stage#7 — 우중 교래 백야드 전환 (5/16 ~ 5/26)</h3>
+<ul class="mdul">
+<li>- <strong>공식 공지(5/16, 피터)</strong>: 올레 #20→#19 역방향 약 34km(세화→월정리→김녕→함덕), 차량 CP·픽업/샌딩·올레이력서 페이지 공개. 신규 합류(김경욱·변진환·엄지선·추재연·윤재은) 항공편 추가.</li>
+<li>- <strong>🔑 D-1 우중런 모드 전환(5/25, 피터)</strong>: 비 예보 → &quot;취소·연기 없음.&quot; 핵심 3줄·참가 16명(13+도민3)·코스 1안(올레)/2안(우중 백야드)·우중런 마음가짐 5계명(&quot;완전히 젖는다를 기본값으로&quot;, &quot;DNF는 행복&quot;)·공용 장비(다이소 방수재킷 4·우비 12·블랭킷·꿀물) 안내.</li>
+<li>- <strong>교래자연휴양림 최종 결정(5/25, 피터·강승현)</strong>: 사유 — ① 비 피할 원두막 중심 ② 다양한 트레일/오름/돌문화공원 진입 용이 ③ 샤워시설. 강승현 원두막 2동 예약(취소 시 현장 변경 가능).</li>
+<li>- <strong>당일(5/26, 우중)</strong>: 08:00 제주공항 집결, 교래 우중런, 야원 한옥카페(대추차·쌍화차·한라봉차), 흑섬 양념목살. 노을 마무리. 전원 무사 귀가 — &quot;비 오는 날 행복하게 달렸어요&quot;(강승현).</li>
+<li>- <strong>정산 공유(5/27, 한채원)</strong>: 16인 총지출 783,500원(점심 닭샤브 322,000 · 야원 카페 129,500 · 저녁 흑섬 332,000), 육지 참여 시 당일 약 6만원 + 항공 12~20만원.</li>
+</ul>
+<hr>
+<h3>5. 번외 — 이새롭(독일) 한국 방문 남산 번개 (5/6 ~ 5/30)</h3>
+<ul class="mdul">
+<li>- <strong>귀국 예고(5/6)</strong>: 독일 9개월차, 5/30(토) 남산국립극장 앞 번개 + 약수역 순대국. → 김윤진 전국 순대국 맛집 지도 공유, &quot;베를린올림픽 함께 달리기&quot; 버킷리스트.</li>
+<li>- <strong>5/24 춘천 모닝런</strong>: 귀국 다음날 유기상과 춘천 공지천 웰컴런.</li>
+<li>- <strong>5/30 남산 번개 실행</strong>: 이남순·이유진·김소영·윤재은 등 참여, 남산 트레일 1회전 + 약수 순대국 + 리사르커피(서서 마시는 에스프레소) + 호두과자. 윤재은 — &quot;작년 새롭님 덕에 첫 남산 러닝 → 남산 백야드까지 도전하게 됐어요.&quot;</li>
+</ul>
+<hr>
+<h3>🗓 5월 타임라인 요약</h3>
+<table class="mdt"><thead><tr><th>날짜</th><th>핵심 안건</th></tr></thead><tbody>
+<tr><td>5/1</td><td>4월 결산 · Stage#7(5/26) 항공권 사전 확보 스레드 개시</td></tr>
+<tr><td>5/6</td><td>이새롭(독일) 한국 방문 예고 + 순대국 맛집 수다 (69건)</td></tr>
+<tr><td>5/7</td><td>태영님 생일 축하 + 부상예방 자료 〈10가지 약속〉 공유</td></tr>
+<tr><td>5/9</td><td>이재군 제주 남북종주 코스 공유 · 6월 이후 미정(유류세)</td></tr>
+<tr><td>5/12</td><td>이재군 남북종주 실행 (우중, 강승현 합류 윗세오름)</td></tr>
+<tr><td>5/16</td><td><strong>Stage#7 공식 공지 (올레 #20→#19 · 신규 합류)</strong></td></tr>
+<tr><td>5/18</td><td><strong>유기상 트랜스제주 100마일 결정 + 김윤진 안전 만류</strong></td></tr>
+<tr><td>5/25</td><td><strong>D-1 우중런 모드 → 교래자연휴양림 백야드 전환 결정</strong></td></tr>
+<tr><td>5/26</td><td><strong>Stage#7 당일 — 우중 교래 백야드 (16명, 노을 마무리) (94건)</strong></td></tr>
+<tr><td>5/27</td><td>정산 공유(78.3만/16인) · 6/23 다음 회차 + 트제 숙박 지원 예고</td></tr>
+<tr><td>5/30</td><td>이새롭 남산 번개 실행 (순대국 + 리사르커피 + 호두과자) (60건)</td></tr>
+</tbody></table>
+<hr>
+<h3>👥 주요 인물 역할</h3>
+<ul class="mdul">
+<li>- <strong>Peter Kim(피터, 10%, 62건)</strong>: Stage#7 호스트·차량 CP·우중런 전환 의사결정·숙소/픽업 조율·코스 지도 표기 — 제주 사이클 총괄.</li>
+<li>- <strong>MFRS 박기영 (9%, 57건)</strong>: 부산→김포 출도착 변경, 사진 대량 공유, 우중런 &quot;빗속의 여인&quot; 적극 참여, 정서적 윤활유.</li>
+<li>- <strong>MFRS 김윤진 (9%, 55건)</strong>: 순대국 맛집 지도·대회 정보 큐레이션, <strong>트제 백마일 안전 만류</strong>(동료 책임 피드백의 모범).</li>
+<li>- <strong>MFRS 유기상 (7%, 43건)</strong>: 트제 100마일 결정 서사, 춘천 웰컴런 호스트, 분위기 메이커.</li>
+<li>- <strong>안홍휘 마풀런4기(도민) (5%)</strong>: 남북종주 샛길·보급 지원, 거제100K 준비 동행.</li>
+<li>- <strong>MFRS 강승현(도민)</strong>: 교래 원두막 예약·차량 CP·보급, Stage#7 현장 운영.</li>
+<li>- <strong>MFRS 이새롭</strong>: 독일 귀국 번개 호스트 — 작년 남산 백야드 추억의 재소환.</li>
+</ul>
+<hr>
+<h3>⛑ 주요 Q&amp;A 및 결정 (5월)</h3>
+<table class="mdt"><thead><tr><th>질문/이슈</th><th>결정·답변</th></tr></thead><tbody>
+<tr><td>6월 이후 제주 마풀런 계속?</td><td>유류세 급등으로 미정 → <strong>6/23(화)로 확정</strong> (08:30 도착/21시 출발 기준, 5/27)</td></tr>
+<tr><td>치유의숲 8시 입장 가능?</td><td>담당자 재확인 완료(이선영) + 예약 없이 가는 샛길 안내(안홍휘)</td></tr>
+<tr><td>비 예보인데 Stage#7은?</td><td><strong>취소·연기 없음 → 교래자연휴양림 우중 백야드로 전환</strong> (원두막·샤워·트레일)</td></tr>
+<tr><td>트제 100마일 도전 응원?</td><td>도전 응원하되 <strong>백마일은 제주 돌길 위험으로 신중</strong> — 충분한 사전 점검·금주 권유 (김윤진)</td></tr>
+<tr><td>하루 전 입도 숙소?</td><td>공항 인근 가성비 숙소 3곳 추천(5~7만), 당일 아침 픽업 제공</td></tr>
+<tr><td>트랜스제주 숙소 만실?</td><td>빠레브 담당자 통화로 소량 확보, 차주 월요일 수요조사 (5/27)</td></tr>
+<tr><td>당일 경비/항공권?</td><td>16인 기준 당일 약 6만원 + 항공 12~20만원 (한채원 정산 공유)</td></tr>
+</tbody></table>
+<hr>
+<h3>🌟 핵심 인사이트 — 제주방</h3>
+<p>1. <strong>&#x27;취소하지 않는&#x27; 운영 철학의 실증</strong>: 비 예보를 만나 코스를 교래 우중 백야드로 전환하되 행사 자체는 지킨 결정 — &quot;비 오는 날도 운치 있게&quot;가 슬로건이 아니라 실제 의사결정 기준임을 입증.</p>
+<p>2. <strong>도민 네트워크가 곧 운영 인프라</strong>: 강승현(원두막·차량)·안홍휘(샛길·보급)·이선영(차량) 도민 마풀러너가 우천 대안·샤워·보급을 즉시 가능케 함 — 외부 행사가 아닌 &#x27;현지 거점&#x27; 모델.</p>
+<p>3. <strong>동료 피드백의 성숙도</strong>: 김윤진의 백마일 만류는 분위기를 깨지 않으면서 안전을 최우선에 둔 직언 — 무조건 응원이 아닌 &#x27;책임 있는 만류&#x27;가 커뮤니티 안에서 자연스럽게 작동.</p>
+<p>4. <strong>걷뛰·DNF를 환대하는 진입장벽 제거</strong>: &quot;걸어도 됩니다&quot;, &quot;DNF는 행복&quot;, 3트랙·차량 CP 상시 대기 — 거리·완주 강박 없이 누구나 합류 가능한 설계가 신규(추재연·변진환·김경욱·엄지선) 유입으로 이어짐.</p>
+<p>5. <strong>추억의 재방문이 만드는 결속</strong>: 이새롭(독일)의 일시 귀국 번개가 작년 남산 백야드 기억을 소환하며 신·구 회원을 잇는 정서적 앵커로 기능 — 제주방이 단순 행사방을 넘어 &#x27;관계의 아카이브&#x27;로 작동.</p>
+<hr>
+<p><em>분석 기준: 2026년 5월 1일 ~ 5월 30일 마인드풀러닝 제주방 607건 · 44명 발신자 대화 내용 기반. 계좌·전화·숙소 예약·회의 링크 등 개인정보는 마스킹.</em></p></div>
+    </div><div id="m04"></div>
+    <div class="card monthcard curated">
+      <div class="mc-h">4월 <span class="mc-cur">📋 상세 분석 (큐레이션)</span></div>
+      <div class="mdbody"><p>2026.05.01</p>
+<h3>📌 핵심 성과 요약 (Executive Summary)</h3>
+<p><strong>&quot;한 달간의 제주 트레일 — 출국·완주·헌정으로 이어진 도전의 호흡&quot;</strong></p>
+<p>4월의 제주방은 단일 주제 채널입니다. <strong>23명(100K 14명 + 36K 9명)이 참가한 제주국제트레일러닝 2026 (4/10–12)</strong> 의 사전 운영, 항공·숙소·물품·셔틀 조율, 대회 직전 결항 대응, 후기·감사·재참가 의지, 그리고 故 서명숙 이사장 헌정런(4/28)으로 이어지는 한 달이 응축되어 있습니다. 총 1,687건·44명·일 평균 73건의 메시지가 오갔으며, 4/9(442건)·4/22(202건)·4/8(170건)·4/12(142건)·4/3(138건)이 활동 절정일이었습니다. <strong>운영자 1인의 폭주가 아니라, 제주 도민 마풀러너(강승현·정경원·안홍휘)와 협찬자·응원단이 분산해 짊어진 &quot;분산형 책임&quot;</strong> 이 본 카톡방의 가장 큰 특징입니다.</p>
+<hr>
+<h3>1. 제주국제트레일러닝 2026 사전 운영 (4/3 ~ 4/9)</h3>
+<p>대회 전 일주일은 행정·물류·정보 동기화에 집중되었습니다.</p>
+<ul class="mdul">
+<li>- <strong>참가 명단 확정</strong> (4/3, Peter Kim): 100K 14명 / 36K 9명 / 응원·서포트 그룹 분리. 코스별 인원 + 숙박/이동 매트릭스 단일 메시지로 정리.</li>
+<li>- <strong>공용숙소 운영비</strong> (4/3): 1인/1박 3만원 실비. 하나은행 11291042389407 김태영 계좌로 본인 숙박 수만큼 입금 → 5명 (박세진, 이두승, 정규하, 정윤심, 왕야)이 첫날 즉시 처리.</li>
+<li>- <strong>여행자 보험 권장</strong> (4/3): 한화손해보험 2,870원/1일. 주최측 보험은 개인 과실/질병(근육통·급체)을 보장하지 않음을 근거로 제시.</li>
+<li>- <strong>MFRS Sync 사전 콜</strong> (4/4 토 21:00, Google Meet): 대회 준비 중 궁금사항 일괄 응답 + 코스 브리핑.</li>
+<li>- <strong>협찬·서포트 기여자 공개 감사</strong> (4/8): 카페자온(콤부차) · 박경애·이지현(컷오프 맵·코스 지도) · 박세진/김태영/이선영(완주 도우미 = 마풀런메이트) · 이선영(숙소·운전) · 타쿠마스시(상품권 5만원 + 오마카세 +α) · 도민 트리오(강승현·안홍휘·정경원).</li>
+<li>- <strong>선수등록 안내</strong> (4/9): 100K 선수는 &#x27;블라제리조트&#x27;에서 배번 수령. 대리수령 가능(접수패스 + 신분증 사본 제출, 마감 17:00).</li>
+</ul>
+<hr>
+<h3>2. 출국 D-1 결항 대란 대응 (4/9, 442건 메시지) 🌧️</h3>
+<p>대회 전날 오전부터 <strong>김포–제주 항공편 다수가 결항/지연</strong>되었습니다. 채팅방은 실시간 상황실로 전환되었습니다.</p>
+<ul class="mdul">
+<li>- <strong>08:55 Peter Kim</strong>: &quot;오늘은 종일 비가오네요&quot; — 대회 기간 중 80–90%는 강수 약화 예보 공유로 안심 메시지.</li>
+<li>- <strong>08:58 박세진</strong>: 15:15 도착 예정 / 택시 → 숙소 사전 동선 확인.</li>
+<li>- <strong>08:59 조용임</strong>: &quot;현재 제주뱅기 9시 10시 결항&quot;.</li>
+<li>- <strong>09:02 Peter Kim</strong>: 제주 도착자 임시 집결지 = <strong>스타벅스 제주삼화DT점</strong>(써니 &amp; 피터의 단골). 늦게 도착하는 6인조용 백업 = 폴 바셋 제주 용담 DT점.</li>
+<li>- <strong>09:08 Peter Kim</strong>: 정규하 단독 숙박은 &#x27;여기어때&#x27;로 인접 숙소 개별 예약 안내(공용숙소 capa 초과 대응).</li>
+<li>- <strong>이두승</strong>: &quot;회사 출근했고 오후반차 쓰고 제주도 날라갑니다 🤣&quot; — 결항이 거듭되는 와중에도 유머로 분위기 유지.</li>
+<li>- <strong>표선 인근 정보 공유</strong> (4/9, 정경원): 마트(하나로/다이소) · 사우나(성산포수협 표선복지회관 목욕탕) · 도민/관광객 맛집 8곳(가시식당·바타타식탁·광어다·장흥식당·제주할망밥상·제주버들못·한라산아래첫마을·표선우동가게) — 운영자가 아닌 <strong>현지 마풀러너 자생 정보</strong>.</li>
+<li>- <strong>23:25 Peter Kim</strong>: 대회 앱 &#x27;Passplane&#x27; 사전 설치 안내. 황유숙: 전번 조회 미등록 → 사무국 메일 문의.</li>
+<li>- <strong>23:31 이두승</strong>: &quot;긴바지는 꼭 챙겨야 할까요?&quot; → 김윤진/강승현: 5도 이하 시 권장, 필수장비이나 장비검사 느슨함.</li>
+</ul>
+<hr>
+<h3>3. 대회 변경 공지 및 직전 운영 (4/9 ~ 4/12)</h3>
+<ul class="mdul">
+<li>- <strong>스테이지1 출발시간 변경</strong> (4/9 오후, 강승현 공유): 06:30 → <strong>08:00</strong> (상황 따라 추가 지연). 사유: 우천.</li>
+<li>- <strong>셔틀버스 안내</strong>: 제주항 5부두 앞 / 4/10(금) 05:30~06:20 / 도착지 = 성읍민속마을 정의읍성 앞.</li>
+<li>- <strong>레이스 후반(4/12) 36K 합류</strong>: 100K 완주자 + 36K 신규 참가자(황유숙·이지혜·이수지 등) 합동 피니시.</li>
+</ul>
+<hr>
+<h3>4. 완주 후 감사·후기 단계 (4/12 ~ 4/22) 🌸</h3>
+<p>대회 종료 후 1주일은 후기와 감사가 채팅방을 채웠습니다.</p>
+<ul class="mdul">
+<li>- <strong>이남순(4/13)</strong>: &quot;내가 할 수 있는 달리기르루 하다보면 내가 할 수 없던 달리기를 하게 된다&quot; — 본인 좌우명 + 코치 김성우에 대한 헌사.</li>
+<li>- <strong>황유숙(4/13)</strong>: 36K 합류 감사. 이수지·이지현 응원·동반 영상 언급.</li>
+<li>- <strong>강승현(4/13, 4/22)</strong>: &quot;대회 첫날 출발 지연 → 의도치 않은 빡런 → 10위권 노렸으나 미달 ㅎ. 그래도 비온 뒤 더 깨끗한 제주 자연·진흙탕 입수까지 즐거웠다.&quot; → 제주관광공사가 본받아야 할 대회로 자평.</li>
+<li>- <strong>이두승(4/22)</strong>: &quot;파타고니아 옷 두 벌·사진 잘 찍어주신 혜자대회&quot;. 100K 완주자 한정 긴팔 추가 지급(95,000원 상당) → &quot;회사 갈 때 입는중요 ㅋㅋ 100k 자랑용&quot;.</li>
+<li>- <strong>이지혜·로함/김성우 농담</strong>: &quot;긴팔은 좀 마니 안좋음 참고요 ㅎㅎ / 작년에 받고 헌옷박스에서 주워온 줄 ㅋㅋ&quot; — 친밀감 신호.</li>
+</ul>
+<hr>
+<h3>5. 故 서명숙 이사장 헌정런 — 시즌2 번외편 (4/14 공지 → 4/28 실행)</h3>
+<ul class="mdul">
+<li>- <strong>계기</strong>: 4/13–14 제주올레 창시자 서명숙 이사장 별세 → &quot;업적 많으신 분이 돌아가시는 날엔 멀쩡하던 날씨도 비바람이 분다&quot;(4/9 박기영) 식의 정서 공유 → 운영진의 헌정 기획.</li>
+<li>- <strong>공식 공지(4/14, Peter Kim)</strong>: 2026-04-28(화) 08:00–21:00 당일치기 / 제주올레 6코스 → 여행자센터(헌정 시간) → 7코스 / 약 28.7km / 정규 Stage7과 별개 번외편.</li>
+<li>- <strong>비용</strong>: 정산 후 마풀런 디지털 도네이션(올레재단 기부 포함). 운전·픽업·간식은 김태영·이선영·도민 멤버 봉사.</li>
+<li>- <strong>본문 공유(4/28, Peter Kim)</strong>: 서명숙 이사장 어록 5선 직접 채록 — &quot;재기재기 와리지 말앙, 꼬닥꼬닥 걸으라게(빨리빨리 서두르지 말고, 천천히 걸어라)&quot; 등.</li>
+<li>- <strong>마지막 메시지(4/30 한채원)</strong>: &quot;4/28_맛풀런 정산 끝~!! 공항에서부터 운전·택시 불러주신 덕분에 편안한 여행…늘 감사드려요 피터님~ 🥰&quot; → 운영 사이클 클로징.</li>
+</ul>
+<hr>
+<h3>6. 다음 시즌 예고 — 5/26 올레길 #20→#19</h3>
+<p>월말부터 다음 번외편 사전 항공권 확보 메시지가 풀렸습니다.</p>
+<ul class="mdul">
+<li>- <strong>5/26(화) 올레 #20→#19</strong> (세화→월정리→김녕→함덕): 항공권 동기화 댓글 스레드. 채원(07:55 도착/21:20 출발), 로함(08:50/21:25 출발), 용임 등 사전 좌석 배정.</li>
+<li>- <strong>박기영(4/30)</strong>: &quot;고민이 많았는데… 일단 티켓팅부터 했습니다!&quot; — 사전 결정의 임팩트 강조.</li>
+</ul>
+<hr>
+<h3>🗓 제주방 4월 타임라인 (Top 13)</h3>
+<table class="mdt"><thead><tr><th>날짜</th><th>메시지 수</th><th>핵심 이슈</th></tr></thead><tbody>
+<tr><td>4/3</td><td>138</td><td>100K/36K 참가 명단 공식 발표 · 공용숙소 입금 · 보험·SYNC 콜 안내</td></tr>
+<tr><td>4/4</td><td>17</td><td>무료 트레일 세미나(TransJeju) 정보 공유</td></tr>
+<tr><td>4/5</td><td>5</td><td>강승현 100마일 후기 PDF 공유</td></tr>
+<tr><td>4/8</td><td>170</td><td>협찬·서포트 명단 공개 감사 · 챌린지 D-2 점검</td></tr>
+<tr><td><strong>4/9</strong></td><td><strong>442</strong></td><td><strong>결항 대란 → 임시 집결지(스벅 삼화)·숙소 분산 운영·표선 정보 자생적 공유</strong></td></tr>
+<tr><td>4/10</td><td>105</td><td>스테이지1 출발 지연(06:30→08:00) · 셔틀 운영</td></tr>
+<tr><td>4/11</td><td>93</td><td>스테이지2 진행 중 응원·중간 보고</td></tr>
+<tr><td>4/12</td><td>142</td><td>36K 합류 + 100K 피니시 시간 동기화</td></tr>
+<tr><td>4/13</td><td>90</td><td>완주 후기 1차(이두승·이남순·황유숙·강승현)</td></tr>
+<tr><td>4/14</td><td>11</td><td>서명숙 이사장 헌정런 공식 공지</td></tr>
+<tr><td><strong>4/22</strong></td><td><strong>202</strong></td><td><strong>완주 회고 + 차세대 설문(@ALL) 도착·내년 재도전 의지</strong></td></tr>
+<tr><td>4/28</td><td>43</td><td>헌정런 당일 6→7코스 28.7km 실행</td></tr>
+<tr><td>4/29–30</td><td>23</td><td>5/26 올레 #20→#19 항공권 사전 확보 스레드</td></tr>
+</tbody></table>
+<hr>
+<h3>⛑ 주요 Q&amp;A 및 운영 결정</h3>
+<table class="mdt"><thead><tr><th>질문/이슈</th><th>답변·결정</th></tr></thead><tbody>
+<tr><td>공용숙소 비용은?</td><td>1인/1박 <strong>3만원</strong> 실비, 하나은행 11291042389407 김태영</td></tr>
+<tr><td>여행자 보험 필요?</td><td>권장. 한화손해보험 1일 2,870원. 개인 과실/질병 보장 위해</td></tr>
+<tr><td>결항 시 집결지?</td><td><strong>스타벅스 제주삼화DT점</strong> (백업: 폴 바셋 용담 DT점)</td></tr>
+<tr><td>정규하님 단독 숙박?</td><td>공용숙소 capa 초과 → &#x27;여기어때&#x27;로 인접 숙소 개별 예약</td></tr>
+<tr><td>대리수령 가능?</td><td>가능. 접수패스 + 신분증 사본 카톡 송부, 마감 17:00</td></tr>
+<tr><td>긴바지 필수?</td><td>5°C 이하 시 권장, 필수장비이나 장비검사는 느슨함 (강승현)</td></tr>
+<tr><td>출발 시간?</td><td>4/10 06:30 → <strong>08:00</strong>로 변경 (우천)</td></tr>
+<tr><td>헌정런 비용은?</td><td>정산 후 디지털 도네이션. 운전/픽업/간식은 멤버 봉사</td></tr>
+</tbody></table>
+<hr>
+<h3>🌟 핵심 인사이트 — 제주방</h3>
+<p>1. <strong>분산형 책임 운영의 성공 사례</strong>: 운영자(피터·이두승·강승현) 3인이 14.6%·8.5%·4.3%로 메시지 비중을 분산하고, 협찬·맵 제작·운전·숙소를 분담한 구조가 결항·지연 같은 돌발 상황에서도 무너지지 않은 핵심 동력.</p>
+<p>2. <strong>현지 도민 마풀러너의 자생적 정보 자산화</strong>: 정경원(원)이 표선 마트·사우나·맛집 8곳을 자생적으로 정리한 메시지(4/9)는 어떤 운영 매뉴얼보다 가치 있는 단일 메시지로, 다음 제주 트런 운영에 그대로 재사용 가능.</p>
+<p>3. <strong>헌정런이라는 즉응적 의례화</strong>: 서명숙 이사장 별세(4/13–14) 직후 14일만에 6→7코스 헌정 번외편(4/28)을 기획·실행 — 마풀런 커뮤니티가 단순한 운동 동호회가 아니라 <strong>상실에 즉시 반응하는 의례 공동체</strong>임을 입증.</p>
+<p>4. <strong>완주의 효용을 &quot;옷 한 벌&quot;로 농담화하는 친밀 코드</strong>: 95,000원 상당 파타고니아 긴팔을 두고 &quot;헌옷박스에서 주워온 줄&quot;이라 농담하는 대화가 상위 권위자 없이 평등하게 오감 → 위계 없는 커뮤니티 문화 시그널.</p>
+<p>5. <strong>다음 시즌 항공권 사전 확보</strong>: 4월 마지막 주 5/26 올레 #20→#19용 항공권을 댓글 스레드로 사전 합의하는 패턴 — <strong>대회 후 1주 내 다음 도전을 즉시 락인하는 모멘텀 운영</strong>이 정착 단계.</p>
+<hr>
+<p><em>분석 기준: 2026년 4월 3일 ~ 4월 30일 [마인드풀러닝] 제주 단톡방 1,687건 · 44명 발신자 대화 내용 기반</em></p></div>
+    </div><div id="m03"></div>
+    <div class="card monthcard curated">
+      <div class="mc-h">3월 <span class="mc-cur">📋 상세 분석 (큐레이션)</span></div>
+      <div class="mdbody"><p>2026.06.04</p>
+<h3>📌 핵심 성과 요약 (Executive Summary)</h3>
+<p><strong>&quot;출생지에서 출발해 30시간 후 일터에서 멈추다 — 강승현 100마일, 이 방이 만든 역사&quot;</strong></p>
+<p>3월 제주방은 703건·44명이 참여하며 제주방 역사상 가장 드라마틱한 달이었습니다. 세 개의 레이어가 중첩되었습니다. ① <strong>3월 3일 올레 Stage#6(#21→#20 역방향, 28km)</strong> — 프릳츠 커피 모닝 → 해안길 러닝 → 타쿠마스시 오마카세 → 은성식당으로 이어진 맛풀런의 정석, ② <strong>3월 17~18일 트랜스제주 UTMB 등록 대란</strong> — 서버 폭주·외국인 모드 팁 공유·류순영(스위스)·장기수 등록 성공, ③ <strong>3월 28일~29일 강승현 쉐프 뉴100마일러 대서사</strong> — 새벽 3시 출발, 28분의 응원글 인쇄 동행, UTMB급 라이브 트래킹, 30시간 후 가족이 기다리는 타쿠마스시 피니쉬. 피크는 3/29(152건)와 3/28(135건)으로, 이틀이 전체 3월 메시지의 41%를 차지합니다. 마지막에는 피터의 <strong>&quot;태백 프로젝트&quot;(피터 100K 도전)</strong> 기획이 즉흥적으로 발의되며 다음 서사의 씨앗이 심어졌습니다.</p>
+<hr>
+<h3>1. 올레 Stage#6 — 프릳츠에서 은성식당까지 (3/1 ~ 3/3)</h3>
+<ul class="mdul">
+<li>- <strong>최종 참석 확인(3/2, 피터 + 이유진·로함·조용임·강승현·한채원)</strong>: 6명 확정. 강승현이 성산 아침 카페를 4곳 추천하자 피터가 &quot;프릳츠에서 봐요&quot;로 즉시 결정했습니다. &quot;이제는 제주가 제2의 고향 정겨우실 것 같아요&quot;(피터)라는 말에 로함이 웃음으로 화답했습니다.</li>
+<li>- <strong>당일 실행(3/3, 흐림·비 없음)</strong>: 공항 픽업 → 성산 프릳츠 커피 모닝 → 올레 #21 시작, 28km 해안길. 강승현이 Garmin 코스와 &quot;체력 되면 식산봉도&quot;를 추천했고, 로함이 대량의 사진을 세 차례 방출하며 원격 대리만족 콘텐츠를 제공했습니다. 저녁은 강승현 추천 은성식당에서 마무리.</li>
+<li>- 🔑 정영화의 &quot;프릳츠 옆 무료 주차장, 성산 바라보며 한두 바퀴&quot; 추천처럼, 매번 축적되는 도민 현지 팁이 올레 마풀런의 품질을 높이는 자산이 됩니다.</li>
+</ul>
+<hr>
+<h3>2. 뉴100마일러 — 30시간의 대서사 (3/5 ~ 3/30)</h3>
+<h4>2-1. D-23 서포터 결집 (3/5, 피터)</h4>
+<p>응원 안내문이 공식 공유되며 페이스메이커(유기상·안홍휘·정경원·이재군·로함/김성우·정연훈·최준호), 지원차량(함정수 외 4대), 현장총괄(피터·이선영·이유진) 체계가 공개되었습니다. 동시에 응원 메시지 28건이 수집되어 인쇄물로 만들어졌습니다.</p>
+<h4>2-2. 디지털 인프라 구축 (3/27, 이선영)</h4>
+<p>이선영(Sunny Lee)이 UTMB 스타일의 공식 라이브 트래킹 홈페이지를 오픈했습니다. Garmin LiveTrack·CP별 예상 도착 시간 자동 산출·Crew Ops 위치 공유까지 구현했습니다. 피터의 &quot;조촐한 이벤트가 UTMB급으로 격상되었습니다&quot;라는 말이 방 분위기를 요약했습니다. 저작권 문제로 사이트가 일시 중단되었다가 재수정 후 재오픈되었습니다. 이두승의 Curation 앱이 보완 역할을 했습니다. 🔑 &quot;국가대표도 이런 대접 못 받습니다&quot;(김윤진) — 커뮤니티 운영 수준이 대회 운영 표준을 넘어선 순간입니다.</p>
+<h4>2-3. D-1 전야 (3/27)</h4>
+<p>김윤진이 태명 &#x27;보석이&#x27;를 밝히며 &quot;달리기를 사랑하는 사람이라 이 여정을 같이하는 게 곧 여행&quot;이라고 표현했습니다. 피터는 &quot;이 모든 영광은 써니(이선영)에게, 기상님은 하나님 같은 존재&quot;라며 도민+원거리 참여자들을 아울렀습니다.</p>
+<h4>2-4. 당일 실행 (3/28 새벽 3:00 ~ 3/29 08:57)</h4>
+<ul class="mdul">
+<li>- <strong>03:00 출발</strong>: 강승현·염주호 코치 대흘리 출발. 방에는 새벽부터 응원 릴레이가 이어졌습니다.</li>
+<li>- <strong>진행 중계</strong>: 유기상이 한라산 구간에서 &quot;뜬금없지만 제주 왜 이렇게 좋나요&quot;라며 사진을 방출했고, 소화 문제로 승현님이 한라산 하산 직후 잠시 힘들어하자 피터·이유진의 지극 정성으로 회복했습니다. CP7 예상 도착 시간 산출 방식도 이선영이 실시간 업데이트했습니다.</li>
+<li>- 박기영: &quot;자다 깨서 본능적으로 핸드폰을 찾아 시각을 확인합니다. 3시 30분... 아 출발하셨겠다... 춥지는 않을까...&quot; — 원격 응원자의 감정을 가장 정확히 포착한 메시지.</li>
+<li>- <strong>3/29 08:57 완주</strong>: 가족이 기다리는 타쿠마스시 피니쉬. 정연훈이 &quot;방금 끝났습니다&quot;를 타전하자 방 전체가 폭발했습니다. 염주호 프로의 더뉴100마일러 프로젝트 <strong>10번째 완주자</strong> 등극. &quot;눈물이 납니다&quot;, &quot;인간극장&quot;, &quot;각본 없는 감동 드라마&quot;가 방을 채웠고, 이남순의 &quot;잘 걷는 사람이 100마일 완주한다&quot;는 명언이 조용히 정리했습니다.</li>
+</ul>
+<hr>
+<h3>3. 트랜스제주 UTMB 등록 대란 (3/17 ~ 3/18)</h3>
+<ul class="mdul">
+<li>- <strong>서버 폭주와 외국인 모드 팁 공유(3/17~18)</strong>: 피터가 100K 외국인 모드로 등록하는 방법을 공유하자 방 전체가 시도했습니다. 류순영(스위스)과 장기수가 각자의 방법으로 성공했습니다. 20K는 비교적 수월하게 등록된 반면 100K는 직전까지 서버 과부하가 지속되었습니다.</li>
+<li>- <strong>제주국제트레일러닝 준비 상호 코칭(3/17)</strong>: 강승현이 &quot;1일차 상승고도 1,000m 이상, 경사도 24도 구간, 스틱 추천&quot;을 알렸고, 이유진이 &quot;걷기만으로도 완주 가능, 사우나·든든한 식사 필수&quot;라는 작년 경험을 공유했습니다. 박경애의 Gemini 기반 100K 준비 가이드 PDF가 큰 호응을 받았습니다.</li>
+</ul>
+<hr>
+<h3>4. 제주도민 Admin 체계 구축 (3/4)</h3>
+<p>피터·강승현·안홍휘·정경원·김윤진이 제주방 Admin 권한을 부여받았습니다. 제주 기반 이벤트가 다양화되면서 운영을 도민에게 분산하는 구조로 전환된 것으로, 이후 100마일 운영의 질적 도약을 가능케 한 기반입니다.</p>
+<hr>
+<h3>5. &quot;태백 프로젝트&quot; 즉흥 발의 (3/30)</h3>
+<ul class="mdul">
+<li>- <strong>안홍휘의 선언(3/30)</strong>: &quot;태영님, 이제 서폿에서 플레이어로 나올 때가 왔다.&quot; 피터를 향한 이 한 마디가 즉시 연쇄 반응을 일으켰습니다.</li>
+<li>- <strong>태명 &#x27;태백&#x27; = 태(영님) + 백(K) + 본적 태백시</strong>: 메인 디렉터(안홍휘), 러닝메이트(정연훈·강승현), 서포트(유기상·김윤진·이두승 등)가 즉석에서 손을 들었습니다.</li>
+<li>- 피터의 반응: &quot;허거덕… 등 떠밀린다.&quot;그러면서도 &quot;앞으로 10K~100M까지 한계 도전하시는 분들의 셰르파 역할을 하겠다&quot;는 방향을 제시했습니다. 🔑 커뮤니티 에너지가 다음 프로젝트를 자연 발생시키는 제주방의 연쇄 구조가 확립된 순간입니다.</li>
+</ul>
+<hr>
+<h3>🗓 3월 타임라인 요약</h3>
+<table class="mdt"><thead><tr><th>날짜</th><th>핵심 안건</th></tr></thead><tbody>
+<tr><td>3/1</td><td>100마일 준비 응원 시작 · 강승현 날씨 현황 공유</td></tr>
+<tr><td>3/2</td><td>Stage#6 코스·참가자 최종 확인</td></tr>
+<tr><td>3/3</td><td><strong>Stage#6 당일 — 성산 프릳츠→올레 28km→타쿠마스시→은성식당</strong> (60건)</td></tr>
+<tr><td>3/4</td><td>제주도민 Admin 5명 체계 구축</td></tr>
+<tr><td>3/5</td><td>뉴100마일러 서포터 안내 + 응원 메시지 취합</td></tr>
+<tr><td>3/17</td><td>제주국제트레일 100K 준비 상호 코칭 (61건)</td></tr>
+<tr><td>3/17-18</td><td><strong>트랜스제주 UTMB 등록 대란 — 외국인 모드 팁 공유</strong></td></tr>
+<tr><td>3/27</td><td><strong>D-1 이선영 UTMB급 라이브트래킹 사이트 오픈</strong> (저작권 이슈 → 재수정 재오픈)</td></tr>
+<tr><td>3/28</td><td><strong>강승현 뉴100마일러 새벽 3:00 출발 (135건)</strong></td></tr>
+<tr><td>3/29</td><td><strong>08:57 완주! 타쿠마스시 피니쉬 · 염주호 프로 10번째 완주자</strong> (152건)</td></tr>
+<tr><td>3/30</td><td>완주 후기 · <strong>태백 프로젝트 즉흥 발의</strong> (100건)</td></tr>
+<tr><td>3/31</td><td>피터 3월 현황 리포트 공유</td></tr>
+</tbody></table>
+<hr>
+<h3>👥 주요 인물 역할</h3>
+<ul class="mdul">
+<li>- <strong>Peter Kim(피터, 14%, 97건)</strong>: Stage#6 호스트 · 사전훈련 총괄 · 서포터 안내 · 디지털 자산 배포 총괄 · 태백 프로젝트 수용. 모든 이벤트의 중심축.</li>
+<li>- <strong>MFRS 김윤진 (11%, 75건)</strong>: CP 지원·영상 촬영·&quot;국가대표도 이런 대접 못 받는다&quot; 명언 · 1차 전략회의 주도 · 완주 후 감동 표현 1위 — 현장 감성 기록자.</li>
+<li>- <strong>MFRS 이두승 (6%, 42건)</strong>: 100K 사전훈련 응원 주도, 완주 순간 감탄 중계, &quot;승현님 100마일 완주 회고 토크 원한다&quot;는 후속 기획 발의.</li>
+<li>- <strong>MFRS-정훈재 (5%, 37건)</strong>: GPX 파일 공유, &quot;10K 열여섯 번 인터벌 = 백마일&quot; 유머, 응원 릴레이 연결고리.</li>
+<li>- <strong>MFRS 유기상 (5%, 36건)</strong>: 페이스메이커 CP3~CP5 구간 담당, &quot;제주도 왜 이렇게 좋나요&quot; 중계 사진 방출, 완주 후 &quot;겸손해졌습니다&quot; 소회 공유.</li>
+<li>- <strong>MFRS 강승현 (5%, 34건)</strong>: 도전 주인공. &quot;부상 하나 없이 잘 달리고 왔습니다. 복기는 마풀런 분들께 공유하겠습니다&quot;로 완주를 마무리했습니다.</li>
+<li>- <strong>MFRS 로함/김성우 (5%, 34건)</strong>: Stage#6 참여 · 뉴100마일러 페이스메이커 마지막 구간 담당 · 대량 사진 방출 · 방 전체 분위기의 유활제.</li>
+<li>- <strong>Sunny Lee 이선영</strong>: UTMB급 라이브 트래킹 홈페이지 개발·운영(바이브코딩) · CP 예상 시간 산출 방식 실시간 업데이트 — 디지털 인프라 책임자.</li>
+<li>- <strong>안홍휘(도민) (4%, ~32건)</strong>: 페이스메이커·보급 지원 · 태백 프로젝트 발의자 · &quot;샛길 없이 당연히 가능한 현지 지식&quot; 보유자.</li>
+</ul>
+<hr>
+<h3>⛑ 주요 Q&amp;A 및 결정 (3월)</h3>
+<table class="mdt"><thead><tr><th>질문/이슈</th><th>결정·답변</th></tr></thead><tbody>
+<tr><td>Stage#6 최종 코스?</td><td>#21→#20 역방향(성산→김녕 28km) — 아침 성산 프릳츠 커피 집결</td></tr>
+<tr><td>제주국제트레일 100K 준비법?</td><td>강승현 &quot;스틱 추천·상승 1,000m&quot;; 이유진 &quot;걷기 완주 가능·사우나 필수&quot;; 박경애 AI 가이드 PDF</td></tr>
+<tr><td>트랜스제주 100K 등록 방법?</td><td>외국인 모드 등록 (피터 공유) — 류순영·장기수 성공</td></tr>
+<tr><td>라이브트래킹 접속 방법?</td><td>이선영 운영 공식 홈페이지 + 패스워드 0328</td></tr>
+<tr><td>소화 문제 발생 시 대처?</td><td>이동 CP에서 피터·이유진 즉각 지원 → 회복 후 계속</td></tr>
+<tr><td>태백 프로젝트 일정?</td><td>트랜스제주(10월) 전까지 — 코스·훈련 구체화 필요</td></tr>
+</tbody></table>
+<hr>
+<h3>🌟 핵심 인사이트 — 제주방</h3>
+<p>1. <strong>커뮤니티가 만드는 UTMB급 운영 표준</strong>: 이선영의 라이브 트래킹 홈페이지, 이두승의 Curation 앱, 정연훈의 Garmin 공유 — 세 개의 디지털 레이어가 동시 가동되며 공식 대회를 능가하는 현장 경험을 만들었습니다. &quot;국가대표도 이런 대접 못 받는다&quot;는 김윤진의 한 마디가 운영 수준을 가장 정확히 표현합니다.</p>
+<p>2. <strong>자발적 역할 분화의 완성</strong>: 디렉터(피터/안홍휘), 기술(이선영/이두승), 현장 지원차량(함정수), 페이스메이커(7명), 미디어(박아영/정연훈), 영양·의료(이유진), 원격 중계(정연훈/유기상) — 누가 시키지 않아도 각자가 가장 잘하는 역할로 스스로 포지셔닝했습니다.</p>
+<p>3. <strong>감동의 연쇄 중계가 공동체 결속을 강화</strong>: 박기영의 &quot;새벽 3시 30분 본능적으로 핸드폰을 찾았다&quot;는 일기 같은 메시지에서 류순영의 스위스 원격 응원까지, 현장에 없어도 실시간으로 함께 달리는 경험이 제주방 30+ 회원 전체를 하나의 감정 공동체로 묶었습니다.</p>
+<p>4. <strong>차기 프로젝트의 자연 발생</strong>: 뉴100마일러 완주의 감동이 식기도 전에 &quot;태영님도 이제 플레이어로&quot;라는 안홍휘의 발의가 즉각 다수의 지지를 받았습니다. 제주방의 에너지는 소비가 아니라 생성 구조입니다.</p>
+<p>5. <strong>제주 정체성과 마풀런 슬로건의 체험화</strong>: 이남순의 &quot;잘 걷는 사람이 100마일 완주한다&quot;는 말, 그리고 &quot;내가 할 수 있는 달리기를 하다 보면 할 수 없던 달리기를 하게 된다&quot;는 마풀런 슬로건이 100마일 완주 당일에 구체적인 사례로 입증되었습니다.</p>
+<hr>
+<p><em>분석 기준: 2026년 3월 1일 ~ 3월 31일 마인드풀러닝 제주방 703건 · 44명 발신자 대화 내용 기반. 계좌·전화·숙소 예약·회의 링크 등 개인정보는 마스킹.</em></p></div>
+    </div><div id="m02"></div>
+    <div class="card monthcard curated">
+      <div class="mc-h">2월 <span class="mc-cur">📋 상세 분석 (큐레이션)</span></div>
+      <div class="mdbody"><p>2026.06.04</p>
+<h3>📌 핵심 성과 요약 (Executive Summary)</h3>
+<p><strong>&quot;100K 사전 훈련 우중 완주, 그리고 100마일 전야제 — 2월의 제주방은 이미 3월을 달리고 있었다&quot;</strong></p>
+<p>2월 제주방은 286건·34명이 활동하며, 방이 본격 가동된 첫 달이자 준비의 달이었습니다. 세 개의 축이 동시에 돌아갔습니다. ① <strong>3월 3일 Stage#6 참가자 항공편 취합 및 코스 변경 공지</strong>, ② <strong>4월 제주국제트레일러닝(100K/36K/10K) 신청 독려 및 상호 코칭</strong>, ③ <strong>3월 28일 강승현 쉐프 뉴100마일러 준비 — 2월 24일 동일코스 100K 사전훈련 우중 완주</strong>가 그것입니다. 피크는 2/24(87건)로, 강승현·정경원·안홍휘 세 명이 한라산을 포함한 100K를 우중에 달리는 장면을 방 전체가 실시간으로 응원하고 중계한 날입니다. &quot;아직 살아있어요 ㅎㅎ&quot;라는 강승현의 12시간째 중간 메시지가 분위기를 정점으로 끌어올렸고, 자정 무렵 완주 소식에 방은 축제 분위기로 마무리되었습니다.</p>
+<hr>
+<h3>1. Stage#6 준비 및 참가자 취합 (2/1 ~ 2/23)</h3>
+<ul class="mdul">
+<li>- <strong>2026 제주 시즌 첫 공지(2/1, 피터)</strong>: &quot;작년에 이어 올해도 본 방에서 진행&quot;을 선언하며 Stage#6(3월 3일, 올레 #21→#20 역방향, 28km) 공지와 제주국제트레일러닝 신청 독려를 동시에 시작했습니다. 제주행 항공편 일정 댓글 취합 방식은 이후 제주방 운영의 기본 포맷으로 자리 잡습니다.</li>
+<li>- <strong>코스 변경 공지(2/21, 피터)</strong>: 강승현님이 타쿠마스시 근무로 오후 3시 이후에야 합류 가능하여 #12→#13에서 <strong>#21→#20 역방향(성산→김녕, 28km 해안길)</strong>으로 변경했습니다. 🔑 운영이 도민 멤버의 현실 스케줄에 맞춰 유연하게 조정되는 패턴의 첫 사례입니다.</li>
+<li>- <strong>참가 확정(2/21~23)</strong>: 이유진, 조용임, 로함/김성우, 한채원 순으로 항공편 댓글이 이어졌고, 한채원의 &quot;서강대 대학원 OT 날짜 확인 후 확정&quot; 일화에서 제주방 특유의 일상 + 달리기 얽힘 수다가 자연스럽게 펼쳐졌습니다.</li>
+</ul>
+<hr>
+<h3>2. 제주국제트레일러닝 상호 코칭 (2/1 ~ 2/8)</h3>
+<ul class="mdul">
+<li>- <strong>&quot;지르고 뒷 수습&quot; 분위기(2/1, 피터 외)</strong>: 이지혜(36K), 이남순(100K), 이두승(100K)이 신청을 밝히자 &quot;힘들면 걸으면 되죠&quot;, &quot;완주 못 하면 안 될 것 같은&quot; 응원이 뒤섞였습니다. 처음 36K를 앞둔 이지혜에게 이두승·이남순·김성우 코치가 &quot;10K/2시간이면 36K 가능&quot;하다며 용기를 실어준 장면이 인상적입니다.</li>
+<li>- <strong>왕야 첫 가이드(2/5)</strong>: 20K 경험만 있는 왕야가 &quot;36K 도전해도 될까요?&quot; 를 묻자 피터·김윤진·이두승이 즉각 응원했고, 김윤진이 &quot;전국 트레일러너 중 이런 커뮤니티 지원 받는 크루는 유일합니다. 축복입니다&quot;라고 정리했습니다. 🔑 제주방의 심리적 안전망 역할이 명확히 드러난 순간입니다.</li>
+<li>- <strong>한채원의 100K 도전 공개 선언(2/5)</strong>: 작년 10K 완주 후 올해 100K로 뛰어오른 한채원의 도전이 공개되자 피터가 &quot;동네방네 소문 냈다&quot;며 농담 섞인 축하를 보내고, 이두승이 &quot;완주하면 트제 100K도 하실 듯&quot;이라고 예언했습니다.</li>
+</ul>
+<hr>
+<h3>3. 뉴100마일러 공식 발표 및 전야 (2/11 ~ 2/28)</h3>
+<ul class="mdul">
+<li>- <strong>프로젝트 공식 공유(2/23, 피터)</strong>: 강승현 쉐프의 뉴100마일러 프로젝트 PDF를 첫 공개했습니다. &quot;태어난 곳에서 출발해, 지금 서 있는 곳까지(3월 28일, 제주)&quot; 문구에 방 전체가 감동했고, 김지훈·이유진 등이 &quot;근사한 프로젝트&quot;, &quot;언젠가 해보고 싶다&quot;는 반응을 보였습니다.</li>
+<li>- <strong>D-46 도민 오프런(2/11, 피터)</strong>: 피터가 제주도민 마풀러너 5명과 함께 뉴100마일러 주제로 러닝+치맥을 진행한 사진을 공유하며 &quot;이 방은 제주 방이자 강승현님 팬클럽 방&quot;이라고 정의했습니다.</li>
+<li>- <strong>100K 사전훈련 실행(2/24, 피터 + 강승현·정경원·안홍휘)</strong>: 동일코스 100K를 실제로 달렸습니다. 우중에 한라산을 포함한 장거리를 12시간 이상 달리는 장면이 Garmin LiveTrack으로 실시간 공유되었고, 방 전체가 응원 릴레이에 참여했습니다. 안홍휘는 40K에서 자진 이탈, 강승현과 정경원이 완주. 🔑 &quot;아직 살아있어요&quot;라는 강승현의 중간 메시지는 이후 3월 본행사의 예열임을 온 방이 직감했습니다.</li>
+<li>- <strong>완주 축하와 페이스메이커 모집(2/24~28)</strong>: 유기상이 &quot;하나님(아내) 허락 받고 티켓팅 완료&quot;했다고 밝히고, 최준호까지 합류를 신청했습니다. 김성우 코치도 지인 준섭님을 소개하며 페이스메이커 네트워크가 자연스럽게 확장되었습니다.</li>
+</ul>
+<hr>
+<h3>🗓 2월 타임라인 요약</h3>
+<table class="mdt"><thead><tr><th>날짜</th><th>핵심 안건</th></tr></thead><tbody>
+<tr><td>2/1</td><td>2026 제주 시즌 공식 개막 · Stage#6 공지 · 제주국제트레일 신청 독려 (46건)</td></tr>
+<tr><td>2/4</td><td>대회 코스별 신청 확인 · 이남순 100K 도전 선언</td></tr>
+<tr><td>2/5</td><td>왕야 36K 상담 · 한채원 100K 공개 선언 · 상호 코칭 (38건)</td></tr>
+<tr><td>2/8</td><td>향후 일정 안내 (뉴100마일러·Stage#6·제주트레일)</td></tr>
+<tr><td>2/10</td><td>이재군 서포트 의사 표명</td></tr>
+<tr><td>2/11</td><td><strong>D-46 도민 오프런 · 피터 &quot;이 방은 강승현님 팬클럽 방&quot;</strong></td></tr>
+<tr><td>2/20</td><td>강승현 3/3 Stage#6 불참 공지 → 코스 변경 논의</td></tr>
+<tr><td>2/21</td><td><strong>Stage#6 코스 변경 확정 (#21→#20 역방향) · 참가자 댓글 취합</strong></td></tr>
+<tr><td>2/23</td><td><strong>뉴100마일러 프로젝트 PDF 공식 공개</strong> (19건)</td></tr>
+<tr><td>2/24</td><td><strong>100K 사전훈련 우중 완주! (강승현·정경원 완주, 안홍휘 40K 자진 이탈)</strong> (87건)</td></tr>
+<tr><td>2/25</td><td>완주 후기 · 페이스메이커 추가 모집</td></tr>
+<tr><td>2/28</td><td>유기상·최준호 페이스메이커 합류 선언</td></tr>
+</tbody></table>
+<hr>
+<h3>👥 주요 인물 역할</h3>
+<ul class="mdul">
+<li>- <strong>Peter Kim(피터, 19%, 54건)</strong>: Stage#6 코스 변경 의사결정 · 뉴100마일러 프로젝트 최초 공개 · 100K 사전훈련 현장 총괄 · 제주국제트레일 신청 독려. 모든 정보의 허브.</li>
+<li>- <strong>MFRS 이지혜 (10%, 30건)</strong>: 36K 도전 고민 솔직 공유, 커뮤니티 상호 코칭의 마중물 역할.</li>
+<li>- <strong>MFRS 강승현 (7%, 19건)</strong>: 코스 변경 수용, &quot;아직 살아있어요&quot; 100K 중간 보고, 완주 후 감사 표현. 방 전체 감정 에너지의 원천.</li>
+<li>- <strong>김성우 코치 (6%, 16건)</strong>: 이지혜 격려, 페이스메이커 네트워크 확장, 강승현 회복 확인 등 실질적 코칭 축.</li>
+<li>- <strong>MFRS 이남순 (5%, 15건)</strong>: 100K 도전 선언, 4월 숙소 예약, 응원 릴레이 주도 — 실무·감성 양 축을 담당.</li>
+<li>- <strong>한채원 마풀런 (5%, 15건)</strong>: 100K 도전 공개, 대학원 시작 스토리로 일상과 달리기의 교차점 대표.</li>
+<li>- <strong>MFRS 김윤진 (5%, 14건)</strong>: &quot;이 커뮤니티는 축복입니다&quot; 발언으로 제주방 정체성 언어화, 완주 후 진심 어린 격려.</li>
+</ul>
+<hr>
+<h3>⛑ 주요 Q&amp;A 및 결정 (2월)</h3>
+<table class="mdt"><thead><tr><th>질문/이슈</th><th>결정·답변</th></tr></thead><tbody>
+<tr><td>36K 처음인데 도전해도 될까요? (왕야)</td><td>&quot;가능, 걸어도 완주 가능 + 커뮤니티 지원&quot; — 피터·김윤진·이두승 합동 안내</td></tr>
+<tr><td>강승현 3/3 불참 가능성?</td><td>코스를 #12→#13에서 <strong>#21→#20 역방향</strong>으로 변경 → 승현님 오후 합류 가능</td></tr>
+<tr><td>100K 첫 참가 준비법?</td><td>매일매일 꾸준한 걷뛰 + 강약 조절 빈도 증가 (김성우 코치)</td></tr>
+<tr><td>사전 100K 훈련 결과?</td><td>강승현·정경원 완주 (우중·한라산 포함 약 12시간 이상) · 안홍휘 40K 자진 이탈</td></tr>
+<tr><td>페이스메이커 모집 방법?</td><td>신청 폼 링크 통해 구간·방식 선택 (피터)</td></tr>
+</tbody></table>
+<hr>
+<h3>🌟 핵심 인사이트 — 제주방</h3>
+<p>1. <strong>제주방 = 행사 공지방 + 대회 상호 코칭방의 이중 구조</strong>: 단순 공지를 넘어, 처음 36K·100K에 도전하는 회원들이 선배 경험자에게 실시간 Q&amp;A를 받는 정보 플랫폼으로 기능했습니다. &quot;인생 지르고 뒷 수습&quot;이라는 피터의 한 마디가 두려움을 극복하는 공동의 언어가 되었습니다.</p>
+<p>2. <strong>사전훈련이 실시간 감동 콘텐츠로 전환</strong>: 2/24 100K 우중 완주는 단순 훈련이 아니라 방 전체가 함께 달리는 중계 이벤트였습니다. Garmin LiveTrack으로 위치를 추적하며 완주를 응원한 경험이 3월 본행사에 대한 기대와 참여 의지를 폭발적으로 높였습니다.</p>
+<p>3. <strong>도민 네트워크가 핵심 인프라 역할 시작</strong>: 피터·강승현·안홍휘·정경원·이선영으로 구성된 도민/현지 팀이 2월부터 이미 사전훈련·보급·현장 총괄을 분담하는 구조를 갖추었습니다.</p>
+<p>4. <strong>코스 변경 유연성이 참여 장벽을 낮춤</strong>: 강승현님 일정에 맞춰 코스를 조정한 결정은 &quot;맞춰 갑니다&quot;가 마풀런의 운영 원칙임을 실증했으며, 참가자들이 더 편하게 일정을 계획하게 했습니다.</p>
+<p>5. <strong>커뮤니티 정체성의 언어화</strong>: 김윤진의 &quot;전국 트레일러너 중 이런 지원 받는 크루는 유일합니다. 축복입니다&quot; 발언은 제주방 멤버들이 이 공간의 가치를 내면화하는 계기가 되었습니다.</p>
+<hr>
+<p><em>분석 기준: 2026년 2월 1일 ~ 2월 28일 마인드풀러닝 제주방 286건 · 34명 발신자 대화 내용 기반. 계좌·전화·숙소 예약·회의 링크 등 개인정보는 마스킹.</em></p></div>
+    </div><div id="m01"></div>
+    <div class="card monthcard curated">
+      <div class="mc-h">1월 <span class="mc-cur">📋 상세 분석 (큐레이션)</span></div>
+      <div class="mdbody"><p>2026.06.04</p>
+<h3>📌 핵심 성과 요약 (Executive Summary)</h3>
+<p><strong>&quot;3월 3일, 달력에 마크업하세요 — 2026 제주 시즌이 열립니다&quot;</strong></p>
+<p>1월 제주방은 9건이라는 극히 희소한 데이터로, 본격 가동 전 예열 단계에 해당합니다. 1월 14일 단 하루에 8건이 집중되었으며, 피터(운영)가 3월 Stage#6 일정을 첫 공지하며 방의 존재를 선언한 것이 핵심입니다. 트랜스제주 UTMB 20K를 앞둔 정연훈 코치의 출전 계획 언급과 이남순님의 4월 숙소 예약 완료 소식이 뒤를 이으며, 이 방이 올레 마풀런·트레일 대회·100마일 프로젝트를 아우르는 제주 운영 허브가 될 것임을 예고했습니다.</p>
+<hr>
+<h3>1. 방 개설과 첫 공지 (1/14)</h3>
+<ul class="mdul">
+<li>- <strong>피터(운영)의 2026 제주 시즌 선언(1/14)</strong>: &quot;3월 3일 달력 마크업해두세요&quot;라는 한 줄 메시지와 사진 공유로 시즌 첫 출발을 알렸습니다. 올해도 작년처럼 제주 행사 전담 방으로 계속 운영한다는 원칙을 천명했습니다.</li>
+<li>- <strong>로함/김성우(1/14)</strong>: 3월 일정이 당겨진 이유를 문의하며 &quot;전국체전 일정 때문에&quot;라는 배경을 공유했습니다. 제주방 고정 멤버가 첫날부터 호응하며 활성화의 씨앗을 심었습니다.</li>
+</ul>
+<hr>
+<h3>2. 대회 준비 첫 화두 (1/14)</h3>
+<ul class="mdul">
+<li>- <strong>정연훈 코치의 트랜스제주 전략(1/14)</strong>: 장수 100K 직후 일정이 겹친다는 현실적 고민을 꺼내며, 20K로 조정해 &quot;충분히 좋게 할 수 있다&quot;고 언급했습니다. 🔑 대회 일정 충돌이라는 제주방의 첫 번째 실질 운영 이슈가 등장한 순간입니다.</li>
+<li>- <strong>로함/김성우(1/14)</strong>: &quot;트제는 20K 달리고 제주 힐링하는 코스가 더 매력적&quot;이라는 멘트로 완주 집착 없는 마풀런 철학이 즉시 반영되었습니다.</li>
+<li>- <strong>이남순(1/17)</strong>: 4월 제주 트레일러닝 숙소 6인실 예약 완료 — 한 달 전부터 공동 숙소를 선점하는 제주방만의 협력 문화가 이미 가동 중임을 보여줍니다.</li>
+</ul>
+<hr>
+<h3>🗓 1월 타임라인 요약</h3>
+<table class="mdt"><thead><tr><th>날짜</th><th>핵심 안건</th></tr></thead><tbody>
+<tr><td>1/14</td><td><strong>방 개설 + 3월 3일 Stage#6 첫 공지</strong> (8건 집중)</td></tr>
+<tr><td>1/14</td><td>정연훈 코치 트랜스제주 20K 전략 논의</td></tr>
+<tr><td>1/17</td><td>이남순 4월 제주 트레일 숙소 6인실 예약 완료</td></tr>
+</tbody></table>
+<hr>
+<h3>👥 주요 인물 역할</h3>
+<ul class="mdul">
+<li>- <strong>Peter Kim(피터, 33%, 3건)</strong>: 3월 Stage#6 최초 공지, 방 운영 원칙 선언. 모든 제주 이벤트 구심점.</li>
+<li>- <strong>MFRS 로함/김성우 (22%, 2건)</strong>: 일정 배경 파악, &quot;힐링 코스&quot; 프레임 제안 — 커뮤니티 정서 조율.</li>
+<li>- <strong>김성우 코치 (22%, 2건)</strong>: 정연훈 코치 UTMB 출전에 공감하며 분위기 환기.</li>
+<li>- <strong>정연훈 (11%, 1건)</strong>: 트랜스제주 전략 공유, 대회 현실론 도입.</li>
+<li>- <strong>MFRS 이남순 (11%, 1건)</strong>: 4월 숙소 사전 예약 — 실무형 리더십의 첫 등장.</li>
+</ul>
+<hr>
+<h3>🌟 핵심 인사이트 — 제주방</h3>
+<p>1. <strong>방 오픈 첫날부터 고정 멤버 즉시 호응</strong>: 피터(운영)의 첫 공지에 로함·코치·정연훈·이남순이 같은 날 반응 — 제주방은 처음부터 &#x27;이미 형성된 커뮤니티&#x27;가 새 채널로 이동한 구조임을 확인.</p>
+<p>2. <strong>대회 일정 충돌 논의가 첫 이슈로 등장</strong>: 정연훈 코치의 장수 100K vs. 트제 20K 고민은 이후 제주방의 반복 패턴(대회 겹침→코스 조정→모두 참여 가능한 방식 찾기)의 원형.</p>
+<hr>
+<p><em>분석 기준: 2026년 1월 1일 ~ 1월 31일 마인드풀러닝 제주방 9건 · 5명 발신자 대화 내용 기반. 데이터 희소(9건) — 1/14 단일일 집중(8건), 이후 1/17 1건. 계좌·전화·숙소 예약·링크 등 개인정보는 마스킹.</em></p></div>
+    </div>
+  </section>
+  <section>
+    <h2><span class="em">🏘️</span> 다른 단톡방</h2>
+    <div class="otherrooms"><a class="otherroom" href="notice.html">📢 전체 공지</a><a class="otherroom" href="community.html">💬 커뮤니티</a><a class="otherroom" href="backyard.html">🔁 백야드</a><a class="otherroom" href="ops.html">🛠️ 운영진</a></div>
+  </section>
+  <footer><p>마인드풀러닝 어드밴스 5기 · 내부 커뮤니티용 · 카톡 raw=OneDrive SSoT(집계·큐레이션만 게시) · 생성 2026-06-04</p></footer>
+</div>
+</body></html>

@@ -1,0 +1,662 @@
+<!DOCTYPE html>
+<html lang="ko"><head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>운영진 단톡방 월별 이력 — MFRS 5기</title>
+<style>
+:root{
+  --bg:#faf8f3; --ink:#2b2a26; --muted:#6f6a60; --line:#e7e1d6;
+  --green:#2f6b4f; --green-d:#1f4a37; --green-l:#e6f0ea;
+  --amber:#d98e3e; --amber-l:#fbeede; --sky:#5b8aa6; --rose:#c97b86;
+  --card:#fffdf9; --shadow:0 1px 3px rgba(60,50,30,.06),0 6px 24px rgba(60,50,30,.05);
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);
+  font-family:"Pretendard","Apple SD Gothic Neo","Noto Sans KR",-apple-system,BlinkMacSystemFont,sans-serif;
+  line-height:1.7;-webkit-font-smoothing:antialiased}
+.wrap{max-width:920px;margin:0 auto;padding:0 20px 80px}
+a{color:var(--green);text-decoration:none}
+a:hover{text-decoration:underline}
+.hero{background:linear-gradient(135deg,var(--green-d),var(--green));color:#fff;
+  border-radius:0 0 28px 28px;padding:48px 28px 40px;margin-bottom:8px}
+.hero .wrap{padding-bottom:0}
+.hero .eyebrow{font-size:.82rem;letter-spacing:.12em;opacity:.85;text-transform:uppercase;margin:0 0 10px}
+.hero h1{font-size:2.1rem;line-height:1.25;margin:0 0 12px;font-weight:800;letter-spacing:-.01em}
+.hero p.sub{font-size:1.02rem;opacity:.92;margin:0;max-width:680px}
+.hero .period{margin-top:18px;font-size:.9rem;opacity:.8}
+section{margin-top:44px}
+h2{font-size:1.42rem;font-weight:800;letter-spacing:-.01em;margin:0 0 6px;
+  display:flex;align-items:center;gap:.5rem}
+h2 .em{font-size:1.3rem}
+.lede{color:var(--muted);margin:0 0 20px;font-size:.98rem}
+.cardrow{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:14px}
+.stat{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:20px;box-shadow:var(--shadow)}
+.stat .v{font-size:2rem;font-weight:800;color:var(--green-d);line-height:1.1}
+.stat .v small{font-size:.95rem;font-weight:700;color:var(--muted)}
+.stat .l{font-size:.86rem;color:var(--muted);margin-top:6px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:24px;box-shadow:var(--shadow)}
+.bar{display:flex;align-items:center;gap:12px;margin:10px 0}
+.bar .name{width:96px;flex:none;font-size:.9rem;color:var(--ink);font-weight:600}
+.bar .track{flex:1;background:#efe9dd;border-radius:999px;height:22px;position:relative;overflow:hidden}
+.bar .fill{height:100%;border-radius:999px;background:linear-gradient(90deg,var(--green),var(--green-d));
+  display:flex;align-items:center;justify-content:flex-end;padding-right:9px;color:#fff;font-size:.76rem;font-weight:700;min-width:34px}
+.bar .fill.amber{background:linear-gradient(90deg,var(--amber),#b9701f)}
+.bar .fill.sky{background:linear-gradient(90deg,#7aa6bd,var(--sky))}
+.bar .fill.rose{background:linear-gradient(90deg,#d99aa3,var(--rose))}
+.season-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+.season{border-radius:18px;padding:22px;color:#fff;position:relative;overflow:hidden}
+.season.winter{background:linear-gradient(150deg,#5b7fa6,#3d5d80)}
+.season.spring{background:linear-gradient(150deg,#5fa06f,#2f6b4f)}
+.season.summer{background:linear-gradient(150deg,#e0a85b,#c47b2f)}
+.season .se{font-size:1.6rem}
+.season h3{margin:6px 0 2px;font-size:1.2rem}
+.season .range{font-size:.78rem;opacity:.85}
+.season .big{font-size:1.8rem;font-weight:800;margin-top:12px;line-height:1}
+.season .sub{font-size:.84rem;opacity:.9;margin-top:4px}
+.season.upcoming{opacity:.96;border:2px dashed rgba(255,255,255,.5)}
+.arc{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+.arc .col{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:18px}
+.arc .col h4{margin:0 0 4px;font-size:1rem;color:var(--green-d)}
+.arc .col .ph{font-size:.78rem;color:var(--muted);margin-bottom:12px}
+.kw{display:flex;align-items:center;gap:8px;margin:7px 0;font-size:.88rem}
+.kw .dot{width:9px;height:9px;border-radius:50%;flex:none}
+.kw .kwbar{flex:1;height:8px;background:#efe9dd;border-radius:999px;overflow:hidden}
+.kw .kwbar i{display:block;height:100%;border-radius:999px}
+.kw .n{width:34px;text-align:right;color:var(--muted);font-size:.78rem;font-variant-numeric:tabular-nums}
+.coachnote{background:var(--green-l);border-left:4px solid var(--green);border-radius:0 14px 14px 0;
+  padding:18px 22px;margin-top:18px}
+.coachnote .tag{font-size:.78rem;font-weight:800;color:var(--green-d);letter-spacing:.04em;margin-bottom:6px}
+.coachnote p{margin:.4rem 0;font-size:.96rem}
+.loclist{columns:2;column-gap:28px}
+.loclist .li{display:flex;justify-content:space-between;padding:7px 0;border-bottom:1px dotted var(--line);
+  break-inside:avoid;font-size:.92rem}
+.loclist .li b{color:var(--muted);font-weight:600}
+.membergrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px}
+.mcard{display:block;background:var(--card);border:1px solid var(--line);border-radius:14px;
+  padding:16px;box-shadow:var(--shadow);transition:transform .12s,box-shadow .12s}
+.mcard:hover{transform:translateY(-2px);box-shadow:0 6px 22px rgba(60,50,30,.1);text-decoration:none}
+.mcard .mn{font-weight:800;color:var(--green-d);font-size:1.02rem}
+.mcard .ms{font-size:.8rem;color:var(--muted);margin-top:4px}
+.mcard .chips{margin-top:8px;display:flex;flex-wrap:wrap;gap:4px}
+.chip{font-size:.72rem;background:var(--green-l);color:var(--green-d);border-radius:999px;padding:2px 9px}
+.runbox{border:1px solid var(--line);border-radius:14px;padding:18px;margin-top:14px;background:#fffdf9}
+.runbox .meta{font-size:.82rem;color:var(--muted);margin-bottom:8px}
+.runbox .title{font-weight:700;margin-bottom:10px}
+.runbox .phase{margin:10px 0}
+.runbox .phase .pl{font-size:.76rem;font-weight:800;color:var(--amber);letter-spacing:.03em}
+.runbox .phase .pt{font-size:.92rem;color:var(--ink);white-space:pre-wrap}
+.nav{display:flex;gap:16px;flex-wrap:wrap;margin-top:16px;font-size:.92rem}
+.backlink{display:inline-block;margin:24px 0 0;font-size:.9rem}
+footer{margin-top:60px;padding-top:24px;border-top:1px solid var(--line);
+  font-size:.82rem;color:var(--muted)}
+.note{font-size:.82rem;color:var(--muted);background:#f3efe6;border-radius:10px;padding:12px 16px;margin-top:14px}
+.russell{position:relative;padding:30px 26px 30px 30px}
+.rgrid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.rq{border-radius:14px;padding:18px 16px;text-align:center;color:#33312c;
+  background:#efe9dd}
+.rq.hp{background:rgba(224,162,62,var(--op))}
+.rq.lp{background:rgba(79,140,94,var(--op))}
+.rq.hn{background:rgba(201,123,134,var(--op))}
+.rq.ln{background:rgba(91,107,122,var(--op))}
+.rq.dom{box-shadow:0 0 0 3px var(--green);font-weight:800}
+.rq .rqv{font-size:1.5rem;font-weight:800;line-height:1}
+.rq .rql{font-size:.84rem;margin-top:5px;opacity:.95}
+.rax{position:absolute;font-size:.72rem;color:var(--muted);font-weight:600}
+.rax-top{top:8px;left:50%;transform:translateX(-50%)}
+.rax-bot{bottom:8px;left:50%;transform:translateX(-50%)}
+.rax-l{left:-2px;top:50%;transform:translateY(-50%) rotate(-90deg);transform-origin:left}
+.rax-r{right:-8px;top:50%;transform:translateY(-50%) rotate(90deg);transform-origin:right}
+.psy{display:grid;grid-template-columns:repeat(2,1fr);gap:14px}
+.psy .pcard{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:20px;box-shadow:var(--shadow)}
+.psy .pcard .pt{font-size:.78rem;font-weight:800;letter-spacing:.04em;color:var(--green-d);margin-bottom:4px}
+.psy .pcard .pv{font-size:1.7rem;font-weight:800;color:var(--green-d);line-height:1.1}
+.psy .pcard .pd{font-size:.86rem;color:var(--ink);margin-top:6px}
+.psy .pcard .cite{font-size:.72rem;color:var(--muted);margin-top:8px;font-style:italic}
+.tag2{display:inline-block;font-size:.7rem;font-weight:700;border-radius:999px;padding:2px 9px;margin:2px 3px 2px 0}
+.tag2.s{background:var(--green-l);color:var(--green-d)}
+.tag2.q{background:#f0ece3;color:#8a8576}
+.dnastrip{display:flex;flex-wrap:wrap;gap:5px;margin-top:6px}
+.dnastrip .k{font-size:.72rem;background:#fff;border:1px solid var(--line);border-radius:999px;padding:3px 10px;color:var(--green-d)}
+.roomcards{display:grid;grid-template-columns:repeat(auto-fit,minmax(155px,1fr));gap:12px}
+.roomcard{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px;box-shadow:var(--shadow)}
+.roomcard .rn{font-weight:800;color:var(--green-d);font-size:1.02rem}
+.roomcard .rd{font-size:.76rem;color:var(--muted);margin:3px 0 8px}
+.roomcard .rv{font-size:1.5rem;font-weight:800;color:var(--green-d);line-height:1}
+.roomcard .rm{font-size:.78rem;color:var(--muted);margin-top:4px}
+.heat{border-collapse:separate;border-spacing:3px;width:100%;font-size:.8rem}
+.heat th{font-weight:700;color:var(--muted);font-size:.76rem;padding:3px 5px;text-align:center}
+.heat td.lbl{text-align:left;font-weight:700;white-space:nowrap;padding-right:8px}
+.heat td.c{text-align:center;border-radius:6px;color:#2b2a26;font-variant-numeric:tabular-nums;padding:6px 4px;min-width:38px}
+.topicrow{display:flex;align-items:center;gap:8px;margin:6px 0;font-size:.88rem}
+.topicrow .tn{width:108px;flex:none}
+.topicrow .tb{flex:1;height:14px;background:#efe9dd;border-radius:999px;overflow:hidden}
+.topicrow .tb i{display:block;height:100%;border-radius:999px;background:linear-gradient(90deg,var(--amber),#b9701f)}
+.topicrow .tv{width:42px;text-align:right;color:var(--muted);font-size:.78rem}
+.histgrid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.histroom{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:16px 18px;box-shadow:var(--shadow)}
+.histroom .hrh{font-weight:800;color:var(--green-d);font-size:1rem;margin-bottom:8px;display:flex;justify-content:space-between;align-items:baseline}
+.histroom .hrn{font-size:.76rem;color:var(--muted);font-weight:600}
+.hli{display:flex;gap:10px;padding:7px 0;border-top:1px dotted var(--line)}
+.hli .hmon{flex:none;width:30px;font-size:.78rem;font-weight:800;color:var(--amber);padding-top:1px}
+.hli .hbody{flex:1;min-width:0}
+.hli .hauth{font-size:.74rem;font-weight:700;color:var(--green);margin-right:6px}
+.htag{font-size:.68rem;background:var(--amber-l);color:#9a5a13;border-radius:999px;padding:1px 7px}
+.hli .hex{font-size:.84rem;color:var(--ink);margin-top:3px;line-height:1.5}
+.kakao-mine{display:flex;flex-wrap:wrap;gap:8px;margin-top:4px}
+.kakao-mine .km{background:var(--green-l);color:var(--green-d);border-radius:10px;padding:6px 12px;font-size:.86rem;font-weight:600}
+.kakao-mine .km b{font-weight:800}
+a.rclick{display:block;text-decoration:none}
+a.rclick:hover{text-decoration:none;transform:translateY(-2px);box-shadow:0 6px 22px rgba(60,50,30,.1)}
+.rarrow{color:var(--amber);font-weight:800}
+.heat td.lbl a{text-decoration:none}
+.navm{display:inline-flex;gap:10px;margin-left:14px}
+.navm a{font-size:.85rem;background:var(--green-l);border-radius:999px;padding:2px 10px}
+.monthcard{margin-top:14px}
+.mc-h{font-size:1.15rem;font-weight:800;color:var(--green-d);display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.mc-n{font-size:.82rem;color:var(--muted);font-weight:700}
+.mc-auto{font-size:.7rem;background:#f0ece3;color:#8a8576;border-radius:999px;padding:2px 9px}
+.mc-cur{font-size:.74rem;background:var(--amber-l);color:#9a5a13;border-radius:999px;padding:2px 10px;font-weight:700}
+.mc-sub{font-size:.84rem;color:var(--muted);margin:8px 0 12px;display:flex;flex-wrap:wrap;gap:5px;align-items:center}
+.mc-grid{display:grid;grid-template-columns:1.3fr 1fr;gap:18px}
+.mc-lbl{font-size:.82rem;font-weight:800;color:var(--amber);margin-bottom:6px}
+.mdbody h3{font-size:1.05rem;color:var(--green-d);margin:18px 0 6px;border-bottom:1px solid var(--line);padding-bottom:4px}
+.mdbody h4{font-size:.95rem;color:var(--ink);margin:12px 0 4px}
+.mdbody p{font-size:.9rem;margin:.4rem 0;line-height:1.7}
+.mdbody .mdul{margin:.3rem 0 .6rem;padding-left:1.1rem}
+.mdbody .mdul li{font-size:.88rem;margin:.25rem 0;line-height:1.6}
+.mdbody blockquote{border-left:3px solid var(--amber);background:var(--amber-l);margin:.5rem 0;padding:8px 14px;border-radius:0 8px 8px 0;font-size:.9rem}
+.mdbody .mdt{border-collapse:collapse;width:100%;font-size:.82rem;margin:8px 0}
+.mdbody .mdt th{background:var(--green-l);text-align:left;padding:6px 8px;font-weight:700}
+.mdbody .mdt td{border-top:1px solid var(--line);padding:6px 8px;vertical-align:top}
+.mdbody hr{border:none;border-top:1px dashed var(--line);margin:14px 0}
+.mdbody code{background:#f0ece3;padding:1px 5px;border-radius:5px;font-size:.86em}
+.otherrooms{display:flex;flex-wrap:wrap;gap:10px}
+.otherroom{background:var(--card);border:1px solid var(--line);border-radius:999px;padding:8px 16px;font-weight:600;box-shadow:var(--shadow)}
+@media(max-width:680px){
+  .season-grid,.arc,.psy,.histgrid,.mc-grid{grid-template-columns:1fr}
+  .hero h1{font-size:1.7rem}.loclist{columns:1}
+  .heat{font-size:.68rem}.heat td.c{min-width:26px;padding:5px 2px}
+}
+</style>
+</head><body>
+
+<div class="hero"><div class="wrap">
+  <p class="eyebrow">마인드풀러닝 어드밴스 5기 · 단톡방 월별 이력</p>
+  <h1>🛠️ 운영진 단톡방</h1>
+  <p class="sub">AX TF 운영진 (앱·기획·SYNC) · 올해 1,644건 · 7명 참여 (2026-01-02~2026-05-31)</p>
+</div></div>
+<div class="wrap">
+  <div class="nav"><a href="../community-report.html">← 마을 전체 대시보드</a><span class="navm"><a href="#m01">1월</a><a href="#m02">2월</a><a href="#m03">3월</a><a href="#m04">4월</a><a href="#m05">5월</a></span></div>
+  <section>
+    <h2><span class="em">📈</span> 월별 대화량</h2>
+    <div class="card"><div class="bar"><div class="name">1월</div><div class="track"><div class="fill " style="width:30.1%">139건</div></div></div><div class="bar"><div class="name">2월</div><div class="track"><div class="fill " style="width:61.7%">285건</div></div></div><div class="bar"><div class="name">3월</div><div class="track"><div class="fill " style="width:98.7%">456건</div></div></div><div class="bar"><div class="name">4월</div><div class="track"><div class="fill amber" style="width:100.0%">462건</div></div></div><div class="bar"><div class="name">5월</div><div class="track"><div class="fill " style="width:65.4%">302건</div></div></div></div>
+  </section>
+  <section>
+    <h2><span class="em">📜</span> 월별 주요 대화 이력</h2>
+    <p class="lede">최신 달부터 거슬러, 매월 핵심 대화·결정·이벤트를 정리했습니다. '큐레이션' 표시는 심층 분석, '자동 요약'은 원천 집계 기반입니다.</p>
+    <div id="m05"></div>
+    <div class="card monthcard curated">
+      <div class="mc-h">5월 <span class="mc-cur">📋 상세 분석 (큐레이션)</span></div>
+      <div class="mdbody"><p>2026.06.03</p>
+<blockquote>⚠️ <strong>비공개 — 운영진 전용.</strong> 본 채널은 회원 배포 대상이 아닙니다. 계정·비밀번호·회의 링크·예약 코드 등 민감정보는 모두 마스킹했으며, 외부/회원 공유 금지.</blockquote>
+<h3>📌 핵심 성과 요약 (Executive Summary)</h3>
+<p><strong>&quot;5/1 BMC 워크숍에서 5/29 기능 확정까지 — 차세대 APP이 슬라이드에서 스프린트로 내려온 한 달&quot;</strong></p>
+<p>운영진방은 회원 대상 4개 방과 결이 전혀 다른 <strong>의사결정·기획 백스테이지 채널</strong>입니다. 5월은 <strong>마플런 차세대 APP(MFRS NextAdv)을 BMC(비즈니스 모델) → 프로토타입 → 기능 정의 → 개발 체제 구성까지 한 사이클로 끌어올린 달</strong>이었습니다. 5/1 오프라인 BMC 워크숍(연석 코치 자문 8 lessons)으로 문을 열고, 이두승의 MVP 프로토타입(5/11)·Phase Hub 배포(5/16)를 거쳐, 5/27~28 김소영·이선영 개발팀 합류와 5/29 오프라인 기능 정의 Day2(V2→V1 스코프 재정의, 리액트 네이티브+Supabase 확정)로 마무리됩니다. 메시지 287건·7명으로 소수 정예이며, <strong>5/1 킥오프(49건)·5/28 기술 세션(51건)·5/29 기능 정의(32건)</strong>가 3대 분기점입니다. 발신은 <strong>이두승·피터·김성우 3인이 각 27~28%로 거의 균등</strong>하게 주도하고, 김종훈(10%)이 비즈니스 확장(보험·외부협업)을 분담했습니다.</p>
+<hr>
+<h3>1. BMC 워크숍 — 비즈니스 모델 정초 (5/1)</h3>
+<ul class="mdul">
+<li>- <strong>오프라인 킥오프(5/1, 문화공간 너구리 시청)</strong>: 피터·이두승·김종훈 + 사업전략 자문(연석 코치). &quot;마풀런의 역사적인 킥오프&quot;(이두승). Miro 보드 + BMC 9블럭 작업.</li>
+<li>- <strong>🔑 자문 8 Lessons (피터 정리)</strong>:</li>
+</ul>
+<p>1. &quot;나를 위한 달리기&quot;는 직장 번아웃 진입장벽을 낮추는 카피 — 트레일/마라톤은 입구가 아니라 성장 결과.</p>
+<p>2. B2C 커뮤니티는 인플루언서 모델 — 자발적 셰르파(호스트)가 확장 핵심(트레바리 사례).</p>
+<p>3. SMCC(서울모닝커피클럽) 모델 — 호스트 자격 낮춤 + 브랜드 협업 + 글로벌 확산.</p>
+<p>4. 평생 멤버십 = &quot;노력하지 않는 비용&quot; 파이프라인(헬스장 1년 끊기 효과 = 정체성).</p>
+<p>5. B2B/노조 채널 = 의사결정 단순 + 입소문 구조(ROI 좋음).</p>
+<p>6. 수익화 난도는 &#x27;유형 상품(체력·경험)&#x27; 한계 → (a)작은 돈 다수 (b)큰 돈 소수 (c)B2B 동시 추진.</p>
+<p>7. 4~5년 데이터 보유 → 가설보다 데이터 기반 패턴 추출 우선.</p>
+<p>8. 앱 = 무료 멤버십 + AI 자산화 — &quot;스트라바·가민이 못 하는 시간·호흡·삶의 변화&quot;(김성우 비전).</p>
+<hr>
+<h3>2. APP 프로토타입 &amp; Phase Hub (5/2 ~ 5/16)</h3>
+<ul class="mdul">
+<li>- <strong>Phase2 아젠다 5주제 확정(5/2)</strong>: BMC · APP Feature · 회원등급 · 코호트 · 온톨로지. 신연선 코치 사업전략 합류.</li>
+<li>- <strong>🔑 MVP1 프로토타입(5/11, 이두승)</strong>: HTML 클릭형. 핵심 철학 — &quot;달리기 전 생각 입력 → 방해 없이 달리고 → 후 느낌 기록. 거리·페이스가 아닌 감정·시간 중심.&quot; 6화면·5탭(홈·달력·통계·마인드풀·프로필).</li>
+<li>- 설계 결정: &quot;달리는 중 텍스트 입력 제외(위험·집중 저해)&quot; → 김성우 &#x27;녹음/Transcribe&#x27; 제안은 V2 후보로.</li>
+<li>- <strong>피터 v1.2 BMC 정합본(5/11)</strong>: 코호트 8종 + Free/Pro $10/Premium $20 라이프타임 반영.</li>
+<li>- <strong>진행 정리 + Phase Hub 배포(5/16, 피터)</strong>: projectresearch.co.kr/mfrs/bmc 에 Phase1 BMC + Phase2 MVP 6종 통합. 미해결 6건(카톡 통폐합·PRD 문서화·UX 영입·코호트/구독·서버·AI챗) 명시.</li>
+</ul>
+<hr>
+<h3>3. 비즈니스 확장 검토 (5/19 ~ 5/21, 김종훈)</h3>
+<ul class="mdul">
+<li>- <strong>🔑 스포츠상해보험 검토</strong>: 스포츠안전재단 [주최자배상책임공제] 추천. 1회 행사 기준 — 대면수업 24명 62,000원 / 올림픽공원 72명 162,000원. 자기부담 대인 10만/치료비 0, 실비 중복 가능. &quot;현재 규모엔 과하나 노조 등 외부 협업 시 요구될 수 있어 구조 미리 파악.&quot;</li>
+<li>- <strong>강형원 교수 협업</strong>: 삼촌(강 교수)에 마풀런·뇌과학 자료 공유 → 구글미트 의향 확보(교수 일정이 변수).</li>
+<li>- 노조·드럼흥신소 협업은 진행 보류.</li>
+</ul>
+<hr>
+<h3>4. 기술 인프라 전환 (5/22 ~ 5/28, 이두승)</h3>
+<ul class="mdul">
+<li>- <strong>Supabase DB 마이그레이션(5/22~24)</strong>: 기록앱 데이터를 노션 → Supabase 데이터베이스로 이관 완료. 공용 계정 생성(자격증명 마스킹).</li>
+<li>- <strong>카카오 로그인 인증 체계(5/26~28)</strong>: 카카오 디벨로퍼스 팀 구성, 비즈앱 전환(김성우), 기록앱 카카오 인증 연동. dailylog.mindfulrunningschool.com 도메인 연결(5/29).</li>
+<li>- <strong>기록앱 리뉴얼 배포(5/28)</strong>: &quot;기록앱이 너무 구려서 점심시간에 개발 … 차세대 앱 나올 때까지 사용.&quot; 카카오 인증 + DB 연동 신버전.</li>
+</ul>
+<hr>
+<h3>5. 개발팀 구성 &amp; 기능 정의 (5/27 ~ 5/31)</h3>
+<ul class="mdul">
+<li>- <strong>🔑 3인 개발팀 합류(5/27)</strong>: 김소영(개발 출신)·이선영(Sunny, 비개발자) 합류. 피터 — &quot;Agentic 시대엔 1인 리드가 더 효율적일 수 있으나 부담 분산·이해관계자 확대 차원.&quot; 협업 가이드 문서(3dev-agentic-collab-guide) 공유.</li>
+<li>- <strong>기술 정의 세션(5/28 21:00 온라인)</strong>: 리액트 네이티브 + Supabase 멀티플랫폼, 서버 개발 생략. 깃허브 PR 협업, 기능(Feature) 단위 분리. 100% Claude/Codex 에이전틱 코딩(코드 품질 Claude 우위 중론).</li>
+<li>- <strong>🔑 기능 정의 Day2(5/29 19:00 시청, 오프 마지막 세션)</strong>:</li>
+<li>- <strong>스코프 재정의(V2→V1)</strong>: 스케줄·코호트·유료 콘텐츠가 사실 V1 핵심(런데이式 습관형성+학습).</li>
+<li>- 오디오 가이드(Day별 코칭 + 게임형 언락), 한 앱 메뉴 분할 통합 구조.</li>
+<li>- 코호트 3-Tier(회복 $20 / 도전 $10 / 입문 $5, 재조정 검토), 프리미엄 인원 제한(1,000명) 아이디어.</li>
+<li>- 앱스토어: 국가별 사업자 등록, 미국 DUNS 번호, 심사 ~1개월.</li>
+<li>- &quot;개발은 리스크 아니다(Claude로 해결). 병목 = 화면 목업 + 상세 기획서.&quot; 회고 — &quot;작년 12월→5/1→오늘 매회 구체화, 팀 결합으로 걱정 없다.&quot;</li>
+<li>- <strong>미니 프로젝트 3안(5/31)</strong>: 기술 스파이크 1 + 재활용 가능 앱 2. 김소영·이선영 &quot;2+3안 공통 개발&quot; 결정, 상민님 Figma 디자인안 참고.</li>
+</ul>
+<hr>
+<h3>🗓 5월 타임라인 요약</h3>
+<table class="mdt"><thead><tr><th>날짜</th><th>핵심 안건</th></tr></thead><tbody>
+<tr><td>5/1</td><td><strong>BMC 워크숍 킥오프 (너구리 시청, 자문 8 Lessons)</strong></td></tr>
+<tr><td>5/2</td><td>Phase2 아젠다 5주제 확정 · 신연선 사업전략 합류</td></tr>
+<tr><td>5/11</td><td><strong>이두승 MVP1 프로토타입(HTML) · 피터 v1.2 BMC 정합본</strong></td></tr>
+<tr><td>5/16</td><td>진행 정리 + Phase Hub 배포 · 5/29 회의 확정</td></tr>
+<tr><td>5/19~21</td><td>스포츠상해보험 검토 · 강형원 교수 협업 컨택 (김종훈)</td></tr>
+<tr><td>5/22~24</td><td>Supabase DB 마이그레이션 (노션→DB)</td></tr>
+<tr><td>5/26~28</td><td>카카오 인증 체계 · 비즈앱 전환 · 기록앱 리뉴얼 배포</td></tr>
+<tr><td>5/27</td><td><strong>김소영·이선영 개발팀 합류 (Agentic 3dev 체제)</strong></td></tr>
+<tr><td>5/28</td><td>기술 정의 세션 (RN+Supabase·PR 협업·Claude/Codex)</td></tr>
+<tr><td>5/29</td><td><strong>기능 정의 Day2 — V2→V1 스코프 재정의 (오프 마지막)</strong></td></tr>
+<tr><td>5/31</td><td>미니 프로젝트 3안 → 2+3안 공통 개발 결정</td></tr>
+</tbody></table>
+<hr>
+<h3>👥 주요 인물 역할</h3>
+<ul class="mdul">
+<li>- <strong>MFRS 이두승 (28%, 87건)</strong>: 개발 총괄·서비스 아키텍트. MVP 프로토타입·Supabase 마이그레이션·카카오 인증·기록앱 리뉴얼 — 기술 자산 전부를 직접 구현.</li>
+<li>- <strong>Peter Kim(피터, 28%, 87건)</strong>: PM. BMC 정합·Phase Hub·회의 진행·협업 가이드·사업자/스토어 조사 — 기획과 운영의 허브.</li>
+<li>- <strong>김성우 코치 (27%, 84건)</strong>: 오너·기획총괄. APP 철학(시간·호흡·삶의 변화), 코호트 정의, 비즈앱/도메인 인증 — 제품 방향성의 최종 결정자.</li>
+<li>- <strong>MFRS 김종훈 (10%, 31건)</strong>: 비즈니스 확장. 스포츠상해보험·강형원 교수·노조 등 외부 협업 채널 개척, 양양 연어런클럽 마풀런 강의.</li>
+<li>- <strong>MFRS 김소영 (3%, 11건)</strong>: 개발 협업 신규 합류, 앱스토어 등록 경험·기능 분리 개발 제안.</li>
+<li>- <strong>신연선 코치·이선영(Sunny)</strong>: 사업전략(BMC·코호트)·비개발 협업 합류.</li>
+</ul>
+<hr>
+<h3>⛑ 주요 Q&amp;A 및 결정 (5월)</h3>
+<table class="mdt"><thead><tr><th>질문/이슈</th><th>결정·답변</th></tr></thead><tbody>
+<tr><td>APP 핵심 철학은?</td><td>거리·페이스가 아닌 <strong>시간·호흡·감정 기록</strong> (스트라바/가민 차별화)</td></tr>
+<tr><td>달리는 중 기록 입력?</td><td><strong>제외</strong> (위험·집중 저해) — 녹음/Transcribe는 V2 후보</td></tr>
+<tr><td>개발 스택?</td><td><strong>리액트 네이티브 + Supabase 멀티플랫폼</strong>, 서버 개발 생략 (5/28)</td></tr>
+<tr><td>협업 방식?</td><td>깃허브 PR·기능 단위 분리, 이두승 베이스 → 팀이 메뉴 붙임 (5/29)</td></tr>
+<tr><td>코호트/요금제?</td><td>3-Tier(회복 $20·도전 $10·입문 $5) — 신연선+김성우 정의 중</td></tr>
+<tr><td>스케줄·코호트는 V2?</td><td><strong>V1로 끌어올림</strong> — 런데이式 습관형성이 핵심 (5/29 재정의)</td></tr>
+<tr><td>스포츠상해보험 가입?</td><td>현 규모엔 과하나 구조 파악 — 외부 협업 시 검토(주최자배상책임공제)</td></tr>
+<tr><td>백엔드 인력?</td><td>용대(서버)·현철(피드백) UI/UX 1차 합의 후 합류</td></tr>
+<tr><td>출시 일정?</td><td>6~7월 개발 → 8월 런칭 목표(동작 우선, 디자인 차후)</td></tr>
+<tr><td>앱스토어 등록?</td><td>국가별 사업자·미국 DUNS·심사 ~1개월 (피터 조사)</td></tr>
+</tbody></table>
+<hr>
+<h3>🌟 핵심 인사이트 — 운영진방</h3>
+<p>1. <strong>&#x27;슬라이드 → 스프린트&#x27; 한 달</strong>: BMC 워크숍(5/1)에서 기능 정의 Day2(5/29)까지 — 비즈니스 모델 추상화가 리액트 네이티브 개발 착수라는 실행 단계로 한 달 만에 내려옴. &quot;개발은 리스크 아니다, 병목은 기획서&quot;라는 진단이 핵심 전환점.</p>
+<p>2. <strong>Agentic 시대의 팀 구성 딜레마</strong>: &quot;1인 리드가 더 효율적일 수 있으나 부담 분산·이해관계자 확대 차원에서 합류&quot;라는 피터의 명시 — AI 코딩 시대에 인원 추가가 자동으로 효율이 아니라는 인식 위에서 의도적 팀 설계.</p>
+<p>3. <strong>&#x27;주경야독 자원봉사&#x27; 프로젝트 정체성</strong>: 직장인 중심·절대 시간 부족·보상은 동작 이후 — &quot;목마른 사람이 우물 판다&quot;는 자원봉사 체제로, 커머셜 품질을 비영리 동력으로 추구하는 구조적 긴장을 정면으로 인정.</p>
+<p>4. <strong>회원방의 결정이 여기서 만들어진다</strong>: 전체공지방의 5/15 설문결과·5/29 앱 업그레이드, 백야드·제주 운영의 상당수가 이 7인 채널의 사전 의사결정에서 비롯 — 회원 경험의 백스테이지로서 운영진방의 레버리지를 확인.</p>
+<p>5. <strong>민감정보 거버넌스 필요 신호</strong>: 본 채널에 계정 비밀번호·예약 키패드·회의 링크가 평문 노출 — 차세대 APP이 실서비스로 가는 만큼 자격증명 관리(비밀번호 관리자·권한 분리)를 별도 규율로 분리할 시점.</p>
+<hr>
+<p><em>분석 기준: 2026년 5월 1일 ~ 5월 31일 [마인드풀러닝 AX] ADV5기 운영진방 287건 · 7명 발신자 대화 내용 기반. <strong>비공개 운영진 채널</strong> — 계정·비밀번호·회의 링크·예약 코드 등 민감정보 전면 마스킹, 회원/외부 배포 금지.</em></p></div>
+    </div><div id="m04"></div>
+    <div class="card monthcard curated">
+      <div class="mc-h">4월 <span class="mc-cur">📋 상세 분석 (큐레이션)</span></div>
+      <div class="mdbody"><p>2026.06.04</p>
+<blockquote>⚠️ <strong>비공개 — 운영진 전용.</strong> 본 채널은 회원 배포 대상이 아닙니다. 계정·비밀번호·회의 링크·예약 코드 등 민감정보는 모두 마스킹했으며, 외부/회원 공유 금지.</blockquote>
+<h3>📌 핵심 성과 요약 (Executive Summary)</h3>
+<p><strong>&quot;강릉 여성수련원 첫 외부 강의 완료, 5/1 대면 워크숍으로 달린 달&quot;</strong></p>
+<p>4월 운영진방은 462건이 오가며 2월과 함께 1~5월 최다 활동량을 기록했습니다. 김종훈이 이달 처음으로 29%(133건)로 발신 1위를 차지하며 현장 운영의 무게를 온전히 담당했습니다. 4/20 한국여성수련원(KWTI) 강릉 첫 외부 강의(피터·종훈 협업), 4/22~23 5/1 대면 운영진 워크숍 장소·일정 확정, 4/21~4/23 멤버 설문조사 배포·분석이 4월의 3대 축이었습니다. 성우 코치는 미국에서 한국으로 귀국(4/22)하며 해솔이 시차 적응과 교통사고 후유증을 챙기는 와중에도 BMC 사전 설문에 응하고 5/1 워크숍 준비를 챙겼습니다. 4/21~4/22 이틀에만 122건(26%)이 집중된 것이 이달의 특징입니다.</p>
+<hr>
+<h3>1. KWTI 강릉 외부 강의 (4/20)</h3>
+<ul class="mdul">
+<li>- <strong>사전 준비(4/6~4/13, 김종훈·피터)</strong>: 강릉 사전답사 영상 제작(김종훈), 36페이지 AI 자동화 배포 교재 제작(피터, Claude Design 첫 적용), 즉답 설문폼·QR 코드까지 포함한 완성 교재 배포.</li>
+<li>- <strong>🔑 강의 당일(4/20)</strong>: &quot;마인드풀러닝 철학을 스며들게 리드하는&quot; 종훈의 진행 + 피터의 설문 분석·이론 지원 협연. 맨발 달리기 도중 수강생 1명 쥐 발생 → 사설 구급대 처치 후 안정. &quot;뒤에서 종훈님이 스며들게 하는 과정을 지근거리에서 내내 감동하면서 함께했다&quot;(피터).</li>
+<li>- <strong>피터 발 부상(4/21)</strong>: 강의 중 모래사장 이물질(검은 모래·조개껍질)로 발가락 찰과상 → 항생제 주사 처치. &quot;수강생이 아니어서 다행.&quot; 교훈: 맨발달리기는 안전(천천히) 강조 필수, 비시즌 모래사장 이물질 위험 공지 체계화.</li>
+<li>- <strong>후속 분석(4/21, 피터)</strong>: 현장 즉답 설문(N=34~39) AI 분석 — 평균 건강점수 6.0/10, 좌식 8시간 이상 47%, 운동 1회 이하 53%, 수면 7시간 미만 59%. 3계층 11축 온톨로지 기반 부상 예방 리서치 결과도 당일 공유.</li>
+</ul>
+<hr>
+<h3>2. 성우 코치 귀국·교통사고 대응 (4/4, 4/22)</h3>
+<ul class="mdul">
+<li>- <strong>교통사고 발생(4/4 직전, 미국)</strong>: 빨간불 신호 대기 중 뒷차 추돌(BMW SUV). 성우 코치·아내·부모님·해솔이 5인 탑승. &quot;모두 소리 지를 정도의 큰 충격.&quot; 성우 코치 목 통증, 아내 허리 통증.</li>
+<li>- <strong>🔑 종훈의 전문가 조언(4/4)</strong>: 신체손해사정사 경력을 살려 사고 유형·미국 보험 구조·변호사 선임 필요성 분석 제공. 성우 코치 &quot;종훈님 설명 읽고 변호사 선임하기로 결정.&quot; 피터 &quot;아빠들끼리 재능 나눔.&quot;</li>
+<li>- <strong>해솔이 건강 확인(4/4)</strong>: 병원 추가 검사 후 &quot;큰 걱정 없다&quot;는 소견. 팀 전체 안도.</li>
+<li>- <strong>귀국(4/22)</strong>: 성우 코치 미국에서 귀국. 해솔이 시차 적응 중. 이두승 &quot;아가랑 비행기 고생하셨겠다.&quot;</li>
+</ul>
+<hr>
+<h3>3. 운영진 대면 워크숍 준비 (4/21 ~ 4/30)</h3>
+<ul class="mdul">
+<li>- <strong>일정 협의 대장정(4/20~4/22, 총 60건)</strong>: 제주(비행기 없음), 춘천, 지리산, 서울 광화문 순으로 순차 검토. 종훈 영등포역 기차, 피터 제주 김포행 항공 예약까지 직접 조율.</li>
+<li>- <strong>🔑 장소 확정(4/22)</strong>: 토즈 광화문 예약 → 피터가 &quot;문화공간 너구리 시청 본점&quot;으로 변경 예약(성우 코치 맛집 리스트 참고). 종훈이 토즈 예약 취소 처리.</li>
+<li>- <strong>일정 확정</strong>: 5/1(금) 10:00 시작, 피터 제주→김포 08:30 도착. 중간 2시간마다 10분 달리기 계획.</li>
+<li>- <strong>BMC 사전 설문 배포(4/22~4/23, 피터)</strong>: 27명 이상 응답 확보. 주요 인사이트 — 회원들이 솔직하게 적은 소중한 피드백들, &quot;지금까지 하지 못한 말들&quot;(이두승). 성우 코치 &quot;큰 꿈을 꿔야겠다.&quot;</li>
+<li>- <strong>워크숍 아젠다 배포(4/24)</strong>: BMC·설문·온톨로지·팀/OKR·용어집 4개 파트 index.html로 사전 공유.</li>
+</ul>
+<hr>
+<h3>4. 마인드풀러닝 철학 토론 (4/9)</h3>
+<ul class="mdul">
+<li>- <strong>🔑 베르그손 철학과 마인드풀러닝(4/9, 김종훈·성우 코치)</strong>: 종훈이 &#x27;공간화된 시간&#x27; vs &#x27;지속&#x27;(지성 vs 직관) 개념 공유. 성우 코치의 &quot;달릴 때 스마트워치 보지 말라&quot;는 코칭 원칙과 정확히 일치.</li>
+<li>- <strong>성우 코치의 철학 확장</strong>: &quot;초보일수록 기기를 사용하면 안 된다&quot; — 오감이 열리기 전 데이터로 달리기를 파악하면 감각 성장 방해. 마인드풀러닝 80:20 원칙(이지런 80%에 데이터 불필요) 재확인.</li>
+<li>- <strong>달리기 데이터 사용 기준 합의</strong>: 사후 모니터링 용도·고강도 20% 인터벌에서는 기기 유용, 일상 80% 이지런에서는 감각 중심이 원칙.</li>
+</ul>
+<hr>
+<h3>5. 앱 기능 추가 논의 (4/1, 4/8)</h3>
+<ul class="mdul">
+<li>- <strong>오디오 가이드 탑재 구상(4/1, 이두승)</strong>: 성우 코치의 코칭 목소리를 앱에 넣어 &quot;달리기 전 생각 입력 → 방해 없이 달리고 → 후 느낌 기록&quot;에 오디오 가이드 추가 가능성 검토. &quot;AI한테 물어보죠 뭐&quot;(이두승).</li>
+<li>- <strong>5/23 백야드 일정 확정(4/8)</strong>: 올림픽공원 맨발달리기 백야드. 지난해 맨발 인기를 감안해 로드/트레일 구분 없이 전원 참여 방식으로 기획. 이두승 자녀 동반 참여 의향 표현.</li>
+</ul>
+<hr>
+<h3>🗓 4월 타임라인 요약</h3>
+<table class="mdt"><thead><tr><th>날짜</th><th>핵심 안건</th></tr></thead><tbody>
+<tr><td>4/1~4/2</td><td>오디오 가이드 앱 구상 · 강의 영상 백그라운드 재생 팁 공유</td></tr>
+<tr><td>4/3~4/4</td><td>SYNC #08 · 성우 코치 미국 교통사고 공유 · 종훈 전문가 조언</td></tr>
+<tr><td>4/5</td><td>강승현 뉴100마일러 특강 기획</td></tr>
+<tr><td>4/6</td><td>종훈 강릉 사전답사 · 피터 SKT AI 데모</td></tr>
+<tr><td>4/8</td><td>5/23 올림픽공원 맨발달리기 백야드 확정</td></tr>
+<tr><td><strong>4/9</strong></td><td><strong>베르그손·마인드풀러닝 철학 토론 (54건 피크) · 달리기 데이터 기준 합의</strong></td></tr>
+<tr><td>4/13</td><td>AI 자동화 교재(설문폼·QR 포함) 36페이지 최종 배포</td></tr>
+<tr><td>4/14</td><td>SYNC #09 안내 (4/18)</td></tr>
+<tr><td>4/17~4/18</td><td>SYNC #09 — 성우 코치 병원 일정 조정 · BMC 워크숍 방향 합의</td></tr>
+<tr><td><strong>4/20</strong></td><td><strong>KWTI 강릉 첫 외부 강의 (종훈·피터 협연) · 수강생 부상·피터 발 부상</strong></td></tr>
+<tr><td><strong>4/21</strong></td><td><strong>강의 후기 공유 · 설문 AI 분석 3종 · 대면 워크숍 일정 협의 시작 (62건 피크)</strong></td></tr>
+<tr><td><strong>4/22</strong></td><td><strong>성우 코치 귀국 · 워크숍 장소 광화문 너구리 확정 · BMC 설문 27명 응답 (60건)</strong></td></tr>
+<tr><td>4/23</td><td>설문 응답 분석 · 대면 워크숍 준비 완료</td></tr>
+<tr><td>4/24</td><td>BMC 워크숍 아젠다 배포</td></tr>
+<tr><td>4/30</td><td>5/1 최종 점검</td></tr>
+</tbody></table>
+<hr>
+<h3>👥 주요 인물 역할</h3>
+<ul class="mdul">
+<li>- <strong>MFRS 김종훈 (29%, 133건)</strong>: 현장 운영·강의 리드. 강릉 사전답사·외부 강의 총괄·보조수업(빌드업 4월) 진행·워크숍 장소 예약·예약금 처리. 이달 처음으로 발신 1위, 현장 운영자로 완전히 자리매김.</li>
+<li>- <strong>김성우 코치 (26%, 121건)</strong>: 오너. 미국 귀국·교통사고 후유증 관리·해솔이 시차 적응·BMC 설문 참여·5/1 워크숍 방향 결정. 체류 환경 제약에도 핵심 의사결정 지속.</li>
+<li>- <strong>MFRS 이두승 (24%, 111건)</strong>: 개발·앱 기술. 오디오 가이드 구상, 번개 앱 유지, 5/1 워크숍 APP 기술검토 담당. &quot;마인드풀러닝 스타트업 만들어지는 것 같아 두근두근.&quot;</li>
+<li>- <strong>Peter Kim 피터 (21%, 93건)</strong>: PM. KWTI 교재 제작·강의 이론 지원·설문 AI 분석·워크숍 아젠다 설계·장소 예약. 제주에서 서울 출장으로 워크숍 참여.</li>
+</ul>
+<hr>
+<h3>⛑ 주요 Q&amp;A 및 결정 (4월)</h3>
+<table class="mdt"><thead><tr><th>질문/이슈</th><th>결정·답변</th></tr></thead><tbody>
+<tr><td>대면 운영진 워크숍 장소?</td><td><strong>문화공간 너구리 시청 본점</strong> (5/1 10:00)</td></tr>
+<tr><td>미국 교통사고 대응?</td><td>종훈 전문가 조언 → 변호사 선임 결정 (성우 코치)</td></tr>
+<tr><td>달리기 중 스마트워치 사용 기준?</td><td>이지런 80%는 감각 중심 / 고강도 인터벌 20%는 데이터 활용</td></tr>
+<tr><td>5/23 백야드 프로그램?</td><td>올림픽공원 맨발달리기 · 로드/트레일 전원 통합</td></tr>
+<tr><td>오디오 가이드 앱 탑재?</td><td>V2 후보로 검토 중 (현재 미구현)</td></tr>
+<tr><td>BMC 워크숍 사전 준비?</td><td>피터 BMC 설문(27명 이상 응답) + 아젠다 4파트 index.html 배포</td></tr>
+<tr><td>워크숍 중간 달리기?</td><td>2시간마다 10분 달리기 계획 (피터 제안)</td></tr>
+</tbody></table>
+<hr>
+<h3>🌟 핵심 인사이트 — 운영진방</h3>
+<p>1. <strong>역할 진화: 종훈이 현장 1인자로</strong>: 1~3월에는 피터가 발신량을 압도했지만, 4월은 종훈이 처음으로 1위를 차지했다. 외부 강의 리드·사전답사·장소 예약·보조수업 진행까지 운영진방의 물리적 현장 책임을 완전히 흡수. &quot;퇴사 후 퇴로가 없다&quot;는 발언이 그 동력임을 스스로 인정.</p>
+<p>2. <strong>철학이 가드레일이 되는 순간</strong>: 베르그손 &#x27;직관&#x27; 논의(4/9)는 단순 철학 이야기가 아니었다. &quot;오디오 가이드를 달리는 중에 넣는가?&quot; &quot;앱에 페이스·거리를 표시하는가?&quot;라는 실제 기능 결정에 직접 영향을 주는 살아있는 철학. 코드에도, UI에도, 커리큘럼에도 배어든다.</p>
+<p>3. <strong>첫 외부 강의의 교훈</strong>: 맨발달리기 중 수강생 쥐 발생·피터 발 이물질 부상이라는 두 개의 안전 사건은, 확장 단계에서 안전 프로토콜이 별도로 필요함을 실증. &quot;아름다운 철학도 안전 없이는 지속 불가.&quot;</p>
+<p>4. <strong>&quot;두근두근&quot; 감정이 에너지가 된다</strong>: 이두승의 &quot;마인드풀러닝 스타트업 만들어지는 것 같아 두근두근&quot;, 피터의 &quot;제주에서 서울 출장&quot; 결정, 종훈의 &quot;임무 수행하러 떠나는 기분&quot;이라는 발언들은 이 팀이 금전적 보상 없이 움직이는 근거. 기여 자체가 에너지 원천.</p>
+<p>5. <strong>BMC 설문이 드러낸 회원의 진심</strong>: &quot;지금까지 하지 못한 말들&quot;이 담긴 27명 이상의 응답은 단순 데이터가 아니라 커뮤니티가 운영진에게 보내는 신뢰의 신호. 이 피드백이 5/1 BMC 워크숍으로 이어지는 원동력.</p>
+<hr>
+<p><em>분석 기준: 2026년 4월 1일 ~ 4월 30일 [마인드풀러닝 AX] ADV5기 운영진방 462건(CSV 기준 442건 실효 메시지) · 4명 발신자 대화 내용 기반. <strong>비공개 운영진 채널</strong> — 계정·비밀번호·회의 링크·예약 코드 등 민감정보 전면 마스킹, 회원/외부 배포 금지.</em></p></div>
+    </div><div id="m03"></div>
+    <div class="card monthcard curated">
+      <div class="mc-h">3월 <span class="mc-cur">📋 상세 분석 (큐레이션)</span></div>
+      <div class="mdbody"><p>2026.06.04</p>
+<blockquote>⚠️ <strong>비공개 — 운영진 전용.</strong> 본 채널은 회원 배포 대상이 아닙니다. 계정·비밀번호·회의 링크·예약 코드 등 민감정보는 모두 마스킹했으며, 외부/회원 공유 금지.</blockquote>
+<h3>📌 핵심 성과 요약 (Executive Summary)</h3>
+<p><strong>&quot;번개앱·AI 워크숍·도메인 통합 — 3월은 마인드풀러닝의 디지털 인프라 원년&quot;</strong></p>
+<p>3월은 운영진방 4개월 통틀어 가장 활발했던 달로, 456건·4인의 대화가 쏟아졌습니다. 이두승이 번개 모임 큐레이션 앱(mindful-running-curation)을 독자 개발·배포하고, 피터가 3일간 운영진 AI 워크숍(Teams·Claude Code·GitHub)을 진행하며 팀 전체의 AI 역량을 한 단계 끌어올렸습니다. DNS·Cloudflare·Kajabi·Netlify를 거쳐 curation.mindfulrunningschool.com과 dailylog.mindfulrunningschool.com 도메인도 마침내 연결되었습니다. 김종훈이 보조수업 전국화(여의도 3/29·지방)를 추진하고 한국여성수련원 외부 강의 기회까지 확보하면서, 3월은 기술·교육·운영 3개 축이 동시에 도약한 달이었습니다. 3/23(60건)·3/19(58건)·3/12(47건)이 3대 피크였습니다.</p>
+<hr>
+<h3>1. 번개 모임 큐레이션 앱 개발·배포 (3/1 ~ 3/20)</h3>
+<ul class="mdul">
+<li>- <strong>구상 시작(3/5, 성우 코치)</strong>: &quot;번개 및 이벤트런(백야드·100마일 등)을 한 곳에서 볼 수 있으면 좋겠다&quot;는 제안 → 이두승이 주말 작업 자청.</li>
+<li>- <strong>🔑 번개 큐레이션 앱 릴리스(3/12, 이두승)</strong>: Notion DB 없이 자체 DB로 독립 구축. 로그인·러닝 세션 등록·참가 신청·공유·인증사진 업로드(최대 3장) 기능. URL: mindful-running-curation.vercel.app.</li>
+<li>- <strong>마인드풀러닝 철학 학습(3/12, 이두승)</strong>: AI 코딩 에이전트에게 직접 만든 백서를 학습시켜 개발. &quot;도시의 속도보다 내 호흡을 먼저 떠올리는 러닝 큐레이션&quot;(AI 자동 생성 카피). 팀 전원 탄성.</li>
+<li>- <strong>피터의 첫 PR(3/12)</strong>: GitHub 협업 첫 실습으로 피터가 PR 제출. 이두승이 마인드풀러닝 철학(페이스·거리 지표 제외 원칙)에 맞지 않는 일반 러닝 지표 항목을 롤백. &quot;개발 전 철학 학습이 가드레일&quot; 확인.</li>
+<li>- <strong>도메인 통합(3/18~3/19)</strong>: Squarespace·Cloudflare·Kajabi DNS 혼재 문제 → 성우 코치가 Kajabi Custom Records에 CNAME 추가로 해결. curation.mindfulrunningschool.com / dailylog.mindfulrunningschool.com 동시 개통.</li>
+</ul>
+<hr>
+<h3>2. 운영진 AI 워크숍 3일 (3/16 ~ 3/18)</h3>
+<ul class="mdul">
+<li>- <strong>🔑 AI 워크숍 기획(3/14, 피터)</strong>: 4인 운영진을 대상으로 3일 집중 AI 워크숍 설계. MS Teams를 업무 협업 도구로 처음 도입(카카오 → Teams 점진적 전환 구상). 이메일 초대·Github 동기화·Claude Code 설치까지 Step-by-Step 가이드 작성.</li>
+<li>- <strong>Day1 — AI 워크플로우 변화(3/16)</strong>: 삼성전자·LG전자 AI 전용 강의장 사례, HITL(Human-in-the-Loop), 100만 토큰 시대, 구글링→오픈AI→젠스파크→옵시디안 전환 워크플로우. &quot;주식회사 마인드풀러닝 만들어지는 것 같다&quot;(이두승).</li>
+<li>- <strong>Day2 — 블로그·인스타 DNA 추출(3/17)</strong>: 개인 블로그·인스타·스레드 글을 AI로 가져와 DNA 뽑기 → 새 글 자동 작성. Claude Code YOLO 모드 설치(터미널 alias). 종훈 &quot;발가벗겨진 기분, 충격적이다.&quot;</li>
+<li>- <strong>Day3 — DNS·배포·GitHub(3/18)</strong>: curation 도메인 연결 최종 확인. 전체 3일 워크숍 자료를 GitHub에 정리 보관. 성우 코치 &quot;github 싱크 완료, 이제 어떤 기기에서도 콘텐츠 작업 가능.&quot;</li>
+<li>- <strong>지속 학습 장려</strong>: &quot;30일 5분 달리기처럼 매일 Clauding하면 프롬프트→컨텍스트→하네스로 점점 올라간다&quot;(피터). Enjoy Mindful Agentic Life.</li>
+</ul>
+<hr>
+<h3>3. 외부 강의 기회 수립 (3/12 ~ 3/13)</h3>
+<ul class="mdul">
+<li>- <strong>한국여성수련원 강의 문의(3/12, 성우 코치)</strong>: &quot;AI시대의 트렌드 톺아보기 주제: 러닝&quot; 강의 문의 수신. 성우 코치가 피터·종훈을 강사로 추천.</li>
+<li>- <strong>🔑 역할 분담 결정(3/12~3/13)</strong>: 피터(PM 코치, AI 이론·백서·건강극복 사례)·종훈(러닝코치, 현장 실습 리드) 협업 강의 구조 합의. 기부(강의료 일부 → Kibet4Kids) 아이디어는 종훈 제안.</li>
+<li>- <strong>강사 프로필 제작(3/13, 피터)</strong>: 종훈의 러닝 이력(현대해상 손해사정사·생활스포츠지도사·달리기 전문가과정 Lv.2·대전한밭벌 울트라마라톤 100km 완주) 2종 버전 제작, AI 자동화로 강의안 커리큘럼까지 완성.</li>
+</ul>
+<hr>
+<h3>4. 보조수업 전국화 (3/11 ~ 3/29)</h3>
+<ul class="mdul">
+<li>- <strong>지방 보조수업 추진(3/11, 김종훈)</strong>: &quot;지방 마플러너의 설움을 아는 사람으로서 서울만 하는 건 그래서&quot; — 부산 외 지방 보조수업 병행 선언.</li>
+<li>- <strong>3월 보조수업 공지(3/16, 김종훈)</strong>: 여의도공원 문화의마당(3/29 오후 3시, 주제: 편안한 질주). 지방 일정은 투표로 결정 방식 도입.</li>
+<li>- <strong>4월 빌드업 주제 확정</strong>: 2월(코호흡·척추느낌·케이던스) → 3월(편안한 질주) → 4월(빌드업) 월별 진화 커리큘럼 체계화.</li>
+</ul>
+<hr>
+<h3>5. 삼일절 회고와 팀 유대 (3/1)</h3>
+<ul class="mdul">
+<li>- <strong>인사이트 대시보드 공유(3/1, 피터)</strong>: 월별 인사이트 대시보드 공개. 이두승 &quot;통계 데이터 정리 진짜 잘하셨네요.&quot;</li>
+<li>- <strong>이두승 아들과 삼일절 3K 달리기</strong>: 스파이더맨 복장 아들과 아빠 달리기 영상 공유 → &quot;아빠가 헐떡거리며 쫓아가네요&quot;(피터), &quot;언제 해솔이가 달릴 수 있을까요?&quot;(성우 코치) — 팀 전원이 아이들 키우는 아빠들로서 깊은 공감과 유대 확인.</li>
+</ul>
+<hr>
+<h3>🗓 3월 타임라인 요약</h3>
+<table class="mdt"><thead><tr><th>날짜</th><th>핵심 안건</th></tr></thead><tbody>
+<tr><td>3/1</td><td>삼일절 인사이트 대시보드 공유 · 이두승 아들 3K 달리기 영상</td></tr>
+<tr><td>3/5</td><td>성우 코치 생일 · 번개 앱 입력폼 구상 시작</td></tr>
+<tr><td>3/8</td><td>피터 AI 출판사(한중일영 4개 언어) 공개</td></tr>
+<tr><td>3/11</td><td>지방 보조수업 추진 선언 · 번개 앱 진행상황 공유</td></tr>
+<tr><td><strong>3/12</strong></td><td><strong>이두승 번개 큐레이션 앱 배포 · 첫 PR 협업 · 한국여성수련원 강의 문의 (47건)</strong></td></tr>
+<tr><td>3/13</td><td>종훈·피터 강사 프로필·커리큘럼 완성</td></tr>
+<tr><td>3/14</td><td>운영진 AI 워크숍 사전 준비(Teams·이메일 초대)</td></tr>
+<tr><td><strong>3/16</strong></td><td><strong>AI 워크숍 Day1 (Teams 세팅 · AI 워크플로우 변화 · 보조수업 공지 초안)</strong></td></tr>
+<tr><td><strong>3/17</strong></td><td><strong>AI 워크숍 Day2 (블로그 DNA 추출 · Claude Code YOLO 모드)</strong></td></tr>
+<tr><td><strong>3/18</strong></td><td><strong>AI 워크숍 Day3 · 전체 자료 GitHub 정리</strong></td></tr>
+<tr><td><strong>3/19</strong></td><td><strong>DNS Cloudflare/Kajabi 원인 파악 → curation·dailylog 도메인 동시 개통 (58건)</strong></td></tr>
+<tr><td>3/20</td><td>curation.mindfulrunningschool.com 전체 커뮤니티 공개 발표</td></tr>
+<tr><td><strong>3/23</strong></td><td><strong>보조수업 준비·선수안전모니터링 외부 세팅 논의 (60건 피크)</strong></td></tr>
+<tr><td>3/25</td><td>여의도 보조수업 강의 세부 confirm 진행</td></tr>
+<tr><td>3/29</td><td>여의도 보조수업 실시 (3월 편안한 질주)</td></tr>
+</tbody></table>
+<hr>
+<h3>👥 주요 인물 역할</h3>
+<ul class="mdul">
+<li>- <strong>Peter Kim 피터 (33%, 145건)</strong>: PM·AI 코치. 운영진 3일 AI 워크숍 기획·진행, 한국여성수련원 강의안 제작, 달리기 인사이트 대시보드, 앱 PR 협업, DNS 근본 원인 분석. 기술과 운영 두 영역의 연결자.</li>
+<li>- <strong>MFRS 이두승 (30%, 135건)</strong>: 개발 총괄. 번개 큐레이션 앱 독자 개발·배포, 도메인 CNAME 설정 가이드, AI 철학 학습 적용, GitHub 협업 구조 확립. &quot;기업용 앱만 만들다 내가 만든 앱을 써준다는 게 뿌듯하다.&quot;</li>
+<li>- <strong>김성우 코치 (26%, 114건)</strong>: 오너·기획총괄. 번개 페이지 워딩 디렉션, DNS 관리 직접 수행, AI 워크숍 참여 후 뉴스레터 자동화 시작, 보조수업 주제 승인. 미국 체류 중 원격 참여.</li>
+<li>- <strong>MFRS 김종훈 (11%, 51건)</strong>: 현장 운영·비즈니스 개척. 지방 보조수업 추진, 여의도 보조수업 진행, 강사 이력 공유, 한국여성수련원 실습 리드 확정.</li>
+</ul>
+<hr>
+<h3>⛑ 주요 Q&amp;A 및 결정 (3월)</h3>
+<table class="mdt"><thead><tr><th>질문/이슈</th><th>결정·답변</th></tr></thead><tbody>
+<tr><td>번개 앱에 페이스·거리 지표 추가?</td><td><strong>제외</strong> — 마인드풀러닝 철학(감각 중심) 위반, PR 롤백</td></tr>
+<tr><td>curation 도메인 연결 안 되는 원인?</td><td>DNS 실제 관리자가 Cloudflare가 아닌 Kajabi였음 — Kajabi에 CNAME 추가로 해결</td></tr>
+<tr><td>번개 앱 서버 비용?</td><td>현재 무료 (10GB 초과 시 유료) — 실서비스 전환 시 성우 코치 계정으로 이전 예정</td></tr>
+<tr><td>AI 워크숍 협업 도구?</td><td>MS Teams(회상회의·회의록 자동화) + GitHub(코드·자료) + Claude Code</td></tr>
+<tr><td>한국여성수련원 강의 역할?</td><td>피터(이론·AI·백서 사례) / 종훈(실습·러닝 코칭) 협업 분담</td></tr>
+<tr><td>지방 보조수업 방식?</td><td>서울 동일 커리큘럼·날짜는 투표 방식 결정</td></tr>
+</tbody></table>
+<hr>
+<h3>🌟 핵심 인사이트 — 운영진방</h3>
+<p>1. <strong>번개 앱에 &#x27;철학&#x27;을 학습시킨 개발자</strong>: 이두승이 직접 마인드풀러닝 백서를 AI 에이전트에 학습시켜 개발한 방식은, 코드가 아닌 가치관이 인프라가 된다는 개념의 실증. &quot;도시의 속도보다 내 호흡을 먼저 떠올리는&quot; 카피를 AI가 자동 생성했을 때 팀 전체가 한 번 더 이 커뮤니티의 정체성을 체감.</p>
+<p>2. <strong>DNS 3시간 혈투가 가르쳐준 것</strong>: Squarespace·Cloudflare·Kajabi 3개 레이어가 꼬여 있었던 도메인 설정 문제는, 빠르게 확장하면서 인프라를 정리하지 않을 때 생기는 기술 부채의 전형. 성우 코치가 직접 DNS 설정을 배우고 해결하면서 단순 코치에서 테크 오너로 한 단계 성장.</p>
+<p>3. <strong>&#x27;AI 워크숍&#x27;이 팀 일체감의 촉매</strong>: 3일간 피터가 팀원들을 코치하는 역전된 구조. 이두승이 &quot;피터 선생님 감사합니다&quot;, 성우 코치가 &quot;주식회사 마인드풀러닝 만들어지는 것 같다&quot;고 표현한 데서 알 수 있듯, 기술 역량 공유가 신뢰와 팀 정체성 강화로 이어짐.</p>
+<p>4. <strong>자원봉사 팀의 경계 설정</strong>: 이두승이 서버 비용을 자비로 부담하면서도 &quot;데이터는 성우 코치님 소유이니 실서비스 전환 시 계정 이전&quot;을 분명히 했다. 재능 기부와 오너십 구분이 이 TF의 지속 가능성을 만드는 핵심 원칙.</p>
+<p>5. <strong>전국화의 시작점</strong>: 서울 여의도(3/29)와 지방 보조수업 병행 추진, 한국여성수련원 외부 강의까지, 3월 마지막 주에 마인드풀러닝의 지리적 반경이 물리적으로 확장되기 시작.</p>
+<hr>
+<p><em>분석 기준: 2026년 3월 1일 ~ 3월 31일 [마인드풀러닝 AX] ADV5기 운영진방 456건(CSV 기준 419건 실효 메시지) · 4명 발신자 대화 내용 기반. <strong>비공개 운영진 채널</strong> — 계정·비밀번호·회의 링크·예약 코드 등 민감정보 전면 마스킹, 회원/외부 배포 금지.</em></p></div>
+    </div><div id="m02"></div>
+    <div class="card monthcard curated">
+      <div class="mc-h">2월 <span class="mc-cur">📋 상세 분석 (큐레이션)</span></div>
+      <div class="mdbody"><p>2026.06.04</p>
+<blockquote>⚠️ <strong>비공개 — 운영진 전용.</strong> 본 채널은 회원 배포 대상이 아닙니다. 계정·비밀번호·회의 링크·예약 코드 등 민감정보는 모두 마스킹했으며, 외부/회원 공유 금지.</blockquote>
+<h3>📌 핵심 성과 요약 (Executive Summary)</h3>
+<p><strong>&quot;5기 개막의 열기 속에서 — 카톡 운영 체계·백서·리더보드를 동시에 세운 첫 달&quot;</strong></p>
+<p>2월은 ADV 5기가 2/1 정식 온보딩으로 출발하면서 운영진방이 가장 빠르게 성장한 달입니다. 3인 채널에 김종훈이 2/2 합류하며 4인 체제로 전환되었고, 메시지 285건 중 2/4(50건)·2/15(25건)·2/8(24건) 3일이 집중 논의일이었습니다. 피터가 40%를 주도하는 가운데, 앱 URL 수정과 테스트 데이터 정리(이두승), 카톡 운영 Rule 공지 및 백서 Vibe Writing 시스템 구축(피터), 2월 보조수업 여의도 사전답사(김종훈)가 동시다발로 진행되었습니다. 특히 피터가 공개한 <strong>AI 자동화 VibeWriting 백서(ePub/PDF)</strong> 결과물에 팀 전체가 전율했으며, 성우 코치가 직접 Biz Model을 요청받아 &quot;판도라의 상자를 여는 느낌&quot;이라고 표현했습니다.</p>
+<hr>
+<h3>1. 온보딩 직후 운영 정비 (2/1 ~ 2/4)</h3>
+<ul class="mdul">
+<li>- <strong>앱 URL 오탈자 수정(2/1, 이두승)</strong>: 기존 배포 URL의 &#x27;d&#x27; 누락을 성우 코치가 발견해 신고 → 이두승이 즉시 수정 배포. &quot;전혀 모르고 있었다&quot;며 웃음.</li>
+<li>- <strong>이두승 온보딩 불참(2/1)</strong>: 자녀 독감으로 온보딩 당일 불참. 피터가 대신 현장 진행.</li>
+<li>- <strong>김종훈 합류(2/2)</strong>: 피터가 &quot;ADV5기 운영 성격이 강해지면서&quot; 부코치 김종훈을 운영진방에 공식 합류. 일정·방향·세부 논의 통합 창구로 운영 선언.</li>
+<li>- <strong>카톡 방 운영 정책 논의(2/4, 피터)</strong>: 달리기 인증이 전체 공지방에 올라오는 문제 → SYNC#4.5 긴급 점검 미팅 제안. Do/Don&#x27;t 공지 초안 작성(인증은 소모임/인증방 1곳, 공감은 리액션 이모지로).</li>
+<li>- <strong>🔑 통합 카톡 Rule 공지(2/7, 피터)</strong>: 5기 전체에 카톡 운영 기준(Do/Don&#x27;t 6조) 공식 공지. 어드밴스 4기 기준 → 5기 맞춤 보정 후 배포.</li>
+</ul>
+<hr>
+<h3>2. 마인드풀러닝 백서 AI 자동화 (2/7 ~ 2/12)</h3>
+<ul class="mdul">
+<li>- <strong>백서 목차 공유(2/7, 피터)</strong>: ADV4기 강의 2편(비공개 유튜브 스크립트 기반) + 기존 자료를 Vibe Writing 방식으로 결합한 목차 초안 공개.</li>
+<li>- <strong>🔑 AI 자동화 VibeWriting 시스템(2/8, 피터)</strong>: 00~03 폴더에 파일/기획안을 작성해 넣으면 04~08이 자동 생성되는 파이프라인 구축. &quot;전율을 느꼈다&quot;(피터). 이두승 &quot;우어 LLM 활용능력은 역시 전문가!!&quot;, 김종훈 &quot;엄청나네요&quot;. Gemini Nano바나나 엔진으로 Figure(그래픽)까지 자동 생성.</li>
+<li>- <strong>ePub/PDF 출판(2/11)</strong>: 마인드풀러닝 백서 전자책 버전 완성. 성우 코치님의 작년 강의 녹취만으로 책 한 권이 만들어진 것에 팀 전원 탄성. &quot;판도라의 상자를 여는 느낌&quot;(성우 코치).</li>
+<li>- <strong>GitHub 공유 &amp; 협업 시작(2/14)</strong>: 피터가 백서 GitHub repo 공개, 이두승·성우 코치 초대. 향후 팀 공용 개발 허브로 활용 예정.</li>
+</ul>
+<hr>
+<h3>3. 앱 DB 정리 및 기능 개선 (2/7 ~ 2/9)</h3>
+<ul class="mdul">
+<li>- <strong>테스트 데이터 삭제 작업(2/7~2/9, 이두승)</strong>: 3만 건의 더미 데이터를 Notion API로 일괄 삭제 시도 중 2/1~2/2 일부 실데이터 삭제 사고 발생. 이두승이 Notion 히스토리에서 수동 복원.</li>
+<li>- <strong>2/1 데이터 영구 소실</strong>: 최종 2/1 테스트 데이터가 복원 불가. 피터가 2/2부터의 실데이터는 카톡 인증 원문을 기반으로 수작업으로 복붙 복원.</li>
+<li>- <strong>🔑 교훈</strong>: 대용량 데이터 삭제 전 백업본 확보 절차 필요성 확인. 이후 단계적 클라우드 DB 전환(Supabase) 구상 시작.</li>
+<li>- <strong>리더보드 인기 확인</strong>: &quot;달리기 기록이 너무 적나라하게 나와서 안뛸 수가 없겠다&quot;(피터) — 한국인 경쟁심리를 자극하는 실시간 리더보드가 회원 참여를 견인하고 있음을 팀 내 공유.</li>
+</ul>
+<hr>
+<h3>4. 외부 협업 개척 (2/8, 김종훈)</h3>
+<ul class="mdul">
+<li>- <strong>여의도 보조수업 사전답사(2/8)</strong>: 2월 중순 첫 대면 보조수업을 위해 여의도공원 현장 사전답사 완료. 병도 선수와 우연히 조우해 사진 촬영. &quot;추운데 다음주엔 조금 나아지겠죠.&quot;</li>
+<li>- <strong>스트라바 AI 러닝코치 사례 공유(2/12, 피터)</strong>: 지인의 지인이 만든 스트라바 → 구글시트 → Gemini AI 러닝 전담코치 시스템 공유. 이두승 &quot;이런 연동 생각하고 있었다, 앱 만들어봐야겠다.&quot;</li>
+<li>- <strong>성우 코치의 앱 방향 제안(2/12)</strong>: &quot;예전에 기획했던 마인드풀러닝 전용앱이 있는데 같이 만들어보시겠어요?&quot; — 이두승이 긍정 응답. 기존 PDR·Canva UX/UI 자료 공유 예정.</li>
+</ul>
+<hr>
+<h3>5. AI 스케줄 자동화 의사결정 (2/28)</h3>
+<ul class="mdul">
+<li>- <strong>🔑 의사결정 #1(2/28 SYNC)</strong>: &quot;코치님 고유 영역인 스케줄 설문 작성에 대한 AI 자동화 여부.&quot; 1월 SYNC에서 코치님 고유 영역으로 유지하기로 결정했던 내용 재확인. &quot;AI가 해주면 편하지만, 참가자와의 연결·감각이 들어가는 영역은 코치 직접 담당&quot;으로 최종 정리.</li>
+</ul>
+<hr>
+<h3>🗓 2월 타임라인 요약</h3>
+<table class="mdt"><thead><tr><th>날짜</th><th>핵심 안건</th></tr></thead><tbody>
+<tr><td><strong>2/1</strong></td><td><strong>ADV5기 공식 온보딩 (이두승 불참 → 피터 대행)</strong> · 앱 URL 오탈자 수정 · 김종훈 합류</td></tr>
+<tr><td>2/2</td><td>김종훈 운영진방 합류 · ADV4기 통계 분석 공유</td></tr>
+<tr><td><strong>2/4</strong></td><td><strong>SYNC#4.5 긴급점검 일정 확정 · 카톡 운영정책 논의 (50건 피크)</strong></td></tr>
+<tr><td>2/6</td><td>1주차 달리기 인증 38건 AI 분석 공유 · SYNC 안건 공지</td></tr>
+<tr><td><strong>2/7</strong></td><td><strong>카톡 통합 Rule 공지 · 백서 목차 초안 · Notion 테스트 데이터 삭제</strong></td></tr>
+<tr><td>2/8</td><td><strong>AI VibeWriting 백서 공개 · 여의도 사전답사(김종훈) · 이두승 AI 생존 고민</strong></td></tr>
+<tr><td>2/9</td><td>테스트 데이터 완전 삭제 · 실데이터 수작업 복원 완료</td></tr>
+<tr><td>2/11</td><td>백서 ePub/PDF 전자책 완성</td></tr>
+<tr><td><strong>2/12</strong></td><td><strong>SYNC#05 — Vibe Writing 설명회 · 스트라바 AI 코치 사례 · 앱 방향 제안</strong></td></tr>
+<tr><td>2/14</td><td>백서 GitHub 공개 · 팀 초대</td></tr>
+<tr><td><strong>2/28</strong></td><td><strong>SYNC — 스케줄 설문 AI 자동화 여부 최종 결정 (코치 고유 영역 유지)</strong></td></tr>
+</tbody></table>
+<hr>
+<h3>👥 주요 인물 역할</h3>
+<ul class="mdul">
+<li>- <strong>Peter Kim 피터 (40%, 108건)</strong>: PM·운영 총괄. 카톡 운영 Rule 설계·배포, AI VibeWriting 백서 파이프라인 구축, 달리기 인증 AI 분석 공유, 회의 SYNC 진행·회의록 작성. 이달 콘텐츠와 운영의 핵심 동력.</li>
+<li>- <strong>김성우 코치 (27%, 76건)</strong>: 오너·기획 총괄. 앱 URL 수정 신고, 보조수업 일정 협의, 백서에 대한 의견 및 방향 공유, 스케줄 자동화 정책 결정.</li>
+<li>- <strong>MFRS 이두승 (20%, 55건)</strong>: 개발 총괄. 앱 URL 수정, Notion DB 대량 삭제·복원, 앱 기능 개선, 스트라바 연동 앱 개발 구상.</li>
+<li>- <strong>MFRS 김종훈 (13%, 38건)</strong>: 현장 운영·비즈니스 개척. 여의도 보조수업 사전답사, 카톡방 인원 체크, 운영 정책 피드백.</li>
+</ul>
+<hr>
+<h3>⛑ 주요 Q&amp;A 및 결정 (2월)</h3>
+<table class="mdt"><thead><tr><th>질문/이슈</th><th>결정·답변</th></tr></thead><tbody>
+<tr><td>앱 URL 오탈자 수정?</td><td>이두승이 즉시 수정 배포 (2/1)</td></tr>
+<tr><td>달리기 인증 방 중복 문제?</td><td>인증은 소모임/인증방 1곳만, 전체방은 공지·질문용 (2/7 Rule 공지)</td></tr>
+<tr><td>Notion 테스트 데이터 삭제 중 실데이터 소실?</td><td>2/1 데이터 영구 소실, 2/2 이후는 카톡 기반 수작업 복원</td></tr>
+<tr><td>AI VibeWriting 방식이란?</td><td>00~03 폴더 기획안 입력 → 04~08 자동 생성 파이프라인</td></tr>
+<tr><td>스케줄 설문 AI 자동화 여부?</td><td><strong>코치 고유 영역 유지</strong> (2/28 SYNC 최종 결정)</td></tr>
+<tr><td>마풀런 전용앱 개발 방향?</td><td>성우 코치 기존 PDR·UX 자료 공유 후 이두승과 공동 개발 검토</td></tr>
+<tr><td>강의 요약 Notion 페이지 작성 프로세스?</td><td>비공개 유튜브 링크 → 피터 요약 → Notion 페이지 → 코치 영상+요약 함께 안내</td></tr>
+</tbody></table>
+<hr>
+<h3>🌟 핵심 인사이트 — 운영진방</h3>
+<p>1. <strong>&#x27;말 한마디 → 즉시 실행&#x27;의 TF 문화 정착</strong>: 성우 코치가 URL 오탈자를 발견하자 이두승이 30분 내 수정, 피터가 카톡 Rule 공지 초안을 대화 직후 완성해 배포. 의사결정과 실행 사이에 지연이 거의 없는 소수 정예 운영 방식이 2월 내내 유지됨.</p>
+<p>2. <strong>이두승의 AI 생존 고민</strong>: &quot;AI 시대에 개발자는 무엇을 해야 할지, 이제는 선택이 아니라 생존의 문제로 느껴진다&quot;(2/8). 피터의 VibeWriting 시스템을 보며 나온 실제 고민으로, 이후 3월 운영진 AI 워크숍으로 이어지는 배경.</p>
+<p>3. <strong>백서는 기술 증명이자 커뮤니티 거울</strong>: ADV4기 강의 녹취만으로 책 한 권이 완성된 것은 기술 실증이기도 하지만, 4년간 축적된 마인드풀러닝 콘텐츠의 밀도를 팀 스스로 확인한 사건. &quot;작년에 하신 강의들을 순차적으로 잘 정리해줬다&quot;(성우 코치).</p>
+<p>4. <strong>김종훈 합류가 현장 운영의 물리적 반경을 넓힘</strong>: 서울 여의도·강릉·지방 보조수업 라인을 확보하며, 운영진방이 온라인 기술 TF에서 현장 러닝 커뮤니티 운영 TF로 성격이 확장됨.</p>
+<hr>
+<p><em>분석 기준: 2026년 2월 1일 ~ 2월 28일 [마인드풀러닝 AX] ADV5기 운영진방 285건(CSV 기준 277건 실효 메시지) · 4명 발신자 대화 내용 기반. <strong>비공개 운영진 채널</strong> — 계정·비밀번호·회의 링크·예약 코드 등 민감정보 전면 마스킹, 회원/외부 배포 금지.</em></p></div>
+    </div><div id="m01"></div>
+    <div class="card monthcard curated">
+      <div class="mc-h">1월 <span class="mc-cur">📋 상세 분석 (큐레이션)</span></div>
+      <div class="mdbody"><p>2026.06.04</p>
+<blockquote>⚠️ <strong>비공개 — 운영진 전용.</strong> 본 채널은 회원 배포 대상이 아닙니다. 계정·비밀번호·회의 링크·예약 코드 등 민감정보는 모두 마스킹했으며, 외부/회원 공유 금지.</blockquote>
+<h3>📌 핵심 성과 요약 (Executive Summary)</h3>
+<p><strong>&quot;MFRS 첫 APP 페이지가 탄생한 달 — Notion 한계를 웹앱 직접 개발로 돌파&quot;</strong></p>
+<p>1월 운영진방은 ADV 5기 온보딩(2/1) 직전 준비를 위한 소수 정예 3인 채널이었습니다. 피터·이두승·김성우 코치 3인이 <strong>거의 균등하게 대화를 주도</strong>하며, Notion 기반 일지 입력폼의 기술적 한계를 확인하자 이두승이 즉시 Notion API 기반 웹앱으로 직접 개발을 전환해 <strong>1월 4일 MFRS 첫 APP 페이지(dailylog)와 리더보드를 공개</strong>했습니다. 메시지 136건 중 절반에 가까운 피크가 1월 4일(31건)과 1월 18일(27건) 양일에 집중되었으며, 두 날 모두 앱 기능 릴리스와 운영 방향 논의가 맞물린 분기점입니다. 월말인 1월 31일에는 첫 SYNC#04 리허설을 완료하며 2월 온보딩을 위한 전체 준비를 마쳤습니다.</p>
+<hr>
+<h3>1. Notion 입력폼 → 웹앱 전환 (1/2 ~ 1/4)</h3>
+<ul class="mdul">
+<li>- <strong>Tally Form 한계 확인(1/2~1/3)</strong>: 피터가 ChatGPT로 생성한 더미 데이터(100명×1년)의 Notion API 대량 insert 시 속도 문제와 관계형 DB 저장 오류를 이두승이 확인. Tally Form이 Notion 관계형 DB와 저장 호환이 되지 않는다는 근본 문제 도출.</li>
+<li>- <strong>🔑 MFRS 첫 웹앱 릴리스(1/4, 이두승)</strong>: Notion API 기반 커스텀 웹페이지를 독자적으로 개발·배포. 이름 선택 시 member 테이블을 실시간 참조하고, daily_log 테이블에 관계형으로 저장. &quot;MFRS 첫 APP 페이지가 만들어져서 의미깊은 시작&quot;(피터).</li>
+<li>- <strong>리더보드 추가(1/4)</strong>: 일지 기록과 함께 리더보드 페이지도 당일 배포. 달리기 인증 데이터를 홈화면 앱 아이콘으로 등록하는 방법까지 안내하며 회원 접근성을 높임.</li>
+<li>- <strong>앱 로고 적용(1/18, 이두승)</strong>: 마인드풀러닝 공식 로고 파비콘 적용 완료 + 리더보드 UI 개편. 성우 코치 &quot;앱 홈화면 추가가 가능한 거군요, 이제야 알았다&quot;며 탄성.</li>
+</ul>
+<hr>
+<h3>2. MFRS Index 알고리즘 설계 (1/3 ~ 1/7)</h3>
+<ul class="mdul">
+<li>- <strong>Index 정의(1/3, 피터)</strong>: MFRS Index 0~1000점 계산식 초안 설계. 최근 1주·4주·100일 달린 횟수·시간·연속성 가중합. A(120분 이상)/B(120분 미만)/C(60분 미만)/D(30분 미만) 4개 레벨 분류.</li>
+<li>- <strong>데이터 세팅 요청(1/3)</strong>: 알고리즘 정교화를 위해 ADV4기 raw 데이터(이름 제외) 필요 → 성우 코치에게 준비 요청.</li>
+<li>- <strong>월별 필터링 구상</strong>: 전체 리더보드 이후 월간·분기·그룹별·남녀별 필터링이 단계적으로 추가 가능함을 공유. &quot;엑셀 RAW와 Filter 원리&quot;(피터).</li>
+</ul>
+<hr>
+<h3>3. SYNC 미팅 사이클 확립 (1/13 ~ 1/31)</h3>
+<ul class="mdul">
+<li>- <strong>Notion 구조 정비(1/13, 피터)</strong>: MFRS 어드밴스 5기 전용(입력폼·리더보드·강의요약)과 커뮤니티 전용 2개 Root로 분리. 멤버 홍보문구도 포함.</li>
+<li>- <strong>SYNC#03(1/17)</strong>: 회의록 주요 결정 — 1/29 데이터 리셋·1/31 최종점검 미팅, MFRS 백서 AI 초안 후 Human Touch 방식, 전용앱·기념용품·상업화(플랫폼/자동화/AI) 미래 방향 브레인스토밍.</li>
+<li>- <strong>회원 명단 수령(1/30, 성우 코치)</strong>: 5기 참가자 60여명 명단 전달. 온보딩 후 방 배정 완료 예정.</li>
+<li>- <strong>SYNC#04 최종 리허설(1/31)</strong>: 온보딩 데모 순서 확정(마풀런 기록/리더보드 → 직접 기록 → 커뮤니티 안내), 백서 방향 결정, 격주 스프린트 SYNC 정규화. openclaw/클로드봇 소개 포함.</li>
+</ul>
+<hr>
+<h3>4. 비즈니스 방향 논의 (1/18)</h3>
+<ul class="mdul">
+<li>- <strong>🔑 성우 코치의 전환 고백</strong>: 앱 완성 및 리더보드 공개 직후, &quot;어드밴스 5기는 올해까지만 하는 걸로 마음을 먹었다&quot;고 공개. 해솔이 출생 후 지속 고민이었던 내용. &quot;3기 때부터 이 모델로는 오래 하기 힘들다는 생각을 했다.&quot;</li>
+<li>- <strong>피터의 응원과 다음 모델 제안</strong>: &quot;STOP이 아닌 다른 형태의 비즈모델 모색&quot;을 제안. 열혈팬 150명 기반 확장 Biz 가능성, 신연선 코치에게 Biz Model 요청 의향 전달.</li>
+<li>- <strong>신연선 코치 연결(1/22)</strong>: 피터가 현재 상황을 신연선 코치에게 공유. 코치가 성우 코치에게 직접 연락하기로 결정.</li>
+</ul>
+<hr>
+<h3>🗓 1월 타임라인 요약</h3>
+<table class="mdt"><thead><tr><th>날짜</th><th>핵심 안건</th></tr></thead><tbody>
+<tr><td>1/2</td><td>Notion API 삽입 속도 문제 확인 · Tally Form 관계형 DB 저장 오류</td></tr>
+<tr><td><strong>1/4</strong></td><td><strong>이두승 MFRS 첫 웹앱(daily_log 입력) + 리더보드 배포 (31건 피크)</strong></td></tr>
+<tr><td>1/5</td><td>MFRS Index A/B/C/D 알고리즘 초안 완성 (피터)</td></tr>
+<tr><td>1/7</td><td>성우 코치 웹앱 홈화면 등록 성공 · 월별 리더보드 필터 구상</td></tr>
+<tr><td>1/13</td><td>Notion 2-Root 구조 정비 · SYNC#03 일정 확정</td></tr>
+<tr><td><strong>1/17</strong></td><td><strong>SYNC#03 — 백서 방향·앱 기능·비즈니스 수익화 논의</strong></td></tr>
+<tr><td><strong>1/18</strong></td><td><strong>앱 로고 리뉴얼 배포 · 성우 코치 5기 이후 전환 방향 고백 (27건 피크)</strong></td></tr>
+<tr><td>1/22</td><td>신연선 코치에게 Biz Model 검토 요청 전달</td></tr>
+<tr><td>1/28</td><td>SYNC#04 리허설 일정 공지 (1/31 07:00)</td></tr>
+<tr><td>1/30</td><td>5기 참가자 명단(60여명) 수령</td></tr>
+<tr><td><strong>1/31</strong></td><td><strong>SYNC#04 최종 리허설 완료 — 2월 온보딩 준비 마감</strong></td></tr>
+</tbody></table>
+<hr>
+<h3>👥 주요 인물 역할</h3>
+<ul class="mdul">
+<li>- <strong>Peter Kim 피터 (44%, 58건)</strong>: PM·운영 총괄. Tally Form 기획·MFRS Index 알고리즘 설계·Notion 구조 정비·SYNC 진행·회의록 작성·신연선 코치 연결. 1월 의사결정의 허브.</li>
+<li>- <strong>MFRS 이두승 (28%, 39건)</strong>: 개발 총괄. Notion API 한계 발견 즉시 웹앱 직접 개발·배포, 리더보드·앱 로고 구현. 기술 문제를 24~48시간 내 자체 해결하는 속도감.</li>
+<li>- <strong>김성우 코치 (28%, 39건)</strong>: 오너·방향 결정. 회원 명단 관리·비즈니스 방향 고민 공유·앱 기능 피드백. 이달 가장 중요한 발언(&quot;5기 마지막&quot;) 당사자.</li>
+</ul>
+<hr>
+<h3>⛑ 주요 Q&amp;A 및 결정 (1월)</h3>
+<table class="mdt"><thead><tr><th>질문/이슈</th><th>결정·답변</th></tr></thead><tbody>
+<tr><td>Tally Form → Notion 관계형 저장이 되는가?</td><td><strong>안 됨</strong> — 이두승이 Notion API 웹앱으로 직접 전환</td></tr>
+<tr><td>MFRS Index 산출 기준?</td><td>A≥120분 / B&lt;120분 / C&lt;60분 / D&lt;30분 × 연속성·기간 가중합</td></tr>
+<tr><td>앱 홈화면 등록 방법?</td><td>사파리 → 공유 → 더보기 → 홈화면에 추가</td></tr>
+<tr><td>월별 리더보드 가능한가?</td><td>가능 — 전체 필터 구현 후 단계적 추가</td></tr>
+<tr><td>어드밴스 5기 이후 방향?</td><td>성우 코치 &quot;5기를 마지막으로&quot; → 새로운 Biz 모델 전환 검토 시작</td></tr>
+<tr><td>백서 작성 방식?</td><td>Peter 초안(Vibe Writing) → 성우 코치 Human Touch 검토</td></tr>
+<tr><td>2월 온보딩 데모 순서?</td><td>마풀런기록·리더보드 안내 → 직접 기록 → 커뮤니티 안내</td></tr>
+</tbody></table>
+<hr>
+<h3>🌟 핵심 인사이트 — 운영진방</h3>
+<p>1. <strong>&#x27;한계 발견 → 직접 개발&#x27;이 하루 만에</strong>: Tally Form이 관계형 DB를 지원하지 않는다는 문제를 1/3에 확인하고, 1/4에 이두승이 Notion API 웹앱을 직접 개발·배포. Notion이라는 도구의 제약을 외부 솔루션 탐색 없이 직접 돌파한 속도가 이 팀의 가장 큰 강점.</p>
+<p>2. <strong>앱 로고 아이콘이 가지는 상징성</strong>: &quot;MFRS 첫 APP 페이지가 만들어져서 의미깊은 시작&quot;이라는 피터의 발언과 성우 코치의 홈화면 등록 성공은 단순 기능 릴리스 이상의 의미. 마인드풀러닝 아이덴티티가 처음으로 스마트폰 홈화면에 올라온 순간.</p>
+<p>3. <strong>&quot;회원 100명 넘기길&quot; 소원</strong>: 이두승이 리더보드를 배포하면서 남긴 이 한 마디가 1월의 정서를 압축한다. 아직 회원도, 앱도 정식이 아닌 상태에서 백스테이지 3인이 매일 밤을 태우며 만들고 있는 무거운 희망.</p>
+<p>4. <strong>성우 코치의 전환 선언이 모든 것을 바꿨다</strong>: 1/18 성우 코치의 발언(&quot;5기를 마지막으로&quot;)은 단순 피로 표현이 아니라, 새로운 Biz 모델 필요성을 인정하는 전략적 전환점이었다. 이후 신연선 코치 Biz Model 검토·5/1 BMC 워크숍으로 이어지는 전체 2026년 변화의 씨앗이 1월에 심어졌다.</p>
+<hr>
+<p><em>분석 기준: 2026년 1월 1일 ~ 1월 31일 [마인드풀러닝 AX] ADV5기 운영진방 139건(CSV 파싱 기준 136건 실효 메시지) · 3명 발신자 대화 내용 기반. <strong>비공개 운영진 채널</strong> — 계정·비밀번호·회의 링크·예약 코드 등 민감정보 전면 마스킹, 회원/외부 배포 금지.</em></p></div>
+    </div>
+  </section>
+  <section>
+    <h2><span class="em">🏘️</span> 다른 단톡방</h2>
+    <div class="otherrooms"><a class="otherroom" href="notice.html">📢 전체 공지</a><a class="otherroom" href="community.html">💬 커뮤니티</a><a class="otherroom" href="jeju.html">🏝️ 제주</a><a class="otherroom" href="backyard.html">🔁 백야드</a></div>
+  </section>
+  <footer><p>마인드풀러닝 어드밴스 5기 · 내부 커뮤니티용 · 카톡 raw=OneDrive SSoT(집계·큐레이션만 게시) · 생성 2026-06-04</p></footer>
+</div>
+</body></html>

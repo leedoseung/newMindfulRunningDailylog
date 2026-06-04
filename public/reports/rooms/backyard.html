@@ -1,0 +1,546 @@
+<!DOCTYPE html>
+<html lang="ko"><head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>백야드 단톡방 월별 이력 — MFRS 5기</title>
+<style>
+:root{
+  --bg:#faf8f3; --ink:#2b2a26; --muted:#6f6a60; --line:#e7e1d6;
+  --green:#2f6b4f; --green-d:#1f4a37; --green-l:#e6f0ea;
+  --amber:#d98e3e; --amber-l:#fbeede; --sky:#5b8aa6; --rose:#c97b86;
+  --card:#fffdf9; --shadow:0 1px 3px rgba(60,50,30,.06),0 6px 24px rgba(60,50,30,.05);
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);
+  font-family:"Pretendard","Apple SD Gothic Neo","Noto Sans KR",-apple-system,BlinkMacSystemFont,sans-serif;
+  line-height:1.7;-webkit-font-smoothing:antialiased}
+.wrap{max-width:920px;margin:0 auto;padding:0 20px 80px}
+a{color:var(--green);text-decoration:none}
+a:hover{text-decoration:underline}
+.hero{background:linear-gradient(135deg,var(--green-d),var(--green));color:#fff;
+  border-radius:0 0 28px 28px;padding:48px 28px 40px;margin-bottom:8px}
+.hero .wrap{padding-bottom:0}
+.hero .eyebrow{font-size:.82rem;letter-spacing:.12em;opacity:.85;text-transform:uppercase;margin:0 0 10px}
+.hero h1{font-size:2.1rem;line-height:1.25;margin:0 0 12px;font-weight:800;letter-spacing:-.01em}
+.hero p.sub{font-size:1.02rem;opacity:.92;margin:0;max-width:680px}
+.hero .period{margin-top:18px;font-size:.9rem;opacity:.8}
+section{margin-top:44px}
+h2{font-size:1.42rem;font-weight:800;letter-spacing:-.01em;margin:0 0 6px;
+  display:flex;align-items:center;gap:.5rem}
+h2 .em{font-size:1.3rem}
+.lede{color:var(--muted);margin:0 0 20px;font-size:.98rem}
+.cardrow{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:14px}
+.stat{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:20px;box-shadow:var(--shadow)}
+.stat .v{font-size:2rem;font-weight:800;color:var(--green-d);line-height:1.1}
+.stat .v small{font-size:.95rem;font-weight:700;color:var(--muted)}
+.stat .l{font-size:.86rem;color:var(--muted);margin-top:6px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:24px;box-shadow:var(--shadow)}
+.bar{display:flex;align-items:center;gap:12px;margin:10px 0}
+.bar .name{width:96px;flex:none;font-size:.9rem;color:var(--ink);font-weight:600}
+.bar .track{flex:1;background:#efe9dd;border-radius:999px;height:22px;position:relative;overflow:hidden}
+.bar .fill{height:100%;border-radius:999px;background:linear-gradient(90deg,var(--green),var(--green-d));
+  display:flex;align-items:center;justify-content:flex-end;padding-right:9px;color:#fff;font-size:.76rem;font-weight:700;min-width:34px}
+.bar .fill.amber{background:linear-gradient(90deg,var(--amber),#b9701f)}
+.bar .fill.sky{background:linear-gradient(90deg,#7aa6bd,var(--sky))}
+.bar .fill.rose{background:linear-gradient(90deg,#d99aa3,var(--rose))}
+.season-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+.season{border-radius:18px;padding:22px;color:#fff;position:relative;overflow:hidden}
+.season.winter{background:linear-gradient(150deg,#5b7fa6,#3d5d80)}
+.season.spring{background:linear-gradient(150deg,#5fa06f,#2f6b4f)}
+.season.summer{background:linear-gradient(150deg,#e0a85b,#c47b2f)}
+.season .se{font-size:1.6rem}
+.season h3{margin:6px 0 2px;font-size:1.2rem}
+.season .range{font-size:.78rem;opacity:.85}
+.season .big{font-size:1.8rem;font-weight:800;margin-top:12px;line-height:1}
+.season .sub{font-size:.84rem;opacity:.9;margin-top:4px}
+.season.upcoming{opacity:.96;border:2px dashed rgba(255,255,255,.5)}
+.arc{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+.arc .col{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:18px}
+.arc .col h4{margin:0 0 4px;font-size:1rem;color:var(--green-d)}
+.arc .col .ph{font-size:.78rem;color:var(--muted);margin-bottom:12px}
+.kw{display:flex;align-items:center;gap:8px;margin:7px 0;font-size:.88rem}
+.kw .dot{width:9px;height:9px;border-radius:50%;flex:none}
+.kw .kwbar{flex:1;height:8px;background:#efe9dd;border-radius:999px;overflow:hidden}
+.kw .kwbar i{display:block;height:100%;border-radius:999px}
+.kw .n{width:34px;text-align:right;color:var(--muted);font-size:.78rem;font-variant-numeric:tabular-nums}
+.coachnote{background:var(--green-l);border-left:4px solid var(--green);border-radius:0 14px 14px 0;
+  padding:18px 22px;margin-top:18px}
+.coachnote .tag{font-size:.78rem;font-weight:800;color:var(--green-d);letter-spacing:.04em;margin-bottom:6px}
+.coachnote p{margin:.4rem 0;font-size:.96rem}
+.loclist{columns:2;column-gap:28px}
+.loclist .li{display:flex;justify-content:space-between;padding:7px 0;border-bottom:1px dotted var(--line);
+  break-inside:avoid;font-size:.92rem}
+.loclist .li b{color:var(--muted);font-weight:600}
+.membergrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px}
+.mcard{display:block;background:var(--card);border:1px solid var(--line);border-radius:14px;
+  padding:16px;box-shadow:var(--shadow);transition:transform .12s,box-shadow .12s}
+.mcard:hover{transform:translateY(-2px);box-shadow:0 6px 22px rgba(60,50,30,.1);text-decoration:none}
+.mcard .mn{font-weight:800;color:var(--green-d);font-size:1.02rem}
+.mcard .ms{font-size:.8rem;color:var(--muted);margin-top:4px}
+.mcard .chips{margin-top:8px;display:flex;flex-wrap:wrap;gap:4px}
+.chip{font-size:.72rem;background:var(--green-l);color:var(--green-d);border-radius:999px;padding:2px 9px}
+.runbox{border:1px solid var(--line);border-radius:14px;padding:18px;margin-top:14px;background:#fffdf9}
+.runbox .meta{font-size:.82rem;color:var(--muted);margin-bottom:8px}
+.runbox .title{font-weight:700;margin-bottom:10px}
+.runbox .phase{margin:10px 0}
+.runbox .phase .pl{font-size:.76rem;font-weight:800;color:var(--amber);letter-spacing:.03em}
+.runbox .phase .pt{font-size:.92rem;color:var(--ink);white-space:pre-wrap}
+.nav{display:flex;gap:16px;flex-wrap:wrap;margin-top:16px;font-size:.92rem}
+.backlink{display:inline-block;margin:24px 0 0;font-size:.9rem}
+footer{margin-top:60px;padding-top:24px;border-top:1px solid var(--line);
+  font-size:.82rem;color:var(--muted)}
+.note{font-size:.82rem;color:var(--muted);background:#f3efe6;border-radius:10px;padding:12px 16px;margin-top:14px}
+.russell{position:relative;padding:30px 26px 30px 30px}
+.rgrid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.rq{border-radius:14px;padding:18px 16px;text-align:center;color:#33312c;
+  background:#efe9dd}
+.rq.hp{background:rgba(224,162,62,var(--op))}
+.rq.lp{background:rgba(79,140,94,var(--op))}
+.rq.hn{background:rgba(201,123,134,var(--op))}
+.rq.ln{background:rgba(91,107,122,var(--op))}
+.rq.dom{box-shadow:0 0 0 3px var(--green);font-weight:800}
+.rq .rqv{font-size:1.5rem;font-weight:800;line-height:1}
+.rq .rql{font-size:.84rem;margin-top:5px;opacity:.95}
+.rax{position:absolute;font-size:.72rem;color:var(--muted);font-weight:600}
+.rax-top{top:8px;left:50%;transform:translateX(-50%)}
+.rax-bot{bottom:8px;left:50%;transform:translateX(-50%)}
+.rax-l{left:-2px;top:50%;transform:translateY(-50%) rotate(-90deg);transform-origin:left}
+.rax-r{right:-8px;top:50%;transform:translateY(-50%) rotate(90deg);transform-origin:right}
+.psy{display:grid;grid-template-columns:repeat(2,1fr);gap:14px}
+.psy .pcard{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:20px;box-shadow:var(--shadow)}
+.psy .pcard .pt{font-size:.78rem;font-weight:800;letter-spacing:.04em;color:var(--green-d);margin-bottom:4px}
+.psy .pcard .pv{font-size:1.7rem;font-weight:800;color:var(--green-d);line-height:1.1}
+.psy .pcard .pd{font-size:.86rem;color:var(--ink);margin-top:6px}
+.psy .pcard .cite{font-size:.72rem;color:var(--muted);margin-top:8px;font-style:italic}
+.tag2{display:inline-block;font-size:.7rem;font-weight:700;border-radius:999px;padding:2px 9px;margin:2px 3px 2px 0}
+.tag2.s{background:var(--green-l);color:var(--green-d)}
+.tag2.q{background:#f0ece3;color:#8a8576}
+.dnastrip{display:flex;flex-wrap:wrap;gap:5px;margin-top:6px}
+.dnastrip .k{font-size:.72rem;background:#fff;border:1px solid var(--line);border-radius:999px;padding:3px 10px;color:var(--green-d)}
+.roomcards{display:grid;grid-template-columns:repeat(auto-fit,minmax(155px,1fr));gap:12px}
+.roomcard{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px;box-shadow:var(--shadow)}
+.roomcard .rn{font-weight:800;color:var(--green-d);font-size:1.02rem}
+.roomcard .rd{font-size:.76rem;color:var(--muted);margin:3px 0 8px}
+.roomcard .rv{font-size:1.5rem;font-weight:800;color:var(--green-d);line-height:1}
+.roomcard .rm{font-size:.78rem;color:var(--muted);margin-top:4px}
+.heat{border-collapse:separate;border-spacing:3px;width:100%;font-size:.8rem}
+.heat th{font-weight:700;color:var(--muted);font-size:.76rem;padding:3px 5px;text-align:center}
+.heat td.lbl{text-align:left;font-weight:700;white-space:nowrap;padding-right:8px}
+.heat td.c{text-align:center;border-radius:6px;color:#2b2a26;font-variant-numeric:tabular-nums;padding:6px 4px;min-width:38px}
+.topicrow{display:flex;align-items:center;gap:8px;margin:6px 0;font-size:.88rem}
+.topicrow .tn{width:108px;flex:none}
+.topicrow .tb{flex:1;height:14px;background:#efe9dd;border-radius:999px;overflow:hidden}
+.topicrow .tb i{display:block;height:100%;border-radius:999px;background:linear-gradient(90deg,var(--amber),#b9701f)}
+.topicrow .tv{width:42px;text-align:right;color:var(--muted);font-size:.78rem}
+.histgrid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.histroom{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:16px 18px;box-shadow:var(--shadow)}
+.histroom .hrh{font-weight:800;color:var(--green-d);font-size:1rem;margin-bottom:8px;display:flex;justify-content:space-between;align-items:baseline}
+.histroom .hrn{font-size:.76rem;color:var(--muted);font-weight:600}
+.hli{display:flex;gap:10px;padding:7px 0;border-top:1px dotted var(--line)}
+.hli .hmon{flex:none;width:30px;font-size:.78rem;font-weight:800;color:var(--amber);padding-top:1px}
+.hli .hbody{flex:1;min-width:0}
+.hli .hauth{font-size:.74rem;font-weight:700;color:var(--green);margin-right:6px}
+.htag{font-size:.68rem;background:var(--amber-l);color:#9a5a13;border-radius:999px;padding:1px 7px}
+.hli .hex{font-size:.84rem;color:var(--ink);margin-top:3px;line-height:1.5}
+.kakao-mine{display:flex;flex-wrap:wrap;gap:8px;margin-top:4px}
+.kakao-mine .km{background:var(--green-l);color:var(--green-d);border-radius:10px;padding:6px 12px;font-size:.86rem;font-weight:600}
+.kakao-mine .km b{font-weight:800}
+a.rclick{display:block;text-decoration:none}
+a.rclick:hover{text-decoration:none;transform:translateY(-2px);box-shadow:0 6px 22px rgba(60,50,30,.1)}
+.rarrow{color:var(--amber);font-weight:800}
+.heat td.lbl a{text-decoration:none}
+.navm{display:inline-flex;gap:10px;margin-left:14px}
+.navm a{font-size:.85rem;background:var(--green-l);border-radius:999px;padding:2px 10px}
+.monthcard{margin-top:14px}
+.mc-h{font-size:1.15rem;font-weight:800;color:var(--green-d);display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.mc-n{font-size:.82rem;color:var(--muted);font-weight:700}
+.mc-auto{font-size:.7rem;background:#f0ece3;color:#8a8576;border-radius:999px;padding:2px 9px}
+.mc-cur{font-size:.74rem;background:var(--amber-l);color:#9a5a13;border-radius:999px;padding:2px 10px;font-weight:700}
+.mc-sub{font-size:.84rem;color:var(--muted);margin:8px 0 12px;display:flex;flex-wrap:wrap;gap:5px;align-items:center}
+.mc-grid{display:grid;grid-template-columns:1.3fr 1fr;gap:18px}
+.mc-lbl{font-size:.82rem;font-weight:800;color:var(--amber);margin-bottom:6px}
+.mdbody h3{font-size:1.05rem;color:var(--green-d);margin:18px 0 6px;border-bottom:1px solid var(--line);padding-bottom:4px}
+.mdbody h4{font-size:.95rem;color:var(--ink);margin:12px 0 4px}
+.mdbody p{font-size:.9rem;margin:.4rem 0;line-height:1.7}
+.mdbody .mdul{margin:.3rem 0 .6rem;padding-left:1.1rem}
+.mdbody .mdul li{font-size:.88rem;margin:.25rem 0;line-height:1.6}
+.mdbody blockquote{border-left:3px solid var(--amber);background:var(--amber-l);margin:.5rem 0;padding:8px 14px;border-radius:0 8px 8px 0;font-size:.9rem}
+.mdbody .mdt{border-collapse:collapse;width:100%;font-size:.82rem;margin:8px 0}
+.mdbody .mdt th{background:var(--green-l);text-align:left;padding:6px 8px;font-weight:700}
+.mdbody .mdt td{border-top:1px solid var(--line);padding:6px 8px;vertical-align:top}
+.mdbody hr{border:none;border-top:1px dashed var(--line);margin:14px 0}
+.mdbody code{background:#f0ece3;padding:1px 5px;border-radius:5px;font-size:.86em}
+.otherrooms{display:flex;flex-wrap:wrap;gap:10px}
+.otherroom{background:var(--card);border:1px solid var(--line);border-radius:999px;padding:8px 16px;font-weight:600;box-shadow:var(--shadow)}
+@media(max-width:680px){
+  .season-grid,.arc,.psy,.histgrid,.mc-grid{grid-template-columns:1fr}
+  .hero h1{font-size:1.7rem}.loclist{columns:1}
+  .heat{font-size:.68rem}.heat td.c{min-width:26px;padding:5px 2px}
+}
+</style>
+</head><body>
+
+<div class="hero"><div class="wrap">
+  <p class="eyebrow">마인드풀러닝 어드밴스 5기 · 단톡방 월별 이력</p>
+  <h1>🔁 백야드 단톡방</h1>
+  <p class="sub">백야드 울트라 LOCAL · 올해 1,706건 · 54명 참여 (2026-01-01~2026-05-26)</p>
+</div></div>
+<div class="wrap">
+  <div class="nav"><a href="../community-report.html">← 마을 전체 대시보드</a><span class="navm"><a href="#m01">1월</a><a href="#m02">2월</a><a href="#m03">3월</a><a href="#m04">4월</a><a href="#m05">5월</a></span></div>
+  <section>
+    <h2><span class="em">📈</span> 월별 대화량</h2>
+    <div class="card"><div class="bar"><div class="name">1월</div><div class="track"><div class="fill " style="width:48.9%">387건</div></div></div><div class="bar"><div class="name">2월</div><div class="track"><div class="fill " style="width:7.8%">62건</div></div></div><div class="bar"><div class="name">3월</div><div class="track"><div class="fill amber" style="width:100.0%">791건</div></div></div><div class="bar"><div class="name">4월</div><div class="track"><div class="fill " style="width:3.0%">9건</div></div></div><div class="bar"><div class="name">5월</div><div class="track"><div class="fill " style="width:57.8%">457건</div></div></div></div>
+  </section>
+  <section>
+    <h2><span class="em">📜</span> 월별 주요 대화 이력</h2>
+    <p class="lede">최신 달부터 거슬러, 매월 핵심 대화·결정·이벤트를 정리했습니다. '큐레이션' 표시는 심층 분석, '자동 요약'은 원천 집계 기반입니다.</p>
+    <div id="m05"></div>
+    <div class="card monthcard curated">
+      <div class="mc-h">5월 <span class="mc-cur">📋 상세 분석 (큐레이션)</span></div>
+      <div class="mdbody"><p>2026.06.03</p>
+<h3>📌 핵심 성과 요약 (Executive Summary)</h3>
+<p><strong>&quot;6개 기수 79명이 잔디 위로 — 자원봉사 매핑부터 후기까지, 한 행사의 전 생애를 담은 방&quot;</strong></p>
+<p>백야드@LOCAL 방은 <strong>5월 23일(토) 올림픽공원 가정의 달 백야드 단일 행사를 위한 전용 사이클 채널</strong>입니다. ① 신청·자원봉사 영역 매핑 → ② 어린이 선물·액티비티·아이스박스·포틀럭 준비 → ③ 당일 운영 → ④ 사진·후기·정산까지, 한 이벤트의 전 생애가 시간순으로 응축되어 있습니다. 메시지 485건·40명·활동 16일로 행사 직전·당일에 집중 폭발했으며, <strong>5/23 당일·후기(157건)·5/22 D-1 포틀럭 준비(62건)·5/25 정남 사진 헌사(55건)</strong>가 3대 분기점입니다. 최종 <strong>46팀 79명(성인·자녀 20명)·6개 기수(어드밴스 1~5기+평생회원) 총집결</strong>, 자원봉사 7영역 23분 매핑이라는 운영 규모를 달성했고, 회비 잔액은 케냐 재단에 기부되었습니다. 운영 축은 <strong>정훈재(11%)·이유진(11%)·유기상(11%)·이세영(8%)·박기영(7%)·Peter Kim(6%)</strong>가 분담했습니다.</p>
+<hr>
+<h3>1. 신청 + 자원봉사 영역 매핑 (5/1 ~ 5/16)</h3>
+<ul class="mdul">
+<li>- <strong>단계별 신청 공지(피터)</strong>: 17명(5/1) → D-8 34팀 60명(5/15) → D-4 39팀 68명(5/19) → <strong>최종 46팀 79명(5/22)</strong>. 어드밴스 2기 첫 신청·짧은 백야드(3km) 부부 부활 등 기수 다양성 확대.</li>
+<li>- <strong>🔑 자원봉사 7영역 매핑(5/15~)</strong>: 맨발 트랙 보조 / 안전(알러지·반려동물) / 쾌적 / 사진·기록 / 의료 / Kids 인솔 / 체크인·포틀럭. 자유봉사 12분에게 &quot;[영역명]/[가능시간]&quot; 한 줄 회신 방식 → 최종 23분 매핑. 박세진 &quot;안 달리고 봉사만 가능&quot;, 조성아 &quot;핸드폰 인화기로 1장씩&quot; 등 자발적 제안.</li>
+</ul>
+<hr>
+<h3>2. 어린이 선물·액티비티 — &#x27;본질&#x27; 논쟁 (5/15 ~ 5/20)</h3>
+<ul class="mdul">
+<li>- <strong>선물·액티비티 아이디어 수렴(피터·정훈재·유민식)</strong>: 연령대별 어린이 선물 20개(영유아6·초저5·초고3·중4·고2), 액티비티 부스(줄넘기·원반던지기·종이비행기·물폭탄·페이스페인팅).</li>
+<li>- <strong>🔑 &#x27;과잉 경계&#x27; 본질 환기(5/16, 이현주)</strong>: &quot;모든 게 과잉인 요즘 … 놀잇감 없이 그저 드넓은 풀밭 맨발로 달리고 뒹굴고 술래잡기만 해도 좋지 않을까.&quot; → 이유진 공감, 피터 &quot;본질을 리마인드해주셔서 감사 … 자유롭게 뛰어놀되 백업 차원으로만 가볍게 준비.&quot; <strong>운영진이 회원 의견으로 방향을 수정한 사례.</strong></li>
+<li>- 이유진 실전 제안 — &quot;유아는 바람개비(500원), 선물은 도서상품권 5천원, 잔디에 미니 탱탱볼 숨겨 보물찾기 = 자연스러운 맨발 체험.&quot;</li>
+</ul>
+<hr>
+<h3>3. 물자 조달 — 아이스박스·포틀럭 (5/20 ~ 5/22)</h3>
+<ul class="mdul">
+<li>- <strong>아이스박스 조달(5/20)</strong>: 더위 대비 얼음 보관용. 유기상 &quot;외박 작전 접고 새벽 상경, 30L+ 2개 가용&quot;, 문홍준·최선영·김훈범 동참(이후 아들이 가져가 불가 해프닝).</li>
+<li>- <strong>포틀럭 집계(5/22, D-1)</strong>: 김밥 65~70줄·과일 13·떡4·빵4·샌드위치4·약과/바/초콜릿8·구운계란 30구·닭강정·유부초밥 등. Cafe 자온 60명분 당근라페 샌드위치+콤부차 협찬, 한채원 자수 손수건 80장 한정 봉사.</li>
+<li>- <strong>재즈페스티벌 주차 변수(5/22, 이유진)</strong>: 같은 날 서울재즈페스티벌(3만명) → 주차 혼잡 사전 공유, P9·P8/북2문 주차 안내(정훈재 상세 가이드).</li>
+<li>- <strong>케어 안내</strong>: 땅콩 알러지 어린이 라벨링, 반려견 2팀(썬더) 동선, 회복기 회원 1분 베이스 봉사 위주.</li>
+</ul>
+<hr>
+<h3>4. 당일 운영 + 후기 폭발 (5/23)</h3>
+<ul class="mdul">
+<li>- <strong>08:00 집결 운영(나홀로나무 잔디밭)</strong>: 올림픽공원 탐방 1바퀴 → 트랙 선택(맨발/3km/5km/Kids/청소년/커플/한강 라면런). 김성우 &quot;런지 300개 후 포틀럭 존 입장&quot;(유머). 12시 해산 — 이세영 &quot;오후엔 사람 많아 12시 해산이 신의 한 수.&quot;</li>
+<li>- <strong>🌟 당일의 주인공들</strong>:</li>
+<li>- <strong>썬더(박기영 반려견)</strong> — &quot;오늘의 스타&quot;, 목줄 풀고 자유롭게 뛰며 아이들 인기 독점.</li>
+<li>- <strong>아이들</strong> — 풀밭 술래잡기·디스크·맨발 달리기. 이유진의 실시간 사진 캡션 중계가 백미.</li>
+<li>- <strong>정남(정훈재)·찬현 사진</strong> — 수백 장 촬영·편집. &quot;시를 쓰는 사진 작가&quot;(김성우).</li>
+<li>- <strong>케냐 기부(5/25, 이세영)</strong>: &quot;회비 중 남은 비용은 마풀런 이름으로 케냐 Kibet4Kids 재단 후원 입금 완료.&quot;</li>
+</ul>
+<hr>
+<h3>5. 후기 — 감동의 여운 (5/23 ~ 5/26)</h3>
+<ul class="mdul">
+<li>- <strong>대표 후기</strong>: 김형찬(신규) &quot;달리기로 모든 사람이 편안하고 즐겁게 공존할 수 있다는 증거.&quot; 추재연 &quot;극I 미국인 남편을 메모리얼데이 피크닉이라 설득해 데려왔는데 정겨운 떡·김밥 뷔페 러닝을 무척 좋아했다.&quot; 이남순 &quot;정남님 눈을 통해 담긴 70명이 온몸으로 즐긴 모습이 아름다웠다 … 우리가 더더 좋아집니다.&quot;</li>
+<li>- <strong>초상권 합의(5/25, 이남순 제안)</strong>: 자녀 사진 SNS 게시 동의 확인 — &quot;아이들은 얼굴인식 안 되는 정도는 괜찮다&quot;(이유진) 등 자율 가이드.</li>
+<li>- <strong>플라잉디스크 구매 안내(5/25, 유기상)</strong>: 인기였던 플디 제품·던지는 법 쇼츠 공유 — 행사 경험의 일상 이어가기.</li>
+</ul>
+<hr>
+<h3>🗓 5월 타임라인 요약</h3>
+<table class="mdt"><thead><tr><th>날짜</th><th>핵심 안건</th></tr></thead><tbody>
+<tr><td>5/1</td><td>신청 17명 시작 · &quot;레드카펫 대신 꽃길&quot;(이남순)</td></tr>
+<tr><td>5/15</td><td><strong>자원봉사 7영역 매핑 시작 (20분) · D-8 신청 34팀</strong></td></tr>
+<tr><td>5/16</td><td><strong>어린이 선물·액티비티 + &#x27;과잉 경계&#x27; 본질 환기(이현주)</strong></td></tr>
+<tr><td>5/19</td><td>D-4 신청 39팀 68명 · 주차 가이드(정훈재)</td></tr>
+<tr><td>5/20</td><td>아이스박스 조달(유기상 외박 포기) · 김소영 봉사 합류</td></tr>
+<tr><td>5/22</td><td><strong>D-1 포틀럭 집계 + 재즈페스티벌 주차 변수 (62건)</strong></td></tr>
+<tr><td>5/23</td><td><strong>백야드 당일 — 46팀 79명 6기수 · 썬더·술래잡기·정남 사진 (157건)</strong></td></tr>
+<tr><td>5/24</td><td>사진 대량 공유 · 부자(유기상) 다정 컷</td></tr>
+<tr><td>5/25</td><td><strong>정남 사진 헌사 + 후기 폭발 · 케냐 기부 + 초상권 합의 (55건)</strong></td></tr>
+<tr><td>5/26</td><td>정남 사진 마무리 배포 + 다음 백야드 기약</td></tr>
+</tbody></table>
+<hr>
+<h3>👥 주요 인물 역할</h3>
+<ul class="mdul">
+<li>- <strong>MFRS 정훈재(정남) (11%, 55건)</strong>: 주차 가이드, <strong>당일 메인 사진작가</strong>(수백 장 촬영·편집), 유머·액티비티 제안 — &quot;시를 쓰는 사진 작가&quot;.</li>
+<li>- <strong>MFRS 이유진 (11%, 55건)</strong>: 재즈페스티벌 주차 변수 사전 공유, <strong>당일 실시간 사진 캡션 중계</strong>, &#x27;과잉 경계&#x27; 본질 공감.</li>
+<li>- <strong>MFRS 유기상 (11%, 54건)</strong>: 아이스박스 조달·플라잉디스크 진행, 부자 동반, 분위기 메이커.</li>
+<li>- <strong>MFRS 이세영 (8%, 39건)</strong>: 올공 공동 운영, 아이스박스·식음료 조율, 케냐 기부 정산 보고.</li>
+<li>- <strong>MFRS 박기영 (7%, 34건)</strong>: 반려견 케어(썬더 — 당일 스타), 부산 원정, 감사 메시지 다발.</li>
+<li>- <strong>Peter Kim(피터) (6%, 31건)</strong>: 신청·자원봉사·선물 매핑 총괄, 본질 환기 수용, D-1 통합 안내.</li>
+<li>- <strong>MFRS 이남순 (4%)</strong>: 체크인·포틀럭 세팅, 사진 대량 공유, 후기 헌사.</li>
+</ul>
+<hr>
+<h3>⛑ 주요 Q&amp;A 및 결정 (5월)</h3>
+<table class="mdt"><thead><tr><th>질문/이슈</th><th>결정·답변</th></tr></thead><tbody>
+<tr><td>자유봉사 어느 영역?</td><td>&quot;[영역명]/[가능시간]&quot; 한 줄 회신 방식 → 7영역 23분 매핑 완료</td></tr>
+<tr><td>어린이 선물·놀이 과한가?</td><td><strong>자유롭게 뛰어놀되 백업 차원만 가볍게</strong> — 회원 의견 수용해 방향 수정(이현주→피터)</td></tr>
+<tr><td>포틀럭 음식 꼭 가져가나?</td><td>자온 샌드위치·콤부차 기본 제공, 부담되면 그냥 와도 OK (이세영)</td></tr>
+<tr><td>더위 대비 얼음 보관?</td><td>회원들 아이스박스 자발 조달(유기상 2개 등)</td></tr>
+<tr><td>재즈페스티벌로 주차 혼잡?</td><td>평소보다 일찍 도착·출차 체증 예상, P9 권장 (이유진·정훈재)</td></tr>
+<tr><td>짧은/긴 백야드 변경 가능?</td><td>가능 — 1회 런 후 자유롭게 달려도 됨(올공이 넓음)</td></tr>
+<tr><td>자녀 사진 SNS 게시?</td><td>얼굴인식 안 되는 정도는 OK, 개별 동의 확인 (이남순·이유진)</td></tr>
+<tr><td>회비 잔액 처리?</td><td>마풀런 이름으로 케냐 Kibet4Kids 재단 기부</td></tr>
+</tbody></table>
+<hr>
+<h3>🌟 핵심 인사이트 — 백야드@LOCAL</h3>
+<p>1. <strong>한 행사의 &#x27;전 생애&#x27;를 담은 운영 아카이브</strong>: 신청→자원봉사 매핑→물자 조달→당일→후기→정산까지 단일 채널에 시간순으로 응축 — 다음 백야드 운영의 완성형 템플릿으로 재사용 가능.</p>
+<p>2. <strong>회원 의견이 운영을 바꾼다</strong>: &#x27;어린이 선물 과잉&#x27;에 대한 이현주의 문제 제기를 운영진이 즉시 수용해 &#x27;자연에서 자유롭게&#x27;로 방향 전환 — 하향식 기획이 아닌 회원-운영진 공동 설계.</p>
+<p>3. <strong>자율 봉사의 정교한 매핑</strong>: 7영역 23분을 한 줄 회신으로 조직화 — 강제 배정 없이 자기 가능 시간·역량에 맞춰 손드는 구조가 79명 규모를 무리 없이 지탱.</p>
+<p>4. <strong>비인간 주인공의 힘</strong>: 반려견 썬더와 아이들이 행사의 정서적 중심이 되며 &#x27;러닝 모임&#x27;을 넘어 &#x27;가족 소풍&#x27;으로 정체성 확장 — 6개 기수·영유아~고1까지 포용하는 세대 통합 모델.</p>
+<p>5. <strong>기록과 나눔의 결합</strong>: 정남·찬현의 사진 봉사가 참여자 모두에게 &#x27;추억의 선물&#x27;이 되고, 회비 잔액이 케냐 기부로 이어지며 — 즐거움(참여)·기록(사진)·환원(기부)이 한 행사 안에서 순환.</p>
+<hr>
+<p><em>분석 기준: 2026년 5월 1일 ~ 5월 26일 마인드풀러닝 백야드@LOCAL 방 485건 · 40명 발신자 대화 내용 기반. 계좌·전화·신청 링크 등 개인정보는 마스킹.</em></p></div>
+    </div><div id="m04"></div>
+    <div class="card monthcard curated">
+      <div class="mc-h">4월 <span class="mc-cur">📋 상세 분석 (큐레이션)</span></div>
+      <div class="mdbody"><p>2026.06.04</p>
+<h3>📌 핵심 성과 요약 (Executive Summary)</h3>
+<p><strong>&quot;부산 종료 → 올공 전환 — 다음 회차의 문을 여는 9건&quot;</strong></p>
+<p>4월 백야드방은 <strong>부산 백야드 종료 선언과 올림픽공원 백야드(5/23) 사전 안내</strong>라는 두 줄로 요약됩니다. 총 9건의 메시지 전량이 피터(운영) 단독 발신으로, 4/29~30 이틀에 집중되었습니다. 방은 3월 부산의 열기가 식고 5월 올공을 위한 씨앗이 심어지는 전환 구간입니다.</p>
+<hr>
+<h3>1. 부산 종료 · 올공 전환 선언 (4/29 ~ 4/30)</h3>
+<ul class="mdul">
+<li>- <strong>공식 전환 선언 (4/29, 피터)</strong>: &quot;종료: 백야드@부산 → 시작: 백야드@올공 가족 소풍.&quot; 부산 채널의 생애가 닫히고 새 시즌이 열리는 순간.</li>
+<li>- <strong>올공 공고문 배포</strong>: 5/23(토) 08:00~12:00 올림픽공원 가정의 달 백야드 공고 PDF 배포. 코치님(김성우) 직접 주관 세션 중심 — &quot;아이의 손, 배우자의 보폭, 연인의 호흡, 반려동물의 발걸음.&quot;</li>
+<li>- <strong>신규 멤버 입장</strong>: 심혜원·이남순·김수미·이지현·유민식·이예정·황지은·엄지선·이효정·오영주 등 올공 백야드 참가 예정자들이 4/29~30 이틀에 걸쳐 집중 입장. &quot;아직 초기라 … 1~2주 전부터 왁자지껄할 거에요&quot;(피터).</li>
+</ul>
+<hr>
+<h3>🗓 4월 타임라인 요약</h3>
+<table class="mdt"><thead><tr><th>날짜</th><th>핵심 안건</th></tr></thead><tbody>
+<tr><td>4/29</td><td><strong>부산 종료 선언 · 올공 공고문 배포 · 신규 멤버 집중 합류 (7건)</strong></td></tr>
+<tr><td>4/30</td><td>황지은·엄지선·이효정·오영주 추가 합류 (2건)</td></tr>
+</tbody></table>
+<hr>
+<h3>👥 주요 인물 역할</h3>
+<ul class="mdul">
+<li>- <strong>Peter Kim(피터, 100%, 9건)</strong>: 방 전환·공고 배포·신규 멤버 환영 전담 — 이 달의 유일한 발신자.</li>
+</ul>
+<hr>
+<h3>🌟 핵심 인사이트 — 백야드방</h3>
+<p>1. <strong>방은 행사 없는 달에도 &#x27;씨앗의 달&#x27;이 된다</strong>: 9건이라는 극소 활동이지만 신규 멤버 10명+이 입장하며 5월 79명 행사의 토대가 여기서 놓인다.</p>
+<p>2. <strong>전환 선언의 의식성</strong>: &quot;종료 → 시작&quot;을 명시적으로 선언하는 방 관리 방식이 참가자에게 새 시즌에 대한 기대와 소속감을 동시에 준다.</p>
+<hr>
+<p><em>분석 기준: 2026년 4월 29일 ~ 4월 30일 마인드풀러닝 백야드@LOCAL 방 9건 · 피터(운영) 단독 발신 기반. 개인정보는 마스킹.</em></p>
+<blockquote><strong>데이터 희소</strong>: 4월 총 9건, 피터 단독 발신. 실질 커뮤니티 대화 없음. 본 요약은 방 전환 이벤트 기록에 한정합니다.</blockquote></div>
+    </div><div id="m03"></div>
+    <div class="card monthcard curated">
+      <div class="mc-h">3월 <span class="mc-cur">📋 상세 분석 (큐레이션)</span></div>
+      <div class="mdbody"><p>2026.06.04</p>
+<h3>📌 핵심 성과 요약 (Executive Summary)</h3>
+<p><strong>&quot;부산인심과 바닷바람 — 이기대에서 해운대까지, 봄 직전의 운동회&quot;</strong></p>
+<p>백야드@LOCAL 방 3월은 <strong>3월 14일(토)~15일(일) 부산 2일 백야드</strong> 단일 사이클이 791건의 압도적 비중을 차지합니다. 사전 준비(3/1~13) → Day1 어린이대공원·이기대 트레일런(3/14) → Day2 오륙도~해운대 LSD(3/15) → 후기·인스타 릴레이(3/16~21)의 전 생애가 담겼습니다. 발신자 축은 <strong>박기영(21%)·정훈재(12%)·이강우(12%)·피터(9%)·정영화(6%)·추재연(6%)</strong>이며, <strong>3/15 2일차(191건)·3/14 1일차(147건)·3/12 D-2(114건)</strong>이 3대 분기점입니다. 핵심 성과는 ① 부산 현지팀(이강우·정영화·박기영·조성아)의 완벽한 호스팅, ② 트레일 첫 도전자(조성아·안신해)의 용기 있는 합류, ③ 이기대 공원 &#x27;달리기로 온다&#x27; 시 발견과 공유, ④ 택시 기사 인생 철학을 나누는 후기 문화까지 담겼습니다.</p>
+<hr>
+<h3>1. 부산 사전 준비 · 교통편 릴레이 (3/1 ~ 3/13)</h3>
+<ul class="mdul">
+<li>- <strong>신규 합류 (3/1)</strong>: 박경애·임자영·추재연이 방 입장. 각자 KTX 예약 일정 공유로 즉시 대화 시작. 추재연 &quot;Day1 오전 일이 있어 2시까지 합류&quot;, 임자영 &quot;2일차 일요일 새벽 KTX&quot; — 부분 참여도 환영하는 운영 문화.</li>
+<li>- <strong>🔑 교통편 댓글 릴레이 (3/11, 정훈재 주도)</strong>: &quot;김태영 KTX 토 09:22 착 / 박경애 SRT 09:06 착 / 왕야 10:26 착 / 임자영 일 08:1x …&quot; 정훈재가 참가자 교통편을 한 줄씩 정리하여 도착 시간 기준 이동 그룹 자연 형성. &quot;내려서 같이 택시타고 넘어가면 개꿀&quot;(정훈재).</li>
+<li>- <strong>음식 투표 (3/12, 박기영)</strong>: 2일차 점심 메뉴 &quot;돼지국밥 vs 밥집 백반&quot; 익명 복수선택 투표. &quot;박빙&quot;(정훈재). 정훈재의 해산물 NO 선언(&quot;바다생명체는 굽든 말리든 날로먹든 못+안 먹어요&quot;) + 정남c 닭도리탕 소원까지 유머 폭발. 결국 송정밥집 방향으로 확정.</li>
+<li>- <strong>현장 답사 (3/12, 박기영)</strong>: 박기영이 당일 송정 해변 사전 답사 후 바닷가 스케치 사진 공유. &quot;오늘 부산 바람이 제법 부는데다 쌀쌀해요 — 잘 레이어드해서 오셔요.&quot;</li>
+<li>- <strong>최종 공지 (3/13, 이강우)</strong>: 날씨 변동 안내(2일차 바람) + 코스별 안내 + CP차량 운영 확정.</li>
+</ul>
+<hr>
+<h3>2. Day1 — 이기대 트레일런 (3/14)</h3>
+<ul class="mdul">
+<li>- <strong>집결·이동 (09:22~10:30)</strong>: 피터·박경애 부산역 합류 → 스타벅스 초읍대공원점 대기. 이강우 &quot;이기대 코스는 중간 하산하면 다른 동네로 나오니 신중히.&quot; 조성아 &quot;트런이 아예 처음이어도 합류 가능한가요?&quot; — 이두승 &quot;거의 걷는 수준으로 달리시니 이번 기회에 체험해보세요!&quot; → 조성아 &quot;살짝 춤췄어요.&quot;</li>
+<li>- <strong>🔑 정영화의 픽업 서비스</strong>: 부산 현지 정영화가 당일 새벽 훈련 후 8:55 부산역에서 두승·정훈재·임자영 픽업 → 이기대까지 차량 이동. 이두승 &quot;와우 부산팀 정말 고생이 많습니다.&quot; 임자영 &quot;부산 도착하면 팬클럽 회장 될 것 같아요.&quot;</li>
+<li>- <strong>이기대 공원 달리기</strong>: 오륙도해맞이공원 → 이기대 해안 트레일. 로드·트레일 양 옵션 운영. 박기영의 CP차량 전진 배치. 정영화 미니핫팩 사전 준비 — &quot;필요하시면 말씀해주세요.&quot;</li>
+</ul>
+<hr>
+<h3>3. Day2 — 오륙도~해운대 LSD (3/15)</h3>
+<ul class="mdul">
+<li>- <strong>해운대 아침 집결</strong>: 금수복국(해운대 본점) 08:00 아침 식사 → 이기대·오륙도~광안리~해운대~송정 LSD. 정규하+여자친구 &quot;늦잠 자서 9시30분 오륙도 공원 직행&quot; — 현장에서 합류 완료.</li>
+<li>- <strong>🔑 당일 191건 최다 폭발</strong>: 실시간 위치 공유·사진·응원·합류 조율이 쉼 없이 올라왔다. 이유진 &quot;나와서 좀 움직여보니 반바지도 괜찮아요&quot; + 피터 &quot;VO2Max 55 이상이라면 반팔 허용&quot; 유머 룰 추가.</li>
+<li>- <strong>송정밥집 백반 점심</strong>: 이기대~해운대~송정 완주 후 단체 식사. 물총칼국수·백반 등 메뉴 다양. &quot;이기대에서 송정까지 뛰고 먹으면 뭐든 다 맛있지 않을까요&quot;(조성아).</li>
+</ul>
+<hr>
+<h3>4. 후기 · 인스타 릴레이 (3/16 ~ 3/21)</h3>
+<ul class="mdul">
+<li>- <strong>정영화의 후기 에세이 (3/16)</strong>: &quot;마인드풀러닝 커뮤니티에 내가 어떤 도움을 드릴 수 있을까 생각만 했는데 그 막연했던 것들 해내고 나니 긴장이 확 풀리고 준비해서 진행했던 분들의 노고가 피부로 느껴졌습니다.&quot; 첫 호스트 경험의 감동을 담은 진정성 있는 글.</li>
+<li>- <strong>🔑 이강우 시 발견 (이유진, 3/16)</strong>: 이기대 공원 시인의 시 — &quot;달리기로 온다.&quot; 사진으로 공유. 정훈재 &quot;아 달리기로 온다&quot;, 임자영 &quot;달리기로 온다 222&quot; — 백야드 후기 최고의 한 줄.</li>
+<li>- <strong>이두승의 택시 철학 (3/16)</strong>: &quot;70대 택시기사 할아버지 말씀: 행복이 50%라면 불행도 50% 찾아오더라고. 슬프다고 한없이 슬퍼할 필요 없고, 행복하다고 그게 계속될 거라 생각해서도 안 돼.&quot; 달리기와 인생에 모두 닿는 메시지.</li>
+<li>- <strong>정규하의 교실 달리기 (3/16)</strong>: 백야드 다음날 학교 운동장에서 혼자 뛰다 중학생들이 따라붙은 이야기 — &quot;올해는 중2·3도 더 많이 뛸 수 있게.&quot;</li>
+<li>- <strong>인스타 릴레이 (3/16~21)</strong>: 정영화·정규하·왕야·임자영·박기영 계정 공유 + 팔로우 릴레이. 임자영의 책 이야기 → &quot;책이 이렇게 생명력을 갖고 다가가게 해주셔서 감사드려요.&quot;</li>
+</ul>
+<hr>
+<h3>🗓 3월 타임라인 요약</h3>
+<table class="mdt"><thead><tr><th>날짜</th><th>핵심 안건</th></tr></thead><tbody>
+<tr><td>3/1</td><td>박경애·임자영·추재연 합류 · KTX 일정 공유 시작</td></tr>
+<tr><td>3/5</td><td>4차 공지 발신 · 인원 최종 집계</td></tr>
+<tr><td>3/11</td><td><strong>교통편 댓글 릴레이 (정훈재) · 두승·정훈재 합류 확정 (53건)</strong></td></tr>
+<tr><td>3/12</td><td><strong>D-2 — 박기영 답사·식당 투표·레이어링 안내 (114건)</strong></td></tr>
+<tr><td>3/13</td><td>이강우 최종 공지 · 풍선+프로포즈 유머</td></tr>
+<tr><td>3/14</td><td><strong>Day1 — 이기대 트레일런 + 정영화 픽업 서비스 (147건)</strong></td></tr>
+<tr><td>3/15</td><td><strong>Day2 — 오륙도~해운대 LSD + 금수복국 아침 (191건)</strong></td></tr>
+<tr><td>3/16</td><td><strong>후기 에세이(정영화)·&#x27;달리기로 온다&#x27;(이유진)·택시 철학(이두승) (79건)</strong></td></tr>
+<tr><td>3/17~18</td><td>피터 공식 후기 게시 · 추가 사진 공유</td></tr>
+<tr><td>3/20~21</td><td>인스타 릴레이 · 임자영 책 이야기 · 방의 여운</td></tr>
+</tbody></table>
+<hr>
+<h3>👥 주요 인물 역할</h3>
+<ul class="mdul">
+<li>- <strong>MFRS 박기영 (21%, 165건)</strong>: 현지 답사·CP차량·식당 투표·레이어링 안내·부산 전 구간 서포트 — 백야드@부산의 실질 공동 호스트.</li>
+<li>- <strong>MFRS 정훈재 (12%, 92건)</strong>: 교통편 릴레이 정리·유머·질문 주도·후기 참여 — &quot;쿨한 유머와 따뜻한 공감의 조합.&quot;</li>
+<li>- <strong>이강우 (12%, 91건)</strong>: 부산 현지 호스팅 총괄(코스·숙소·CP·최종 공지) — 부산 백야드의 든든한 뿌리.</li>
+<li>- <strong>Peter Kim(피터, 9%, 75건)</strong>: 공지 반복 발신·교통 조율·공식 후기 게시·분위기 메이커(&quot;VO2Max 55 룰&quot;).</li>
+<li>- <strong>MFRS 정영화 (6%, 50건)</strong>: 새벽 훈련 후 픽업 서비스 + 진정성 있는 후기 에세이 작성 — 부산 현지 새 호스트의 데뷔.</li>
+<li>- <strong>MFRS 추재연 (6%, 48건)</strong>: 당일 운영 적극 참여 + 후기 사진 공유.</li>
+</ul>
+<hr>
+<h3>⛑ 주요 Q&amp;A 및 결정 (3월)</h3>
+<table class="mdt"><thead><tr><th>질문/이슈</th><th>결정·답변</th></tr></thead><tbody>
+<tr><td>트런 처음인데 합류 가능?</td><td>거의 걷는 수준·하산 선택 가능 · 이두승 &quot;이번 기회에 꼭 체험해보세요&quot;</td></tr>
+<tr><td>Day2 점심 메뉴?</td><td>돼지국밥 vs 백반 투표 → <strong>송정밥집 백반</strong> 방향</td></tr>
+<tr><td>중간 하산 가능?</td><td>다른 동네로 나오므로 자력 이동 필요 — 신중히 (이강우)</td></tr>
+<tr><td>부산역 도착 시간이 달라서?</td><td>정영화 픽업 서비스 + 도착 시간별 식당·이동 경로 안내</td></tr>
+<tr><td>숙소 정산은?</td><td>해운대 공동 숙소 인원 기준 분배 (이강우 최종 확인)</td></tr>
+<tr><td>트레일화 없으면?</td><td>로드화로 로드런 옵션 선택 가능 — &quot;네팔분들도 쪼리로 산 다닙니다&quot;(정훈재)</td></tr>
+</tbody></table>
+<hr>
+<h3>🌟 핵심 인사이트 — 백야드방</h3>
+<p>1. <strong>로컬 팀이 곧 운영 인프라</strong>: 이강우·박기영·정영화·조성아 등 부산 멤버들이 답사·숙소·CP차량·픽업·식당 섭외까지 맡아 외부에서 온 참가자들이 달리기에만 집중할 수 있게 했다 — &quot;런트립은 로컬이 키운다.&quot;</p>
+<p>2. <strong>&#x27;달리기로 온다&#x27; — 현장이 만드는 시적 순간</strong>: 공식 일정 외에 이기대 공원 시비에서 발견한 한 줄 시가 후기의 중심이 된 장면. 백야드는 코스만이 아닌 그 공간 안의 모든 것을 담는 그릇.</p>
+<p>3. <strong>첫 호스트 경험의 전환</strong>: 정영화 &quot;내가 어떤 도움을 드릴 수 있을까 생각만 했는데 해내고 나니 긴장이 풀렸다&quot; — 이 경험이 다음 회차 부산팀 운영 역량의 축적이 된다.</p>
+<p>4. <strong>유머가 진입 장벽을 낮춘다</strong>: 트런 첫 도전자(조성아·안신해)의 두려움을 이두승의 &quot;춤추시면서 달리시길&quot;로 해소. 정훈재의 투표 유머·피터의 VO2Max 룰이 무거운 분위기를 차단하며 &quot;누구나 괜찮다&quot;는 신호를 보낸다.</p>
+<p>5. <strong>달리기가 교실로 이어진다</strong>: 정규하 교사가 백야드 다음날 운동장에서 혼자 달리자 학생들이 따라붙은 이야기 — 마인드풀러닝의 파급 반경이 커뮤니티를 넘어 일상과 직업으로 번진다.</p>
+<hr>
+<p><em>분석 기준: 2026년 3월 1일 ~ 3월 21일 마인드풀러닝 백야드@LOCAL 방 791건 · 주요 발신자 20인+ 대화 내용 기반. 계좌·전화·숙소 주소 등 개인정보는 마스킹.</em></p></div>
+    </div><div id="m02"></div>
+    <div class="card monthcard curated">
+      <div class="mc-h">2월 <span class="mc-cur">📋 상세 분석 (큐레이션)</span></div>
+      <div class="mdbody"><p>2026.06.04</p>
+<h3>📌 핵심 성과 요약 (Executive Summary)</h3>
+<p><strong>&quot;오금천 종료 → 부산 예열 — 방의 역할이 전환되는 조용한 한 달&quot;</strong></p>
+<p>2월 백야드방은 <strong>1월 오금천/북한산 백야드의 마무리와 3월 부산 백야드의 사전 준비</strong>라는 두 가지 임무를 62건이라는 희소한 메시지 안에 압축했습니다. 2/8 공식 종료 선언 + 부산 공지를 시작으로, 일부 회원이 퇴장하고 부산 현지 스태프(이강우)·신규 참가자(변진환·정규하·이유진·안신해)가 합류하는 <strong>멤버십 재편의 달</strong>입니다. 피터(21%)·이강우(15%)·정규하(11%)·이유진(10%)·박기영(8%)가 대화를 이끌었으며, 2/9 부산 공지(19건)·2/25 참가 확정+현장 예열(12건)이 2대 분기점입니다.</p>
+<hr>
+<h3>1. 오금천 종료 · 부산 전환 공지 (2/8 ~ 2/12)</h3>
+<ul class="mdul">
+<li>- <strong>공식 방 전환 선언 (2/8, 피터)</strong>: &quot;2.10부터 백야드@부산(3.14~15) 행사가 진행되니 Exit 하실 분은 2/9 24:00까지.&quot; 오금천 방의 생애가 종료되고 부산 방으로 전환되는 공식 게이트.</li>
+<li>- <strong>자연스러운 탈퇴와 환영</strong>: 조용임·유민식·정윤심 등 부산 불참 멤버 퇴장. 동시에 조수아·변진환·안신해 등 부산 참가 신규 멤버 합류. &quot;드는 사람, 나는 사람, 각자의 이유&quot; — 강제 없는 자연스러운 멤버십 갱신.</li>
+<li>- <strong>부산 공고 배포 (피터)</strong>: PDF 공고문 + 백야드@부산 개요 (3/14 토 12:00 ~ 3/15 일 15:00, #런트립 #맛풀런 #부산인심). 이강우 합류 — 부산 현지 호스트 공식 등장.</li>
+</ul>
+<hr>
+<h3>2. 부산 참가 확정 · 현장 예열 (2/19 ~ 2/26)</h3>
+<ul class="mdul">
+<li>- <strong>🔑 정규하+여자친구 2인 참가 확정 (2/19)</strong>: &quot;여자친구와 함께 참여하겠습니다! Day1만.&quot; 피터 &quot;프로포즈 반지도 준비하세요 이참에&quot; — 이후 3월 부산에서 &#x27;데이트런&#x27; 서사로 이어지는 씨앗.</li>
+<li>- <strong>숙소 협의 스레드</strong>: 정규하 숙소 자체 확보 → 번복 → 이강우 &quot;인원 추가&quot; 등 실용적 조율. 해운대 인근 숙소 방향 확정.</li>
+<li>- <strong>날씨·바람 예열 (2/25, 이유진·이강우)</strong>: 이유진 &quot;부산 바닷가 달리기는 극기체험이 될까요&quot;, 이강우 &quot;바람만 막으면 됩니다 — 가장 취약한 곳을 알아서 침투합니다&quot; 유머. 박기영 &quot;CP차량 서울에서 부산으로 이동 중&quot; — 2/25 미리 내려가는 헌신.</li>
+</ul>
+<hr>
+<h3>🗓 2월 타임라인 요약</h3>
+<table class="mdt"><thead><tr><th>날짜</th><th>핵심 안건</th></tr></thead><tbody>
+<tr><td>2/8</td><td><strong>오금천 종료 선언 + 부산 백야드 공식 공지 (피터)</strong></td></tr>
+<tr><td>2/9</td><td>탈퇴·합류 재편 · 부산 공고문 배포 (19건)</td></tr>
+<tr><td>2/11~12</td><td>이강우·안신해·변진환 합류 환영</td></tr>
+<tr><td>2/19</td><td><strong>정규하+여자친구 참가 확정</strong></td></tr>
+<tr><td>2/20~21</td><td>숙소 협의 · KTX 각자 예약 안내</td></tr>
+<tr><td>2/23</td><td>정훈재 발목 부상 — 이번 부산 불참 선언</td></tr>
+<tr><td>2/25</td><td><strong>날씨·바람 예열 · 박기영 CP차량 사전 이동 (12건)</strong></td></tr>
+</tbody></table>
+<hr>
+<h3>👥 주요 인물 역할</h3>
+<ul class="mdul">
+<li>- <strong>Peter Kim(피터, 21%, 18건)</strong>: 방 전환 공식 선언·부산 공고 배포·신규 합류 환영 · 운영 총괄.</li>
+<li>- <strong>이강우 (15%, 9건)</strong>: 부산 현지 호스트 등장 — 숙소 협의·날씨 안내·CP차량 코디.</li>
+<li>- <strong>MFRS 정규하 (11%, 7건)</strong>: 커플 참가 확정·숙소 문의 스레드 주도.</li>
+<li>- <strong>MFRS 이유진 (10%, 6건)</strong>: 날씨 수다 + 참가 준비.</li>
+<li>- <strong>MFRS 박기영 (8%, 5건)</strong>: 2/25 CP차량 사전 부산 이동 — 헌신의 상징.</li>
+</ul>
+<hr>
+<h3>⛑ 주요 Q&amp;A 및 결정 (2월)</h3>
+<table class="mdt"><thead><tr><th>질문/이슈</th><th>결정·답변</th></tr></thead><tbody>
+<tr><td>부산 불참시 방 나가야 하나?</td><td>2/9 24:00까지 자유 퇴장, 강제 없음</td></tr>
+<tr><td>지인 게스트 참가 가능?</td><td>&quot;지인찬스&quot; 환영 (안신해 동반자)</td></tr>
+<tr><td>숙소는 공동 or 개별?</td><td>해운대 인근 공동 숙소 기준, 개별도 가능 (이강우 확인 후 확정)</td></tr>
+<tr><td>KTX는 어떻게?</td><td>각자 예약, 도착 시간 공유 후 합류 조율</td></tr>
+<tr><td>날씨 추우면?</td><td>바람 대비 레이어링 + CP차량 상시 대기</td></tr>
+</tbody></table>
+<hr>
+<h3>🌟 핵심 인사이트 — 백야드방</h3>
+<p>1. <strong>행사 간 &#x27;숨 고르기&#x27;의 역할</strong>: 62건이라는 낮은 메시지 수는 조용한 달이 아니라 다음 행사를 위한 에너지 재충전 구간. 백야드방은 행사 전후 폭발-고요-폭발의 리듬을 타며 지속된다.</p>
+<p>2. <strong>자발적 멤버십 갱신</strong>: 강제 퇴장 없이 불참자가 스스로 나가고 새 참가자가 들어오는 구조 — 커뮤니티 자체 정화 메커니즘이 자연스럽게 작동.</p>
+<hr>
+<p><em>분석 기준: 2026년 2월 8일 ~ 2월 26일 마인드풀러닝 백야드@LOCAL 방 62건 · 주요 발신자 10인 대화 내용 기반. 계좌·전화 등 개인정보는 마스킹.</em></p>
+<blockquote><strong>데이터 희소</strong>: 2월 총 62건으로 1·3월 대비 현저히 적음. 이는 행사 간 전환기 특성으로 분석 분량을 축소함.</blockquote></div>
+    </div><div id="m01"></div>
+    <div class="card monthcard curated">
+      <div class="mc-h">1월 <span class="mc-cur">📋 상세 분석 (큐레이션)</span></div>
+      <div class="mdbody"><p>2026.06.04</p>
+<h3>📌 핵심 성과 요약 (Executive Summary)</h3>
+<p><strong>&quot;2026년 첫 백야드 — 이두승 동네 오금천·북한산에서 영하의 설경을 달리며 시작된 한 해&quot;</strong></p>
+<p>백야드@LOCAL 방은 <strong>1월 10일(토)~11일(일) 오금천/북한산 2일 백야드를 중심 축으로</strong>, 신규 멤버 합류 환영과 사전 안내(1/1~1/9) → 행사 당일(1/10~11) → 후기·정산(1/12~13)의 완전한 사이클을 구성합니다. 메시지 387건(실질 약 401건) · 발신자 이두승(17%)·피터(16%)·박기영(8%)·정규하(8%)·김찬현(8%)·이수지(8%)가 주도했으며, <strong>1/10 당일 154건·1/11 2일차 71건·1/5 사전준비 32건</strong>이 3대 분기점입니다. 핵심 성과는 ① 새해 첫날부터 신규 합류(조용임·한채원 등) → 방 에너지 형성, ② 이두승 가족이 함께한 따뜻한 홈 백야드 구현, ③ 영하 날씨·눈 예보에도 &quot;춥지 않게 따스하게&quot; 완주, ④ 아내·자녀와의 가족 환대가 참가자 전원 깊은 감동을 남긴 것입니다. 이 달은 2026년 백야드 시리즈의 <strong>원점이자 온도 설정(tone-setting) 회차</strong>입니다.</p>
+<hr>
+<h3>1. 신규 합류 · 방 온도 세팅 (1/1 ~ 1/7)</h3>
+<ul class="mdul">
+<li>- <strong>새해 첫날 합류 러시</strong>: 조용임·한채원 등이 새해 첫날 입장. 찬현 &quot;환영합니다~&quot;, 두승 &quot;아이구 용임님까지 오시다니 환영합니다&quot;로 문이 열렸다. 설레는 새해 인사와 참가 다짐이 오가며 방에 활기가 불었다.</li>
+<li>- <strong>🔑 이두승 공식 안내 (1/3)</strong>: 오금천 백야드 공식 안내 발신. Day1 코스 2가지 옵션(오금천 산책로 순회 6~7km × 3바퀴 / 오금천+노고산 트레일 10~12km), CP는 어라이즈 카페 앤 커뮤니티. &quot;원하신다면 5바퀴까지 기다려드립니다&quot;(피터)의 여유로운 운영 선언.</li>
+<li>- <strong>눈 예보 + 아이젠 질답 (1/5)</strong>: 박경애의 ChatGPT 기상 기설제(!) 덕분이라며 눈 가능성 공유. 찬현 &quot;아마존 아이젠 언제 오려나요..&quot;, 두승 &quot;아이젠 안오면 썰매 태워드립니다&quot; — 겨울 백야드 특유의 유머. 이재군이 아이젠 제품·주의사항 상세 공유하며 초보자 케어.</li>
+<li>- <strong>코스·GPX 배포 (1/3)</strong>: 피터가 북한산둘레길 10-9-8 GPX(Day2, 선택옵션 편도 10km·왕복 20km) 배포. 정훈재 &quot;Day1 러닝타임이 짧지 않나&quot; 피드백에 두승 &quot;트레일 코스는 뛰어보고 은평한옥마을까지&quot;로 보완.</li>
+</ul>
+<hr>
+<h3>2. D-1 최종 준비 · 설레는 집결 (1/9)</h3>
+<ul class="mdul">
+<li>- <strong>집결지·CP 공식 안내 (두승)</strong>: 09:00 오금동 625 집결 → CP 어라이즈카페(10시 오픈). 피터가 겨울철 트레일러닝 레이어링 PDF 배포, &quot;내일 뵙겠습니다.&quot;</li>
+<li>- <strong>부산에서 올라오는 기영님</strong>: 박기영 &quot;지금 부산역에서 기차탔습니다. 두근반 세근반 합니다 — 이렇게 멍석 깔아주셔서 진심으로 감사드립니다.&quot; 서울-부산 원정 참가의 상징적 장면.</li>
+<li>- <strong>두승의 환영 메시지</strong>: &quot;저와 태영님 내일 드디어 저희동네에서 여러분과 같이 달리네요. 멀리서 오시는 분들 조심조심 운전해서 오세요 — 덕양구 오금동 호스트 주인장 두승.&quot;</li>
+</ul>
+<hr>
+<h3>3. 백야드 1일차 — 오금천 설경 (1/10)</h3>
+<ul class="mdul">
+<li>- <strong>당일 가장 많은 메시지 154건</strong>: 집결 안내·실시간 현장 중계·사진·일지 공유가 집중되었다. 피터 &quot;다들 잠시 후에 뵙겠습니다~ 따스하고 안전하게 이동하세요.&quot;</li>
+<li>- <strong>🔑 이두승 가족의 환대</strong>: 두승의 아내가 당일 운영에 함께 함. &quot;아내가 도와줄 줄은 몰랐는데, 덕분에 첫날 백야드도 잘 마무리했다&quot;(두승, 1/12 후기). 정훈재, 김찬현, 이수지, 이효정, 이세영, 박기영 등이 오금천 순회·노고산 트레일 각자 페이스로 달렸다.</li>
+<li>- <strong>당일 러닝 일지 (피터)</strong>: &quot;오금천 산책로·팥죽 — 달리기 전: 추웠는데 뛰니까 좋다 / 중: 팥죽 먹고싶다 / 후: 이맛에 뛰지.&quot;</li>
+</ul>
+<hr>
+<h3>4. 2일차 · 후기 폭발 (1/11 ~ 1/13)</h3>
+<ul class="mdul">
+<li>- <strong>북한산 스타벅스 집결 (1/11)</strong>: 정규하 &quot;집결지 앞 스벅 도착, 좋은 자리 잡아놨습니다!&quot; 얼리버드 일출런 + 09:00 합류로 양일제 운영. 박기영 &quot;오늘도 적극 참여&quot;, 이효정 &quot;와 준비해주신 분들 너무 감사합니다!!&quot;</li>
+<li>- <strong>두승의 마무리 메시지</strong>: &quot;저와 태영님은 북한산 온천에서 목욕을 하고, 해가 지는 북한산 노을을 본 뒤 각자 집으로. … 여러분 덕분에 주말을 정말 행복하게 보냈습니다.&quot;</li>
+<li>- <strong>🔑 정규하의 &#x27;완벽했던 백야드&#x27; 후기</strong>: &quot;한 줄 후기 — 두승님 동네로 이사가고 싶습니다. 모든 것이 완벽했던 백야드. 춘천 기상님 백야드 때 너무 큰 충격을 받아 이보다 더 좋을 순 없다고 생각했고, 그래서 큰 기대 없이 왔는데 완벽히 틀렸습니다.&quot;</li>
+<li>- <strong>정산 공개 (두승, 1/13)</strong>: 총 참가비 75만원 / Day1 과일·어라이즈카페·말미뼈국수 합산 / Day2 코스 비용. 피터가 공식 후기 게시: &quot;영하의 날씨 속에서도 따뜻한 마음으로 모여주신 마풀러너 분들과의 백야드는 그 어느 때보다 특별했습니다.&quot;</li>
+<li>- <strong>박지은의 사진 러시</strong>: 북한산 트레일 사진 19장 + 동영상 다수 공유 — &quot;날이 아~쥬 화창해서 추운 줄도 모르고 북한산 만끽하고 왔네요.&quot;</li>
+</ul>
+<hr>
+<h3>🗓 1월 타임라인 요약</h3>
+<table class="mdt"><thead><tr><th>날짜</th><th>핵심 안건</th></tr></thead><tbody>
+<tr><td>1/1</td><td>새해 첫날 조용임·한채원 합류 · 환영 릴레이</td></tr>
+<tr><td>1/3</td><td><strong>오금천 백야드 공식 안내 (이두승) · Day2 GPX 배포 (피터)</strong></td></tr>
+<tr><td>1/5</td><td>눈 예보 + 아이젠 질답 · 집결 장소·시간 공유</td></tr>
+<tr><td>1/9</td><td>CP·코스 최종 확인 · 겨울 레이어링 자료 공유 · 박기영 부산 출발</td></tr>
+<tr><td>1/10</td><td><strong>1일차 당일 — 오금천 설경·노고산 트레일 (154건)</strong></td></tr>
+<tr><td>1/11</td><td><strong>2일차 — 북한산 스타벅스 집결 · 일출 + 트레일 (71건)</strong></td></tr>
+<tr><td>1/12</td><td>후기 사진 러시 · 정규하·박지은·정훈재 등 감사 메시지</td></tr>
+<tr><td>1/13</td><td><strong>공식 후기 발행 (피터) · 정산 공개 (두승)</strong></td></tr>
+<tr><td>1/22</td><td>정훈재·성우 코치 짧은 유머 교환 — 방의 여운</td></tr>
+</tbody></table>
+<hr>
+<h3>👥 주요 인물 역할</h3>
+<ul class="mdul">
+<li>- <strong>MFRS 이두승 (17%, 67건)</strong>: 오금천 백야드 호스트 총괄 — 코스 설계·CP 섭외·집결 안내·가족 환대·정산까지. &quot;동네 주인장&quot;으로 2일간 모든 참가자를 품은 핵심 축.</li>
+<li>- <strong>Peter Kim(피터, 16%, 61건)</strong>: GPX 배포·레이어링 자료 공유·실시간 공지·공식 후기 발행. 브릿지 및 아카이브 역할.</li>
+<li>- <strong>MFRS 박기영 (8%, 32건)</strong>: 부산에서 서울 원정 · 다정한 위로·응원 메시지 다발 — 감성 윤활유.</li>
+<li>- <strong>MFRS 정규하 (8%, 33건)</strong>: 역대급 후기 &quot;두승님 동네로 이사가고 싶다&quot; 작성 · 일찍 도착해 스벅 자리 잡기 · 무거운 배낭 메고 달리는 열정.</li>
+<li>- <strong>MFRS 김찬현 (8%, 33건)</strong>: 새 멤버 환영·적극 참여·두승 사진 칭찬 — 긍정 에너지 앵커.</li>
+<li>- <strong>MFRS 이수지 (8%, 32건)</strong>: 달리기·후기 활발 참여, 정산 후 감사 표현.</li>
+<li>- <strong>MFRS 정훈재 (5%, 21건)</strong>: 유머(&quot;Q1. 샌드위치는 몇 바퀴 돌아야?&quot;)·실질 질문으로 분위기 주도.</li>
+</ul>
+<hr>
+<h3>⛑ 주요 Q&amp;A 및 결정</h3>
+<table class="mdt"><thead><tr><th>질문/이슈</th><th>결정·답변</th></tr></thead><tbody>
+<tr><td>Day1 코스 시간이 짧지 않나?</td><td>CP 기준으로 각자 1~3바퀴 + 노고산 옵션 재량 운영 (피터)</td></tr>
+<tr><td>눈 오면 아이젠 필요?</td><td>로드는 불필요, 트레일은 이재군 제품 추천 / 얼면 위험</td></tr>
+<tr><td>CP 언제부터 들어갈 수 있나?</td><td>어라이즈카페 10시 오픈 — 9시 집결지 먼저 (두승)</td></tr>
+<tr><td>KTX 기차표 어떻게?</td><td>각자 예약 — 박기영은 부산역에서 서울 직행</td></tr>
+<tr><td>참가비·정산 내역?</td><td>총 75만원 수입 / Day1+2 식음료·교통 지출 후 공개 정산 (두승)</td></tr>
+</tbody></table>
+<hr>
+<h3>🌟 핵심 인사이트 — 백야드방</h3>
+<p>1. <strong>홈 백야드의 힘</strong>: 이두승이 자신이 사는 오금동을 코스로 열고 아내·자녀까지 함께했다. &quot;동네로 이사가고 싶다&quot;는 후기가 나올 정도로, 일상의 공간이 최고의 백야드가 될 수 있다는 것을 증명한 회차.</p>
+<p>2. <strong>새해 첫 문을 여는 방식</strong>: 새해 첫날부터 신규 합류를 환영하며 설레는 기대를 쌓고, 1주일간 코스·날씨·장비 정보를 차곡차곡 쌓아 당일 154건의 폭발로 연결 — 사전 빌드업이 현장 에너지를 결정한다는 운영 패턴.</p>
+<p>3. <strong>원정 참가자가 만드는 특별함</strong>: 부산에서 서울로 올라온 박기영의 존재가 참가자 모두에게 &quot;이 정도면 나도 어디든 달려야지&quot;라는 동기를 자극. 거리의 장벽을 즐거움으로 치환하는 백야드 특유의 문화.</p>
+<p>4. <strong>후기가 다음 달의 씨앗이 된다</strong>: 정규하의 진솔한 장문 후기, 박지은의 대량 사진 공유, 두승의 온천-노을 마무리 담담한 서사가 방에 남아 다음 참가자를 당기는 콘텐츠가 된다.</p>
+<hr>
+<p><em>분석 기준: 2026년 1월 1일 ~ 1월 22일 마인드풀러닝 백야드@LOCAL 방 387건(+비실질 시스템 포함 401건) · 주요 발신자 15인 대화 내용 기반. 계좌·전화·GPS 좌표 등 개인정보는 마스킹.</em></p></div>
+    </div>
+  </section>
+  <section>
+    <h2><span class="em">🏘️</span> 다른 단톡방</h2>
+    <div class="otherrooms"><a class="otherroom" href="notice.html">📢 전체 공지</a><a class="otherroom" href="community.html">💬 커뮤니티</a><a class="otherroom" href="jeju.html">🏝️ 제주</a><a class="otherroom" href="ops.html">🛠️ 운영진</a></div>
+  </section>
+  <footer><p>마인드풀러닝 어드밴스 5기 · 내부 커뮤니티용 · 카톡 raw=OneDrive SSoT(집계·큐레이션만 게시) · 생성 2026-06-04</p></footer>
+</div>
+</body></html>

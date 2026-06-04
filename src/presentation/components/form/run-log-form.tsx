@@ -47,6 +47,8 @@ const TEXT_INPUT_STYLE: React.CSSProperties = {
 
 export function RunLogForm({ memberId, memberName = '', memberAvatarUrl = '', mode = 'create', recordId, initialData }: Props) {
   const router = useRouter()
+  const draftKey = `run-log-draft-${memberId}`
+
   const [date, setDate]                   = useState(() => {
     if (initialData?.date) return initialData.date
     const d = new Date()
@@ -62,7 +64,45 @@ export function RunLogForm({ memberId, memberName = '', memberAvatarUrl = '', mo
   const [submitting, setSubmitting]       = useState(false)
   const [error, setError]                 = useState('')
   const [previewOpen, setPreviewOpen]     = useState(false)
+  const [draftRestored, setDraftRestored] = useState(false)
   const photoObjectUrlRef                 = useRef<string | null>(null)
+  const draftTimerRef                     = useRef<ReturnType<typeof setTimeout>>(undefined)
+
+  // create 모드: 마운트 시 드래프트 복원
+  useEffect(() => {
+    if (mode !== 'create') return
+    try {
+      const raw = localStorage.getItem(draftKey)
+      if (!raw) return
+      const d = JSON.parse(raw) as Record<string, unknown>
+      const hasContent = d.title || d.thoughtBefore || d.thoughtDuring || d.thoughtAfter || d.location
+      if (!hasContent) return
+      if (typeof d.date === 'string') setDate(d.date)
+      if (typeof d.durationMin === 'number') setDurationMin(d.durationMin)
+      if (typeof d.title === 'string') setTitle(d.title)
+      if (typeof d.location === 'string') setLocation(d.location)
+      if (typeof d.thoughtBefore === 'string') setThoughtBefore(d.thoughtBefore)
+      if (typeof d.thoughtDuring === 'string') setThoughtDuring(d.thoughtDuring)
+      if (typeof d.thoughtAfter === 'string') setThoughtAfter(d.thoughtAfter)
+      setDraftRestored(true)
+      setTimeout(() => setDraftRestored(false), 3500)
+    } catch { /* ignore */ }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
+  // create 모드: 필드 변경 시 800ms 디바운스 자동저장
+  useEffect(() => {
+    if (mode !== 'create') return
+    clearTimeout(draftTimerRef.current)
+    draftTimerRef.current = setTimeout(() => {
+      try {
+        localStorage.setItem(draftKey, JSON.stringify(
+          { date, durationMin, title, location, thoughtBefore, thoughtDuring, thoughtAfter }
+        ))
+      } catch { /* storage quota 초과 무시 */ }
+    }, 800)
+    return () => clearTimeout(draftTimerRef.current)
+  }, [mode, draftKey, date, durationMin, title, location, thoughtBefore, thoughtDuring, thoughtAfter])
 
   // photoFile이 바뀔 때 object URL 생성/해제
   useEffect(() => {
@@ -132,6 +172,7 @@ export function RunLogForm({ memberId, memberName = '', memberAvatarUrl = '', mo
         throw new Error(body.error ?? '저장 실패')
       }
       const saved = await res.json()
+      localStorage.removeItem(draftKey)
       sessionStorage.setItem('openRun', JSON.stringify(saved))
       router.refresh()
       router.push('/home')
@@ -148,6 +189,18 @@ export function RunLogForm({ memberId, memberName = '', memberAvatarUrl = '', mo
       show={submitting}
       message={mode === 'edit' ? '수정 중...' : '저장 중...'}
     />
+    {draftRestored && (
+      <div style={{
+        position: 'fixed', top: 60, left: '50%', transform: 'translateX(-50%)',
+        background: '#111', color: '#fff', borderRadius: 20,
+        padding: '8px 18px', fontSize: '0.72rem', fontWeight: 500,
+        fontFamily: "'Pretendard Variable', Pretendard, -apple-system, sans-serif",
+        zIndex: 300, whiteSpace: 'nowrap', boxShadow: '0 4px 16px rgba(0,0,0,0.18)',
+        pointerEvents: 'none',
+      }}>
+        임시저장된 내용을 불러왔습니다
+      </div>
+    )}
     <form onSubmit={handleSubmit} style={{ paddingBottom: '40px' }}>
 
       {/* 날짜 */}

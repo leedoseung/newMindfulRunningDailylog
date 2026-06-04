@@ -41,7 +41,7 @@ function AutoGrowTextarea({ value, onChange, placeholder }: {
       style={{
         width: '100%', border: 'none', outline: 'none',
         fontFamily: "'Pretendard Variable', Pretendard, -apple-system, sans-serif",
-        fontSize: '0.82rem', color: '#333',
+        fontSize: '1rem', color: '#333',
         lineHeight: 1.6, resize: 'none', background: 'transparent',
         boxSizing: 'border-box', overflow: 'hidden',
       }}

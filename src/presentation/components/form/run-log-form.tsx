@@ -40,7 +40,7 @@ const SECTION_STYLE: React.CSSProperties = { padding: '0 22px 18px' }
 
 const TEXT_INPUT_STYLE: React.CSSProperties = {
   width: '100%', background: '#fff', border: 'none', borderRadius: '16px',
-  padding: '16px 18px', fontFamily: "'Pretendard Variable', Pretendard, -apple-system, sans-serif", fontSize: '0.92rem',
+  padding: '16px 18px', fontFamily: "'Pretendard Variable', Pretendard, -apple-system, sans-serif", fontSize: '1rem',
   color: '#111111', outline: 'none', boxShadow: '0 1px 6px rgba(0,0,0,0.05)',
   boxSizing: 'border-box',
 }
@@ -212,7 +212,7 @@ export function RunLogForm({ memberId, memberName = '', memberAvatarUrl = '', mo
             type="date"
             value={date}
             onChange={e => setDate(e.target.value)}
-            style={{ fontFamily: "'Pretendard Variable', Pretendard, -apple-system, sans-serif", fontSize: '0.92rem', fontWeight: 500, color: '#111111', border: 'none', background: 'transparent', outline: 'none', width: '100%' }}
+            style={{ fontFamily: "'Pretendard Variable', Pretendard, -apple-system, sans-serif", fontSize: '1rem', fontWeight: 500, color: '#111111', border: 'none', background: 'transparent', outline: 'none', width: '100%' }}
           />
         </div>
       </div>

@@ -32,7 +32,7 @@ export function InsightsBanner() {
             fontFamily: FONT, fontSize: '0.65rem', fontWeight: 400,
             color: 'rgba(255,255,255,0.7)', marginTop: 4,
           }}>
-            크루 달리기 데이터 대시보드 보기 →
+            마풀런 달리기 데이터 대시보드 보기 →
           </div>
         </div>
         <div style={{

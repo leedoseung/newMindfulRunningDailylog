@@ -6,6 +6,7 @@ import { TodayCardDeck } from '../feed/today-card-deck'
 import { DetailSheet } from '../feed/detail-sheet'
 import { AvatarImage } from '../shared/avatar-image'
 import { DonationBanner } from './donation-banner'
+import { InsightsBanner } from './insights-banner'
 import type { RunLog } from '@/domain/entities/run-log'
 
 const FONT = "'Pretendard Variable', Pretendard, -apple-system, sans-serif"
@@ -252,6 +253,7 @@ export function HomeFeed({ recentRuns, myRuns, memberId, crew, weeklyBars, weekl
   return (
     <>
       <div style={{ height: 12 }} />
+      <InsightsBanner />
       <DonationBanner />
 
       <StatsHeader

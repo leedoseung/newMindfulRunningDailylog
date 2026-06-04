@@ -1,0 +1,417 @@
+<!DOCTYPE html>
+<html lang="ko"><head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>두레곳간 — MFRS 어드밴스 5기 2-5월 누적 인사이트</title>
+<style>
+:root{
+  --bg:#faf8f3; --ink:#2b2a26; --muted:#6f6a60; --line:#e7e1d6;
+  --green:#2f6b4f; --green-d:#1f4a37; --green-l:#e6f0ea;
+  --amber:#d98e3e; --amber-l:#fbeede; --sky:#5b8aa6; --rose:#c97b86;
+  --card:#fffdf9; --shadow:0 1px 3px rgba(60,50,30,.06),0 6px 24px rgba(60,50,30,.05);
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);
+  font-family:"Pretendard","Apple SD Gothic Neo","Noto Sans KR",-apple-system,BlinkMacSystemFont,sans-serif;
+  line-height:1.7;-webkit-font-smoothing:antialiased}
+.wrap{max-width:920px;margin:0 auto;padding:0 20px 80px}
+a{color:var(--green);text-decoration:none}
+a:hover{text-decoration:underline}
+.hero{background:linear-gradient(135deg,var(--green-d),var(--green));color:#fff;
+  border-radius:0 0 28px 28px;padding:48px 28px 40px;margin-bottom:8px}
+.hero .wrap{padding-bottom:0}
+.hero .eyebrow{font-size:.82rem;letter-spacing:.12em;opacity:.85;text-transform:uppercase;margin:0 0 10px}
+.hero h1{font-size:2.1rem;line-height:1.25;margin:0 0 12px;font-weight:800;letter-spacing:-.01em}
+.hero p.sub{font-size:1.02rem;opacity:.92;margin:0;max-width:680px}
+.hero .period{margin-top:18px;font-size:.9rem;opacity:.8}
+section{margin-top:44px}
+h2{font-size:1.42rem;font-weight:800;letter-spacing:-.01em;margin:0 0 6px;
+  display:flex;align-items:center;gap:.5rem}
+h2 .em{font-size:1.3rem}
+.lede{color:var(--muted);margin:0 0 20px;font-size:.98rem}
+.cardrow{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:14px}
+.stat{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:20px;box-shadow:var(--shadow)}
+.stat .v{font-size:2rem;font-weight:800;color:var(--green-d);line-height:1.1}
+.stat .v small{font-size:.95rem;font-weight:700;color:var(--muted)}
+.stat .l{font-size:.86rem;color:var(--muted);margin-top:6px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:24px;box-shadow:var(--shadow)}
+.bar{display:flex;align-items:center;gap:12px;margin:10px 0}
+.bar .name{width:96px;flex:none;font-size:.9rem;color:var(--ink);font-weight:600}
+.bar .track{flex:1;background:#efe9dd;border-radius:999px;height:22px;position:relative;overflow:hidden}
+.bar .fill{height:100%;border-radius:999px;background:linear-gradient(90deg,var(--green),var(--green-d));
+  display:flex;align-items:center;justify-content:flex-end;padding-right:9px;color:#fff;font-size:.76rem;font-weight:700;min-width:34px}
+.bar .fill.amber{background:linear-gradient(90deg,var(--amber),#b9701f)}
+.bar .fill.sky{background:linear-gradient(90deg,#7aa6bd,var(--sky))}
+.bar .fill.rose{background:linear-gradient(90deg,#d99aa3,var(--rose))}
+.season-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+.season{border-radius:18px;padding:22px;color:#fff;position:relative;overflow:hidden}
+.season.winter{background:linear-gradient(150deg,#5b7fa6,#3d5d80)}
+.season.spring{background:linear-gradient(150deg,#5fa06f,#2f6b4f)}
+.season.summer{background:linear-gradient(150deg,#e0a85b,#c47b2f)}
+.season .se{font-size:1.6rem}
+.season h3{margin:6px 0 2px;font-size:1.2rem}
+.season .range{font-size:.78rem;opacity:.85}
+.season .big{font-size:1.8rem;font-weight:800;margin-top:12px;line-height:1}
+.season .sub{font-size:.84rem;opacity:.9;margin-top:4px}
+.season.upcoming{opacity:.96;border:2px dashed rgba(255,255,255,.5)}
+.arc{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+.arc .col{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:18px}
+.arc .col h4{margin:0 0 4px;font-size:1rem;color:var(--green-d)}
+.arc .col .ph{font-size:.78rem;color:var(--muted);margin-bottom:12px}
+.kw{display:flex;align-items:center;gap:8px;margin:7px 0;font-size:.88rem}
+.kw .dot{width:9px;height:9px;border-radius:50%;flex:none}
+.kw .kwbar{flex:1;height:8px;background:#efe9dd;border-radius:999px;overflow:hidden}
+.kw .kwbar i{display:block;height:100%;border-radius:999px}
+.kw .n{width:34px;text-align:right;color:var(--muted);font-size:.78rem;font-variant-numeric:tabular-nums}
+.coachnote{background:var(--green-l);border-left:4px solid var(--green);border-radius:0 14px 14px 0;
+  padding:18px 22px;margin-top:18px}
+.coachnote .tag{font-size:.78rem;font-weight:800;color:var(--green-d);letter-spacing:.04em;margin-bottom:6px}
+.coachnote p{margin:.4rem 0;font-size:.96rem}
+.loclist{columns:2;column-gap:28px}
+.loclist .li{display:flex;justify-content:space-between;padding:7px 0;border-bottom:1px dotted var(--line);
+  break-inside:avoid;font-size:.92rem}
+.loclist .li b{color:var(--muted);font-weight:600}
+.membergrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px}
+.mcard{display:block;background:var(--card);border:1px solid var(--line);border-radius:14px;
+  padding:16px;box-shadow:var(--shadow);transition:transform .12s,box-shadow .12s}
+.mcard:hover{transform:translateY(-2px);box-shadow:0 6px 22px rgba(60,50,30,.1);text-decoration:none}
+.mcard .mn{font-weight:800;color:var(--green-d);font-size:1.02rem}
+.mcard .ms{font-size:.8rem;color:var(--muted);margin-top:4px}
+.mcard .chips{margin-top:8px;display:flex;flex-wrap:wrap;gap:4px}
+.chip{font-size:.72rem;background:var(--green-l);color:var(--green-d);border-radius:999px;padding:2px 9px}
+.runbox{border:1px solid var(--line);border-radius:14px;padding:18px;margin-top:14px;background:#fffdf9}
+.runbox .meta{font-size:.82rem;color:var(--muted);margin-bottom:8px}
+.runbox .title{font-weight:700;margin-bottom:10px}
+.runbox .phase{margin:10px 0}
+.runbox .phase .pl{font-size:.76rem;font-weight:800;color:var(--amber);letter-spacing:.03em}
+.runbox .phase .pt{font-size:.92rem;color:var(--ink);white-space:pre-wrap}
+.nav{display:flex;gap:16px;flex-wrap:wrap;margin-top:16px;font-size:.92rem}
+.backlink{display:inline-block;margin:24px 0 0;font-size:.9rem}
+footer{margin-top:60px;padding-top:24px;border-top:1px solid var(--line);
+  font-size:.82rem;color:var(--muted)}
+.note{font-size:.82rem;color:var(--muted);background:#f3efe6;border-radius:10px;padding:12px 16px;margin-top:14px}
+.russell{position:relative;padding:30px 26px 30px 30px}
+.rgrid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.rq{border-radius:14px;padding:18px 16px;text-align:center;color:#33312c;
+  background:#efe9dd}
+.rq.hp{background:rgba(224,162,62,var(--op))}
+.rq.lp{background:rgba(79,140,94,var(--op))}
+.rq.hn{background:rgba(201,123,134,var(--op))}
+.rq.ln{background:rgba(91,107,122,var(--op))}
+.rq.dom{box-shadow:0 0 0 3px var(--green);font-weight:800}
+.rq .rqv{font-size:1.5rem;font-weight:800;line-height:1}
+.rq .rql{font-size:.84rem;margin-top:5px;opacity:.95}
+.rax{position:absolute;font-size:.72rem;color:var(--muted);font-weight:600}
+.rax-top{top:8px;left:50%;transform:translateX(-50%)}
+.rax-bot{bottom:8px;left:50%;transform:translateX(-50%)}
+.rax-l{left:-2px;top:50%;transform:translateY(-50%) rotate(-90deg);transform-origin:left}
+.rax-r{right:-8px;top:50%;transform:translateY(-50%) rotate(90deg);transform-origin:right}
+.psy{display:grid;grid-template-columns:repeat(2,1fr);gap:14px}
+.psy .pcard{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:20px;box-shadow:var(--shadow)}
+.psy .pcard .pt{font-size:.78rem;font-weight:800;letter-spacing:.04em;color:var(--green-d);margin-bottom:4px}
+.psy .pcard .pv{font-size:1.7rem;font-weight:800;color:var(--green-d);line-height:1.1}
+.psy .pcard .pd{font-size:.86rem;color:var(--ink);margin-top:6px}
+.psy .pcard .cite{font-size:.72rem;color:var(--muted);margin-top:8px;font-style:italic}
+.tag2{display:inline-block;font-size:.7rem;font-weight:700;border-radius:999px;padding:2px 9px;margin:2px 3px 2px 0}
+.tag2.s{background:var(--green-l);color:var(--green-d)}
+.tag2.q{background:#f0ece3;color:#8a8576}
+.dnastrip{display:flex;flex-wrap:wrap;gap:5px;margin-top:6px}
+.dnastrip .k{font-size:.72rem;background:#fff;border:1px solid var(--line);border-radius:999px;padding:3px 10px;color:var(--green-d)}
+.roomcards{display:grid;grid-template-columns:repeat(auto-fit,minmax(155px,1fr));gap:12px}
+.roomcard{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px;box-shadow:var(--shadow)}
+.roomcard .rn{font-weight:800;color:var(--green-d);font-size:1.02rem}
+.roomcard .rd{font-size:.76rem;color:var(--muted);margin:3px 0 8px}
+.roomcard .rv{font-size:1.5rem;font-weight:800;color:var(--green-d);line-height:1}
+.roomcard .rm{font-size:.78rem;color:var(--muted);margin-top:4px}
+.heat{border-collapse:separate;border-spacing:3px;width:100%;font-size:.8rem}
+.heat th{font-weight:700;color:var(--muted);font-size:.76rem;padding:3px 5px;text-align:center}
+.heat td.lbl{text-align:left;font-weight:700;white-space:nowrap;padding-right:8px}
+.heat td.c{text-align:center;border-radius:6px;color:#2b2a26;font-variant-numeric:tabular-nums;padding:6px 4px;min-width:38px}
+.topicrow{display:flex;align-items:center;gap:8px;margin:6px 0;font-size:.88rem}
+.topicrow .tn{width:108px;flex:none}
+.topicrow .tb{flex:1;height:14px;background:#efe9dd;border-radius:999px;overflow:hidden}
+.topicrow .tb i{display:block;height:100%;border-radius:999px;background:linear-gradient(90deg,var(--amber),#b9701f)}
+.topicrow .tv{width:42px;text-align:right;color:var(--muted);font-size:.78rem}
+.histgrid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.histroom{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:16px 18px;box-shadow:var(--shadow)}
+.histroom .hrh{font-weight:800;color:var(--green-d);font-size:1rem;margin-bottom:8px;display:flex;justify-content:space-between;align-items:baseline}
+.histroom .hrn{font-size:.76rem;color:var(--muted);font-weight:600}
+.hli{display:flex;gap:10px;padding:7px 0;border-top:1px dotted var(--line)}
+.hli .hmon{flex:none;width:30px;font-size:.78rem;font-weight:800;color:var(--amber);padding-top:1px}
+.hli .hbody{flex:1;min-width:0}
+.hli .hauth{font-size:.74rem;font-weight:700;color:var(--green);margin-right:6px}
+.htag{font-size:.68rem;background:var(--amber-l);color:#9a5a13;border-radius:999px;padding:1px 7px}
+.hli .hex{font-size:.84rem;color:var(--ink);margin-top:3px;line-height:1.5}
+.kakao-mine{display:flex;flex-wrap:wrap;gap:8px;margin-top:4px}
+.kakao-mine .km{background:var(--green-l);color:var(--green-d);border-radius:10px;padding:6px 12px;font-size:.86rem;font-weight:600}
+.kakao-mine .km b{font-weight:800}
+a.rclick{display:block;text-decoration:none}
+a.rclick:hover{text-decoration:none;transform:translateY(-2px);box-shadow:0 6px 22px rgba(60,50,30,.1)}
+.rarrow{color:var(--amber);font-weight:800}
+.heat td.lbl a{text-decoration:none}
+.navm{display:inline-flex;gap:10px;margin-left:14px}
+.navm a{font-size:.85rem;background:var(--green-l);border-radius:999px;padding:2px 10px}
+.monthcard{margin-top:14px}
+.mc-h{font-size:1.15rem;font-weight:800;color:var(--green-d);display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.mc-n{font-size:.82rem;color:var(--muted);font-weight:700}
+.mc-auto{font-size:.7rem;background:#f0ece3;color:#8a8576;border-radius:999px;padding:2px 9px}
+.mc-cur{font-size:.74rem;background:var(--amber-l);color:#9a5a13;border-radius:999px;padding:2px 10px;font-weight:700}
+.mc-sub{font-size:.84rem;color:var(--muted);margin:8px 0 12px;display:flex;flex-wrap:wrap;gap:5px;align-items:center}
+.mc-grid{display:grid;grid-template-columns:1.3fr 1fr;gap:18px}
+.mc-lbl{font-size:.82rem;font-weight:800;color:var(--amber);margin-bottom:6px}
+.mdbody h3{font-size:1.05rem;color:var(--green-d);margin:18px 0 6px;border-bottom:1px solid var(--line);padding-bottom:4px}
+.mdbody h4{font-size:.95rem;color:var(--ink);margin:12px 0 4px}
+.mdbody p{font-size:.9rem;margin:.4rem 0;line-height:1.7}
+.mdbody .mdul{margin:.3rem 0 .6rem;padding-left:1.1rem}
+.mdbody .mdul li{font-size:.88rem;margin:.25rem 0;line-height:1.6}
+.mdbody blockquote{border-left:3px solid var(--amber);background:var(--amber-l);margin:.5rem 0;padding:8px 14px;border-radius:0 8px 8px 0;font-size:.9rem}
+.mdbody .mdt{border-collapse:collapse;width:100%;font-size:.82rem;margin:8px 0}
+.mdbody .mdt th{background:var(--green-l);text-align:left;padding:6px 8px;font-weight:700}
+.mdbody .mdt td{border-top:1px solid var(--line);padding:6px 8px;vertical-align:top}
+.mdbody hr{border:none;border-top:1px dashed var(--line);margin:14px 0}
+.mdbody code{background:#f0ece3;padding:1px 5px;border-radius:5px;font-size:.86em}
+.otherrooms{display:flex;flex-wrap:wrap;gap:10px}
+.otherroom{background:var(--card);border:1px solid var(--line);border-radius:999px;padding:8px 16px;font-weight:600;box-shadow:var(--shadow)}
+@media(max-width:680px){
+  .season-grid,.arc,.psy,.histgrid,.mc-grid{grid-template-columns:1fr}
+  .hero h1{font-size:1.7rem}.loclist{columns:1}
+  .heat{font-size:.68rem}.heat td.c{min-width:26px;padding:5px 2px}
+}
+</style>
+</head><body>
+
+<div class="hero"><div class="wrap">
+  <p class="eyebrow">마인드풀러닝 어드밴스 5기 · 2–5월 누적 인사이트 (2월 → 2-3월 → 2-4월 시리즈 연속)</p>
+  <h1>우리 마을의 두레곳간 ☘️<br>봄을 지나 여름의 문턱에서</h1>
+  <p class="sub">2월부터 5월까지, 67명의 마을 사람들이 텃밭을 가꾸듯 하루하루 달림을 쌓았습니다.
+  누구도 앞서거나 뒤처지지 않았고, 그저 각자의 속도로 같은 길 위에 있었습니다.</p>
+  <div class="period">기록 기간 · 2026-02-01 ~ 2026-05-31</div>
+</div></div>
+<div class="wrap">
+
+  <section>
+    <h2><span class="em">🏘️</span> 두레곳간 — 우리가 함께 쌓은 것</h2>
+    <p class="lede">개인의 순위가 아니라, 마을 전체가 함께 채운 공동의 곳간입니다.</p>
+    <div class="cardrow">
+      <div class="stat"><div class="v">2,393<small>시간</small></div><div class="l">마을 전체 누적 달림 (총 143,582분)</div></div>
+      <div class="stat"><div class="v">2,432<small>번</small></div><div class="l">함께 남긴 달리기 일지</div></div>
+      <div class="stat"><div class="v">67<small>명</small></div><div class="l">텃밭을 가꾼 마을 사람들</div></div>
+      <div class="stat"><div class="v">120<small>일</small></div><div class="l">누군가 달리고 있던 날</div></div>
+    </div>
+    <div class="coachnote">
+      <div class="tag">📌 핵심</div>
+      <p>넉 달 동안 마을은 <b>2,393시간</b>을 함께 달렸습니다. 하루 평균 한 명꼴로 약 59분씩,
+      그 작은 달림들이 모여 곳간을 채웠어요. 한 사람의 기록이 아니라 <b>모두의 합</b>이라는 점이 마인드풀러닝다운 숫자입니다.</p>
+    </div>
+  </section>
+
+  <section>
+    <h2><span class="em">🍃</span> 시즌별 현황 — 겨울에서 봄, 그리고 여름으로</h2>
+    <p class="lede">겨울(2월~3월 초)의 다짐이 봄(3~5월)의 무성함으로 이어졌고, 이제 여름(6~8월)의 문턱에 섰습니다.</p>
+    <div class="season-grid">
+      <div class="season winter"><div class="se">❄️</div><h3>겨울</h3>
+        <div class="range">2/1 ~ 3/5 · 시작과 안착</div>
+        <div class="big">807번</div><div class="sub">731시간 · 63명 · 평균 54분</div></div>
+      <div class="season spring"><div class="se">🌸</div><h3>봄</h3>
+        <div class="range">3/6 ~ 5/31 · 무성해진 텃밭</div>
+        <div class="big">1,625번</div><div class="sub">1,662시간 · 58명 · 평균 61분</div></div>
+      <div class="season summer upcoming"><div class="se">☀️</div><h3>여름 <small style="font-size:.7rem">다가옴</small></h3>
+        <div class="range">6/1 ~ 8/31 · 새로운 계절</div>
+        <div class="big">시작 전</div><div class="sub">전해질·새벽런·열적응의 계절</div></div>
+    </div>
+    <div class="card" style="margin-top:16px">
+      <div style="font-size:.9rem;color:var(--muted);margin-bottom:10px">시즌별 달리기 횟수</div>
+      <div class="bar"><div class="name">❄️ 겨울</div><div class="track"><div class="fill sky" style="width:49.7%">807번</div></div></div>
+      <div class="bar"><div class="name">🌸 봄</div><div class="track"><div class="fill " style="width:100.0%">1625번</div></div></div>
+      <div class="bar"><div class="name">☀️ 여름</div><div class="track"><div class="fill amber" style="width:3.0%">0번</div></div></div>
+    </div>
+    <div class="coachnote">
+      <div class="tag">🌱 코치 노트 — 계절이 바뀝니다</div>
+      <p>봄은 마을이 가장 무성했던 계절이었어요. 겨울의 807번이 봄에는 1,625번으로,
+      한 번 한 번이 텃밭의 잔디처럼 자랐습니다.</p>
+      <p>이제 <b>여름</b>입니다. 더위는 겨울 추위와는 다른 방식으로 우리를 시험해요.
+      <b>새벽·저녁의 선선한 시간</b>, <b>수분과 전해질</b>, <b>속도를 낮추고 코로 호흡이 편한 페이스(코호흡)</b> —
+      여름엔 '더 빨리'가 아니라 '안전하게 오래'가 정답입니다. 무리하지 않는 것도 실력이에요.</p>
+      <p style="font-size:.82rem;color:var(--muted)">— 여름 러닝 키워드는 MFRS 브랜드 키워드 ⑯사계절·⑰전해질·⑥코호흡과 이어집니다.</p>
+    </div>
+  </section>
+
+  <section>
+    <h2><span class="em">📆</span> 월별 발자취</h2>
+    <p class="lede">2월의 첫걸음부터 5월까지, 마을의 달림이 어떻게 흘러왔는지.</p>
+    <div class="card"><div class="bar"><div class="name">2월</div><div class="track"><div class="fill amber" style="width:100.0%">695회</div></div></div><div class="bar"><div class="name">3월</div><div class="track"><div class="fill amber" style="width:92.4%">642회</div></div></div><div class="bar"><div class="name">4월</div><div class="track"><div class="fill amber" style="width:76.1%">529회</div></div></div><div class="bar"><div class="name">5월</div><div class="track"><div class="fill amber" style="width:81.4%">566회</div></div></div></div>
+  </section>
+
+  <section>
+    <h2><span class="em">💭</span> 전 · 중 · 후 — 마음의 흐름</h2>
+    <p class="lede">우리는 달리기 전, 달리는 중, 달린 후에 무엇을 느꼈을까요?
+    2,432개의 일지에서 가장 자주 떠오른 마음을 모았습니다.</p>
+    <div class="arc"><div class="col"><h4>달리기 전</h4><div class="ph">문밖으로 나서기 전, 마음에 떠오른 것</div><div class="kw"><span class="dot" style="background:#8a8576"></span><span style="width:96px;flex:none">몸·컨디션</span><span class="kwbar"><i style="width:100%;background:#8a8576"></i></span><span class="n">479</span></div><div class="kw"><span class="dot" style="background:#7aa6bd"></span><span style="width:96px;flex:none">날씨·계절감</span><span class="kwbar"><i style="width:93%;background:#7aa6bd"></i></span><span class="n">446</span></div><div class="kw"><span class="dot" style="background:#7c9c6f"></span><span style="width:96px;flex:none">회복·천천히</span><span class="kwbar"><i style="width:63%;background:#7c9c6f"></i></span><span class="n">301</span></div><div class="kw"><span class="dot" style="background:#5b8aa6"></span><span style="width:96px;flex:none">함께·공동체</span><span class="kwbar"><i style="width:49%;background:#5b8aa6"></i></span><span class="n">235</span></div><div class="kw"><span class="dot" style="background:#4f8c5e"></span><span style="width:96px;flex:none">자연·풍경</span><span class="kwbar"><i style="width:46%;background:#4f8c5e"></i></span><span class="n">219</span></div><div class="kw"><span class="dot" style="background:#a08bbf"></span><span style="width:96px;flex:none">꾸준함·루틴</span><span class="kwbar"><i style="width:33%;background:#a08bbf"></i></span><span class="n">158</span></div></div><div class="col"><h4>달리는 중</h4><div class="ph">발이 땅에 닿는 동안 스친 것</div><div class="kw"><span class="dot" style="background:#8a8576"></span><span style="width:96px;flex:none">몸·컨디션</span><span class="kwbar"><i style="width:100%;background:#8a8576"></i></span><span class="n">1758</span></div><div class="kw"><span class="dot" style="background:#7aa6bd"></span><span style="width:96px;flex:none">날씨·계절감</span><span class="kwbar"><i style="width:52%;background:#7aa6bd"></i></span><span class="n">908</span></div><div class="kw"><span class="dot" style="background:#4f8c5e"></span><span style="width:96px;flex:none">자연·풍경</span><span class="kwbar"><i style="width:47%;background:#4f8c5e"></i></span><span class="n">822</span></div><div class="kw"><span class="dot" style="background:#7c9c6f"></span><span style="width:96px;flex:none">회복·천천히</span><span class="kwbar"><i style="width:46%;background:#7c9c6f"></i></span><span class="n">810</span></div><div class="kw"><span class="dot" style="background:#e0a23e"></span><span style="width:96px;flex:none">즐거움·기쁨</span><span class="kwbar"><i style="width:29%;background:#e0a23e"></i></span><span class="n">505</span></div><div class="kw"><span class="dot" style="background:#5b8aa6"></span><span style="width:96px;flex:none">함께·공동체</span><span class="kwbar"><i style="width:26%;background:#5b8aa6"></i></span><span class="n">464</span></div></div><div class="col"><h4>달린 후</h4><div class="ph">멈추고 숨을 고르며 남은 것</div><div class="kw"><span class="dot" style="background:#8a8576"></span><span style="width:96px;flex:none">몸·컨디션</span><span class="kwbar"><i style="width:100%;background:#8a8576"></i></span><span class="n">548</span></div><div class="kw"><span class="dot" style="background:#e0a23e"></span><span style="width:96px;flex:none">즐거움·기쁨</span><span class="kwbar"><i style="width:87%;background:#e0a23e"></i></span><span class="n">476</span></div><div class="kw"><span class="dot" style="background:#5b8aa6"></span><span style="width:96px;flex:none">함께·공동체</span><span class="kwbar"><i style="width:55%;background:#5b8aa6"></i></span><span class="n">303</span></div><div class="kw"><span class="dot" style="background:#7c9c6f"></span><span style="width:96px;flex:none">회복·천천히</span><span class="kwbar"><i style="width:54%;background:#7c9c6f"></i></span><span class="n">295</span></div><div class="kw"><span class="dot" style="background:#7aa6bd"></span><span style="width:96px;flex:none">날씨·계절감</span><span class="kwbar"><i style="width:43%;background:#7aa6bd"></i></span><span class="n">238</span></div><div class="kw"><span class="dot" style="background:#c97b86"></span><span style="width:96px;flex:none">감사</span><span class="kwbar"><i style="width:43%;background:#c97b86"></i></span><span class="n">235</span></div></div></div>
+    <div class="coachnote">
+      <div class="tag">📌 핵심 — 즐거움은 '달린 후'에 옵니다</div>
+      <p>달리기 <b>전</b>에는 몸 상태와 날씨를 살피는 마음이 가장 컸어요. 나설까 말까 망설이는 마음이죠.
+      달리는 <b>중</b>에는 몸·자연·날씨에 집중하다가 어느새 <b>즐거움</b>이 피어오릅니다.
+      그리고 달린 <b>후</b>, 마음에 가장 많이 남은 건 <b>즐거움과 감사</b>였습니다.</p>
+      <p>이것이 코치님이 늘 말씀하신 <b>"내가 할 수 있는 달리기를 하다 보면, 즐거움이 드러난다"</b>는 말의
+      데이터 버전이에요. 즐거움은 출발선이 아니라 도착선에서 우리를 기다리고 있었습니다.</p>
+    </div>
+  </section>
+
+  <section>
+    <h2><span class="em">⚗️</span> 감정 연금술 — 전환의 증거</h2>
+    <p class="lede">달리기 전과 후, 마음의 색이 어떻게 바뀌었을까요? 긍정적인 표현이 차지하는 비율로 본 '달리기의 마법'입니다.</p>
+    <div class="card">
+      <div class="bar"><div class="name">달리기 전</div><div class="track"><div class="fill sky" style="width:44.7%">44.7% 긍정</div></div></div>
+      <div class="bar"><div class="name">달린 후</div><div class="track"><div class="fill amber" style="width:72.9%">72.9% 긍정</div></div></div>
+      <div style="text-align:center;margin-top:14px;font-size:1.05rem">
+        긍정 비율 <b style="color:var(--sky)">45%</b>
+        <span style="color:var(--amber);font-weight:800">　→　+28%p　→</span>
+        <b style="color:var(--amber)">73%</b></div>
+    </div>
+    <div class="cardrow" style="margin-top:14px">
+      <div class="card" style="grid-column:span 2">
+        <div style="font-weight:800;color:#5b6b7a;margin-bottom:8px">😮‍💨 달리기 <b>전</b>, 자주 떠오른 무거운 마음</div>
+        <div class="chips"><span class="chip" style="background:#eef1f4;color:#5b6b7a">피곤 <b>111</b></span><span class="chip" style="background:#eef1f4;color:#5b6b7a">무리 <b>61</b></span><span class="chip" style="background:#eef1f4;color:#5b6b7a">힘들 <b>58</b></span><span class="chip" style="background:#eef1f4;color:#5b6b7a">걱정 <b>53</b></span><span class="chip" style="background:#eef1f4;color:#5b6b7a">통증 <b>47</b></span><span class="chip" style="background:#eef1f4;color:#5b6b7a">무겁 <b>41</b></span><span class="chip" style="background:#eef1f4;color:#5b6b7a">귀찮 <b>26</b></span><span class="chip" style="background:#eef1f4;color:#5b6b7a">아프 <b>21</b></span></div></div>
+      <div class="card" style="grid-column:span 2">
+        <div style="font-weight:800;color:#9a5a13;margin-bottom:8px">✨ 달린 <b>후</b>, 마음에 남은 가벼운 말</div>
+        <div class="chips"><span class="chip" style="background:var(--amber-l);color:#9a5a13">좋다 <b>188</b></span><span class="chip" style="background:var(--amber-l);color:#9a5a13">감사 <b>172</b></span><span class="chip" style="background:var(--amber-l);color:#9a5a13">좋은 <b>115</b></span><span class="chip" style="background:var(--amber-l);color:#9a5a13">행복 <b>101</b></span><span class="chip" style="background:var(--amber-l);color:#9a5a13">좋았 <b>99</b></span><span class="chip" style="background:var(--amber-l);color:#9a5a13">즐거 <b>96</b></span><span class="chip" style="background:var(--amber-l);color:#9a5a13">뿌듯 <b>85</b></span><span class="chip" style="background:var(--amber-l);color:#9a5a13">개운 <b>79</b></span></div></div>
+    </div>
+    <div class="coachnote">
+      <div class="tag">📌 핵심 — 달리기는 마음의 연금술입니다</div>
+      <p>달리기 <b>전</b>에는 '피곤·무리·힘들·걱정·통증' 같은 무거운 말이 더 많아, 긍정은 <b>45%</b>에 그쳤어요.
+      그런데 달린 <b>후</b>에는 '좋다·감사·행복·즐거움'이 마음을 채우며 긍정이 <b>73%</b>로 올라섭니다.</p>
+      <p>무거운 납(鉛)이 금(金)으로 바뀌듯, 달리기는 우리 마음을 <b>28%포인트</b>만큼 더 환하게 바꿔 놓았습니다.
+      이 전환은 2월부터 5월까지, 계절이 바뀌어도 <b>한 번도 멈추지 않았어요</b>.</p>
+    </div>
+  </section>
+
+  <section>
+    <h2><span class="em">🧭</span> 우리 마을의 감정 지도 — Russell 4분면</h2>
+    <p class="lede">심리학자 러셀(Russell, 1980)의 감정 원형 모델로, 우리의 마음을 '에너지(각성)'와 '편안함(정서가)' 두 축으로 펼쳐 봤습니다.</p>
+    <div class="card"><div class="russell"><div class="rax rax-top">▲ 에너지 높음 (각성↑)</div><div class="rgrid"><div class="rq hn" style="--op:0.48"><div class="rqv">500</div><div class="rql">답답·불안·긴장</div></div><div class="rq hp" style="--op:0.53"><div class="rqv">699</div><div class="rql">활력·기쁨·호기심</div></div><div class="rq ln" style="--op:0.42"><div class="rqv">269</div><div class="rql">우울·외로움·무력</div></div><div class="rq lp dom" style="--op:1.00"><div class="rqv">2,565 ★</div><div class="rql">평온·감사·만족</div></div></div><div class="rax rax-bot">에너지 낮음 (각성↓) ▼</div><div class="rax rax-l">◀ 불편한 마음</div><div class="rax rax-r">편안한 마음 ▶</div></div></div>
+    <div class="coachnote">
+      <div class="tag">📌 핵심 — MFRS는 '고요한 충만'의 자리에 산다</div>
+      <p>우리 마을의 마음은 압도적으로 <b>저각성·긍정(평온·감사·만족)</b> 칸에 모여 있습니다(2,565회).
+      이는 아드레날린과 경쟁으로 들끓는 '고각성' 러닝 문화와 정반대예요. 우리는 <b>흥분이 아니라 평온으로</b> 달립니다.</p>
+      <p>이것이 마인드풀러닝의 정체성입니다 — '더 빨리'의 짜릿함이 아니라, <b>'내가 할 수 있는 달리기'의 잔잔한 만족</b>.
+      코치님의 DNA가 회원 마음의 좌표로 그대로 찍혔습니다.</p>
+    </div>
+  </section>
+
+  <section>
+    <h2><span class="em">🧬</span> MFRS 온톨로지로 본 우리의 특장점</h2>
+    <p class="lede">MFRS 고유의 5층 온톨로지(마음·몸·달리기·삶·맥락)로 우리 일지를 비춰, <b>무성하게 자란 결</b>과 <b>아직 조용한 결</b>을 살펴봤습니다.
+    (텍스트에서 추론한 값이며, 순위가 아니라 결의 농도입니다.)</p>
+    <div class="card">
+      <div style="font-size:.86rem;color:var(--muted);margin-bottom:10px">레이어별 표현 농도 (회원 커버리지)</div>
+      <div class="bar"><div class="name" style="width:130px;font-size:.82rem">CONTEXT 5.1 환경</div><div class="track"><div class="fill" style="width:100%;background:#7c9c6f"></div></div><span class="n" style="width:62px">59/67명</span></div><div class="bar"><div class="name" style="width:130px;font-size:.82rem">MIND 1.1 기분</div><div class="track"><div class="fill" style="width:84%;background:#6f9c8a"></div></div><span class="n" style="width:62px">62/67명</span></div><div class="bar"><div class="name" style="width:130px;font-size:.82rem">BODY 2.1 몸 감각</div><div class="track"><div class="fill" style="width:22%;background:#c08a5a"></div></div><span class="n" style="width:62px">58/67명</span></div><div class="bar"><div class="name" style="width:130px;font-size:.82rem">MIND 1.4 알아차림</div><div class="track"><div class="fill" style="width:21%;background:#6f9c8a"></div></div><span class="n" style="width:62px">54/67명</span></div><div class="bar"><div class="name" style="width:130px;font-size:.82rem">RUN 3.1 시간·꾸준</div><div class="track"><div class="fill" style="width:12%;background:#5b8aa6"></div></div><span class="n" style="width:62px">54/67명</span></div><div class="bar"><div class="name" style="width:130px;font-size:.82rem">RUN 3.2 코호흡</div><div class="track"><div class="fill" style="width:11%;background:#5b8aa6"></div></div><span class="n" style="width:62px">50/67명</span></div><div class="bar"><div class="name" style="width:130px;font-size:.82rem">MIND 1.3 에너지</div><div class="track"><div class="fill" style="width:11%;background:#6f9c8a"></div></div><span class="n" style="width:62px">53/67명</span></div><div class="bar"><div class="name" style="width:130px;font-size:.82rem">MIND 1.2 스트레스</div><div class="track"><div class="fill" style="width:11%;background:#6f9c8a"></div></div><span class="n" style="width:62px">49/67명</span></div><div class="bar"><div class="name" style="width:130px;font-size:.82rem">MIND 1.5 자기친절</div><div class="track"><div class="fill" style="width:9%;background:#6f9c8a"></div></div><span class="n" style="width:62px">56/67명</span></div><div class="bar"><div class="name" style="width:130px;font-size:.82rem">LIFE 4.1 수면</div><div class="track"><div class="fill" style="width:7%;background:#a08bbf"></div></div><span class="n" style="width:62px">48/67명</span></div><div class="bar"><div class="name" style="width:130px;font-size:.82rem">LIFE 4.2 업무부담</div><div class="track"><div class="fill" style="width:7%;background:#a08bbf"></div></div><span class="n" style="width:62px">41/67명</span></div><div class="bar"><div class="name" style="width:130px;font-size:.82rem">MIND 1.5 자기비난</div><div class="track"><div class="fill" style="width:4%;background:#6f9c8a"></div></div><span class="n" style="width:62px">27/67명</span></div>
+    </div>
+    <div class="cardrow" style="margin-top:14px">
+      <div class="card" style="grid-column:span 2">
+        <div style="font-weight:800;color:var(--green-d);margin-bottom:6px">🌳 강한 결 — 무성하게 자란 곳</div>
+        <div class="dnastrip"><span class="tag2 s">CONTEXT 5.1 환경</span><span class="tag2 s">MIND 1.1 기분</span><span class="tag2 s">BODY 2.1 몸 감각</span></div>
+        <p style="font-size:.88rem;color:var(--ink);margin:8px 0 0">자연·환경을 알아차리고(맥락), 마음을 풍부하게 표현하며(기분), 몸의 감각에 깨어 있는 것 — MFRS의 마인드풀 코어가 가장 무성합니다.</p>
+      </div>
+      <div class="card" style="grid-column:span 2">
+        <div style="font-weight:800;color:#8a8576;margin-bottom:6px">🌱 살펴볼 결 — 아직 조용한 곳</div>
+        <div class="dnastrip"><span class="tag2 q">MIND 1.5 자기친절</span><span class="tag2 q">LIFE 4.1 수면</span><span class="tag2 q">LIFE 4.2 업무부담</span></div>
+        <p style="font-size:.88rem;color:var(--ink);margin:8px 0 0">수면·업무 같은 '삶'과의 연결은 달리기 일지에 잘 드러나지 않았어요. 부족이 아니라, 달리기가 일상 스트레스에서 잠시 <b>떨어져 쉬는 자리</b>임을 뜻할 수도 있습니다(앱이 이 연결을 도울 영역).</p>
+      </div>
+    </div>
+    <div class="note">※ 가장 약한 결은 <b>자기비난</b>(27/67명만, 농도 최하위)이었습니다. 이건 좋은 신호예요 — 우리 마을은 자신을 잘 다그치지 않습니다.</div>
+  </section>
+
+  <section>
+    <h2><span class="em">🔬</span> 심리학으로 더 깊이 — 우리 마음의 건강 지표</h2>
+    <p class="lede">마인드풀러닝 온톨로지가 기대는 심리학 표준 4가지로, 우리 마음의 건강을 비춰 봤습니다.</p>
+    <div class="psy">
+      <div class="pcard">
+        <div class="pt">😌 자기자비 (Self-Compassion)</div>
+        <div class="pv">4.8 : 1</div>
+        <div class="pd">자기 <b>친절</b>이 자기 <b>비난</b>보다 4.8배 많았어요. 67명 중 <b>63명</b>이 자신에게 친절이 우세했습니다. '빠진 날 자책하지 않기'가 마을의 기본값입니다.</div>
+        <div class="cite">Neff (2003) Self-Compassion Scale · MFRS 브랜드 키워드 ⑭자기 공감</div>
+      </div>
+      <div class="pcard">
+        <div class="pt">🎨 감정 입자도 (Emotion Granularity)</div>
+        <div class="pv">3.19 / 4</div>
+        <div class="pd">평균 3.19개 감정 분면을 표현했고, <b>38명</b>이 네 분면(기쁨·평온·불안·우울)을 모두 썼습니다. 감정 어휘가 풍부할수록 정서 회복탄력성이 높습니다.</div>
+        <div class="cite">Barrett (2017) Emotion Granularity = 정서 회복탄력성↑</div>
+      </div>
+      <div class="pcard">
+        <div class="pt">🧘 알아차림 (Mindfulness)</div>
+        <div class="pv">54 / 67명</div>
+        <div class="pd">'느낌·감각·지금 이 순간·머무름·알아차림'을 일지에 표현한 회원 수입니다. 측정 거리가 아니라 <b>현재에 머무는 능력</b> — 다른 러닝 앱엔 없는 MFRS 고유 지표예요.</div>
+        <div class="cite">Kabat-Zinn (MBSR) · Brown & Ryan (2003) MAAS</div>
+      </div>
+      <div class="pcard">
+        <div class="pt">🌿 자연 노출 (Green Exercise)</div>
+        <div class="pv">89%</div>
+        <div class="pd">장소가 확인된 달림 중 89%가 <b>숲·공원(그린)과 강·하천(블루)</b>에서 이뤄졌어요. 자연 속 운동은 5분만으로도 기분·자존감에 가장 큰 효과를 줍니다.</div>
+        <div class="cite">Wilson 생명사랑 가설 · Pretty et al.(2005) Green Exercise</div>
+      </div>
+    </div>
+    <div class="coachnote">
+      <div class="tag">📌 점검 결과 — 우리는 충분히 깊이 분석되고 있나요?</div>
+      <p>네. 단순한 '횟수·시간' 통계를 넘어, <b>감정의 4분면 분포·자기자비·알아차림·자연 노출</b>까지 — 마인드풀러닝이 표방하는
+      심리학적 깊이로 우리 마음을 비췄습니다. 그리고 그 결과는 한결같이 <b>건강합니다</b>: 평온이 지배하고, 자신에게 친절하며,
+      감정이 풍부하고, 자연 속에 머뭅니다.</p>
+    </div>
+  </section>
+
+  <section>
+    <h2><span class="em">🗺️</span> 우리가 달린 마을길</h2>
+    <p class="lede">트레드밀부터 동네 공원, 한강, 올림픽공원까지 — 마을 사람들의 발자국이 닿은 곳.</p>
+    <div class="card"><div class="loclist"><div class="li"><span>동네 공원</span><b>151회</b></div><div class="li"><span>트레드밀</span><b>91회</b></div><div class="li"><span>올림픽공원</span><b>81회</b></div><div class="li"><span>광교호수공원</span><b>62회</b></div><div class="li"><span>한강</span><b>62회</b></div><div class="li"><span>오금천</span><b>58회</b></div><div class="li"><span>안양천</span><b>37회</b></div><div class="li"><span>탄천</span><b>34회</b></div><div class="li"><span>동네 한바퀴</span><b>32회</b></div><div class="li"><span>좌광천</span><b>30회</b></div><div class="li"><span>중랑천</span><b>23회</b></div><div class="li"><span>청림어울림길</span><b>22회</b></div><div class="li"><span>홍제천</span><b>21회</b></div><div class="li"><span>불암천</span><b>19회</b></div><div class="li"><span>연희공원</span><b>19회</b></div><div class="li"><span>동네</span><b>17회</b></div></div></div>
+  </section>
+
+  <section>
+    <h2><span class="em">🤝</span> 함께 달린 마을 사람들</h2>
+    <p class="lede">순위가 아닙니다. 각자가 두레곳간에 보탠 달림이에요. 이름을 누르면 그 분의 러닝 일지로 갑니다.</p>
+    <div class="membergrid"><a class="mcard" href="members/member-13.html"><div class="mn">로함/김성우</div><div class="ms">41번 · 133시간 48분 · 41일</div><div class="chips"><span class="chip">성취·뿌듯</span><span class="chip">즐거움·기쁨</span></div></a><a class="mcard" href="members/member-41.html"><div class="mn">이세영</div><div class="ms">106번 · 125시간 13분 · 104일</div><div class="chips"><span class="chip">몸·컨디션</span><span class="chip">자연·풍경</span></div></a><a class="mcard" href="members/member-21.html"><div class="mn">백미라</div><div class="ms">120번 · 114시간 38분 · 119일</div><div class="chips"><span class="chip">몸·컨디션</span><span class="chip">날씨·계절감</span></div></a><a class="mcard" href="members/member-37.html"><div class="mn">이두승</div><div class="ms">80번 · 112시간 57분 · 78일</div><div class="chips"><span class="chip">날씨·계절감</span><span class="chip">몸·컨디션</span></div></a><a class="mcard" href="members/member-24.html"><div class="mn">설재영</div><div class="ms">73번 · 96시간 16분 · 73일</div><div class="chips"><span class="chip">즐거움·기쁨</span><span class="chip">몸·컨디션</span></div></a><a class="mcard" href="members/member-44.html"><div class="mn">이예정</div><div class="ms">75번 · 93시간 16분 · 73일</div><div class="chips"><span class="chip">몸·컨디션</span><span class="chip">함께·공동체</span></div></a><a class="mcard" href="members/member-54.html"><div class="mn">전영호</div><div class="ms">101번 · 92시간 45분 · 101일</div><div class="chips"><span class="chip">몸·컨디션</span><span class="chip">회복·천천히</span></div></a><a class="mcard" href="members/member-26.html"><div class="mn">신순주</div><div class="ms">99번 · 87시간 39분 · 98일</div><div class="chips"><span class="chip">몸·컨디션</span><span class="chip">힘듦·도전</span></div></a><a class="mcard" href="members/member-11.html"><div class="mn">김훈범</div><div class="ms">62번 · 85시간 16분 · 57일</div><div class="chips"><span class="chip">몸·컨디션</span><span class="chip">회복·천천히</span></div></a><a class="mcard" href="members/member-65.html"><div class="mn">황유숙</div><div class="ms">93번 · 81시간 28분 · 89일</div><div class="chips"><span class="chip">자연·풍경</span><span class="chip">날씨·계절감</span></div></a><a class="mcard" href="members/member-06.html"><div class="mn">김종훈</div><div class="ms">94번 · 67시간 36분 · 92일</div><div class="chips"><span class="chip">몸·컨디션</span><span class="chip">회복·천천히</span></div></a><a class="mcard" href="members/member-17.html"><div class="mn">박경애</div><div class="ms">56번 · 66시간 27분 · 55일</div><div class="chips"><span class="chip">자연·풍경</span><span class="chip">날씨·계절감</span></div></a><a class="mcard" href="members/member-55.html"><div class="mn">정경원</div><div class="ms">34번 · 62시간 12분 · 34일</div><div class="chips"><span class="chip">몸·컨디션</span><span class="chip">날씨·계절감</span></div></a><a class="mcard" href="members/member-08.html"><div class="mn">김지훈</div><div class="ms">23번 · 57시간 57분 · 23일</div><div class="chips"><span class="chip">몸·컨디션</span><span class="chip">날씨·계절감</span></div></a><a class="mcard" href="members/member-45.html"><div class="mn">이유진</div><div class="ms">51번 · 57시간 52분 · 50일</div><div class="chips"><span class="chip">몸·컨디션</span><span class="chip">회복·천천히</span></div></a><a class="mcard" href="members/member-56.html"><div class="mn">정남C</div><div class="ms">76번 · 56시간 37분 · 76일</div><div class="chips"><span class="chip">몸·컨디션</span><span class="chip">마음챙김·평온</span></div></a><a class="mcard" href="members/member-29.html"><div class="mn">심혜원</div><div class="ms">54번 · 55시간 3분 · 54일</div><div class="chips"><span class="chip">몸·컨디션</span><span class="chip">즐거움·기쁨</span></div></a><a class="mcard" href="members/member-51.html"><div class="mn">임상범</div><div class="ms">85번 · 54시간 52분 · 83일</div><div class="chips"><span class="chip">몸·컨디션</span><span class="chip">함께·공동체</span></div></a><a class="mcard" href="members/member-09.html"><div class="mn">김찬현</div><div class="ms">59번 · 51시간 38분 · 58일</div><div class="chips"><span class="chip">날씨·계절감</span><span class="chip">자연·풍경</span></div></a><a class="mcard" href="members/member-58.html"><div class="mn">조예쁜성아</div><div class="ms">52번 · 50시간 15분 · 52일</div><div class="chips"><span class="chip">즐거움·기쁨</span><span class="chip">몸·컨디션</span></div></a><a class="mcard" href="members/member-18.html"><div class="mn">박기영</div><div class="ms">67번 · 50시간 1분 · 67일</div><div class="chips"><span class="chip">몸·컨디션</span><span class="chip">즐거움·기쁨</span></div></a><a class="mcard" href="members/member-35.html"><div class="mn">이남순</div><div class="ms">30번 · 46시간 45분 · 30일</div><div class="chips"><span class="chip">몸·컨디션</span><span class="chip">날씨·계절감</span></div></a><a class="mcard" href="members/member-52.html"><div class="mn">임자영</div><div class="ms">63번 · 44시간 29분 · 61일</div><div class="chips"><span class="chip">함께·공동체</span><span class="chip">몸·컨디션</span></div></a><a class="mcard" href="members/member-50.html"><div class="mn">이훈영</div><div class="ms">75번 · 40시간 17분 · 72일</div><div class="chips"><span class="chip">몸·컨디션</span><span class="chip">날씨·계절감</span></div></a><a class="mcard" href="members/member-12.html"><div class="mn">김희은</div><div class="ms">40번 · 37시간 22분 · 37일</div><div class="chips"><span class="chip">몸·컨디션</span><span class="chip">마음챙김·평온</span></div></a><a class="mcard" href="members/member-38.html"><div class="mn">이미애</div><div class="ms">50번 · 36시간 54분 · 50일</div><div class="chips"><span class="chip">몸·컨디션</span><span class="chip">날씨·계절감</span></div></a><a class="mcard" href="members/member-01.html"><div class="mn">고진수</div><div class="ms">48번 · 35시간 21분 · 46일</div><div class="chips"><span class="chip">몸·컨디션</span><span class="chip">즐거움·기쁨</span></div></a><a class="mcard" href="members/member-14.html"><div class="mn">류순영</div><div class="ms">27번 · 32시간 24분 · 27일</div><div class="chips"><span class="chip">날씨·계절감</span><span class="chip">자연·풍경</span></div></a><a class="mcard" href="members/member-25.html"><div class="mn">송승진</div><div class="ms">28번 · 30시간 55분 · 26일</div><div class="chips"><span class="chip">몸·컨디션</span><span class="chip">회복·천천히</span></div></a><a class="mcard" href="members/member-53.html"><div class="mn">장미순</div><div class="ms">36번 · 29시간 45분 · 36일</div><div class="chips"><span class="chip">몸·컨디션</span><span class="chip">즐거움·기쁨</span></div></a><a class="mcard" href="members/member-46.html"><div class="mn">이지윤</div><div class="ms">51번 · 24시간 29분 · 50일</div><div class="chips"><span class="chip">몸·컨디션</span><span class="chip">날씨·계절감</span></div></a><a class="mcard" href="members/member-27.html"><div class="mn">신승엽</div><div class="ms">23번 · 23시간 58분 · 23일</div><div class="chips"><span class="chip">즐거움·기쁨</span><span class="chip">몸·컨디션</span></div></a><a class="mcard" href="members/member-15.html"><div class="mn">모니카염</div><div class="ms">25번 · 22시간 37분 · 24일</div><div class="chips"><span class="chip">몸·컨디션</span><span class="chip">회복·천천히</span></div></a><a class="mcard" href="members/member-61.html"><div class="mn">추재연</div><div class="ms">24번 · 22시간 12분 · 22일</div><div class="chips"><span class="chip">몸·컨디션</span><span class="chip">즐거움·기쁨</span></div></a><a class="mcard" href="members/member-62.html"><div class="mn">크리스킴</div><div class="ms">36번 · 21시간 55분 · 35일</div><div class="chips"><span class="chip">몸·컨디션</span><span class="chip">날씨·계절감</span></div></a><a class="mcard" href="members/member-48.html"><div class="mn">이현주</div><div class="ms">32번 · 20시간 41분 · 29일</div><div class="chips"><span class="chip">즐거움·기쁨</span><span class="chip">자연·풍경</span></div></a><a class="mcard" href="members/member-05.html"><div class="mn">김수진</div><div class="ms">21번 · 20시간 4분 · 21일</div><div class="chips"><span class="chip">몸·컨디션</span><span class="chip">회복·천천히</span></div></a><a class="mcard" href="members/member-04.html"><div class="mn">김소영</div><div class="ms">25번 · 19시간 53분 · 25일</div><div class="chips"><span class="chip">회복·천천히</span><span class="chip">날씨·계절감</span></div></a><a class="mcard" href="members/member-42.html"><div class="mn">이수응</div><div class="ms">16번 · 19시간 13분 · 16일</div><div class="chips"><span class="chip">날씨·계절감</span><span class="chip">함께·공동체</span></div></a><a class="mcard" href="members/member-30.html"><div class="mn">안신해</div><div class="ms">17번 · 19시간 8분 · 17일</div><div class="chips"><span class="chip">몸·컨디션</span><span class="chip">함께·공동체</span></div></a><a class="mcard" href="members/member-23.html"><div class="mn">변진환</div><div class="ms">16번 · 17시간 53분 · 14일</div><div class="chips"><span class="chip">회복·천천히</span><span class="chip">몸·컨디션</span></div></a><a class="mcard" href="members/member-43.html"><div class="mn">이영화</div><div class="ms">28번 · 16시간 43분 · 26일</div><div class="chips"><span class="chip">함께·공동체</span><span class="chip">힘듦·도전</span></div></a><a class="mcard" href="members/member-63.html"><div class="mn">한채원</div><div class="ms">20번 · 16시간 31분 · 20일</div><div class="chips"><span class="chip">즐거움·기쁨</span><span class="chip">몸·컨디션</span></div></a><a class="mcard" href="members/member-33.html"><div class="mn">윤정원</div><div class="ms">25번 · 16시간 31분 · 24일</div><div class="chips"><span class="chip">날씨·계절감</span><span class="chip">회복·천천히</span></div></a><a class="mcard" href="members/member-10.html"><div class="mn">김태영</div><div class="ms">9번 · 14시간 26분 · 9일</div><div class="chips"><span class="chip">함께·공동체</span><span class="chip">날씨·계절감</span></div></a><a class="mcard" href="members/member-40.html"><div class="mn">이새롭</div><div class="ms">20번 · 12시간 50분 · 17일</div><div class="chips"><span class="chip">날씨·계절감</span><span class="chip">몸·컨디션</span></div></a><a class="mcard" href="members/member-03.html"><div class="mn">김미혜</div><div class="ms">13번 · 10시간 45분 · 13일</div><div class="chips"><span class="chip">몸·컨디션</span><span class="chip">힘듦·도전</span></div></a><a class="mcard" href="members/member-49.html"><div class="mn">이화연</div><div class="ms">4번 · 10시간 34분 · 4일</div><div class="chips"><span class="chip">즐거움·기쁨</span><span class="chip">함께·공동체</span></div></a><a class="mcard" href="members/member-16.html"><div class="mn">박건희</div><div class="ms">22번 · 10시간 19분 · 22일</div><div class="chips"><span class="chip">몸·컨디션</span><span class="chip">힘듦·도전</span></div></a><a class="mcard" href="members/member-20.html"><div class="mn">박히준</div><div class="ms">14번 · 10시간 8분 · 14일</div><div class="chips"><span class="chip">마음챙김·평온</span><span class="chip">몸·컨디션</span></div></a><a class="mcard" href="members/member-02.html"><div class="mn">김경욱</div><div class="ms">13번 · 9시간 25분 · 13일</div><div class="chips"><span class="chip">회복·천천히</span><span class="chip">마음챙김·평온</span></div></a><a class="mcard" href="members/member-32.html"><div class="mn">우경호</div><div class="ms">13번 · 9시간 14분 · 12일</div><div class="chips"><span class="chip">몸·컨디션</span><span class="chip">즐거움·기쁨</span></div></a><a class="mcard" href="members/member-31.html"><div class="mn">엄지선</div><div class="ms">16번 · 8시간 32분 · 15일</div><div class="chips"><span class="chip">몸·컨디션</span><span class="chip">마음챙김·평온</span></div></a><a class="mcard" href="members/member-39.html"><div class="mn">이상언</div><div class="ms">10번 · 4시간 17분 · 10일</div><div class="chips"><span class="chip">몸·컨디션</span><span class="chip">꾸준함·루틴</span></div></a><a class="mcard" href="members/member-59.html"><div class="mn">채주경</div><div class="ms">7번 · 4시간 12분 · 7일</div><div class="chips"><span class="chip">몸·컨디션</span><span class="chip">날씨·계절감</span></div></a><a class="mcard" href="members/member-60.html"><div class="mn">최경숙</div><div class="ms">6번 · 3시간 42분 · 6일</div><div class="chips"><span class="chip">즐거움·기쁨</span><span class="chip">함께·공동체</span></div></a><a class="mcard" href="members/member-57.html"><div class="mn">정연훈</div><div class="ms">1번 · 3시간 20분 · 1일</div><div class="chips"></div></a><a class="mcard" href="members/member-47.html"><div class="mn">이진우</div><div class="ms">6번 · 2시간 48분 · 6일</div><div class="chips"><span class="chip">몸·컨디션</span><span class="chip">회복·천천히</span></div></a><a class="mcard" href="members/member-28.html"><div class="mn">신한주</div><div class="ms">3번 · 2시간 40분 · 3일</div><div class="chips"><span class="chip">즐거움·기쁨</span></div></a><a class="mcard" href="members/member-34.html"><div class="mn">윤정화</div><div class="ms">7번 · 1시간 36분 · 7일</div><div class="chips"><span class="chip">몸·컨디션</span><span class="chip">날씨·계절감</span></div></a><a class="mcard" href="members/member-36.html"><div class="mn">이다원</div><div class="ms">4번 · 1시간 30분 · 4일</div><div class="chips"><span class="chip">몸·컨디션</span><span class="chip">마음챙김·평온</span></div></a><a class="mcard" href="members/member-19.html"><div class="mn">박세진</div><div class="ms">1번 · 1시간 0분 · 1일</div><div class="chips"></div></a><a class="mcard" href="members/member-64.html"><div class="mn">한현철</div><div class="ms">2번 · 0시간 45분 · 2일</div><div class="chips"><span class="chip">몸·컨디션</span></div></a><a class="mcard" href="members/member-66.html"><div class="mn">황지은</div><div class="ms">1번 · 0시간 37분 · 1일</div><div class="chips"><span class="chip">몸·컨디션</span></div></a><a class="mcard" href="members/member-67.html"><div class="mn">황지호</div><div class="ms">1번 · 0시간 25분 · 1일</div><div class="chips"><span class="chip">몸·컨디션</span></div></a><a class="mcard" href="members/member-07.html"><div class="mn">김지선</div><div class="ms">1번 · 0시간 10분 · 1일</div><div class="chips"><span class="chip">회복·천천히</span></div></a><a class="mcard" href="members/member-22.html"><div class="mn">백소희</div><div class="ms">1번 · 0시간 1분 · 1일</div><div class="chips"><span class="chip">몸·컨디션</span></div></a></div>
+    <div class="note">※ 마인드풀러닝은 비교·경쟁을 권하지 않습니다. 위 목록은 누적 시간순이지만,
+    1분을 달린 분과 10시간을 달린 분 모두 같은 마을의 같은 주민입니다. (MFRS 헌장 §1 존중)</div>
+  </section>
+
+  <section>
+    <h2><span class="em">🏘️</span> 마을의 대화 — 단톡방 월별·주제별 이력</h2>
+    <p class="lede">올해(2026) 5개 단톡방에서 오간 <b>9,670건</b>의 대화를 월별·주제별로 모았습니다.
+    달리기 기록(두레곳간)과 함께, 마을이 어떻게 <b>소통하며 굴러왔는지</b>의 기록입니다.
+    <b>방 이름을 누르면</b> 그 방의 <b>월별 주요 대화 이력</b>으로 갑니다.</p>
+    <div class="roomcards"><a class="roomcard rclick" href="rooms/notice.html"><div class="rn">📢 전체 공지 <span class="rarrow">→</span></div><div class="rd">5기 공식 공지·운영</div><div class="rv">2,162<span style="font-size:.8rem">건</span></div><div class="rm">69명 참여 · 최다 2월(702)</div></a><a class="roomcard rclick" href="rooms/community.html"><div class="rn">💬 커뮤니티 <span class="rarrow">→</span></div><div class="rd">자유 소통·기록 나눔</div><div class="rv">954<span style="font-size:.8rem">건</span></div><div class="rm">62명 참여 · 최다 5월(338)</div></a><a class="roomcard rclick" href="rooms/jeju.html"><div class="rn">🏝️ 제주 <span class="rarrow">→</span></div><div class="rd">제주 올레·100마일 운영</div><div class="rv">3,204<span style="font-size:.8rem">건</span></div><div class="rm">60명 참여 · 최다 4월(1,639)</div></a><a class="roomcard rclick" href="rooms/backyard.html"><div class="rn">🔁 백야드 <span class="rarrow">→</span></div><div class="rd">백야드 울트라 LOCAL</div><div class="rv">1,706<span style="font-size:.8rem">건</span></div><div class="rm">54명 참여 · 최다 3월(791)</div></a><a class="roomcard rclick" href="rooms/ops.html"><div class="rn">🛠️ 운영진 <span class="rarrow">→</span></div><div class="rd">AX TF 운영진 (앱·기획·SYNC)</div><div class="rv">1,644<span style="font-size:.8rem">건</span></div><div class="rm">7명 참여 · 최다 4월(462)</div></a></div>
+
+    <div class="card" style="margin-top:16px">
+      <div style="font-size:.86rem;color:var(--muted);margin-bottom:10px">단톡방 × 월별 대화량 (진할수록 활발)</div>
+      <table class="heat"><thead><tr><th style="text-align:left">단톡방</th><th>1월</th><th>2월</th><th>3월</th><th>4월</th><th>5월</th></tr></thead>
+      <tbody><tr><td class="lbl"><a href="rooms/notice.html">📢 전체 공지</a></td><td class="c" style="background:#f3efe6;color:#bbb4a6"></td><td class="c" style="background:rgba(47,107,79,0.63);color:#2b2a26">702</td><td class="c" style="background:rgba(47,107,79,0.60);color:#2b2a26">621</td><td class="c" style="background:rgba(47,107,79,0.50);color:#2b2a26">391</td><td class="c" style="background:rgba(47,107,79,0.53);color:#2b2a26">448</td></tr><tr><td class="lbl"><a href="rooms/community.html">💬 커뮤니티</a></td><td class="c" style="background:rgba(47,107,79,0.31);color:#2b2a26">93</td><td class="c" style="background:rgba(47,107,79,0.31);color:#2b2a26">95</td><td class="c" style="background:rgba(47,107,79,0.42);color:#2b2a26">246</td><td class="c" style="background:rgba(47,107,79,0.38);color:#2b2a26">182</td><td class="c" style="background:rgba(47,107,79,0.47);color:#2b2a26">338</td></tr><tr><td class="lbl"><a href="rooms/jeju.html">🏝️ 제주</a></td><td class="c" style="background:rgba(47,107,79,0.18);color:#2b2a26">9</td><td class="c" style="background:rgba(47,107,79,0.44);color:#2b2a26">280</td><td class="c" style="background:rgba(47,107,79,0.62);color:#2b2a26">684</td><td class="c" style="background:rgba(47,107,79,0.90);color:#fff">1639</td><td class="c" style="background:rgba(47,107,79,0.59);color:#2b2a26">592</td></tr><tr><td class="lbl"><a href="rooms/backyard.html">🔁 백야드</a></td><td class="c" style="background:rgba(47,107,79,0.50);color:#2b2a26">387</td><td class="c" style="background:rgba(47,107,79,0.27);color:#2b2a26">62</td><td class="c" style="background:rgba(47,107,79,0.66);color:#fff">791</td><td class="c" style="background:rgba(47,107,79,0.18);color:#2b2a26">9</td><td class="c" style="background:rgba(47,107,79,0.53);color:#2b2a26">457</td></tr><tr><td class="lbl"><a href="rooms/ops.html">🛠️ 운영진</a></td><td class="c" style="background:rgba(47,107,79,0.35);color:#2b2a26">139</td><td class="c" style="background:rgba(47,107,79,0.45);color:#2b2a26">285</td><td class="c" style="background:rgba(47,107,79,0.53);color:#2b2a26">456</td><td class="c" style="background:rgba(47,107,79,0.53);color:#2b2a26">462</td><td class="c" style="background:rgba(47,107,79,0.45);color:#2b2a26">302</td></tr><tr><td class="lbl" style="color:var(--green-d)">합계</td><td class="c" style="font-weight:800">628</td><td class="c" style="font-weight:800">1,424</td><td class="c" style="font-weight:800">2,798</td><td class="c" style="font-weight:800">2,683</td><td class="c" style="font-weight:800">2,137</td></tr></tbody></table>
+    </div>
+
+    <div class="cardrow" style="margin-top:16px">
+      <div class="card" style="grid-column:span 2">
+        <div style="font-weight:800;color:var(--green-d);margin-bottom:10px">전체 주제 분포</div>
+        <div class="topicrow"><span class="tn">💛 응원·소통</span><span class="tb"><i style="width:100%"></i></span><span class="tv">2,485</span></div><div class="topicrow"><span class="tn">🏃 기록·인증</span><span class="tb"><i style="width:42%"></i></span><span class="tv">1,056</span></div><div class="topicrow"><span class="tn">📋 운영·공지</span><span class="tb"><i style="width:33%"></i></span><span class="tv">827</span></div><div class="topicrow"><span class="tn">🥾 제주·올레</span><span class="tb"><i style="width:32%"></i></span><span class="tv">796</span></div><div class="topicrow"><span class="tn">🏅 대회·이벤트</span><span class="tb"><i style="width:26%"></i></span><span class="tv">654</span></div><div class="topicrow"><span class="tn">📚 강의·교육</span><span class="tb"><i style="width:20%"></i></span><span class="tv">486</span></div><div class="topicrow"><span class="tn">📱 앱·기술</span><span class="tb"><i style="width:17%"></i></span><span class="tv">418</span></div><div class="topicrow"><span class="tn">🔁 백야드</span><span class="tb"><i style="width:7%"></i></span><span class="tv">183</span></div><div class="topicrow"><span class="tn">🩹 부상·건강</span><span class="tb"><i style="width:7%"></i></span><span class="tv">180</span></div>
+      </div>
+      <div class="card" style="grid-column:span 2">
+        <div style="font-weight:800;color:var(--green-d);margin-bottom:10px">단톡방별 성격 (주요 주제)</div>
+        <div style="margin:6px 0;font-size:.88rem"><a href="rooms/notice.html"><b>📢 전체 공지</b></a> &nbsp;<span class="chip">💛 응원·소통</span><span class="chip">🏃 기록·인증</span></div><div style="margin:6px 0;font-size:.88rem"><a href="rooms/community.html"><b>💬 커뮤니티</b></a> &nbsp;<span class="chip">💛 응원·소통</span><span class="chip">🏃 기록·인증</span></div><div style="margin:6px 0;font-size:.88rem"><a href="rooms/jeju.html"><b>🏝️ 제주</b></a> &nbsp;<span class="chip">💛 응원·소통</span><span class="chip">🥾 제주·올레</span></div><div style="margin:6px 0;font-size:.88rem"><a href="rooms/backyard.html"><b>🔁 백야드</b></a> &nbsp;<span class="chip">💛 응원·소통</span><span class="chip">🏃 기록·인증</span></div><div style="margin:6px 0;font-size:.88rem"><a href="rooms/ops.html"><b>🛠️ 운영진</b></a> &nbsp;<span class="chip">💛 응원·소통</span><span class="chip">🏃 기록·인증</span></div>
+      </div>
+    </div>
+
+    <div class="coachnote">
+      <div class="tag">📌 핵심 — 숫자 너머의 이야기</div>
+      <p>5개 방을 통틀어 가장 많은 주제는 <b>응원·소통</b>이었습니다(2,485건).
+      공지·기록·제주·대회 같은 '일' 이야기보다, <b>서로를 북돋는 말</b>이 마을 대화의 바탕색이에요.</p>
+      <p>방마다 결이 다릅니다 — <b>제주</b>는 올레·100마일 운영(매월 코스·CP 안내), <b>백야드</b>는 루프 도전과 후기,
+      <b>커뮤니티</b>는 피터의 <b>월간 분석 보고서</b>, <b>운영진</b>은 앱 MVP·SYNC 회의록으로 마을을 굴려 왔습니다.
+      두레곳간이 '발'의 기록이라면, 이 대화는 <b>'마음과 운영'</b>의 기록입니다.</p>
+    </div>
+  </section>
+
+  <footer>
+    <p><b>마인드풀러닝 어드밴스 5기 · 2–5월 누적 인사이트 대시보드(공통편)</b> · 생성 2026-06-04</p>
+    <p>이 리포트는 기존 운영통계 시리즈(20260220 2월 · 20260331 2-3월 · 20260430 2-4월 누적 대시보드)를 잇는 <b>2-5월 누적</b>편입니다. "감정 연금술" 분석을 계승하고, 시즌별 현황·회원별 개인 리포트를 새로 더했습니다.</p>
+    <p>데이터 출처: ① 마인드풀러닝 기록 앱 export (2월~5월, 2,432건 · 4월까지 Notion DB, 5월부터 Vercel JSON) · ② 카톡 단톡방 5개 export (9,670건 · 올해 2026 · 집계만, 본문 비공개).</p>
+    <p>내부 커뮤니티용 · 회원 실명 포함 · 외부 배포 금지. · <a href="members/index.html">회원별 리포트 →</a></p>
+  </footer>
+</div>
+
+</body></html>

@@ -1,6 +1,7 @@
 'use client'
 
-import { useState, useCallback, useEffect, useMemo } from 'react'
+import { useState, useCallback, useEffect, useMemo, useRef } from 'react'
+import { useRouter } from 'next/navigation'
 import { RunFeed, PhotoGrid } from '../feed/run-feed'
 import { TodayCardDeck } from '../feed/today-card-deck'
 import { DetailSheet } from '../feed/detail-sheet'
@@ -198,7 +199,12 @@ function StatsHeader({
 }
 
 export function HomeFeed({ recentRuns, myRuns, memberId, crew, weeklyBars, weeklyTotalHours = 0, initialOffset = 20, memberName = '', memberAvatarUrl = '' }: Props) {
+  const router = useRouter()
   const [tab, setTab] = useState<Tab>('all')
+  const [refreshing, setRefreshing] = useState(false)
+  const pullStartY = useRef(0)
+  const pullDeltaY = useRef(0)
+  const isPulling = useRef(false)
   const [triggerRun, setTriggerRun] = useState<RunLog | null>(null)
   const [autoOpenRun, setAutoOpenRun] = useState<RunLog | null>(null)
 
@@ -238,6 +244,51 @@ export function HomeFeed({ recentRuns, myRuns, memberId, crew, weeklyBars, weekl
     try { setAutoOpenRun(JSON.parse(stored) as RunLog) } catch {}
   }, [])
 
+  // visibilitychange: 앱 복귀 시 자동 갱신
+  useEffect(() => {
+    const onVisible = () => {
+      if (document.visibilityState === 'visible') router.refresh()
+    }
+    document.addEventListener('visibilitychange', onVisible)
+    return () => document.removeEventListener('visibilitychange', onVisible)
+  }, [router])
+
+  // pull-to-refresh
+  useEffect(() => {
+    const el = document.documentElement
+
+    const onTouchStart = (e: TouchEvent) => {
+      if (el.scrollTop > 0) return
+      pullStartY.current = e.touches[0]!.clientY
+      isPulling.current = true
+    }
+
+    const onTouchMove = (e: TouchEvent) => {
+      if (!isPulling.current) return
+      pullDeltaY.current = e.touches[0]!.clientY - pullStartY.current
+    }
+
+    const onTouchEnd = () => {
+      if (!isPulling.current) return
+      isPulling.current = false
+      if (pullDeltaY.current > 72) {
+        setRefreshing(true)
+        router.refresh()
+        setTimeout(() => setRefreshing(false), 1000)
+      }
+      pullDeltaY.current = 0
+    }
+
+    window.addEventListener('touchstart', onTouchStart, { passive: true })
+    window.addEventListener('touchmove', onTouchMove, { passive: true })
+    window.addEventListener('touchend', onTouchEnd)
+    return () => {
+      window.removeEventListener('touchstart', onTouchStart)
+      window.removeEventListener('touchmove', onTouchMove)
+      window.removeEventListener('touchend', onTouchEnd)
+    }
+  }, [router])
+
   const handleCrewClick = useCallback((crewMemberId: string) => {
     const run = recentRuns.find(r => r.memberId === crewMemberId) ?? null
     if (!run) return
@@ -252,6 +303,20 @@ export function HomeFeed({ recentRuns, myRuns, memberId, crew, weeklyBars, weekl
 
   return (
     <>
+      {refreshing && (
+        <div style={{
+          display: 'flex', justifyContent: 'center', alignItems: 'center',
+          height: 36, marginTop: 4,
+        }}>
+          <div style={{
+            width: 20, height: 20, borderRadius: '50%',
+            border: '2px solid #e0e0e0',
+            borderTopColor: '#2f6b4f',
+            animation: 'spin 0.7s linear infinite',
+          }} />
+          <style>{`@keyframes spin { to { transform: rotate(360deg) } }`}</style>
+        </div>
+      )}
       <div style={{ height: 12 }} />
       <InsightsBanner />
       <DonationBanner />

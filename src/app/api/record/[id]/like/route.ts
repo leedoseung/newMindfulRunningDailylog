@@ -77,7 +77,7 @@ export async function POST(
             comment_body: null,
             is_read: false,
           },
-          { onConflict: 'recipient_member_id,actor_member_id,run_log_id', ignoreDuplicates: false }
+          { onConflict: 'recipient_member_id,actor_member_id,run_log_id,type', ignoreDuplicates: false }
         )
       } catch { /* non-critical */ }
     })()

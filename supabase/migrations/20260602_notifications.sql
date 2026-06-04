@@ -14,10 +14,10 @@ CREATE TABLE notifications (
 
 ALTER TABLE notifications ENABLE ROW LEVEL SECURITY;
 
--- Partial unique index: one like notification per actor+run (prevent duplicates on re-like)
+-- Unique index: one like notification per actor+run+type
+-- Note: partial index (WHERE type='like') is incompatible with Supabase upsert onConflict
 CREATE UNIQUE INDEX notif_like_unique
-  ON notifications(recipient_member_id, actor_member_id, run_log_id)
-  WHERE type = 'like';
+  ON notifications(recipient_member_id, actor_member_id, run_log_id, type);
 
 -- Index for fast lookup by recipient
 CREATE INDEX notifications_recipient_idx ON notifications(recipient_member_id, created_at DESC);

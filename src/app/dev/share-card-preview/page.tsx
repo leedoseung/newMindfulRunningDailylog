@@ -65,18 +65,14 @@ function FullBleedCard({ height, label, run }: { height: number; label: string; 
               textShadow: '0 1px 6px rgba(0,0,0,0.6)',
             }}>"{run.title}"</div>
           )}
-          {/* 메타: 달린시간 · 장소 · 이름 */}
+          {/* 메타: 한 줄 텍스트 */}
           <div style={{
-            display: 'flex', gap: 6, flexWrap: 'wrap', marginBottom: 14,
+            fontSize: 11, color: 'rgba(255,255,255,0.7)', fontFamily: FONT,
+            marginBottom: 14, letterSpacing: '0.3px',
+            textShadow: '0 1px 3px rgba(0,0,0,0.5)',
+            overflow: 'hidden', whiteSpace: 'nowrap', textOverflow: 'ellipsis',
           }}>
-            {[`${run.durationMin}분`, run.location, run.memberName].filter(Boolean).map(v => (
-              <span key={v} style={{
-                fontSize: 10, fontWeight: 600, color: '#fff',
-                background: 'rgba(255,255,255,0.18)', borderRadius: 20,
-                padding: '3px 10px', fontFamily: FONT, letterSpacing: '0.3px',
-                backdropFilter: 'blur(4px)',
-              }}>{v}</span>
-            ))}
+            {[`${run.durationMin}분`, run.location, run.memberName].filter(Boolean).join(' · ')}
           </div>
           {thoughts.map(({ label: l, text }, i) => (
             <div key={l} style={{
@@ -90,7 +86,7 @@ function FullBleedCard({ height, label, run }: { height: number; label: string; 
               <span style={{
                 fontSize: 11, color: 'rgba(255,255,255,0.75)', lineHeight: 1.6, fontFamily: FONT,
                 textShadow: '0 1px 3px rgba(0,0,0,0.4)',
-                display: '-webkit-box', WebkitLineClamp: 3, WebkitBoxOrient: 'vertical', overflow: 'hidden',
+                display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden',
               }}>{text}</span>
             </div>
           ))}

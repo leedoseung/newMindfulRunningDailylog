@@ -422,26 +422,15 @@ ${run.thoughtAfter}`
           />
         )}
 
-        {/* Photo gradient — fades photo into #111 at 300px; full-screen in photoFull */}
+        {/* Dark overlay — dims photo so text is readable; hides in fullscreen mode */}
         {hasPhoto && (
           <div style={{
-            position: 'absolute', top: 0, left: 0, right: 0, height: photoFull ? '100%' : 300,
-            background: 'linear-gradient(to bottom, rgba(0,0,0,0.2) 0%, rgba(0,0,0,0.45) 50%, rgba(17,17,17,0.9) 80%, rgba(17,17,17,1) 100%)',
+            position: 'absolute', inset: 0,
+            background: 'linear-gradient(to bottom, rgba(0,0,0,0.38) 0%, rgba(0,0,0,0.55) 40%, rgba(0,0,0,0.65) 100%)',
             opacity: photoFull ? 0 : 1,
             transition: 'opacity 0.35s',
             pointerEvents: 'none',
             zIndex: 1,
-          }} />
-        )}
-        {/* Solid #111 cover below photo area; fades away in photoFull */}
-        {hasPhoto && (
-          <div style={{
-            position: 'absolute', top: 300, left: 0, right: 0, bottom: 0,
-            background: '#111',
-            opacity: photoFull ? 0 : 1,
-            transition: 'opacity 0.35s',
-            pointerEvents: 'none',
-            zIndex: 2,
           }} />
         )}
 

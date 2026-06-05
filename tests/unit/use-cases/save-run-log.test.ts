@@ -14,7 +14,7 @@ const savedRun: RunLog = {
   id: 'r1', memberId: 'm1', memberName: '이두승', memberAvatarUrl: '', memberInstaId: '', date: '2026-05-26', runTime: null,
   durationMin: 30, title: '테스트 달리기', thoughtBefore: '설레',
   thoughtDuring: '힘들다', thoughtAfter: '뿌듯', location: '한강',
-  photoUrl: '', createdAt: '2026-05-26T00:00:00Z',
+  photoUrl: '', rawPhotoUrl: null, createdAt: '2026-05-26T00:00:00Z',
   likeCount: 0, commentCount: 0,
 }
 

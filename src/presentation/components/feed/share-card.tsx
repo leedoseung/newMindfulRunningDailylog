@@ -27,7 +27,7 @@ function PhotoCard({ run }: Props) {
       <div style={{ position: 'relative', height: 400, overflow: 'hidden' }}>
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
-          src={run.photoUrl}
+          src={run.rawPhotoUrl ?? run.photoUrl}
           alt=""
           data-photo
           crossOrigin="anonymous"

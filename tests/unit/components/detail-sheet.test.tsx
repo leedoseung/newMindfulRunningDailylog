@@ -28,6 +28,7 @@ const run: RunLog = {
   thoughtAfter: '뿌듯하다',
   location: '남산',
   photoUrl: '',
+  rawPhotoUrl: null,
   createdAt: '2026-05-24T09:00:00Z',
   likeCount: 0,
   commentCount: 0,

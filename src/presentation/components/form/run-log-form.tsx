@@ -131,6 +131,7 @@ export function RunLogForm({ memberId, memberName = '', memberAvatarUrl = '', mo
     thoughtAfter,
     location,
     photoUrl: photoObjectUrlRef.current ?? initialData?.photoUrl ?? '',
+    rawPhotoUrl: null,
     createdAt: new Date().toISOString(),
     likeCount: 0,
     commentCount: 0,

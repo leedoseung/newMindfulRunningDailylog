@@ -62,6 +62,7 @@ export async function GET(
     thoughtAfter: row.thought_after as string,
     location: row.location as string,
     photoUrl: row.photo_url as string,
+    rawPhotoUrl: (row.photo_url as string | null) ?? null,
     createdAt: row.created_at as string,
     likeCount: (row.likes?.[0]?.count as number) ?? 0,
     commentCount: (row.comments?.[0]?.count as number) ?? 0,

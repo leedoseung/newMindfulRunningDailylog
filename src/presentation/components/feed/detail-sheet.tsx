@@ -54,6 +54,31 @@ function useCountUp(target: number, active: boolean) {
 
 const FONT = "'Pretendard Variable', Pretendard, -apple-system, sans-serif"
 
+// Pre-crop image to match share card photo container (375×400 at scale:2 = 750×800).
+// html2canvas v1.x ignores objectFit:cover — we crop manually so nothing gets squished.
+function cropToSharePhoto(dataUrl: string): Promise<string> {
+  return new Promise(resolve => {
+    const img = new Image()
+    img.onload = () => {
+      const tW = 750, tH = 800  // 375 * 2, 400 * 2
+      const srcRatio = img.naturalWidth / img.naturalHeight
+      const tgtRatio = tW / tH
+      let sX: number, sY: number, sW: number, sH: number
+      if (srcRatio > tgtRatio) {
+        sH = img.naturalHeight; sW = sH * tgtRatio; sX = (img.naturalWidth - sW) / 2; sY = 0
+      } else {
+        sW = img.naturalWidth; sH = sW / tgtRatio; sX = 0; sY = (img.naturalHeight - sH) / 2
+      }
+      const c = document.createElement('canvas')
+      c.width = tW; c.height = tH
+      c.getContext('2d')?.drawImage(img, sX, sY, sW, sH, 0, 0, tW, tH)
+      resolve(c.toDataURL('image/jpeg', 0.95))
+    }
+    img.onerror = () => resolve(dataUrl)
+    img.src = dataUrl
+  })
+}
+
 export function DetailSheet({ run, open, onClose, memberId, memberName = '', memberAvatarUrl = '', onDeleted, onRunUpdate }: Props) {
   const router = useRouter()
   const [photoFull, setPhotoFull] = useState(false)
@@ -98,11 +123,12 @@ export function DetailSheet({ run, open, onClose, memberId, memberName = '', mem
     }
   }
 
-  // 사진 URL이 바뀔 때마다 data URL로 프리패치
+  // 사진 URL이 바뀔 때마다 data URL로 프리패치 (rawPhotoUrl = 원본 full-res)
   useEffect(() => {
     if (!run?.photoUrl) { photoDataUrlRef.current = null; return }
     let cancelled = false
-    fetch(run.photoUrl, { cache: 'no-store', mode: 'cors' })
+    const fetchUrl = run.rawPhotoUrl ?? run.photoUrl
+    fetch(fetchUrl, { cache: 'no-store', mode: 'cors' })
       .then(r => r.ok ? r.blob() : Promise.reject(r.status))
       .then(blob => new Promise<string>((res, rej) => {
         const reader = new FileReader()
@@ -113,7 +139,7 @@ export function DetailSheet({ run, open, onClose, memberId, memberName = '', mem
       .then(dataUrl => { if (!cancelled) photoDataUrlRef.current = dataUrl })
       .catch(() => {})
     return () => { cancelled = true }
-  }, [run?.photoUrl])
+  }, [run?.rawPhotoUrl, run?.photoUrl])
 
   const isOwner = Boolean(memberId && run && run.memberId === memberId)
   const hasPhoto = Boolean(run?.photoUrl)
@@ -196,15 +222,15 @@ ${run.thoughtAfter}`
       const html2canvas = (await import('html2canvas')).default
 
       // 사진 있을 때: img[data-photo] src를 data URL로 교체해야 html2canvas가 캡처 가능
-      // (html2canvas useCORS:true도 Safari opaque-cache 문제로 실패할 수 있음)
+      // rawPhotoUrl = 원본 full-res; photoUrl = display용 resized (quality=75)
+      // cropToSharePhoto로 objectFit:cover 효과를 직접 구현 (html2canvas가 무시하므로)
       if (run.photoUrl) {
+        const srcUrl = `${run.rawPhotoUrl ?? run.photoUrl}?_t=${Date.now()}`
         let photoDataUrl = photoDataUrlRef.current
 
         if (!photoDataUrl) {
-          // 캐시 버스팅 URL로 Safari opaque-cache 우회
-          const bustUrl = `${run.photoUrl}${run.photoUrl.includes('?') ? '&' : '?'}_t=${Date.now()}`
           try {
-            const resp = await fetch(bustUrl, { cache: 'no-store', mode: 'cors' })
+            const resp = await fetch(srcUrl, { cache: 'no-store', mode: 'cors' })
             if (resp.ok) {
               const blob = await resp.blob()
               photoDataUrl = await new Promise<string>((res, rej) => {
@@ -228,18 +254,20 @@ ${run.thoughtAfter}`
                   const ctx = canvas.getContext('2d')
                   if (ctx) {
                     ctx.drawImage(tempImg, 0, 0)
-                    photoDataUrl = canvas.toDataURL('image/jpeg', 0.92)
+                    photoDataUrl = canvas.toDataURL('image/jpeg', 0.95)
                   }
                 } catch { /* tainted */ }
                 resolve()
               }
               tempImg.onerror = () => resolve()
-              tempImg.src = `${run.photoUrl}${run.photoUrl.includes('?') ? '&' : '?'}_t=${Date.now()}`
+              tempImg.src = srcUrl
             })
           }
         }
 
         if (photoDataUrl) {
+          // Crop to exact share card photo dimensions so html2canvas has no aspect-ratio work to do
+          photoDataUrl = await cropToSharePhoto(photoDataUrl)
           const photoImg = shareCardRef.current.querySelector<HTMLImageElement>('img[data-photo]')
           if (photoImg) {
             await new Promise<void>(resolve => {

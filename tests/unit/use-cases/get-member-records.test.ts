@@ -15,6 +15,7 @@ const makeRun = (id: string): RunLog => ({
   thoughtAfter: '',
   location: '',
   photoUrl: '',
+  rawPhotoUrl: null,
   createdAt: '2026-05-24T09:00:00Z',
   likeCount: 0,
   commentCount: 0,

@@ -12,7 +12,8 @@ export type RunLog = {
   thoughtDuring: string
   thoughtAfter: string
   location: string
-  photoUrl: string // '' if no photo
+  photoUrl: string // '' if no photo (display-optimised, may be resized)
+  rawPhotoUrl: string | null // original full-resolution URL for share card save
   createdAt: string
   likeCount: number
   commentCount: number

@@ -11,7 +11,7 @@ const makeRun = (overrides: Partial<RunLog> = {}): RunLog => ({
   id: 'r1', memberId: 'm1', memberName: '이두승', memberAvatarUrl: '', memberInstaId: '',
   date: '2026-05-26', runTime: null, durationMin: 45, title: '남산',
   thoughtBefore: '', thoughtDuring: '', thoughtAfter: '',
-  location: '남산', photoUrl: '', createdAt: '2026-05-26T00:00:00Z',
+  location: '남산', photoUrl: '', rawPhotoUrl: null, createdAt: '2026-05-26T00:00:00Z',
   likeCount: 0,
   commentCount: 0,
   ...overrides,

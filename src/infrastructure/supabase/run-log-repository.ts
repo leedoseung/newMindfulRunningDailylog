@@ -3,6 +3,7 @@ import type { SupabaseClient } from '@supabase/supabase-js'
 import type { IRunLogRepository } from '@/domain/repositories/run-log-repository'
 import type { RunLog } from '@/domain/entities/run-log'
 import type { RunLogInput } from '@/domain/entities/run-log-input'
+import { toTransformedUrl } from './image-url'
 
 type RunLogRow = {
   id: string
@@ -27,7 +28,7 @@ function toRunLog(row: RunLogRow): RunLog {
     id: row.id,
     memberId: row.member_id,
     memberName: row.members?.name ?? '',
-    memberAvatarUrl: row.members?.avatar_url ?? '',
+    memberAvatarUrl: toTransformedUrl(row.members?.avatar_url, 120, 80),
     memberInstaId: row.members?.insta_id ?? '',
     date: row.date,
     runTime: row.run_time ?? null,
@@ -37,7 +38,7 @@ function toRunLog(row: RunLogRow): RunLog {
     thoughtDuring: row.thought_during,
     thoughtAfter: row.thought_after,
     location: row.location,
-    photoUrl: row.photo_url,
+    photoUrl: toTransformedUrl(row.photo_url, 900),
     createdAt: row.created_at,
     likeCount: (row.likes?.[0]?.count as number) ?? 0,
     commentCount: (row.comments?.[0]?.count as number) ?? 0,

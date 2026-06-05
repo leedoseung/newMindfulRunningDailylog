@@ -1,7 +1,13 @@
-import type { Metadata } from 'next'
+import type { Metadata, Viewport } from 'next'
 import './globals.css'
 import { BottomNav } from '@/presentation/components/layout/bottom-nav'
 import { PageTransition } from '@/presentation/components/layout/page-transition'
+
+export const viewport: Viewport = {
+  width: 'device-width',
+  initialScale: 1,
+  maximumScale: 1,
+}
 
 export const metadata: Metadata = {
   title: '마인드풀러닝',

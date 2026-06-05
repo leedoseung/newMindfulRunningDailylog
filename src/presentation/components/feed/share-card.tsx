@@ -24,7 +24,7 @@ function PhotoCard({ run }: Props) {
   return (
     <div style={{ width: W, background: '#0a0a0a' }}>
       {/* 사진 영역 — 320px 고정, objectFit:cover로 비율 유지 */}
-      <div style={{ position: 'relative', height: 320, overflow: 'hidden' }}>
+      <div style={{ position: 'relative', height: 400, overflow: 'hidden' }}>
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
           src={run.photoUrl}

@@ -22,82 +22,76 @@ function PhotoCard({ run }: Props) {
   ].filter(t => t.text)
 
   return (
-    <div style={{ width: W, height: 667, position: 'relative', overflow: 'hidden', background: '#0a0a0a' }}>
-      {/* 배경 사진 */}
-      {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img
-        src={run.photoUrl}
-        alt=""
-        data-photo
-        crossOrigin="anonymous"
-        style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }}
-      />
-      {/* 그라디언트 스크림 */}
-      <div style={{
-        position: 'absolute', inset: 0,
-        background: 'linear-gradient(to bottom, rgba(0,0,0,0.35) 0%, rgba(0,0,0,0) 30%, rgba(0,0,0,0.65) 52%, rgba(0,0,0,0.97) 100%)',
-      }} />
-
-      {/* 상단: 로고 + 날짜 */}
-      <div style={{
-        position: 'absolute', top: 22, left: 22, right: 22,
-        display: 'flex', justifyContent: 'space-between', alignItems: 'center',
-      }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src="/icon-192.png" alt="" crossOrigin="anonymous"
-            style={{ width: 14, height: 14, objectFit: 'contain', filter: 'brightness(0) invert(1)', opacity: 0.85 }} />
+    <div style={{ width: W, background: '#0a0a0a' }}>
+      {/* 사진 영역 — 320px 고정, objectFit:cover로 비율 유지 */}
+      <div style={{ position: 'relative', height: 320, overflow: 'hidden' }}>
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          src={run.photoUrl}
+          alt=""
+          data-photo
+          crossOrigin="anonymous"
+          style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
+        />
+        {/* 상단 로고 + 날짜 */}
+        <div style={{
+          position: 'absolute', top: 20, left: 20, right: 20,
+          display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+        }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src="/icon-192.png" alt="" crossOrigin="anonymous"
+              style={{ width: 14, height: 14, objectFit: 'contain', filter: 'brightness(0) invert(1)', opacity: 0.85 }} />
+            <span style={{
+              fontSize: 8, fontWeight: 700, letterSpacing: '2.5px', textTransform: 'uppercase',
+              color: 'rgba(255,255,255,0.9)', fontFamily: FONT, textShadow: '0 1px 4px rgba(0,0,0,0.7)',
+            }}>Mindful Running</span>
+          </div>
           <span style={{
-            fontSize: 8, fontWeight: 700, letterSpacing: '2.5px', textTransform: 'uppercase',
-            color: 'rgba(255,255,255,0.85)', fontFamily: FONT, textShadow: '0 1px 4px rgba(0,0,0,0.6)',
-          }}>Mindful Running</span>
+            fontSize: 9, color: 'rgba(255,255,255,0.8)', letterSpacing: '1px',
+            fontFamily: FONT, textShadow: '0 1px 4px rgba(0,0,0,0.7)',
+          }}>{formatDate(run.date)}</span>
         </div>
-        <span style={{
-          fontSize: 9, color: 'rgba(255,255,255,0.75)', letterSpacing: '1px',
-          fontFamily: FONT, textShadow: '0 1px 4px rgba(0,0,0,0.6)',
-        }}>{formatDate(run.date)}</span>
+        {/* 하단 페이드 — 사진→다크 전환 */}
+        <div style={{
+          position: 'absolute', bottom: 0, left: 0, right: 0, height: 80,
+          background: 'linear-gradient(to bottom, rgba(10,10,10,0) 0%, rgba(10,10,10,1) 100%)',
+        }} />
       </div>
 
-      {/* 하단 텍스트 */}
-      <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, padding: '0 22px 24px' }}>
+      {/* 텍스트 영역 — auto height, 절대 안 짤림 */}
+      <div style={{ padding: '16px 22px 28px' }}>
         {run.title && (
           <div style={{
             fontSize: 20, fontWeight: 700, color: '#fff', fontFamily: FONT,
             lineHeight: 1.25, letterSpacing: '-0.3px', marginBottom: 8,
-            textShadow: '0 1px 6px rgba(0,0,0,0.6)',
           }}>"{run.title}"</div>
         )}
-        {/* 메타: 한 줄 텍스트 */}
         <div style={{
-          fontSize: 11, color: 'rgba(255,255,255,0.7)', fontFamily: FONT,
-          marginBottom: 14, letterSpacing: '0.3px',
-          textShadow: '0 1px 3px rgba(0,0,0,0.5)',
-          overflow: 'hidden', whiteSpace: 'nowrap', textOverflow: 'ellipsis',
+          fontSize: 11, color: 'rgba(255,255,255,0.55)', fontFamily: FONT,
+          marginBottom: 16, letterSpacing: '0.3px',
         }}>
           {[`${run.durationMin}분`, run.location, run.memberName].filter(Boolean).join(' · ')}
         </div>
-        {/* 생각 기록 */}
         {thoughts.map(({ label, text }, i) => (
           <div key={label} style={{
-            display: 'flex', gap: 10, padding: '7px 0',
-            borderTop: i > 0 ? '1px solid rgba(255,255,255,0.1)' : 'none',
+            display: 'flex', gap: 12, padding: '10px 0',
+            borderTop: i > 0 ? '1px solid rgba(255,255,255,0.07)' : 'none',
           }}>
             <span style={{
               fontSize: 7, fontWeight: 700, letterSpacing: '1.5px', textTransform: 'uppercase',
-              color: 'rgba(255,255,255,0.35)', width: 16, flexShrink: 0, paddingTop: 2, fontFamily: FONT,
+              color: 'rgba(255,255,255,0.28)', width: 18, flexShrink: 0, paddingTop: 2, fontFamily: FONT,
             }}>{label}</span>
             <span style={{
-              fontSize: 11, color: 'rgba(255,255,255,0.75)', lineHeight: 1.55, fontFamily: FONT,
-              textShadow: '0 1px 3px rgba(0,0,0,0.4)',
-              display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden',
-            } as React.CSSProperties}>{text}</span>
+              fontSize: 11, color: 'rgba(255,255,255,0.7)', lineHeight: 1.65, fontFamily: FONT,
+            }}>{text}</span>
           </div>
         ))}
         <div style={{
-          marginTop: 16, paddingTop: 12,
-          borderTop: '1px solid rgba(255,255,255,0.08)',
+          marginTop: 20, paddingTop: 14,
+          borderTop: '1px solid rgba(255,255,255,0.07)',
           fontSize: 7.5, letterSpacing: '2px', textTransform: 'uppercase',
-          color: 'rgba(255,255,255,0.22)', textAlign: 'center', fontFamily: FONT,
+          color: 'rgba(255,255,255,0.2)', textAlign: 'center', fontFamily: FONT,
         }}>Mindful Running</div>
       </div>
     </div>

@@ -80,7 +80,7 @@ function PhotoCard({ run }: Props) {
           }}>
             <span style={{
               fontSize: 7, fontWeight: 700, letterSpacing: '1.5px', textTransform: 'uppercase',
-              color: 'rgba(255,255,255,0.28)', width: 18, flexShrink: 0, paddingTop: 2, fontFamily: FONT,
+              color: 'rgba(255,255,255,0.5)', width: 18, flexShrink: 0, paddingTop: 2, fontFamily: FONT,
             }}>{label}</span>
             <span style={{
               fontSize: 11, color: 'rgba(255,255,255,0.7)', lineHeight: 1.65, fontFamily: FONT,

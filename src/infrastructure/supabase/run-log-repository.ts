@@ -38,7 +38,7 @@ function toRunLog(row: RunLogRow): RunLog {
     thoughtDuring: row.thought_during,
     thoughtAfter: row.thought_after,
     location: row.location,
-    photoUrl: toTransformedUrl(row.photo_url, 1200),
+    photoUrl: row.photo_url ?? '',
     rawPhotoUrl: row.photo_url ?? null,
     createdAt: row.created_at,
     likeCount: (row.likes?.[0]?.count as number) ?? 0,

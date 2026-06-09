@@ -8,6 +8,7 @@ import { LoadingOverlay } from '../shared/loading-overlay'
 import { LikeCommentBar } from './like-comment-bar'
 import { CommentsSheet } from './comments-sheet'
 import { LikersSheet } from './likers-sheet'
+import { toTransformedUrl } from '@/infrastructure/supabase/image-url'
 
 const ShareCard = dynamic(
   () => import('./share-card').then(m => m.ShareCard),
@@ -412,7 +413,7 @@ ${run.thoughtAfter}`
             onClick={() => setPhotoFull(v => !v)}
             style={{
               position: 'absolute', inset: 0,
-              backgroundImage: `url(${run.photoUrl})`,
+              backgroundImage: `url(${toTransformedUrl(run.photoUrl, 1200)})`,
               backgroundSize: 'cover', backgroundPosition: 'center',
               zIndex: 0,
               cursor: 'pointer',

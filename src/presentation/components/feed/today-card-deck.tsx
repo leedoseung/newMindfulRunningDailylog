@@ -4,6 +4,7 @@ import { useState, useEffect, useRef } from 'react'
 import gsap from 'gsap'
 import { AvatarImage } from '../shared/avatar-image'
 import type { RunLog } from '@/domain/entities/run-log'
+import { toTransformedUrl } from '@/infrastructure/supabase/image-url'
 
 const FONT = "'Pretendard Variable', Pretendard, -apple-system, sans-serif"
 
@@ -249,7 +250,7 @@ export function TodayCardDeck({ todayRuns, memberId, onRunClick }: Props) {
                 boxShadow: '0 8px 28px rgba(0,0,0,0.18), 0 2px 8px rgba(0,0,0,0.10)',
               }}>
                 {run.photoUrl && (
-                  <div style={{ position: 'absolute', inset: 0, borderRadius: 20, backgroundImage: `url(${run.photoUrl})`, backgroundSize: 'cover', backgroundPosition: 'center' }} />
+                  <div style={{ position: 'absolute', inset: 0, borderRadius: 20, backgroundImage: `url(${toTransformedUrl(run.photoUrl, 600)})`, backgroundSize: 'cover', backgroundPosition: 'center' }} />
                 )}
                 <div style={{ position: 'absolute', inset: 0, borderRadius: 20, background: 'linear-gradient(to bottom, rgba(0,0,0,0.02) 0%, rgba(0,0,0,0.68) 100%)' }} />
                 <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: '45%', background: 'linear-gradient(to bottom, rgba(255,255,255,0.07), transparent)', borderRadius: '20px 20px 0 0', pointerEvents: 'none' }} />

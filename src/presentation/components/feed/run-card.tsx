@@ -1,5 +1,6 @@
 import type { RunLog } from '@/domain/entities/run-log'
 import { AvatarImage } from '../shared/avatar-image'
+import { toTransformedUrl } from '@/infrastructure/supabase/image-url'
 
 export type CardType = 'hero' | 'photo' | 'white'
 
@@ -160,7 +161,7 @@ export function RunCard({ run, cardType, onClick }: Props) {
         <>
           <div style={{
             position: 'absolute', inset: 0,
-            backgroundImage: `url(${run.photoUrl})`,
+            backgroundImage: `url(${toTransformedUrl(run.photoUrl, 800)})`,
             backgroundSize: 'cover', backgroundPosition: 'center',
           }} />
           <div style={{

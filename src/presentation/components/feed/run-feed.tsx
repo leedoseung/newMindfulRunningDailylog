@@ -5,6 +5,7 @@ import { RunCard } from './run-card'
 import { DetailSheet } from './detail-sheet'
 import { AvatarImage } from '../shared/avatar-image'
 import type { RunLog } from '@/domain/entities/run-log'
+import { toTransformedUrl } from '@/infrastructure/supabase/image-url'
 
 const FONT = "'Pretendard Variable', Pretendard, -apple-system, sans-serif"
 
@@ -54,7 +55,7 @@ function GridCell({ run, height, onClick }: { run: RunLog; height: number; onCli
       {run.photoUrl && (
         <div style={{
           position: 'absolute', inset: 0,
-          backgroundImage: `url(${run.photoUrl})`,
+          backgroundImage: `url(${toTransformedUrl(run.photoUrl, 400)})`,
           backgroundSize: 'cover', backgroundPosition: 'center',
         }} />
       )}

@@ -9,6 +9,25 @@ import { DetailSheet } from '../feed/detail-sheet'
 import { createBrowserClient } from '@/infrastructure/supabase/browser-client'
 import { LoadingOverlay } from '../shared/loading-overlay'
 
+function compressImage(file: File, maxWidth: number, quality: number): Promise<Blob> {
+  return new Promise((resolve, reject) => {
+    const img = new Image()
+    const url = URL.createObjectURL(file)
+    img.onload = () => {
+      URL.revokeObjectURL(url)
+      const scale = img.width > maxWidth ? maxWidth / img.width : 1
+      const canvas = document.createElement('canvas')
+      canvas.width = Math.round(img.width * scale)
+      canvas.height = Math.round(img.height * scale)
+      const ctx = canvas.getContext('2d')!
+      ctx.drawImage(img, 0, 0, canvas.width, canvas.height)
+      canvas.toBlob(blob => blob ? resolve(blob) : reject(new Error('canvas toBlob failed')), 'image/jpeg', quality)
+    }
+    img.onerror = reject
+    img.src = url
+  })
+}
+
 type ThoughtKey = 'before' | 'during' | 'after'
 
 type RunLogFormInitial = {
@@ -151,12 +170,12 @@ export function RunLogForm({ memberId, memberName = '', memberAvatarUrl = '', mo
     try {
       let photoUrl = initialData?.photoUrl ?? ''
       if (photoFile) {
+        const compressed = await compressImage(photoFile, 1200, 0.82)
         const supabase = createBrowserClient()
-        const ext = photoFile.name.split('.').pop() ?? 'jpg'
-        const path = `${Date.now()}.${ext}`
+        const path = `${Date.now()}.jpg`
         const { data: uploadData, error: uploadError } = await supabase.storage
           .from('run-photos')
-          .upload(path, photoFile, { cacheControl: '3600', upsert: false })
+          .upload(path, compressed, { contentType: 'image/jpeg', cacheControl: '31536000', upsert: false })
         if (uploadError) throw new Error(`사진 업로드 실패: ${uploadError.message}`)
         const { data: urlData } = supabase.storage.from('run-photos').getPublicUrl(uploadData.path)
         photoUrl = urlData.publicUrl

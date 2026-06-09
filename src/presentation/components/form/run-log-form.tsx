@@ -9,22 +9,18 @@ import { DetailSheet } from '../feed/detail-sheet'
 import { createBrowserClient } from '@/infrastructure/supabase/browser-client'
 import { LoadingOverlay } from '../shared/loading-overlay'
 
-function compressImage(file: File, maxWidth: number, quality: number): Promise<Blob> {
+async function compressImage(file: File, maxWidth: number, quality: number): Promise<Blob> {
+  // createImageBitmap reads EXIF orientation so portrait iPhone photos aren't stored rotated
+  const bitmap = await createImageBitmap(file, { imageOrientation: 'from-image' })
+  const scale = bitmap.width > maxWidth ? maxWidth / bitmap.width : 1
+  const canvas = document.createElement('canvas')
+  canvas.width = Math.round(bitmap.width * scale)
+  canvas.height = Math.round(bitmap.height * scale)
+  const ctx = canvas.getContext('2d')!
+  ctx.drawImage(bitmap, 0, 0, canvas.width, canvas.height)
+  bitmap.close()
   return new Promise((resolve, reject) => {
-    const img = new Image()
-    const url = URL.createObjectURL(file)
-    img.onload = () => {
-      URL.revokeObjectURL(url)
-      const scale = img.width > maxWidth ? maxWidth / img.width : 1
-      const canvas = document.createElement('canvas')
-      canvas.width = Math.round(img.width * scale)
-      canvas.height = Math.round(img.height * scale)
-      const ctx = canvas.getContext('2d')!
-      ctx.drawImage(img, 0, 0, canvas.width, canvas.height)
-      canvas.toBlob(blob => blob ? resolve(blob) : reject(new Error('canvas toBlob failed')), 'image/jpeg', quality)
-    }
-    img.onerror = reject
-    img.src = url
+    canvas.toBlob(blob => blob ? resolve(blob) : reject(new Error('canvas toBlob failed')), 'image/jpeg', quality)
   })
 }
 

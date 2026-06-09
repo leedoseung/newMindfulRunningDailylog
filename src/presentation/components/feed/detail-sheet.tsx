@@ -414,7 +414,7 @@ ${run.thoughtAfter}`
             style={{
               position: 'absolute', inset: 0,
               backgroundImage: `url(${toTransformedUrl(run.photoUrl, 1200)})`,
-              backgroundSize: 'cover', backgroundPosition: 'center',
+              backgroundSize: 'contain', backgroundPosition: 'center',
               zIndex: 0,
               cursor: 'pointer',
               transition: 'transform 0.55s cubic-bezier(0.32,0.72,0,1)',

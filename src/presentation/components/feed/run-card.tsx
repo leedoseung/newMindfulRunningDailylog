@@ -161,7 +161,7 @@ export function RunCard({ run, cardType, onClick }: Props) {
         <>
           <div style={{
             position: 'absolute', inset: 0,
-            backgroundImage: `url(${toTransformedUrl(run.photoUrl, 800)})`,
+            backgroundImage: `url(${toTransformedUrl(run.photoUrl, 1200)})`,
             backgroundSize: 'cover', backgroundPosition: 'center',
           }} />
           <div style={{

@@ -56,7 +56,7 @@ function GridCell({ run, height, onClick }: { run: RunLog; height: number; onCli
         <div style={{
           position: 'absolute', inset: 0,
           backgroundImage: `url(${toTransformedUrl(run.photoUrl, 800)})`,
-          backgroundSize: 'contain', backgroundPosition: 'center',
+          backgroundSize: 'contain', backgroundPosition: 'center', backgroundRepeat: 'no-repeat',
         }} />
       )}
       <div style={{

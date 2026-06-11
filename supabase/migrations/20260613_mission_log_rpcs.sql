@@ -53,4 +53,6 @@ BEGIN
 END;
 $$;
 
+-- service_role only by design: pass marking is a system action performed by the
+-- cron Edge Function (P3 daily-pass-check), never directly by end users.
 GRANT EXECUTE ON FUNCTION mark_mission_log_pass(uuid, date) TO service_role;

@@ -35,10 +35,10 @@ export async function POST(req: Request) {
     const mRepo = new SupabaseMissionLogRepository(supabase)
 
     const challenge = await cRepo.getActive()
-    if (!challenge) return NextResponse.json({ error: 'NO_ACTIVE_CHALLENGE' }, { status: 400 })
+    if (!challenge) return NextResponse.json({ error: 'NO_ACTIVE_CHALLENGE' }, { status: 404 })
 
     const participation = await pRepo.getByMember(challenge.id, memberId)
-    if (!participation) return NextResponse.json({ error: 'NOT_ENROLLED' }, { status: 400 })
+    if (!participation) return NextResponse.json({ error: 'NOT_ENROLLED' }, { status: 404 })
 
     const uc = new LogMissionCountUseCase(cRepo, pRepo, mRepo)
     const log = await uc.execute({

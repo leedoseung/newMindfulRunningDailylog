@@ -99,4 +99,13 @@ export class SupabaseChallengeParticipationRepository
     if (error) throw new Error(`listForChallenge failed: ${error.message}`)
     return (data as unknown as Row[]).map(toEntity)
   }
+
+  async delete(participationId: string): Promise<void> {
+    const { error } = await this.supabase
+      .from('challenge_participations')
+      .delete()
+      .eq('id', participationId)
+
+    if (error) throw new Error(`delete participation failed: ${error.message}`)
+  }
 }

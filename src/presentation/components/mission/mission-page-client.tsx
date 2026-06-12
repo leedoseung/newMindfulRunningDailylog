@@ -151,6 +151,29 @@ export function MissionPageClient(props: Props) {
     }
   }
 
+  async function cancelEnroll(challengeId: string) {
+    if (!confirm('참가 신청을 취소하시겠어요? 다시 신청은 모집 마감 전까지 가능해요.')) return
+    try {
+      const res = await fetch('/api/challenges/enroll', {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ challengeId }),
+      })
+      if (!res.ok) {
+        const err = await res.json()
+        if (err.error === 'ALREADY_STARTED') {
+          alert('이미 시작한 시즌은 취소할 수 없어요')
+        } else {
+          alert(`취소 실패: ${err.error}`)
+        }
+        return
+      }
+      router.refresh()
+    } catch (err) {
+      alert(`취소 실패: ${String(err)}`)
+    }
+  }
+
   const wrap: React.CSSProperties = {
     fontFamily: FONT,
     padding: '16px 16px 120px',
@@ -214,6 +237,7 @@ export function MissionPageClient(props: Props) {
   const isCompleted = !!participation.completedAt
   const isFailed = !!participation.failedAt
   const canLog = board.todayIndex >= 0 && !isCompleted && !isFailed
+  const preStart = props.participants !== undefined
   const restBudget = challenge.restDaysPerWeek ?? 1
   const restRemainingThisWeek = (() => {
     if (!todayCell) return restBudget
@@ -247,6 +271,26 @@ export function MissionPageClient(props: Props) {
           participants={props.participants}
           currentMemberId={props.currentMemberId}
         />
+      )}
+      {preStart && (
+        <button
+          type="button"
+          onClick={() => cancelEnroll(challenge.id)}
+          style={{
+            alignSelf: 'center',
+            background: 'transparent',
+            color: '#b8231f',
+            border: '1px solid #f3d3d2',
+            borderRadius: 999,
+            padding: '8px 18px',
+            fontSize: 12,
+            fontWeight: 600,
+            fontFamily: "'Pretendard Variable', Pretendard, -apple-system, sans-serif",
+            cursor: 'pointer',
+          }}
+        >
+          참가 취소
+        </button>
       )}
       {canLog && (
         <>

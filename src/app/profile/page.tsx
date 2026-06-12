@@ -3,6 +3,7 @@ import { SupabaseRunLogRepository } from '@/infrastructure/supabase/run-log-repo
 import { GetMemberRecordsUseCase } from '@/application/use-cases/get-member-records'
 import { ProfileView } from '@/presentation/components/profile/profile-view'
 import { ChallengeBadge, type Badge } from '@/presentation/components/profile/challenge-badge'
+import { NotificationSettings } from '@/presentation/components/profile/notification-settings'
 import { redirect } from 'next/navigation'
 import type { RunLog } from '@/domain/entities/run-log'
 
@@ -72,6 +73,7 @@ export default async function ProfilePage() {
         memberAvatarUrl={m.avatar_url ?? ''}
       />
       <ChallengeBadge badges={badges} />
+      <NotificationSettings />
     </>
   )
 }

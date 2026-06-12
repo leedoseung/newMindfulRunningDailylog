@@ -6,7 +6,7 @@ describe('TodayCounter', () => {
   it('renders current count and goal', () => {
     render(<TodayCounter count={47} goal={100} onSave={() => {}} />)
     expect(screen.getByText('47')).toBeInTheDocument()
-    expect(screen.getByText(/100/)).toBeInTheDocument()
+    expect(screen.getByText('/ 100')).toBeInTheDocument()
   })
 
   it('initialises the input with the current count', () => {
@@ -25,7 +25,7 @@ describe('TodayCounter', () => {
     render(<TodayCounter count={47} goal={100} onSave={onSave} />)
     fireEvent.change(screen.getByLabelText('런지 횟수'), { target: { value: '120' } })
     fireEvent.click(screen.getByText('저장'))
-    expect(onSave).toHaveBeenCalledWith(120)
+    expect(onSave).toHaveBeenCalledWith(120, null)
   })
 
   it('allows values greater than the goal', () => {
@@ -33,7 +33,7 @@ describe('TodayCounter', () => {
     render(<TodayCounter count={0} goal={100} onSave={onSave} />)
     fireEvent.change(screen.getByLabelText('런지 횟수'), { target: { value: '250' } })
     fireEvent.click(screen.getByText('저장'))
-    expect(onSave).toHaveBeenCalledWith(250)
+    expect(onSave).toHaveBeenCalledWith(250, null)
   })
 
   it('does not call onSave when disabled prop set', () => {
@@ -44,10 +44,10 @@ describe('TodayCounter', () => {
     expect(onSave).not.toHaveBeenCalled()
   })
 
-  it('shows raw count (not capped) when count > goal and renders excess chip', () => {
+  it('shows raw count (not capped) when count > goal and surfaces gold-bonus label', () => {
     render(<TodayCounter count={150} goal={100} onSave={() => {}} />)
     expect(screen.getByText('150')).toBeInTheDocument()
-    expect(screen.getByLabelText('목표 초과 50개')).toBeInTheDocument()
+    expect(screen.getByText(/골드 보너스 \+50/)).toBeInTheDocument()
   })
 
   it('rejects negative input with an error message', () => {

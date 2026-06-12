@@ -72,7 +72,7 @@ describe('GET /api/challenges/mission/board', () => {
     mockedMRepo.mockImplementation(function () {
       return {
         getByParticipation: vi.fn().mockResolvedValue([]),
-        getOne: vi.fn(), upsertCount: vi.fn(), setCount: vi.fn(), markPass: vi.fn(),
+        getOne: vi.fn(), upsertCount: vi.fn(), setCount: vi.fn(), markPass: vi.fn(), markRestDay: vi.fn(),
       } as unknown as InstanceType<typeof SupabaseMissionLogRepository>
     })
 

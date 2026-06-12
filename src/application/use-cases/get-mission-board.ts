@@ -50,6 +50,8 @@ export class GetMissionBoardUseCase {
         cellDate,
         today: input.today,
         log: logByDate.get(cellDate) ?? null,
+        goalMin: challenge.goalMin ?? 10,
+        bonusGoal: challenge.goalPerDay,
       })
       cells.push(cell)
       if (cellDate === input.today) todayIndex = i
@@ -59,13 +61,13 @@ export class GetMissionBoardUseCase {
     for (let i = cells.length - 1; i >= 0; i--) {
       const c = cells[i]!
       if (c.state === 'future') continue
-      const keep = c.state === 'done' || c.state === 'partial' || c.state === 'pass' || (c.state === 'today' && c.count > 0)
+      const keep = c.state === 'done' || c.state === 'partial' || c.state === 'pass' || c.state === 'rest' || (c.state === 'today' && c.count > 0)
       if (keep) streak++
       else break
     }
 
     const completedDays = cells.filter(c =>
-      c.state === 'done' || c.state === 'pass' || (c.state === 'today' && c.usedPass)
+      c.state === 'done' || c.state === 'pass' || c.state === 'rest' || (c.state === 'today' && c.usedPass)
     ).length
 
     return {

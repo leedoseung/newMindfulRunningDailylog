@@ -11,5 +11,7 @@ export type Challenge = {
   passCount: number
   status: ChallengeStatus
   imageUrl?: string | null
+  goalMin?: number             // daily stamp threshold (default 10)
+  restDaysPerWeek?: number     // weekly rest budget (default 1)
   createdAt: string            // ISO timestamptz
 }

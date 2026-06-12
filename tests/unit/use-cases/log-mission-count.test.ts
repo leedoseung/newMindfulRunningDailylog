@@ -46,6 +46,7 @@ function makeRepos(overrides: { challenge?: Challenge | null; participation?: Ch
       upsertCount: vi.fn().mockResolvedValue(log),
       setCount: vi.fn(),
       markPass: vi.fn(),
+      markRestDay: vi.fn(),
     } as IMissionLogRepository,
   }
 }

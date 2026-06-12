@@ -4,11 +4,9 @@ import type { ChallengeParticipation } from '@/domain/entities/challenge-partici
 import type { MissionLog } from '@/domain/entities/mission-log'
 import { LogMissionError } from './log-mission-count'
 
-export type SetMissionCountInput = {
+export type MarkRestDayInput = {
   participation: ChallengeParticipation
-  count: number
-  today: string   // 'YYYY-MM-DD' KST
-  note?: string | null
+  today: string
 }
 
 function addDays(yyyyMmDd: string, days: number): string {
@@ -21,28 +19,20 @@ function addDays(yyyyMmDd: string, days: number): string {
   return `${yy}-${mm}-${dd}`
 }
 
-export class SetMissionCountUseCase {
+export class MarkRestDayUseCase {
   constructor(
     private challengeRepo: IChallengeRepository,
     private missionLogRepo: IMissionLogRepository
   ) {}
 
-  async execute(input: SetMissionCountInput): Promise<MissionLog> {
-    if (input.count < 0) throw new LogMissionError('NEGATIVE_DELTA')
+  async execute(input: MarkRestDayInput): Promise<MissionLog> {
     if (input.participation.failedAt) throw new LogMissionError('ALREADY_FAILED')
-
     const challenge = await this.challengeRepo.getById(input.participation.challengeId)
     if (!challenge) throw new LogMissionError('CHALLENGE_NOT_FOUND')
-
     if (input.today < challenge.startDate) throw new LogMissionError('BEFORE_START')
     const lastDay = addDays(challenge.startDate, challenge.durationDays - 1)
     if (input.today > lastDay) throw new LogMissionError('SEASON_ENDED')
 
-    return this.missionLogRepo.setCount({
-      participationId: input.participation.id,
-      logDate: input.today,
-      count: input.count,
-      note: input.note ?? null,
-    })
+    return this.missionLogRepo.markRestDay(input.participation.id, input.today)
   }
 }

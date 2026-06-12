@@ -10,6 +10,7 @@ export type SetCountInput = {
   participationId: string
   logDate: string   // 'YYYY-MM-DD'
   count: number     // absolute (>= 0)
+  note?: string | null
 }
 
 export interface IMissionLogRepository {
@@ -18,4 +19,5 @@ export interface IMissionLogRepository {
   upsertCount(input: UpsertCountInput): Promise<MissionLog>
   setCount(input: SetCountInput): Promise<MissionLog>
   markPass(participationId: string, logDate: string): Promise<MissionLog>
+  markRestDay(participationId: string, logDate: string): Promise<MissionLog>
 }

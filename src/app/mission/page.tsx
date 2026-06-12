@@ -4,6 +4,7 @@ import { SupabaseChallengeParticipationRepository } from '@/infrastructure/supab
 import { SupabaseMissionLogRepository } from '@/infrastructure/supabase/mission-log-repository'
 import { GetActiveChallengeUseCase } from '@/application/use-cases/get-active-challenge'
 import { GetMissionBoardUseCase } from '@/application/use-cases/get-mission-board'
+import { GetChallengeParticipantsUseCase } from '@/application/use-cases/get-challenge-participants'
 import { MissionPageClient } from '@/presentation/components/mission/mission-page-client'
 import { redirect } from 'next/navigation'
 import { kstToday } from '@/lib/kst'
@@ -21,32 +22,69 @@ export default async function MissionPage() {
   const mRepo = new SupabaseMissionLogRepository(supabase)
 
   const active = await new GetActiveChallengeUseCase(cRepo, pRepo).execute(memberId)
+  const today = kstToday()
+  const participantsUC = new GetChallengeParticipantsUseCase(supabase)
 
   if (!active.challenge) {
     // try upcoming
     const upcoming = await cRepo.getUpcoming()
     if (upcoming.length > 0) {
       const next = upcoming[0]!
+      const participants = await participantsUC.execute(next.id)
       const existing = await pRepo.getByMember(next.id, memberId)
       if (existing) {
-        // already enrolled in upcoming, show board with no today
         const board = await new GetMissionBoardUseCase(cRepo, mRepo).execute({
-          participation: existing, today: kstToday(),
+          participation: existing, today,
         })
-        return <MissionPageClient mode="enrolled" challenge={next} participation={existing} board={board} />
+        return (
+          <MissionPageClient
+            mode="enrolled"
+            challenge={next}
+            participation={existing}
+            board={board}
+            participants={today < next.startDate ? participants : undefined}
+            currentMemberId={memberId}
+          />
+        )
       }
-      return <MissionPageClient mode="not-enrolled" challenge={next} />
+      return (
+        <MissionPageClient
+          mode="not-enrolled"
+          challenge={next}
+          participants={participants}
+          currentMemberId={memberId}
+        />
+      )
     }
     return <MissionPageClient mode="no-challenge" />
   }
 
+  const preStart = today < active.challenge.startDate
+  const participants = preStart ? await participantsUC.execute(active.challenge.id) : []
+
   if (!active.participation) {
-    return <MissionPageClient mode="not-enrolled" challenge={active.challenge} />
+    return (
+      <MissionPageClient
+        mode="not-enrolled"
+        challenge={active.challenge}
+        participants={participants}
+        currentMemberId={memberId}
+      />
+    )
   }
 
   const board = await new GetMissionBoardUseCase(cRepo, mRepo).execute({
-    participation: active.participation, today: kstToday(),
+    participation: active.participation, today,
   })
 
-  return <MissionPageClient mode="enrolled" challenge={active.challenge} participation={active.participation} board={board} />
+  return (
+    <MissionPageClient
+      mode="enrolled"
+      challenge={active.challenge}
+      participation={active.participation}
+      board={board}
+      participants={preStart ? participants : undefined}
+      currentMemberId={memberId}
+    />
+  )
 }

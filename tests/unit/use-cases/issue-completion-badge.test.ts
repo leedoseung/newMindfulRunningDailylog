@@ -38,7 +38,7 @@ describe('IssueCompletionBadgeUseCase', () => {
     }
     const cRepo = { getActive: vi.fn().mockResolvedValue(challenge), getById: vi.fn(), getUpcoming: vi.fn() } as unknown as IChallengeRepository
     const pRepo = {
-      listForChallenge: vi.fn().mockResolvedValue([p]),
+      listForChallenge: vi.fn().mockResolvedValue([p]), delete: vi.fn(),
       markCompleted: vi.fn(),
       enroll: vi.fn(), getByMember: vi.fn(), decrementPass: vi.fn(), markFailed: vi.fn(),
     } as unknown as IChallengeParticipationRepository
@@ -65,7 +65,7 @@ describe('IssueCompletionBadgeUseCase', () => {
 
     const cRepo = { getActive: vi.fn().mockResolvedValue(challenge), getById: vi.fn(), getUpcoming: vi.fn() } as unknown as IChallengeRepository
     const pRepo = {
-      listForChallenge: vi.fn().mockResolvedValue([p]),
+      listForChallenge: vi.fn().mockResolvedValue([p]), delete: vi.fn(),
       markCompleted: vi.fn(),
       enroll: vi.fn(), getByMember: vi.fn(), decrementPass: vi.fn(), markFailed: vi.fn(),
     } as unknown as IChallengeParticipationRepository
@@ -94,7 +94,7 @@ describe('IssueCompletionBadgeUseCase', () => {
 
     const cRepo = { getActive: vi.fn().mockResolvedValue(challenge), getById: vi.fn(), getUpcoming: vi.fn() } as unknown as IChallengeRepository
     const pRepo = {
-      listForChallenge: vi.fn().mockResolvedValue([p]),
+      listForChallenge: vi.fn().mockResolvedValue([p]), delete: vi.fn(),
       markCompleted: vi.fn(),
       enroll: vi.fn(), getByMember: vi.fn(), decrementPass: vi.fn(), markFailed: vi.fn(),
     } as unknown as IChallengeParticipationRepository
@@ -113,7 +113,7 @@ describe('IssueCompletionBadgeUseCase', () => {
   it('skips before season end day', async () => {
     const cRepo = { getActive: vi.fn().mockResolvedValue(challenge), getById: vi.fn(), getUpcoming: vi.fn() } as unknown as IChallengeRepository
     const pRepo = {
-      listForChallenge: vi.fn(),
+      listForChallenge: vi.fn(), delete: vi.fn(),
       markCompleted: vi.fn(),
       enroll: vi.fn(), getByMember: vi.fn(), decrementPass: vi.fn(), markFailed: vi.fn(),
     } as unknown as IChallengeParticipationRepository
@@ -139,7 +139,7 @@ describe('IssueCompletionBadgeUseCase', () => {
     }
     const cRepo = { getActive: vi.fn().mockResolvedValue(challenge), getById: vi.fn(), getUpcoming: vi.fn() } as unknown as IChallengeRepository
     const pRepo = {
-      listForChallenge: vi.fn().mockResolvedValue([failed, done]),
+      listForChallenge: vi.fn().mockResolvedValue([failed, done]), delete: vi.fn(),
       markCompleted: vi.fn(),
       enroll: vi.fn(), getByMember: vi.fn(), decrementPass: vi.fn(), markFailed: vi.fn(),
     } as unknown as IChallengeParticipationRepository

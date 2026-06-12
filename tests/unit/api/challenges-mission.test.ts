@@ -62,7 +62,7 @@ describe('POST /api/challenges/mission', () => {
           completedAt: null, failedAt: null,
         }),
         enroll: vi.fn(), decrementPass: vi.fn(),
-        markFailed: vi.fn(), markCompleted: vi.fn(), listForChallenge: vi.fn(),
+        markFailed: vi.fn(), markCompleted: vi.fn(), listForChallenge: vi.fn(), delete: vi.fn(),
       } as unknown as InstanceType<typeof SupabaseChallengeParticipationRepository>
     })
     mockedMRepo.mockImplementation(function () {

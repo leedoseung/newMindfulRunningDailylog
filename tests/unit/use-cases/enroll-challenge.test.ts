@@ -30,7 +30,7 @@ function makeRepos() {
       decrementPass: vi.fn(),
       markFailed: vi.fn(),
       markCompleted: vi.fn(),
-      listForChallenge: vi.fn(),
+      listForChallenge: vi.fn(), delete: vi.fn(),
     } as IChallengeParticipationRepository,
   }
 }

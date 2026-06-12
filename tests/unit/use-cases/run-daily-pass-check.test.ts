@@ -26,7 +26,7 @@ describe('RunDailyPassCheckUseCase', () => {
     const p = makeParticipation({ passesRemaining: 3 })
     const cRepo = { getActive: vi.fn().mockResolvedValue(challenge), getById: vi.fn(), getUpcoming: vi.fn() } as unknown as IChallengeRepository
     const pRepo = {
-      listForChallenge: vi.fn().mockResolvedValue([p]),
+      listForChallenge: vi.fn().mockResolvedValue([p]), delete: vi.fn(),
       decrementPass: vi.fn(),
       markFailed: vi.fn(),
       enroll: vi.fn(), getByMember: vi.fn(), markCompleted: vi.fn(),
@@ -51,7 +51,7 @@ describe('RunDailyPassCheckUseCase', () => {
     const p = makeParticipation()
     const cRepo = { getActive: vi.fn().mockResolvedValue(challenge), getById: vi.fn(), getUpcoming: vi.fn() } as unknown as IChallengeRepository
     const pRepo = {
-      listForChallenge: vi.fn().mockResolvedValue([p]),
+      listForChallenge: vi.fn().mockResolvedValue([p]), delete: vi.fn(),
       decrementPass: vi.fn(), markFailed: vi.fn(),
       enroll: vi.fn(), getByMember: vi.fn(), markCompleted: vi.fn(),
     } as unknown as IChallengeParticipationRepository
@@ -76,7 +76,7 @@ describe('RunDailyPassCheckUseCase', () => {
     const p = makeParticipation({ passesRemaining: 0 })
     const cRepo = { getActive: vi.fn().mockResolvedValue(challenge), getById: vi.fn(), getUpcoming: vi.fn() } as unknown as IChallengeRepository
     const pRepo = {
-      listForChallenge: vi.fn().mockResolvedValue([p]),
+      listForChallenge: vi.fn().mockResolvedValue([p]), delete: vi.fn(),
       decrementPass: vi.fn(), markFailed: vi.fn(),
       enroll: vi.fn(), getByMember: vi.fn(), markCompleted: vi.fn(),
     } as unknown as IChallengeParticipationRepository
@@ -99,7 +99,7 @@ describe('RunDailyPassCheckUseCase', () => {
     const done = makeParticipation({ id: 'p_done', completedAt: '2026-07-03T00:00:00Z' })
     const cRepo = { getActive: vi.fn().mockResolvedValue(challenge), getById: vi.fn(), getUpcoming: vi.fn() } as unknown as IChallengeRepository
     const pRepo = {
-      listForChallenge: vi.fn().mockResolvedValue([failed, done]),
+      listForChallenge: vi.fn().mockResolvedValue([failed, done]), delete: vi.fn(),
       decrementPass: vi.fn(), markFailed: vi.fn(),
       enroll: vi.fn(), getByMember: vi.fn(), markCompleted: vi.fn(),
     } as unknown as IChallengeParticipationRepository
@@ -119,7 +119,7 @@ describe('RunDailyPassCheckUseCase', () => {
   it('returns early when no active challenge', async () => {
     const cRepo = { getActive: vi.fn().mockResolvedValue(null), getById: vi.fn(), getUpcoming: vi.fn() } as unknown as IChallengeRepository
     const pRepo = {
-      listForChallenge: vi.fn(),
+      listForChallenge: vi.fn(), delete: vi.fn(),
       decrementPass: vi.fn(), markFailed: vi.fn(),
       enroll: vi.fn(), getByMember: vi.fn(), markCompleted: vi.fn(),
     } as unknown as IChallengeParticipationRepository
@@ -135,7 +135,7 @@ describe('RunDailyPassCheckUseCase', () => {
   it('skips when yesterday is before season start', async () => {
     const cRepo = { getActive: vi.fn().mockResolvedValue(challenge), getById: vi.fn(), getUpcoming: vi.fn() } as unknown as IChallengeRepository
     const pRepo = {
-      listForChallenge: vi.fn(),
+      listForChallenge: vi.fn(), delete: vi.fn(),
       decrementPass: vi.fn(), markFailed: vi.fn(),
       enroll: vi.fn(), getByMember: vi.fn(), markCompleted: vi.fn(),
     } as unknown as IChallengeParticipationRepository

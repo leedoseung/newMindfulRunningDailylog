@@ -57,7 +57,7 @@ describe('POST /api/challenges/enroll', () => {
       return {
         getByMember: vi.fn().mockResolvedValue(null),
         enroll: vi.fn(), decrementPass: vi.fn(),
-        markFailed: vi.fn(), markCompleted: vi.fn(), listForChallenge: vi.fn(),
+        markFailed: vi.fn(), markCompleted: vi.fn(), listForChallenge: vi.fn(), delete: vi.fn(),
       } as unknown as InstanceType<typeof SupabaseChallengeParticipationRepository>
     })
 
@@ -92,7 +92,7 @@ describe('POST /api/challenges/enroll', () => {
           completedAt: null, failedAt: null,
         }),
         decrementPass: vi.fn(),
-        markFailed: vi.fn(), markCompleted: vi.fn(), listForChallenge: vi.fn(),
+        markFailed: vi.fn(), markCompleted: vi.fn(), listForChallenge: vi.fn(), delete: vi.fn(),
       } as unknown as InstanceType<typeof SupabaseChallengeParticipationRepository>
     })
 

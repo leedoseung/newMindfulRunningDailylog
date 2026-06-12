@@ -38,7 +38,7 @@ function makeRepos(overrides: { challenge?: Challenge | null; participation?: Ch
       decrementPass: vi.fn(),
       markFailed: vi.fn(),
       markCompleted: vi.fn(),
-      listForChallenge: vi.fn(),
+      listForChallenge: vi.fn(), delete: vi.fn(),
     } as IChallengeParticipationRepository,
     mRepo: {
       getByParticipation: vi.fn(),

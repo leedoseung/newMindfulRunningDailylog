@@ -54,7 +54,7 @@ describe('GET /api/challenges/active', () => {
       return {
         getByMember: vi.fn().mockResolvedValue({ id: 'p1' }),
         enroll: vi.fn(), decrementPass: vi.fn(),
-        markFailed: vi.fn(), markCompleted: vi.fn(), listForChallenge: vi.fn(),
+        markFailed: vi.fn(), markCompleted: vi.fn(), listForChallenge: vi.fn(), delete: vi.fn(),
       } as unknown as InstanceType<typeof SupabaseChallengeParticipationRepository>
     })
 

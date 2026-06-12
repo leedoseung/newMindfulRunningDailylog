@@ -41,6 +41,17 @@ function IconTrophy({ active }: { active: boolean }) {
   )
 }
 
+function IconStamp({ active }: { active: boolean }) {
+  return (
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      strokeWidth={active ? 2.2 : 1.6} strokeLinecap="round" strokeLinejoin="round">
+      <circle cx="12" cy="11" r="6" fill={active ? 'currentColor' : 'none'} />
+      <path d="M8 21h8" />
+      <path d="M12 17v4" />
+    </svg>
+  )
+}
+
 function IconPerson({ active }: { active: boolean }) {
   return (
     <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor"
@@ -54,6 +65,7 @@ function IconPerson({ active }: { active: boolean }) {
 const NAV_ITEMS = [
   { href: '/home',        Icon: IconHome,   label: '홈' },
   { href: '/',            Icon: IconPen,    label: '기록' },
+  { href: '/mission',     Icon: IconStamp,  label: '미션' },
   { href: '/leaderboard', Icon: IconTrophy, label: '리더보드' },
   { href: '/profile',     Icon: IconPerson, label: '프로필' },
 ]

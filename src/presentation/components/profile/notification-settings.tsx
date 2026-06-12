@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useState } from 'react'
 import { usePushSubscribe } from '../mission/use-push-subscribe'
+import { IOSInstallGuideSheet } from '../mission/ios-install-guide-sheet'
 
 const FONT = "'Pretendard Variable', Pretendard, -apple-system, sans-serif"
 
@@ -26,6 +27,7 @@ function isIOSWithoutPWA(): boolean {
 
 export function NotificationSettings() {
   const [status, setStatus] = useState<Status>('unknown')
+  const [showIosSheet, setShowIosSheet] = useState(false)
   const push = usePushSubscribe()
 
   useEffect(() => {
@@ -34,7 +36,7 @@ export function NotificationSettings() {
 
   const handleClick = useCallback(async () => {
     if (isIOSWithoutPWA()) {
-      alert('iOS에서는 홈 화면에 추가한 뒤 다시 시도해주세요.')
+      setShowIosSheet(true)
       return
     }
     await push.subscribe()
@@ -95,6 +97,7 @@ export function NotificationSettings() {
 
   // status === 'granted' but not subscribed yet, OR status === 'default'
   return (
+    <>
     <section style={baseCard}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 12 }}>
         <div style={{ flex: 1 }}>
@@ -134,5 +137,7 @@ export function NotificationSettings() {
         </button>
       </div>
     </section>
+    <IOSInstallGuideSheet open={showIosSheet} onClose={() => setShowIosSheet(false)} />
+    </>
   )
 }

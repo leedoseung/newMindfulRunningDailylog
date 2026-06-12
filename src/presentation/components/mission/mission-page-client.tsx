@@ -39,6 +39,33 @@ const FONT = "'Pretendard Variable', Pretendard, -apple-system, sans-serif"
 export function MissionPageClient(props: Props) {
   const router = useRouter()
   const [enrollPending, setEnrollPending] = useState(false)
+  const [overrideCount, setOverrideCount] = useState<number | null>(null)
+  const [overrideError, setOverrideError] = useState<string | null>(null)
+
+  async function addCount(delta: number, prevCount: number) {
+    const newOptimistic = prevCount + delta
+    setOverrideCount(newOptimistic)
+    setOverrideError(null)
+    try {
+      const res = await fetch('/api/challenges/mission', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ delta }),
+      })
+      if (!res.ok) {
+        const err = await res.json()
+        setOverrideCount(prevCount)
+        setOverrideError(err.error ?? 'UNKNOWN')
+        return
+      }
+      const log = await res.json()
+      setOverrideCount(typeof log.count === 'number' ? log.count : newOptimistic)
+      router.refresh()
+    } catch (err) {
+      setOverrideCount(prevCount)
+      setOverrideError(String(err))
+    }
+  }
 
   async function enroll(challengeId: string) {
     setEnrollPending(true)
@@ -108,18 +135,18 @@ export function MissionPageClient(props: Props) {
         passCount={challenge.passCount}
       />
       {board.todayIndex >= 0 && (
-        <TodayCounter
-          count={todayCount}
-          goal={challenge.goalPerDay}
-          onAdd={async (delta) => {
-            await fetch('/api/challenges/mission', {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({ delta }),
-            })
-            router.refresh()
-          }}
-        />
+        <>
+          <TodayCounter
+            count={overrideCount ?? todayCount}
+            goal={challenge.goalPerDay}
+            onAdd={(delta) => addCount(delta, overrideCount ?? todayCount)}
+          />
+          {overrideError && (
+            <div role="alert" style={{ color: '#b8231f', fontSize: 12, textAlign: 'center' }}>
+              실패: {overrideError}
+            </div>
+          )}
+        </>
       )}
       <MissionBoard cells={board.cells} />
     </main>

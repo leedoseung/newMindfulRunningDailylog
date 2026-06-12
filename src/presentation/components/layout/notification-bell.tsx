@@ -60,6 +60,12 @@ export function NotificationBell({ memberId, memberName, memberAvatarUrl }: Prop
 
   async function handleNotificationClick(n: Notification) {
     setOpen(false)
+    if (n.type === 'challenge_announcement') {
+      const url = n.payload?.url ?? '/mission'
+      if (typeof window !== 'undefined') window.location.href = url
+      return
+    }
+    if (!n.runLogId) return
     try {
       const res = await fetch(`/api/record/${n.runLogId}`)
       if (!res.ok) return
@@ -154,47 +160,83 @@ export function NotificationBell({ memberId, memberName, memberAvatarUrl }: Prop
                   >
                     {/* 아바타 + 타입 뱃지 */}
                     <div style={{ position: 'relative', flexShrink: 0 }}>
-                      <AvatarImage
-                        name={n.actorName}
-                        avatarUrl={n.actorAvatarUrl ?? ''}
-                        size={40}
-                        bg="#e5e5e5"
-                        color="#888"
-                      />
-                      <div style={{
-                        position: 'absolute', bottom: -2, right: -3,
-                        width: 17, height: 17, borderRadius: '50%',
-                        background: n.type === 'like' ? '#FF3B30' : '#007AFF',
-                        display: 'flex', alignItems: 'center', justifyContent: 'center',
-                        fontSize: '0.55rem', border: '2px solid #fff',
-                      }}>
-                        {n.type === 'like' ? '♥' : '💬'}
-                      </div>
+                      {n.type === 'challenge_announcement' ? (
+                        <div style={{
+                          width: 40, height: 40, borderRadius: '50%',
+                          background: '#111', color: '#fff',
+                          display: 'flex', alignItems: 'center', justifyContent: 'center',
+                          fontSize: '1rem',
+                        }}>🏃</div>
+                      ) : (
+                        <AvatarImage
+                          name={n.actorName ?? ''}
+                          avatarUrl={n.actorAvatarUrl ?? ''}
+                          size={40}
+                          bg="#e5e5e5"
+                          color="#888"
+                        />
+                      )}
+                      {n.type !== 'challenge_announcement' && (
+                        <div style={{
+                          position: 'absolute', bottom: -2, right: -3,
+                          width: 17, height: 17, borderRadius: '50%',
+                          background: n.type === 'like' ? '#FF3B30' : '#007AFF',
+                          display: 'flex', alignItems: 'center', justifyContent: 'center',
+                          fontSize: '0.55rem', border: '2px solid #fff',
+                        }}>
+                          {n.type === 'like' ? '♥' : '💬'}
+                        </div>
+                      )}
                     </div>
 
                     {/* 텍스트 */}
                     <div style={{ flex: 1, minWidth: 0 }}>
-                      <div style={{ fontFamily: FONT, fontSize: '0.82rem', color: '#111', lineHeight: 1.5 }}>
-                        <span style={{ fontWeight: 600 }}>{n.actorName}</span>
-                        {n.type === 'like'
-                          ? '님이 회원님의 달리기에 좋아요를 눌렀습니다.'
-                          : '님이 댓글을 남겼습니다.'}
-                      </div>
-                      {n.runTitle && (
-                        <div style={{
-                          fontFamily: FONT, fontSize: '0.7rem', color: '#999',
-                          marginTop: 2, overflow: 'hidden', whiteSpace: 'nowrap', textOverflow: 'ellipsis',
-                        }}>
-                          "{n.runTitle}"
-                        </div>
-                      )}
-                      {n.type === 'comment' && n.commentBody && (
-                        <div style={{
-                          fontFamily: FONT, fontSize: '0.72rem', color: '#555',
-                          marginTop: 3, overflow: 'hidden', whiteSpace: 'nowrap', textOverflow: 'ellipsis',
-                        }}>
-                          {n.commentBody}
-                        </div>
+                      {n.type === 'challenge_announcement' ? (
+                        <>
+                          <div style={{ fontFamily: FONT, fontSize: '0.82rem', color: '#111', lineHeight: 1.5 }}>
+                            <span style={{ fontWeight: 600 }}>새 챌린지 공지</span>
+                          </div>
+                          {n.payload?.title && (
+                            <div style={{
+                              fontFamily: FONT, fontSize: '0.72rem', color: '#555',
+                              marginTop: 3, overflow: 'hidden', whiteSpace: 'nowrap', textOverflow: 'ellipsis',
+                            }}>
+                              {n.payload.title}
+                            </div>
+                          )}
+                          {n.payload?.start_date && (
+                            <div style={{
+                              fontFamily: FONT, fontSize: '0.7rem', color: '#999', marginTop: 2,
+                            }}>
+                              시작: {n.payload.start_date}
+                            </div>
+                          )}
+                        </>
+                      ) : (
+                        <>
+                          <div style={{ fontFamily: FONT, fontSize: '0.82rem', color: '#111', lineHeight: 1.5 }}>
+                            <span style={{ fontWeight: 600 }}>{n.actorName}</span>
+                            {n.type === 'like'
+                              ? '님이 회원님의 달리기에 좋아요를 눌렀습니다.'
+                              : '님이 댓글을 남겼습니다.'}
+                          </div>
+                          {n.runTitle && (
+                            <div style={{
+                              fontFamily: FONT, fontSize: '0.7rem', color: '#999',
+                              marginTop: 2, overflow: 'hidden', whiteSpace: 'nowrap', textOverflow: 'ellipsis',
+                            }}>
+                              &quot;{n.runTitle}&quot;
+                            </div>
+                          )}
+                          {n.type === 'comment' && n.commentBody && (
+                            <div style={{
+                              fontFamily: FONT, fontSize: '0.72rem', color: '#555',
+                              marginTop: 3, overflow: 'hidden', whiteSpace: 'nowrap', textOverflow: 'ellipsis',
+                            }}>
+                              {n.commentBody}
+                            </div>
+                          )}
+                        </>
                       )}
                       <div style={{ fontFamily: FONT, fontSize: '0.6rem', color: '#ccc', marginTop: 4 }}>
                         {formatRelativeTime(n.createdAt)}

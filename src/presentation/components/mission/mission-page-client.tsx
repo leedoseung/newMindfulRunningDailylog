@@ -196,6 +196,12 @@ export function MissionPageClient(props: Props) {
         passesRemaining={board.passesRemaining}
         passCount={challenge.passCount}
       />
+      {props.participants && (
+        <ParticipantList
+          participants={props.participants}
+          currentMemberId={props.currentMemberId}
+        />
+      )}
       {canLog && (
         <>
           <TodayCounter
@@ -220,12 +226,6 @@ export function MissionPageClient(props: Props) {
         </div>
       )}
       <MissionBoard cells={board.cells} />
-      {props.participants && (
-        <ParticipantList
-          participants={props.participants}
-          currentMemberId={props.currentMemberId}
-        />
-      )}
       {isCompleted && !completionDismissed && (
         <CompletionSheet
           open

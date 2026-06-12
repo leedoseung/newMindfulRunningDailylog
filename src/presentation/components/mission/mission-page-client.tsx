@@ -107,10 +107,10 @@ export function MissionPageClient(props: Props) {
         alert(`참가 실패: ${err.error}`)
         return
       }
-      // After enroll: show in-app consent first so the browser permission
-      // prompt is opt-in, not surprise-driven.
+      // Show consent FIRST. router.refresh() would replace this page with
+      // the enrolled view while the sheet is still up; defer it to the
+      // consent callbacks so the sheet stays mounted until the user acts.
       setShowPushConsent(true)
-      router.refresh()
     } finally {
       setEnrollPending(false)
     }
@@ -151,8 +151,12 @@ export function MissionPageClient(props: Props) {
             setShowPushConsent(false)
             if (isIOSWithoutPWA()) setShowIosSheet(true)
             else push.subscribe()
+            router.refresh()
           }}
-          onLater={() => setShowPushConsent(false)}
+          onLater={() => {
+            setShowPushConsent(false)
+            router.refresh()
+          }}
         />
         <IOSInstallGuideSheet
           open={showIosSheet}
@@ -211,19 +215,6 @@ export function MissionPageClient(props: Props) {
           onClose={() => setCompletionDismissed(true)}
         />
       )}
-      <PushConsentSheet
-        open={showPushConsent}
-        onAllow={() => {
-          setShowPushConsent(false)
-          if (isIOSWithoutPWA()) setShowIosSheet(true)
-          else push.subscribe()
-        }}
-        onLater={() => setShowPushConsent(false)}
-      />
-      <IOSInstallGuideSheet
-        open={showIosSheet}
-        onClose={() => setShowIosSheet(false)}
-      />
     </main>
   )
 }

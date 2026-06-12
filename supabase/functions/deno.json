@@ -1,0 +1,9 @@
+{
+  "tasks": {
+    "deploy:daily-pass-check": "supabase functions deploy daily-pass-check",
+    "deploy:issue-completion": "supabase functions deploy issue-completion-badges"
+  },
+  "imports": {
+    "@supabase/supabase-js": "npm:@supabase/supabase-js@2"
+  }
+}

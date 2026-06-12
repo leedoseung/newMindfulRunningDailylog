@@ -2,6 +2,7 @@ import { createServerClient } from '@/infrastructure/supabase/client'
 import { SupabaseRunLogRepository } from '@/infrastructure/supabase/run-log-repository'
 import { GetMemberRecordsUseCase } from '@/application/use-cases/get-member-records'
 import { ProfileView } from '@/presentation/components/profile/profile-view'
+import { ChallengeBadge, type Badge } from '@/presentation/components/profile/challenge-badge'
 import { redirect } from 'next/navigation'
 import type { RunLog } from '@/domain/entities/run-log'
 
@@ -40,25 +41,37 @@ export default async function ProfilePage() {
   const [memberRes, myRuns] = await Promise.all([
     supabase
       .from('members')
-      .select('name, group_name, generation, insta_id, avatar_url')
+      .select('name, group_name, generation, insta_id, avatar_url, challenge_badges')
       .eq('id', memberId)
       .single(),
     new GetMemberRecordsUseCase(new SupabaseRunLogRepository(supabase)).execute(memberId),
   ])
 
   if (!memberRes.data) redirect('/')
-  const m = memberRes.data as { name: string; group_name: string; generation: string; insta_id: string; avatar_url: string | null }
+  const m = memberRes.data as {
+    name: string
+    group_name: string
+    generation: string
+    insta_id: string
+    avatar_url: string | null
+    challenge_badges: Badge[] | null
+  }
+
+  const badges = Array.isArray(m.challenge_badges) ? m.challenge_badges : []
 
   return (
-    <ProfileView
-      member={{ name: m.name, groupName: m.group_name, generation: m.generation, instaId: m.insta_id, avatarUrl: m.avatar_url ?? '' }}
-      stats={computeStats(myRuns)}
-      monthlyChart={computeMonthlyChart(myRuns)}
-      recentRuns={myRuns.slice(0, 5)}
-      allRuns={myRuns}
-      memberId={memberId}
-      memberName={m.name}
-      memberAvatarUrl={m.avatar_url ?? ''}
-    />
+    <>
+      <ProfileView
+        member={{ name: m.name, groupName: m.group_name, generation: m.generation, instaId: m.insta_id, avatarUrl: m.avatar_url ?? '' }}
+        stats={computeStats(myRuns)}
+        monthlyChart={computeMonthlyChart(myRuns)}
+        recentRuns={myRuns.slice(0, 5)}
+        allRuns={myRuns}
+        memberId={memberId}
+        memberName={m.name}
+        memberAvatarUrl={m.avatar_url ?? ''}
+      />
+      <ChallengeBadge badges={badges} />
+    </>
   )
 }

@@ -25,16 +25,50 @@ export function StampCell({ cell }: Props) {
         data-state="done"
         role="img"
         style={{
-          ...base,
-          border: '1.5px solid #111',
-          backgroundImage: "url('/icon-192.png')",
-          backgroundSize: '75%',
-          backgroundRepeat: 'no-repeat',
-          backgroundPosition: 'center',
-          filter: 'brightness(0) saturate(100%) invert(15%) sepia(95%) saturate(4200%) hue-rotate(355deg) brightness(0.85) contrast(1.1)',
+          aspectRatio: base.aspectRatio,
+          position: 'relative',
+          borderRadius: base.borderRadius,
         }}
-        aria-label={`Day ${cell.dayIndex + 1} 달성`}
-      />
+        aria-label={`Day ${cell.dayIndex + 1} 달성${(cell.excess ?? 0) > 0 ? ` +${cell.excess ?? 0}` : ''}`}
+      >
+        <div
+          style={{
+            position: 'absolute',
+            inset: 0,
+            border: '1.5px solid #111',
+            borderRadius: base.borderRadius,
+            backgroundImage: "url('/icon-192.png')",
+            backgroundSize: '75%',
+            backgroundRepeat: 'no-repeat',
+            backgroundPosition: 'center',
+            filter: 'brightness(0) saturate(100%) invert(15%) sepia(95%) saturate(4200%) hue-rotate(355deg) brightness(0.85) contrast(1.1)',
+            transform: `rotate(${rotation}deg)`,
+          }}
+        />
+        {(cell.excess ?? 0) > 0 && (
+          <span
+            data-testid="excess-badge"
+            style={{
+              position: 'absolute',
+              top: -4,
+              right: -4,
+              background: '#d4a017',
+              color: '#fff',
+              fontSize: 8,
+              fontWeight: 700,
+              padding: '1px 4px',
+              borderRadius: 999,
+              lineHeight: 1,
+              border: '1.5px solid #fff',
+              minWidth: 14,
+              textAlign: 'center',
+              zIndex: 2,
+            }}
+          >
+            +{cell.excess ?? 0}
+          </span>
+        )}
+      </div>
     )
   }
 

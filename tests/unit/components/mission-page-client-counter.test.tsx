@@ -52,8 +52,8 @@ describe('TodayCounter optimistic update', () => {
     fireEvent.click(screen.getByText('저장'))
 
     await waitFor(() => {
-      // value > goal so display is capped to goal (100)
-      expect(screen.getByText('100')).toBeInTheDocument()
+      // raw count shown even when over goal
+      expect(screen.getByText('120')).toBeInTheDocument()
     })
   })
 

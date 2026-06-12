@@ -10,6 +10,7 @@ type Props = {
 }
 
 const FONT = "'Pretendard Variable', Pretendard, -apple-system, sans-serif"
+const GOLD = '#d4a017'
 
 export function TodayCounter({ count, goal, onSave, disabled = false }: Props) {
   const [input, setInput] = useState<string>(String(count))
@@ -21,7 +22,7 @@ export function TodayCounter({ count, goal, onSave, disabled = false }: Props) {
   const parsed = Number(input)
   const valid = Number.isFinite(parsed) && parsed >= 0
   const changed = valid && parsed !== count
-  const displayCount = Math.min(count, goal)
+  const over = count > goal
   const ratio = Math.min(count / goal, 1)
   const ringDeg = ratio * 360
 
@@ -45,7 +46,9 @@ export function TodayCounter({ count, goal, onSave, disabled = false }: Props) {
             position: 'absolute',
             inset: 0,
             borderRadius: '50%',
-            background: `conic-gradient(#111 0deg ${ringDeg}deg, #EBEBEB ${ringDeg}deg 360deg)`,
+            background: over
+              ? `conic-gradient(${GOLD} 0deg 360deg)`
+              : `conic-gradient(#111 0deg ${ringDeg}deg, #EBEBEB ${ringDeg}deg 360deg)`,
           }}
         />
         <div
@@ -60,12 +63,27 @@ export function TodayCounter({ count, goal, onSave, disabled = false }: Props) {
             flexDirection: 'column',
           }}
         >
-          <span style={{ fontSize: 44, fontWeight: 700, letterSpacing: '-0.03em', lineHeight: 1 }}>
-            {displayCount}
+          <span style={{
+            fontSize: 44, fontWeight: 700, letterSpacing: '-0.03em', lineHeight: 1,
+            color: over ? GOLD : '#111',
+          }}>
+            {count}
           </span>
           <span style={{ fontSize: 12, color: '#888', marginTop: 4 }}>/ {goal}</span>
         </div>
       </div>
+      {over && (
+        <div
+          aria-label={`목표 초과 ${count - goal}개`}
+          style={{
+            fontSize: 12, fontWeight: 600, color: GOLD,
+            background: '#FFF6E0', padding: '5px 11px', borderRadius: 999,
+            marginTop: -8,
+          }}
+        >
+          +{count - goal}개 초과 달성 🔥
+        </div>
+      )}
 
       <div style={{ display: 'flex', gap: 8, width: '100%', alignItems: 'stretch' }}>
         <input

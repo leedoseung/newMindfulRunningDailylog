@@ -14,6 +14,7 @@ export type MissionDayCell = {
   date: string                 // 'YYYY-MM-DD'
   state: MissionDayCellState
   count: number                // display, capped at 100
+  excess?: number              // count above goal (>= 0)
   usedPass: boolean
 }
 
@@ -30,7 +31,9 @@ export function computeMissionDayCell({
   today,
   log,
 }: ComputeArgs): MissionDayCell {
-  const displayCount = log ? Math.min(log.count, 100) : 0
+  const rawCount = log?.count ?? 0
+  const displayCount = Math.min(rawCount, 100)
+  const excess = Math.max(rawCount - 100, 0)
   const usedPass = log?.usedPass ?? false
 
   let state: MissionDayCellState
@@ -54,6 +57,7 @@ export function computeMissionDayCell({
     date: cellDate,
     state,
     count: displayCount,
+    excess,
     usedPass,
   }
 }

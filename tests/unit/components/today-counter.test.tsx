@@ -44,9 +44,10 @@ describe('TodayCounter', () => {
     expect(onSave).not.toHaveBeenCalled()
   })
 
-  it('caps display count at goal when count > goal', () => {
+  it('shows raw count (not capped) when count > goal and renders excess chip', () => {
     render(<TodayCounter count={150} goal={100} onSave={() => {}} />)
-    expect(screen.getByText('100')).toBeInTheDocument()
+    expect(screen.getByText('150')).toBeInTheDocument()
+    expect(screen.getByLabelText('목표 초과 50개')).toBeInTheDocument()
   })
 
   it('rejects negative input with an error message', () => {

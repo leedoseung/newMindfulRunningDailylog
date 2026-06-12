@@ -7,6 +7,8 @@ import { ChallengeHeader } from './challenge-header'
 import { TodayCounter } from './today-counter'
 import { EnrollCard } from './enroll-card'
 import { NoActiveChallenge } from './no-active-challenge'
+import { IOSInstallGuideSheet } from './ios-install-guide-sheet'
+import { usePushSubscribe } from './use-push-subscribe'
 import type { Challenge } from '@/domain/entities/challenge'
 import type { MissionDayCell } from '@/domain/entities/mission-day-cell'
 
@@ -36,13 +38,25 @@ type Props = EnrolledProps | NotEnrolledProps | NoChallengeProps
 
 const FONT = "'Pretendard Variable', Pretendard, -apple-system, sans-serif"
 
+function isIOSWithoutPWA(): boolean {
+  if (typeof navigator === 'undefined' || typeof window === 'undefined') return false
+  const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent)
+  if (!isIOS) return false
+  const standalone =
+    window.matchMedia('(display-mode: standalone)').matches ||
+    (window.navigator as Navigator & { standalone?: boolean }).standalone === true
+  return !standalone
+}
+
 export function MissionPageClient(props: Props) {
   const router = useRouter()
   const [enrollPending, setEnrollPending] = useState(false)
   const [overrideCount, setOverrideCount] = useState<number | null>(null)
   const [overrideError, setOverrideError] = useState<string | null>(null)
   const [countPending, setCountPending] = useState(false)
+  const [showIosSheet, setShowIosSheet] = useState(false)
   const inFlightRef = useRef(false)
+  const push = usePushSubscribe()
 
   async function addCount(delta: number, prevCount: number) {
     if (inFlightRef.current) return
@@ -88,6 +102,12 @@ export function MissionPageClient(props: Props) {
         alert(`참가 실패: ${err.error}`)
         return
       }
+      // After enroll: prompt for push (iOS sheet first when PWA not installed)
+      if (isIOSWithoutPWA()) {
+        setShowIosSheet(true)
+      } else {
+        push.subscribe()
+      }
       router.refresh()
     } finally {
       setEnrollPending(false)
@@ -122,6 +142,10 @@ export function MissionPageClient(props: Props) {
           registrationDeadline={props.challenge.registrationDeadline}
           onEnroll={() => enroll(props.challenge.id)}
           isPending={enrollPending}
+        />
+        <IOSInstallGuideSheet
+          open={showIosSheet}
+          onClose={() => setShowIosSheet(false)}
         />
       </main>
     )

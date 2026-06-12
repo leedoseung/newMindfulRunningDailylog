@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from 'next'
 import './globals.css'
 import { BottomNav } from '@/presentation/components/layout/bottom-nav'
 import { PageTransition } from '@/presentation/components/layout/page-transition'
+import { SWRegistrar } from '@/presentation/components/layout/sw-registrar'
 
 export const viewport: Viewport = {
   width: 'device-width',
@@ -37,6 +38,7 @@ export default function RootLayout({
         />
       </head>
       <body style={{ paddingBottom: '80px' }}>
+        <SWRegistrar />
         <PageTransition>{children}</PageTransition>
         <BottomNav />
       </body>

@@ -23,6 +23,7 @@ export function StampCell({ cell }: Props) {
     return (
       <div
         data-state="done"
+        role="img"
         style={{
           ...base,
           border: '1.5px solid #111',
@@ -41,6 +42,7 @@ export function StampCell({ cell }: Props) {
     return (
       <div
         data-state="today"
+        role="img"
         style={{
           ...base,
           border: '2px dashed #111',
@@ -55,6 +57,7 @@ export function StampCell({ cell }: Props) {
     return (
       <div
         data-state="partial"
+        role="img"
         style={{
           ...base,
           border: '1px solid #c8c8c4',
@@ -73,6 +76,7 @@ export function StampCell({ cell }: Props) {
     return (
       <div
         data-state="pass"
+        role="img"
         style={{
           ...base,
           border: '1px solid #c8c8c4',
@@ -87,6 +91,7 @@ export function StampCell({ cell }: Props) {
     return (
       <div
         data-state="miss"
+        role="img"
         style={{
           ...base,
           border: '1px solid #f0e0e0',
@@ -101,6 +106,7 @@ export function StampCell({ cell }: Props) {
   return (
     <div
       data-state="future"
+      role="img"
       style={{
         ...base,
         border: '1px dashed #d8d8d4',

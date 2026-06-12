@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useRef, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { MissionBoard } from './mission-board'
 import { ChallengeHeader } from './challenge-header'
@@ -41,8 +41,13 @@ export function MissionPageClient(props: Props) {
   const [enrollPending, setEnrollPending] = useState(false)
   const [overrideCount, setOverrideCount] = useState<number | null>(null)
   const [overrideError, setOverrideError] = useState<string | null>(null)
+  const [countPending, setCountPending] = useState(false)
+  const inFlightRef = useRef(false)
 
   async function addCount(delta: number, prevCount: number) {
+    if (inFlightRef.current) return
+    inFlightRef.current = true
+    setCountPending(true)
     const newOptimistic = prevCount + delta
     setOverrideCount(newOptimistic)
     setOverrideError(null)
@@ -64,6 +69,9 @@ export function MissionPageClient(props: Props) {
     } catch (err) {
       setOverrideCount(prevCount)
       setOverrideError(String(err))
+    } finally {
+      inFlightRef.current = false
+      setCountPending(false)
     }
   }
 
@@ -140,6 +148,7 @@ export function MissionPageClient(props: Props) {
             count={overrideCount ?? todayCount}
             goal={challenge.goalPerDay}
             onAdd={(delta) => addCount(delta, overrideCount ?? todayCount)}
+            disabled={countPending}
           />
           {overrideError && (
             <div role="alert" style={{ color: '#b8231f', fontSize: 12, textAlign: 'center' }}>

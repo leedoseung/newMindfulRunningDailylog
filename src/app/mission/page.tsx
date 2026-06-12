@@ -6,12 +6,7 @@ import { GetActiveChallengeUseCase } from '@/application/use-cases/get-active-ch
 import { GetMissionBoardUseCase } from '@/application/use-cases/get-mission-board'
 import { MissionPageClient } from '@/presentation/components/mission/mission-page-client'
 import { redirect } from 'next/navigation'
-
-function kstToday(): string {
-  const now = new Date()
-  const kst = new Date(now.getTime() + 9 * 60 * 60 * 1000)
-  return kst.toISOString().slice(0, 10)
-}
+import { kstToday } from '@/lib/kst'
 
 export default async function MissionPage() {
   const supabase = await createServerClient()

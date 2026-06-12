@@ -9,12 +9,15 @@ import { EnrollCard } from './enroll-card'
 import { NoActiveChallenge } from './no-active-challenge'
 import { IOSInstallGuideSheet } from './ios-install-guide-sheet'
 import { usePushSubscribe } from './use-push-subscribe'
+import { CompletionSheet } from './completion-sheet'
 import type { Challenge } from '@/domain/entities/challenge'
 import type { MissionDayCell } from '@/domain/entities/mission-day-cell'
+import type { ChallengeParticipation } from '@/domain/entities/challenge-participation'
 
 type EnrolledProps = {
   mode: 'enrolled'
   challenge: Challenge
+  participation: ChallengeParticipation
   board: {
     cells: MissionDayCell[]
     streak: number
@@ -55,6 +58,7 @@ export function MissionPageClient(props: Props) {
   const [overrideError, setOverrideError] = useState<string | null>(null)
   const [countPending, setCountPending] = useState(false)
   const [showIosSheet, setShowIosSheet] = useState(false)
+  const [completionDismissed, setCompletionDismissed] = useState(false)
   const inFlightRef = useRef(false)
   const push = usePushSubscribe()
 
@@ -152,9 +156,12 @@ export function MissionPageClient(props: Props) {
   }
 
   // enrolled
-  const { challenge, board } = props
+  const { challenge, board, participation } = props
   const todayCell = board.todayIndex >= 0 ? board.cells[board.todayIndex] : null
   const todayCount = todayCell?.count ?? 0
+  const isCompleted = !!participation.completedAt
+  const isFailed = !!participation.failedAt
+  const canLog = board.todayIndex >= 0 && !isCompleted && !isFailed
 
   return (
     <main style={wrap}>
@@ -166,7 +173,7 @@ export function MissionPageClient(props: Props) {
         passesRemaining={board.passesRemaining}
         passCount={challenge.passCount}
       />
-      {board.todayIndex >= 0 && (
+      {canLog && (
         <>
           <TodayCounter
             count={overrideCount ?? todayCount}
@@ -181,7 +188,22 @@ export function MissionPageClient(props: Props) {
           )}
         </>
       )}
+      {isFailed && (
+        <div role="alert" style={{
+          background: '#fff', border: '1px solid #f0e0e0', borderRadius: 18,
+          padding: 20, textAlign: 'center', color: '#b8231f', fontSize: 13,
+        }}>
+          챌린지 종료. 면죄권 모두 소진.
+        </div>
+      )}
       <MissionBoard cells={board.cells} />
+      {isCompleted && !completionDismissed && (
+        <CompletionSheet
+          open
+          participationId={participation.id}
+          onClose={() => setCompletionDismissed(true)}
+        />
+      )}
     </main>
   )
 }

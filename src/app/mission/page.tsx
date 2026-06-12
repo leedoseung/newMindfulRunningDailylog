@@ -33,7 +33,7 @@ export default async function MissionPage() {
         const board = await new GetMissionBoardUseCase(cRepo, mRepo).execute({
           participation: existing, today: kstToday(),
         })
-        return <MissionPageClient mode="enrolled" challenge={next} board={board} />
+        return <MissionPageClient mode="enrolled" challenge={next} participation={existing} board={board} />
       }
       return <MissionPageClient mode="not-enrolled" challenge={next} />
     }
@@ -48,5 +48,5 @@ export default async function MissionPage() {
     participation: active.participation, today: kstToday(),
   })
 
-  return <MissionPageClient mode="enrolled" challenge={active.challenge} board={board} />
+  return <MissionPageClient mode="enrolled" challenge={active.challenge} participation={active.participation} board={board} />
 }

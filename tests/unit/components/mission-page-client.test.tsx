@@ -2,10 +2,17 @@ import { render, screen } from '@testing-library/react'
 import { MissionPageClient } from '@/presentation/components/mission/mission-page-client'
 import type { MissionDayCell } from '@/domain/entities/mission-day-cell'
 import type { Challenge } from '@/domain/entities/challenge'
+import type { ChallengeParticipation } from '@/domain/entities/challenge-participation'
 
 vi.mock('next/navigation', () => ({
   useRouter: () => ({ refresh: () => {} }),
 }))
+
+const participation: ChallengeParticipation = {
+  id: 'p1', challengeId: 'c1', memberId: 'm1',
+  joinedAt: '2026-07-01T00:00:00Z', passesRemaining: 4,
+  completedAt: null, failedAt: null,
+}
 
 const makeCells = (): MissionDayCell[] =>
   Array.from({ length: 100 }, (_, i) => ({
@@ -26,6 +33,7 @@ describe('MissionPageClient', () => {
       <MissionPageClient
         mode="enrolled"
         challenge={challenge}
+        participation={participation}
         board={{
           cells: makeCells(), streak: 5, completedDays: 5,
           passesRemaining: 4, todayIndex: 5, challengeId: 'c1',

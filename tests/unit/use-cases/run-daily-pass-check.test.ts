@@ -34,7 +34,7 @@ describe('RunDailyPassCheckUseCase', () => {
     const mRepo = {
       getOne: vi.fn().mockResolvedValue(null),
       markPass: vi.fn(),
-      getByParticipation: vi.fn(), upsertCount: vi.fn(),
+      getByParticipation: vi.fn(), upsertCount: vi.fn(), setCount: vi.fn(),
     } as IMissionLogRepository
 
     const uc = new RunDailyPassCheckUseCase(cRepo, pRepo, mRepo)
@@ -61,7 +61,7 @@ describe('RunDailyPassCheckUseCase', () => {
         count: 50, completed: false, usedPass: false, updatedAt: '2026-07-04T10:00:00Z',
       }),
       markPass: vi.fn(),
-      getByParticipation: vi.fn(), upsertCount: vi.fn(),
+      getByParticipation: vi.fn(), upsertCount: vi.fn(), setCount: vi.fn(),
     } as IMissionLogRepository
 
     const uc = new RunDailyPassCheckUseCase(cRepo, pRepo, mRepo)
@@ -83,7 +83,7 @@ describe('RunDailyPassCheckUseCase', () => {
     const mRepo = {
       getOne: vi.fn().mockResolvedValue(null),
       markPass: vi.fn(),
-      getByParticipation: vi.fn(), upsertCount: vi.fn(),
+      getByParticipation: vi.fn(), upsertCount: vi.fn(), setCount: vi.fn(),
     } as IMissionLogRepository
 
     const uc = new RunDailyPassCheckUseCase(cRepo, pRepo, mRepo)
@@ -105,7 +105,7 @@ describe('RunDailyPassCheckUseCase', () => {
     } as unknown as IChallengeParticipationRepository
     const mRepo = {
       getOne: vi.fn(), markPass: vi.fn(),
-      getByParticipation: vi.fn(), upsertCount: vi.fn(),
+      getByParticipation: vi.fn(), upsertCount: vi.fn(), setCount: vi.fn(),
     } as IMissionLogRepository
 
     const uc = new RunDailyPassCheckUseCase(cRepo, pRepo, mRepo)
@@ -123,7 +123,7 @@ describe('RunDailyPassCheckUseCase', () => {
       decrementPass: vi.fn(), markFailed: vi.fn(),
       enroll: vi.fn(), getByMember: vi.fn(), markCompleted: vi.fn(),
     } as unknown as IChallengeParticipationRepository
-    const mRepo = { getOne: vi.fn(), markPass: vi.fn(), getByParticipation: vi.fn(), upsertCount: vi.fn() } as IMissionLogRepository
+    const mRepo = { getOne: vi.fn(), markPass: vi.fn(), getByParticipation: vi.fn(), upsertCount: vi.fn(), setCount: vi.fn() } as IMissionLogRepository
 
     const uc = new RunDailyPassCheckUseCase(cRepo, pRepo, mRepo)
     const result = await uc.execute({ today: '2026-07-05' })
@@ -139,7 +139,7 @@ describe('RunDailyPassCheckUseCase', () => {
       decrementPass: vi.fn(), markFailed: vi.fn(),
       enroll: vi.fn(), getByMember: vi.fn(), markCompleted: vi.fn(),
     } as unknown as IChallengeParticipationRepository
-    const mRepo = { getOne: vi.fn(), markPass: vi.fn(), getByParticipation: vi.fn(), upsertCount: vi.fn() } as IMissionLogRepository
+    const mRepo = { getOne: vi.fn(), markPass: vi.fn(), getByParticipation: vi.fn(), upsertCount: vi.fn(), setCount: vi.fn() } as IMissionLogRepository
 
     const uc = new RunDailyPassCheckUseCase(cRepo, pRepo, mRepo)
     // today=07-01, yesterday=06-30 (before startDate 07-01)

@@ -68,7 +68,7 @@ describe('POST /api/challenges/mission', () => {
     mockedMRepo.mockImplementation(function () {
       return {
         getByParticipation: vi.fn(), getOne: vi.fn(),
-        upsertCount: vi.fn(), markPass: vi.fn(),
+        upsertCount: vi.fn(), setCount: vi.fn(), markPass: vi.fn(),
       } as unknown as InstanceType<typeof SupabaseMissionLogRepository>
     })
 

@@ -44,7 +44,7 @@ describe('IssueCompletionBadgeUseCase', () => {
     } as unknown as IChallengeParticipationRepository
     const mRepo = {
       getByParticipation: vi.fn().mockResolvedValue(fullSeasonLogs()),
-      getOne: vi.fn(), upsertCount: vi.fn(), markPass: vi.fn(),
+      getOne: vi.fn(), upsertCount: vi.fn(), setCount: vi.fn(), markPass: vi.fn(),
     } as IMissionLogRepository
 
     const uc = new IssueCompletionBadgeUseCase(cRepo, pRepo, mRepo)
@@ -71,7 +71,7 @@ describe('IssueCompletionBadgeUseCase', () => {
     } as unknown as IChallengeParticipationRepository
     const mRepo = {
       getByParticipation: vi.fn().mockResolvedValue(logs),
-      getOne: vi.fn(), upsertCount: vi.fn(), markPass: vi.fn(),
+      getOne: vi.fn(), upsertCount: vi.fn(), setCount: vi.fn(), markPass: vi.fn(),
     } as IMissionLogRepository
 
     const uc = new IssueCompletionBadgeUseCase(cRepo, pRepo, mRepo)
@@ -100,7 +100,7 @@ describe('IssueCompletionBadgeUseCase', () => {
     } as unknown as IChallengeParticipationRepository
     const mRepo = {
       getByParticipation: vi.fn().mockResolvedValue(logs),
-      getOne: vi.fn(), upsertCount: vi.fn(), markPass: vi.fn(),
+      getOne: vi.fn(), upsertCount: vi.fn(), setCount: vi.fn(), markPass: vi.fn(),
     } as IMissionLogRepository
 
     const uc = new IssueCompletionBadgeUseCase(cRepo, pRepo, mRepo)
@@ -117,7 +117,7 @@ describe('IssueCompletionBadgeUseCase', () => {
       markCompleted: vi.fn(),
       enroll: vi.fn(), getByMember: vi.fn(), decrementPass: vi.fn(), markFailed: vi.fn(),
     } as unknown as IChallengeParticipationRepository
-    const mRepo = { getByParticipation: vi.fn(), getOne: vi.fn(), upsertCount: vi.fn(), markPass: vi.fn() } as IMissionLogRepository
+    const mRepo = { getByParticipation: vi.fn(), getOne: vi.fn(), upsertCount: vi.fn(), setCount: vi.fn(), markPass: vi.fn() } as IMissionLogRepository
 
     const uc = new IssueCompletionBadgeUseCase(cRepo, pRepo, mRepo)
     const r = await uc.execute({ today: '2026-10-08' })  // last day = 2026-10-08, only run AFTER
@@ -143,7 +143,7 @@ describe('IssueCompletionBadgeUseCase', () => {
       markCompleted: vi.fn(),
       enroll: vi.fn(), getByMember: vi.fn(), decrementPass: vi.fn(), markFailed: vi.fn(),
     } as unknown as IChallengeParticipationRepository
-    const mRepo = { getByParticipation: vi.fn(), getOne: vi.fn(), upsertCount: vi.fn(), markPass: vi.fn() } as IMissionLogRepository
+    const mRepo = { getByParticipation: vi.fn(), getOne: vi.fn(), upsertCount: vi.fn(), setCount: vi.fn(), markPass: vi.fn() } as IMissionLogRepository
 
     const uc = new IssueCompletionBadgeUseCase(cRepo, pRepo, mRepo)
     const r = await uc.execute({ today: '2026-10-09' })

@@ -27,11 +27,15 @@ const cells: MissionDayCell[] = Array.from({ length: 100 }, (_, i) => ({
   count: i === 0 ? 40 : 0, usedPass: false,
 }))
 
+function setInput(value: string) {
+  fireEvent.change(screen.getByLabelText('런지 횟수'), { target: { value } })
+}
+
 describe('TodayCounter optimistic update', () => {
-  it('shows updated count immediately after +10 click (optimistic)', async () => {
+  it('shows updated count immediately after save (optimistic)', async () => {
     global.fetch = vi.fn().mockResolvedValue({
       ok: true,
-      json: async () => ({ count: 50 }),
+      json: async () => ({ count: 120 }),
     } as Response)
 
     render(
@@ -44,17 +48,19 @@ describe('TodayCounter optimistic update', () => {
     )
 
     expect(screen.getByText('40')).toBeInTheDocument()
-    fireEvent.click(screen.getByText('+10'))
+    setInput('120')
+    fireEvent.click(screen.getByText('저장'))
 
     await waitFor(() => {
-      expect(screen.getByText('50')).toBeInTheDocument()
+      // value > goal so display is capped to goal (100)
+      expect(screen.getByText('100')).toBeInTheDocument()
     })
   })
 
   it('rolls back to previous count on API failure', async () => {
     global.fetch = vi.fn().mockResolvedValue({
       ok: false,
-      json: async () => ({ error: 'NEGATIVE_DELTA' }),
+      json: async () => ({ error: 'BEFORE_START' }),
     } as Response)
 
     render(
@@ -67,9 +73,9 @@ describe('TodayCounter optimistic update', () => {
     )
 
     expect(screen.getByText('40')).toBeInTheDocument()
-    fireEvent.click(screen.getByText('+10'))
+    setInput('80')
+    fireEvent.click(screen.getByText('저장'))
 
-    // optimistic 50 then rollback to 40
     await waitFor(() => {
       expect(screen.getByText('40')).toBeInTheDocument()
     })

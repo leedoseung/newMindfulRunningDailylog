@@ -2,6 +2,7 @@ import type { SupabaseClient } from '@supabase/supabase-js'
 import type {
   IMissionLogRepository,
   UpsertCountInput,
+  SetCountInput,
 } from '@/domain/repositories/mission-log-repository'
 import type { MissionLog } from '@/domain/entities/mission-log'
 
@@ -69,6 +70,19 @@ export class SupabaseMissionLogRepository implements IMissionLogRepository {
     })
 
     if (error) throw new Error(`upsertCount failed: ${error.message}`)
+    return toEntity(data as unknown as Row)
+  }
+
+  async setCount(input: SetCountInput): Promise<MissionLog> {
+    if (input.count < 0) throw new Error('setCount: negative count not allowed')
+
+    const { data, error } = await this.supabase.rpc('set_mission_log_count', {
+      p_participation_id: input.participationId,
+      p_log_date: input.logDate,
+      p_count: input.count,
+    })
+
+    if (error) throw new Error(`setCount failed: ${error.message}`)
     return toEntity(data as unknown as Row)
   }
 

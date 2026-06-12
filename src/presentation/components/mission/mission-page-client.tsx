@@ -8,6 +8,7 @@ import { TodayCounter } from './today-counter'
 import { EnrollCard } from './enroll-card'
 import { NoActiveChallenge } from './no-active-challenge'
 import { IOSInstallGuideSheet } from './ios-install-guide-sheet'
+import { PushConsentSheet } from './push-consent-sheet'
 import { usePushSubscribe } from './use-push-subscribe'
 import { CompletionSheet } from './completion-sheet'
 import type { Challenge } from '@/domain/entities/challenge'
@@ -58,22 +59,22 @@ export function MissionPageClient(props: Props) {
   const [overrideError, setOverrideError] = useState<string | null>(null)
   const [countPending, setCountPending] = useState(false)
   const [showIosSheet, setShowIosSheet] = useState(false)
+  const [showPushConsent, setShowPushConsent] = useState(false)
   const [completionDismissed, setCompletionDismissed] = useState(false)
   const inFlightRef = useRef(false)
   const push = usePushSubscribe()
 
-  async function addCount(delta: number, prevCount: number) {
+  async function saveCount(next: number, prevCount: number) {
     if (inFlightRef.current) return
     inFlightRef.current = true
     setCountPending(true)
-    const newOptimistic = prevCount + delta
-    setOverrideCount(newOptimistic)
+    setOverrideCount(next)
     setOverrideError(null)
     try {
       const res = await fetch('/api/challenges/mission', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ delta }),
+        body: JSON.stringify({ count: next }),
       })
       if (!res.ok) {
         const err = await res.json()
@@ -82,7 +83,7 @@ export function MissionPageClient(props: Props) {
         return
       }
       const log = await res.json()
-      setOverrideCount(typeof log.count === 'number' ? log.count : newOptimistic)
+      setOverrideCount(typeof log.count === 'number' ? log.count : next)
       router.refresh()
     } catch (err) {
       setOverrideCount(prevCount)
@@ -106,12 +107,9 @@ export function MissionPageClient(props: Props) {
         alert(`참가 실패: ${err.error}`)
         return
       }
-      // After enroll: prompt for push (iOS sheet first when PWA not installed)
-      if (isIOSWithoutPWA()) {
-        setShowIosSheet(true)
-      } else {
-        push.subscribe()
-      }
+      // After enroll: show in-app consent first so the browser permission
+      // prompt is opt-in, not surprise-driven.
+      setShowPushConsent(true)
       router.refresh()
     } finally {
       setEnrollPending(false)
@@ -147,6 +145,15 @@ export function MissionPageClient(props: Props) {
           onEnroll={() => enroll(props.challenge.id)}
           isPending={enrollPending}
         />
+        <PushConsentSheet
+          open={showPushConsent}
+          onAllow={() => {
+            setShowPushConsent(false)
+            if (isIOSWithoutPWA()) setShowIosSheet(true)
+            else push.subscribe()
+          }}
+          onLater={() => setShowPushConsent(false)}
+        />
         <IOSInstallGuideSheet
           open={showIosSheet}
           onClose={() => setShowIosSheet(false)}
@@ -178,7 +185,7 @@ export function MissionPageClient(props: Props) {
           <TodayCounter
             count={overrideCount ?? todayCount}
             goal={challenge.goalPerDay}
-            onAdd={(delta) => addCount(delta, overrideCount ?? todayCount)}
+            onSave={(next) => saveCount(next, overrideCount ?? todayCount)}
             disabled={countPending}
           />
           {overrideError && (

@@ -39,7 +39,7 @@ describe('GetMissionBoardUseCase', () => {
         mkLog('2026-07-04', 0, true),
         mkLog('2026-07-06', 30),
       ]),
-      getOne: vi.fn(), upsertCount: vi.fn(), markPass: vi.fn(),
+      getOne: vi.fn(), upsertCount: vi.fn(), setCount: vi.fn(), markPass: vi.fn(),
     } as IMissionLogRepository
 
     const uc = new GetMissionBoardUseCase(cRepo, mRepo)
@@ -68,7 +68,7 @@ describe('GetMissionBoardUseCase', () => {
         mkLog('2026-07-04', 50),
         mkLog('2026-07-05', 100),
       ]),
-      getOne: vi.fn(), upsertCount: vi.fn(), markPass: vi.fn(),
+      getOne: vi.fn(), upsertCount: vi.fn(), setCount: vi.fn(), markPass: vi.fn(),
     } as IMissionLogRepository
 
     const uc = new GetMissionBoardUseCase(cRepo, mRepo)
@@ -87,7 +87,7 @@ describe('GetMissionBoardUseCase', () => {
         mkLog('2026-07-03', 100),
         mkLog('2026-07-04', 100),
       ]),
-      getOne: vi.fn(), upsertCount: vi.fn(), markPass: vi.fn(),
+      getOne: vi.fn(), upsertCount: vi.fn(), setCount: vi.fn(), markPass: vi.fn(),
     } as IMissionLogRepository
 
     const uc = new GetMissionBoardUseCase(cRepo, mRepo)
@@ -105,7 +105,7 @@ describe('GetMissionBoardUseCase', () => {
         mkLog('2026-07-02', 50),
         mkLog('2026-07-03', 0, true),
       ]),
-      getOne: vi.fn(), upsertCount: vi.fn(), markPass: vi.fn(),
+      getOne: vi.fn(), upsertCount: vi.fn(), setCount: vi.fn(), markPass: vi.fn(),
     } as IMissionLogRepository
 
     const uc = new GetMissionBoardUseCase(cRepo, mRepo)

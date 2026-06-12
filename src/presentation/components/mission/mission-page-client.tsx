@@ -211,6 +211,19 @@ export function MissionPageClient(props: Props) {
           onClose={() => setCompletionDismissed(true)}
         />
       )}
+      <PushConsentSheet
+        open={showPushConsent}
+        onAllow={() => {
+          setShowPushConsent(false)
+          if (isIOSWithoutPWA()) setShowIosSheet(true)
+          else push.subscribe()
+        }}
+        onLater={() => setShowPushConsent(false)}
+      />
+      <IOSInstallGuideSheet
+        open={showIosSheet}
+        onClose={() => setShowIosSheet(false)}
+      />
     </main>
   )
 }

@@ -106,6 +106,29 @@ export function StampCell({ cell }: Props) {
     )
   }
 
+  if (cell.state === 'rest') {
+    return (
+      <div
+        data-state="rest"
+        role="img"
+        style={{
+          ...base,
+          border: '1.5px solid #1e7e34',
+          background: '#E8F5EC',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          fontSize: 14,
+          transform: 'none',
+        }}
+        aria-label={`휴식일${cell.note ? ` (${cell.note})` : ''}`}
+        title={cell.note ?? '쉬어가는 날'}
+      >
+        🌿
+      </div>
+    )
+  }
+
   if (cell.state === 'pass') {
     return (
       <div

@@ -9,7 +9,8 @@ import type { MissionLog } from '@/domain/entities/mission-log'
 const challenge: Challenge = {
   id: 'c1', title: '런지 100일', description: '', goalPerDay: 100,
   durationDays: 100, startDate: '2026-07-01', registrationDeadline: '2026-07-04',
-  passCount: 5, status: 'active', createdAt: '2026-06-01T00:00:00Z',
+  passCount: 5, status: 'active', goalMin: 100, restDaysPerWeek: 0,
+  createdAt: '2026-06-01T00:00:00Z',
 }
 
 const participation: ChallengeParticipation = {
@@ -39,7 +40,7 @@ describe('GetMissionBoardUseCase', () => {
         mkLog('2026-07-04', 0, true),
         mkLog('2026-07-06', 30),
       ]),
-      getOne: vi.fn(), upsertCount: vi.fn(), setCount: vi.fn(), markPass: vi.fn(),
+      getOne: vi.fn(), upsertCount: vi.fn(), setCount: vi.fn(), markPass: vi.fn(), markRestDay: vi.fn(),
     } as IMissionLogRepository
 
     const uc = new GetMissionBoardUseCase(cRepo, mRepo)
@@ -68,7 +69,7 @@ describe('GetMissionBoardUseCase', () => {
         mkLog('2026-07-04', 50),
         mkLog('2026-07-05', 100),
       ]),
-      getOne: vi.fn(), upsertCount: vi.fn(), setCount: vi.fn(), markPass: vi.fn(),
+      getOne: vi.fn(), upsertCount: vi.fn(), setCount: vi.fn(), markPass: vi.fn(), markRestDay: vi.fn(),
     } as IMissionLogRepository
 
     const uc = new GetMissionBoardUseCase(cRepo, mRepo)
@@ -87,7 +88,7 @@ describe('GetMissionBoardUseCase', () => {
         mkLog('2026-07-03', 100),
         mkLog('2026-07-04', 100),
       ]),
-      getOne: vi.fn(), upsertCount: vi.fn(), setCount: vi.fn(), markPass: vi.fn(),
+      getOne: vi.fn(), upsertCount: vi.fn(), setCount: vi.fn(), markPass: vi.fn(), markRestDay: vi.fn(),
     } as IMissionLogRepository
 
     const uc = new GetMissionBoardUseCase(cRepo, mRepo)
@@ -105,7 +106,7 @@ describe('GetMissionBoardUseCase', () => {
         mkLog('2026-07-02', 50),
         mkLog('2026-07-03', 0, true),
       ]),
-      getOne: vi.fn(), upsertCount: vi.fn(), setCount: vi.fn(), markPass: vi.fn(),
+      getOne: vi.fn(), upsertCount: vi.fn(), setCount: vi.fn(), markPass: vi.fn(), markRestDay: vi.fn(),
     } as IMissionLogRepository
 
     const uc = new GetMissionBoardUseCase(cRepo, mRepo)

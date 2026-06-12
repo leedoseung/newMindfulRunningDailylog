@@ -13,6 +13,8 @@ type Row = {
   count: number
   completed: boolean
   used_pass: boolean
+  is_rest_day: boolean | null
+  note: string | null
   updated_at: string
 }
 
@@ -24,12 +26,14 @@ function toEntity(row: Row): MissionLog {
     count: row.count,
     completed: row.completed,
     usedPass: row.used_pass,
+    isRestDay: row.is_rest_day ?? false,
+    note: row.note,
     updatedAt: row.updated_at,
   }
 }
 
 const SELECT =
-  'id, participation_id, log_date, count, completed, used_pass, updated_at'
+  'id, participation_id, log_date, count, completed, used_pass, is_rest_day, note, updated_at'
 
 export class SupabaseMissionLogRepository implements IMissionLogRepository {
   constructor(private supabase: SupabaseClient) {}
@@ -80,9 +84,20 @@ export class SupabaseMissionLogRepository implements IMissionLogRepository {
       p_participation_id: input.participationId,
       p_log_date: input.logDate,
       p_count: input.count,
+      p_note: input.note ?? null,
     })
 
     if (error) throw new Error(`setCount failed: ${error.message}`)
+    return toEntity(data as unknown as Row)
+  }
+
+  async markRestDay(participationId: string, logDate: string): Promise<MissionLog> {
+    const { data, error } = await this.supabase.rpc('mark_mission_rest_day', {
+      p_participation_id: participationId,
+      p_log_date: logDate,
+    })
+
+    if (error) throw new Error(`markRestDay failed: ${error.message}`)
     return toEntity(data as unknown as Row)
   }
 

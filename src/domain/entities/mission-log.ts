@@ -3,7 +3,9 @@ export type MissionLog = {
   participationId: string
   logDate: string              // 'YYYY-MM-DD'
   count: number
-  completed: boolean           // count >= 100 (DB generated)
+  completed: boolean           // count >= goalMin (DB generated)
   usedPass: boolean
+  isRestDay?: boolean          // user-marked weekly rest
+  note?: string | null         // short reflection (mindful check-in)
   updatedAt: string            // ISO timestamptz
 }

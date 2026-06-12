@@ -70,7 +70,7 @@ export function MissionPageClient(props: Props) {
   const inFlightRef = useRef(false)
   const push = usePushSubscribe()
 
-  async function saveCount(next: number, prevCount: number) {
+  async function saveCount(next: number, prevCount: number, note: string | null) {
     if (inFlightRef.current) return
     inFlightRef.current = true
     setCountPending(true)
@@ -80,7 +80,7 @@ export function MissionPageClient(props: Props) {
       const res = await fetch('/api/challenges/mission', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ count: next }),
+        body: JSON.stringify({ count: next, note }),
       })
       if (!res.ok) {
         const err = await res.json()
@@ -93,6 +93,35 @@ export function MissionPageClient(props: Props) {
       router.refresh()
     } catch (err) {
       setOverrideCount(prevCount)
+      setOverrideError(String(err))
+    } finally {
+      inFlightRef.current = false
+      setCountPending(false)
+    }
+  }
+
+  async function markRest() {
+    if (inFlightRef.current) return
+    inFlightRef.current = true
+    setCountPending(true)
+    setOverrideError(null)
+    try {
+      const res = await fetch('/api/challenges/mission', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ rest: true }),
+      })
+      if (!res.ok) {
+        const err = await res.json()
+        if (err.error === 'REST_BUDGET_EXHAUSTED') {
+          setOverrideError('이번 주 휴식권을 모두 사용했어요')
+        } else {
+          setOverrideError(err.error ?? 'UNKNOWN')
+        }
+        return
+      }
+      router.refresh()
+    } catch (err) {
       setOverrideError(String(err))
     } finally {
       inFlightRef.current = false
@@ -185,6 +214,23 @@ export function MissionPageClient(props: Props) {
   const isCompleted = !!participation.completedAt
   const isFailed = !!participation.failedAt
   const canLog = board.todayIndex >= 0 && !isCompleted && !isFailed
+  const restBudget = challenge.restDaysPerWeek ?? 1
+  const restRemainingThisWeek = (() => {
+    if (!todayCell) return restBudget
+    const [ty, tm, td] = todayCell.date.split('-').map(Number) as [number, number, number]
+    const dt = new Date(Date.UTC(ty, tm - 1, td))
+    const isoDow = dt.getUTCDay() === 0 ? 7 : dt.getUTCDay()  // Mon=1..Sun=7
+    const monMs = Date.UTC(ty, tm - 1, td) - (isoDow - 1) * 86400000
+    const sunMs = monMs + 6 * 86400000
+    let used = 0
+    for (const c of board.cells) {
+      if (!c.isRestDay) continue
+      const [cy, cm, cd] = c.date.split('-').map(Number) as [number, number, number]
+      const ms = Date.UTC(cy, cm - 1, cd)
+      if (ms >= monMs && ms <= sunMs) used++
+    }
+    return Math.max(restBudget - used, 0)
+  })()
 
   return (
     <main style={wrap}>
@@ -207,8 +253,12 @@ export function MissionPageClient(props: Props) {
           <TodayCounter
             count={overrideCount ?? todayCount}
             goal={challenge.goalPerDay}
-            onSave={(next) => saveCount(next, overrideCount ?? todayCount)}
+            goalMin={challenge.goalMin ?? 10}
+            note={todayCell?.note ?? null}
+            onSave={(next, note) => saveCount(next, overrideCount ?? todayCount, note)}
+            onRest={markRest}
             disabled={countPending}
+            restAvailable={!todayCell?.isRestDay && restRemainingThisWeek > 0}
           />
           {overrideError && (
             <div role="alert" style={{ color: '#b8231f', fontSize: 12, textAlign: 'center' }}>

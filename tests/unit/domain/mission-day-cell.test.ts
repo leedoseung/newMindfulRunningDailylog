@@ -56,15 +56,37 @@ describe('computeMissionDayCell', () => {
     expect(cell.count).toBe(100)
   })
 
-  it('returns partial when 0 < count < 100', () => {
+  it('returns done at goalMin (default 10) so 50 stamps', () => {
     const cell = computeMissionDayCell({
       dayIndex: 0,
       cellDate: '2026-06-10',
       today: '2026-06-11',
       log: log({ count: 50 }),
     })
-    expect(cell.state).toBe('partial')
+    expect(cell.state).toBe('done')
     expect(cell.count).toBe(50)
+  })
+
+  it('returns partial when 0 < count < goalMin', () => {
+    const cell = computeMissionDayCell({
+      dayIndex: 0,
+      cellDate: '2026-06-10',
+      today: '2026-06-11',
+      log: log({ count: 5 }),
+      goalMin: 10,
+    })
+    expect(cell.state).toBe('partial')
+    expect(cell.count).toBe(5)
+  })
+
+  it('returns rest when isRestDay = true', () => {
+    const cell = computeMissionDayCell({
+      dayIndex: 0,
+      cellDate: '2026-06-10',
+      today: '2026-06-11',
+      log: log({ count: 0, isRestDay: true }),
+    })
+    expect(cell.state).toBe('rest')
   })
 
   it('returns pass when used_pass = true', () => {

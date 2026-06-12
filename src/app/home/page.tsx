@@ -77,7 +77,7 @@ export default async function HomePage() {
   const recentRuns = initialGridRuns
 
   // Challenge banner: active OR upcoming
-  let bannerChallenge: { id: string; title: string; description: string; startDate: string; registrationDeadline: string } | null = null
+  let bannerChallenge: { id: string; title: string; description: string; startDate: string; registrationDeadline: string; imageUrl: string | null } | null = null
   let bannerEnrolled = false
   const today = kstToday()
   if (memberId) {
@@ -97,6 +97,7 @@ export default async function HomePage() {
           description: candidate.description,
           startDate: candidate.startDate,
           registrationDeadline: candidate.registrationDeadline,
+          imageUrl: candidate.imageUrl ?? null,
         }
       }
     }

@@ -12,6 +12,7 @@ type ChallengeRow = {
   registration_deadline: string
   pass_count: number
   status: ChallengeStatus
+  image_url: string | null
   created_at: string
 }
 
@@ -26,11 +27,12 @@ function toChallenge(row: ChallengeRow): Challenge {
     registrationDeadline: row.registration_deadline,
     passCount: row.pass_count,
     status: row.status,
+    imageUrl: row.image_url,
     createdAt: row.created_at,
   }
 }
 
-const SELECT = 'id, title, description, goal_per_day, duration_days, start_date, registration_deadline, pass_count, status, created_at'
+const SELECT = 'id, title, description, goal_per_day, duration_days, start_date, registration_deadline, pass_count, status, image_url, created_at'
 
 export class SupabaseChallengeRepository implements IChallengeRepository {
   constructor(private supabase: SupabaseClient) {}

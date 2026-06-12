@@ -10,6 +10,7 @@ type SimpleChallenge = {
   description: string
   startDate: string
   registrationDeadline: string
+  imageUrl?: string | null
 }
 
 type Props = {
@@ -31,26 +32,36 @@ export function ChallengeAnnouncementBanner({ challenge, today, enrolled }: Prop
 
   const dDay = diffDays(today, challenge.startDate)
   const dayLabel = dDay > 0 ? `D-${dDay}` : dDay === 0 ? '오늘 시작' : `${-dDay}일째`
+  const imageUrl = challenge.imageUrl
 
   return (
     <Link
       href="/mission"
       style={{
+        position: 'relative',
         display: 'block',
         textDecoration: 'none',
-        background: '#111',
         color: '#fff',
         borderRadius: 18,
         padding: 18,
         fontFamily: FONT,
+        overflow: 'hidden',
+        backgroundColor: '#111',
+        backgroundImage: imageUrl
+          ? `linear-gradient(180deg, rgba(0,0,0,0.35) 0%, rgba(0,0,0,0.78) 100%), url("${imageUrl}")`
+          : 'none',
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        backgroundRepeat: 'no-repeat',
       }}
     >
-      <p style={{ fontSize: 10, letterSpacing: '0.1em', margin: 0, opacity: 0.7 }}>NEW SEASON</p>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: 8 }}>
-        <h2 style={{ fontSize: 17, fontWeight: 700, letterSpacing: '-0.02em', margin: 0 }}>
+      <p style={{ fontSize: 10, letterSpacing: '0.1em', margin: 0, opacity: 0.85 }}>NEW SEASON</p>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: 8, gap: 8 }}>
+        <h2 style={{ fontSize: 17, fontWeight: 700, letterSpacing: '-0.02em', margin: 0, textShadow: '0 1px 4px rgba(0,0,0,0.5)' }}>
           {challenge.title}
         </h2>
         <span style={{
+          flexShrink: 0,
           fontSize: 12, fontWeight: 600,
           background: '#b8231f', padding: '4px 10px', borderRadius: 999,
         }}>
@@ -58,11 +69,18 @@ export function ChallengeAnnouncementBanner({ challenge, today, enrolled }: Prop
         </span>
       </div>
       {challenge.description && (
-        <p style={{ fontSize: 12, color: 'rgba(255,255,255,0.7)', margin: '6px 0 0' }}>
+        <p style={{
+          fontSize: 12,
+          color: 'rgba(255,255,255,0.88)',
+          margin: '6px 0 0',
+          whiteSpace: 'pre-line',
+          lineHeight: 1.55,
+          textShadow: '0 1px 3px rgba(0,0,0,0.6)',
+        }}>
           {challenge.description}
         </p>
       )}
-      <p style={{ fontSize: 11, color: 'rgba(255,255,255,0.8)', margin: '12px 0 0', fontWeight: 600 }}>
+      <p style={{ fontSize: 11, color: 'rgba(255,255,255,0.92)', margin: '12px 0 0', fontWeight: 600 }}>
         {enrolled ? '참가 중 ✓' : '참가 신청 →'}
       </p>
     </Link>

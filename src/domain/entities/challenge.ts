@@ -10,5 +10,6 @@ export type Challenge = {
   registrationDeadline: string // 'YYYY-MM-DD'
   passCount: number
   status: ChallengeStatus
+  imageUrl?: string | null
   createdAt: string            // ISO timestamptz
 }

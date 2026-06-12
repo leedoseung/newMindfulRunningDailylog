@@ -11,9 +11,11 @@ import { IOSInstallGuideSheet } from './ios-install-guide-sheet'
 import { PushConsentSheet } from './push-consent-sheet'
 import { usePushSubscribe } from './use-push-subscribe'
 import { CompletionSheet } from './completion-sheet'
+import { ParticipantList } from './participant-list'
 import type { Challenge } from '@/domain/entities/challenge'
 import type { MissionDayCell } from '@/domain/entities/mission-day-cell'
 import type { ChallengeParticipation } from '@/domain/entities/challenge-participation'
+import type { ChallengeParticipantView } from '@/application/use-cases/get-challenge-participants'
 
 type EnrolledProps = {
   mode: 'enrolled'
@@ -27,11 +29,15 @@ type EnrolledProps = {
     todayIndex: number
     challengeId: string
   }
+  participants?: ChallengeParticipantView[]
+  currentMemberId?: string
 }
 
 type NotEnrolledProps = {
   mode: 'not-enrolled'
   challenge: Challenge
+  participants?: ChallengeParticipantView[]
+  currentMemberId?: string
 }
 
 type NoChallengeProps = {
@@ -145,6 +151,12 @@ export function MissionPageClient(props: Props) {
           onEnroll={() => enroll(props.challenge.id)}
           isPending={enrollPending}
         />
+        {props.participants && (
+          <ParticipantList
+            participants={props.participants}
+            currentMemberId={props.currentMemberId}
+          />
+        )}
         <PushConsentSheet
           open={showPushConsent}
           onAllow={() => {
@@ -208,6 +220,12 @@ export function MissionPageClient(props: Props) {
         </div>
       )}
       <MissionBoard cells={board.cells} />
+      {props.participants && (
+        <ParticipantList
+          participants={props.participants}
+          currentMemberId={props.currentMemberId}
+        />
+      )}
       {isCompleted && !completionDismissed && (
         <CompletionSheet
           open

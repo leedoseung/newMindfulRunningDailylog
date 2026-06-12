@@ -3,12 +3,7 @@ import { createServerClient } from '@/infrastructure/supabase/client'
 import { SupabaseChallengeRepository } from '@/infrastructure/supabase/challenge-repository'
 import { SupabaseChallengeParticipationRepository } from '@/infrastructure/supabase/challenge-participation-repository'
 import { EnrollChallengeUseCase, EnrollError } from '@/application/use-cases/enroll-challenge'
-
-function kstToday(): string {
-  const now = new Date()
-  const kst = new Date(now.getTime() + 9 * 60 * 60 * 1000)
-  return kst.toISOString().slice(0, 10)
-}
+import { kstToday } from '@/lib/kst'
 
 export async function POST(req: Request) {
   const supabase = await createServerClient()

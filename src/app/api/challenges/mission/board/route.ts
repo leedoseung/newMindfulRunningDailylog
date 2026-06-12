@@ -4,12 +4,7 @@ import { SupabaseChallengeRepository } from '@/infrastructure/supabase/challenge
 import { SupabaseChallengeParticipationRepository } from '@/infrastructure/supabase/challenge-participation-repository'
 import { SupabaseMissionLogRepository } from '@/infrastructure/supabase/mission-log-repository'
 import { GetMissionBoardUseCase } from '@/application/use-cases/get-mission-board'
-
-function kstToday(): string {
-  const now = new Date()
-  const kst = new Date(now.getTime() + 9 * 60 * 60 * 1000)
-  return kst.toISOString().slice(0, 10)
-}
+import { kstToday } from '@/lib/kst'
 
 export async function GET() {
   const supabase = await createServerClient()

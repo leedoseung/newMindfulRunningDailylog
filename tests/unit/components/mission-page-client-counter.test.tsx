@@ -3,6 +3,13 @@ import { vi } from 'vitest'
 import { MissionPageClient } from '@/presentation/components/mission/mission-page-client'
 import type { MissionDayCell } from '@/domain/entities/mission-day-cell'
 import type { Challenge } from '@/domain/entities/challenge'
+import type { ChallengeParticipation } from '@/domain/entities/challenge-participation'
+
+const participation: ChallengeParticipation = {
+  id: 'p1', challengeId: 'c1', memberId: 'm1',
+  joinedAt: '2026-07-01T00:00:00Z', passesRemaining: 5,
+  completedAt: null, failedAt: null,
+}
 
 vi.mock('next/navigation', () => ({
   useRouter: () => ({ refresh: vi.fn() }),
@@ -31,6 +38,7 @@ describe('TodayCounter optimistic update', () => {
       <MissionPageClient
         mode="enrolled"
         challenge={challenge}
+        participation={participation}
         board={{ cells, streak: 0, completedDays: 0, passesRemaining: 5, todayIndex: 0, challengeId: 'c1' }}
       />
     )
@@ -53,6 +61,7 @@ describe('TodayCounter optimistic update', () => {
       <MissionPageClient
         mode="enrolled"
         challenge={challenge}
+        participation={participation}
         board={{ cells, streak: 0, completedDays: 0, passesRemaining: 5, todayIndex: 0, challengeId: 'c1' }}
       />
     )

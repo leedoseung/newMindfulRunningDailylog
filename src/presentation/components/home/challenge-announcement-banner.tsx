@@ -31,7 +31,23 @@ export function ChallengeAnnouncementBanner({ challenge, today, enrolled }: Prop
   if (!challenge) return null
 
   const dDay = diffDays(today, challenge.startDate)
-  const dayLabel = dDay > 0 ? `D-${dDay}` : dDay === 0 ? '오늘 시작' : `${-dDay}일째`
+  const daysUntilDeadline = diffDays(today, challenge.registrationDeadline)
+  const started = today >= challenge.startDate
+  const recruiting = today <= challenge.registrationDeadline
+  const isLateRecruit = started && recruiting && !enrolled
+
+  let kicker = 'NEW SEASON'
+  let dayLabel = dDay > 0 ? `D-${dDay}` : dDay === 0 ? '오늘 시작' : `${-dDay}일째`
+  let cta = enrolled ? '참가 중 ✓' : '참가 신청 →'
+  let chipBg = '#b8231f'
+
+  if (isLateRecruit) {
+    kicker = '추가 모집 중'
+    dayLabel = daysUntilDeadline === 0 ? '오늘 마감' : `D-${daysUntilDeadline} 마감`
+    cta = '지금 합류하기 →'
+    chipBg = '#d4a017'
+  }
+
   const imageUrl = challenge.imageUrl
 
   return (
@@ -55,7 +71,7 @@ export function ChallengeAnnouncementBanner({ challenge, today, enrolled }: Prop
         backgroundRepeat: 'no-repeat',
       }}
     >
-      <p style={{ fontSize: 10, letterSpacing: '0.1em', margin: 0, opacity: 0.85 }}>NEW SEASON</p>
+      <p style={{ fontSize: 10, letterSpacing: '0.1em', margin: 0, opacity: 0.85 }}>{kicker}</p>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: 8, gap: 8 }}>
         <h2 style={{ fontSize: 17, fontWeight: 700, letterSpacing: '-0.02em', margin: 0, textShadow: '0 1px 4px rgba(0,0,0,0.5)' }}>
           {challenge.title}
@@ -63,7 +79,7 @@ export function ChallengeAnnouncementBanner({ challenge, today, enrolled }: Prop
         <span style={{
           flexShrink: 0,
           fontSize: 12, fontWeight: 600,
-          background: '#b8231f', padding: '4px 10px', borderRadius: 999,
+          background: chipBg, padding: '4px 10px', borderRadius: 999,
         }}>
           {dayLabel}
         </span>
@@ -81,7 +97,7 @@ export function ChallengeAnnouncementBanner({ challenge, today, enrolled }: Prop
         </p>
       )}
       <p style={{ fontSize: 11, color: 'rgba(255,255,255,0.92)', margin: '12px 0 0', fontWeight: 600 }}>
-        {enrolled ? '참가 중 ✓' : '참가 신청 →'}
+        {cta}
       </p>
     </Link>
   )

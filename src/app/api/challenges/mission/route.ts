@@ -59,6 +59,7 @@ export async function POST(req: Request) {
       : await new LogMissionCountUseCase(cRepo, pRepo, mRepo).execute({
           participation,
           delta: body.delta as number,
+          note: body.note ?? null,
           today: kstToday(),
         })
     return NextResponse.json(log, { status: 200 })

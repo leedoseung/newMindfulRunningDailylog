@@ -70,7 +70,37 @@ export function MissionPageClient(props: Props) {
   const inFlightRef = useRef(false)
   const push = usePushSubscribe()
 
-  async function saveCount(next: number, prevCount: number, note: string | null) {
+  async function addCount(delta: number, prevCount: number, note: string | null) {
+    if (inFlightRef.current) return
+    inFlightRef.current = true
+    setCountPending(true)
+    setOverrideCount(prevCount + delta)
+    setOverrideError(null)
+    try {
+      const res = await fetch('/api/challenges/mission', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ delta, note }),
+      })
+      if (!res.ok) {
+        const err = await res.json()
+        setOverrideCount(prevCount)
+        setOverrideError(err.error ?? 'UNKNOWN')
+        return
+      }
+      const log = await res.json()
+      setOverrideCount(typeof log.count === 'number' ? log.count : prevCount + delta)
+      router.refresh()
+    } catch (err) {
+      setOverrideCount(prevCount)
+      setOverrideError(String(err))
+    } finally {
+      inFlightRef.current = false
+      setCountPending(false)
+    }
+  }
+
+  async function setCountAbsolute(next: number, prevCount: number, note: string | null) {
     if (inFlightRef.current) return
     inFlightRef.current = true
     setCountPending(true)
@@ -299,7 +329,8 @@ export function MissionPageClient(props: Props) {
             goal={challenge.goalPerDay}
             goalMin={challenge.goalMin ?? 10}
             note={todayCell?.note ?? null}
-            onSave={(next, note) => saveCount(next, overrideCount ?? todayCount, note)}
+            onAdd={(delta, note) => addCount(delta, overrideCount ?? todayCount, note)}
+            onSetAbsolute={(next, note) => setCountAbsolute(next, overrideCount ?? todayCount, note)}
             onRest={markRest}
             disabled={countPending}
             restAvailable={!todayCell?.isRestDay && restRemainingThisWeek > 0}

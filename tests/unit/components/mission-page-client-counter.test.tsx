@@ -27,15 +27,15 @@ const cells: MissionDayCell[] = Array.from({ length: 100 }, (_, i) => ({
   count: i === 0 ? 40 : 0, usedPass: false,
 }))
 
-function setInput(value: string) {
-  fireEvent.change(screen.getByLabelText('런지 횟수'), { target: { value } })
+function setDelta(value: string) {
+  fireEvent.change(screen.getByLabelText('이번에 추가할 횟수'), { target: { value } })
 }
 
-describe('TodayCounter optimistic update', () => {
-  it('shows updated count immediately after save (optimistic)', async () => {
+describe('TodayCounter delta optimistic update', () => {
+  it('shows cumulative count immediately after add (optimistic)', async () => {
     global.fetch = vi.fn().mockResolvedValue({
       ok: true,
-      json: async () => ({ count: 120 }),
+      json: async () => ({ count: 70 }),
     } as Response)
 
     render(
@@ -48,16 +48,15 @@ describe('TodayCounter optimistic update', () => {
     )
 
     expect(screen.getByText('40')).toBeInTheDocument()
-    setInput('120')
+    setDelta('30')
     fireEvent.click(screen.getByText('저장'))
 
     await waitFor(() => {
-      // raw count shown even when over goal
-      expect(screen.getByText('120')).toBeInTheDocument()
+      expect(screen.getByText('70')).toBeInTheDocument()
     })
   })
 
-  it('rolls back to previous count on API failure', async () => {
+  it('rolls back on API failure', async () => {
     global.fetch = vi.fn().mockResolvedValue({
       ok: false,
       json: async () => ({ error: 'BEFORE_START' }),
@@ -73,7 +72,7 @@ describe('TodayCounter optimistic update', () => {
     )
 
     expect(screen.getByText('40')).toBeInTheDocument()
-    setInput('80')
+    setDelta('30')
     fireEvent.click(screen.getByText('저장'))
 
     await waitFor(() => {

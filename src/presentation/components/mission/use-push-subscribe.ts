@@ -12,7 +12,7 @@ function urlBase64ToUint8Array(base64String: string): Uint8Array<ArrayBuffer> {
   return out
 }
 
-export type PushSubscribeState = 'idle' | 'unsupported' | 'denied' | 'subscribed' | 'pending' | 'error'
+export type PushSubscribeState = 'idle' | 'unsupported' | 'denied' | 'subscribed' | 'pending' | 'unsubscribed' | 'error'
 
 export function usePushSubscribe() {
   const [state, setState] = useState<PushSubscribeState>('idle')
@@ -58,5 +58,41 @@ export function usePushSubscribe() {
     }
   }, [])
 
-  return { state, error, subscribe }
+  const unsubscribe = useCallback(async () => {
+    setError(null)
+    if (typeof window === 'undefined' || !('serviceWorker' in navigator) || !('PushManager' in window)) {
+      setState('unsupported')
+      return
+    }
+    setState('pending')
+    try {
+      const reg = await navigator.serviceWorker.ready
+      const sub = await reg.pushManager.getSubscription()
+      const endpoint = sub?.endpoint ?? null
+
+      if (sub) {
+        await sub.unsubscribe()
+      }
+
+      if (endpoint) {
+        const res = await fetch('/api/push/unsubscribe', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ endpoint }),
+        })
+        if (!res.ok) {
+          const err = await res.json().catch(() => ({}))
+          setState('error')
+          setError(err.error ?? 'unknown')
+          return
+        }
+      }
+      setState('unsubscribed')
+    } catch (e) {
+      setState('error')
+      setError(String(e))
+    }
+  }, [])
+
+  return { state, error, subscribe, unsubscribe }
 }

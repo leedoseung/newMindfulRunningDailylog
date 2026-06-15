@@ -6,13 +6,7 @@ import { IOSInstallGuideSheet } from '../mission/ios-install-guide-sheet'
 
 const FONT = "'Pretendard Variable', Pretendard, -apple-system, sans-serif"
 
-type Status = 'unknown' | 'unsupported' | 'default' | 'granted' | 'denied'
-
-function detectStatus(): Status {
-  if (typeof window === 'undefined') return 'unknown'
-  if (!('Notification' in window) || !('serviceWorker' in navigator) || !('PushManager' in window)) return 'unsupported'
-  return Notification.permission as Status
-}
+type State = 'unknown' | 'unsupported' | 'on' | 'off' | 'denied'
 
 function isIOSWithoutPWA(): boolean {
   if (typeof window === 'undefined') return false
@@ -25,25 +19,47 @@ function isIOSWithoutPWA(): boolean {
   return !isStandalone
 }
 
+async function detectState(): Promise<State> {
+  if (typeof window === 'undefined') return 'unknown'
+  if (!('Notification' in window) || !('serviceWorker' in navigator) || !('PushManager' in window)) return 'unsupported'
+  if (Notification.permission === 'denied') return 'denied'
+  try {
+    const reg = await navigator.serviceWorker.ready
+    const sub = await reg.pushManager.getSubscription()
+    return sub ? 'on' : 'off'
+  } catch {
+    return 'off'
+  }
+}
+
 export function NotificationSettings() {
-  const [status, setStatus] = useState<Status>('unknown')
+  const [state, setState] = useState<State>('unknown')
   const [showIosSheet, setShowIosSheet] = useState(false)
   const push = usePushSubscribe()
 
-  useEffect(() => {
-    setStatus(detectStatus())
-  }, [push.state])
+  const refresh = useCallback(async () => {
+    setState(await detectState())
+  }, [])
 
-  const handleClick = useCallback(async () => {
+  useEffect(() => {
+    refresh()
+  }, [refresh, push.state])
+
+  const handleToggle = useCallback(async () => {
+    if (state === 'on') {
+      await push.unsubscribe()
+      await refresh()
+      return
+    }
     if (isIOSWithoutPWA()) {
       setShowIosSheet(true)
       return
     }
     await push.subscribe()
-    setStatus(detectStatus())
-  }, [push])
+    await refresh()
+  }, [state, push, refresh])
 
-  if (status === 'unknown') return null
+  if (state === 'unknown') return null
 
   const baseCard: React.CSSProperties = {
     background: '#fff',
@@ -54,7 +70,7 @@ export function NotificationSettings() {
     margin: '12px 16px',
   }
 
-  if (status === 'unsupported') {
+  if (state === 'unsupported') {
     return (
       <section style={baseCard}>
         <h3 style={{ margin: 0, fontSize: 14, fontWeight: 700 }}>알림</h3>
@@ -65,26 +81,7 @@ export function NotificationSettings() {
     )
   }
 
-  if (status === 'granted' && (push.state === 'subscribed' || push.state === 'idle')) {
-    return (
-      <section style={baseCard}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 12 }}>
-          <div>
-            <h3 style={{ margin: 0, fontSize: 14, fontWeight: 700 }}>알림 켜짐 ✓</h3>
-            <p style={{ margin: '4px 0 0', fontSize: 12, color: '#666' }}>
-              매일 저녁 8시에 미션 리마인더가 전송됩니다.
-            </p>
-          </div>
-          <span style={{
-            fontSize: 11, fontWeight: 700, color: '#1e7e34',
-            background: '#E8F5EC', padding: '4px 9px', borderRadius: 999,
-          }}>ON</span>
-        </div>
-      </section>
-    )
-  }
-
-  if (status === 'denied') {
+  if (state === 'denied') {
     return (
       <section style={baseCard}>
         <h3 style={{ margin: 0, fontSize: 14, fontWeight: 700 }}>알림 차단됨</h3>
@@ -95,49 +92,59 @@ export function NotificationSettings() {
     )
   }
 
-  // status === 'granted' but not subscribed yet, OR status === 'default'
+  const isOn = state === 'on'
+  const pending = push.state === 'pending'
+
   return (
     <>
-    <section style={baseCard}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 12 }}>
-        <div style={{ flex: 1 }}>
-          <h3 style={{ margin: 0, fontSize: 14, fontWeight: 700 }}>미션 알림 받기</h3>
-          <p style={{ margin: '6px 0 0', fontSize: 12, color: '#666', lineHeight: 1.5 }}>
-            매일 저녁 8시에 런지 100개 미션 리마인더를 보내드려요.
-          </p>
-          {push.state === 'denied' && (
-            <p style={{ margin: '6px 0 0', fontSize: 11, color: '#b8231f' }}>
-              브라우저에서 권한을 거부하셨습니다. 설정에서 다시 허용해주세요.
+      <section style={baseCard}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 12 }}>
+          <div style={{ flex: 1 }}>
+            <h3 style={{ margin: 0, fontSize: 14, fontWeight: 700 }}>
+              미션 알림
+            </h3>
+            <p style={{ margin: '6px 0 0', fontSize: 12, color: '#666', lineHeight: 1.5 }}>
+              {isOn ? '매일 저녁 8시에 미션 리마인더가 전송됩니다.' : '알림을 켜면 매일 저녁 8시에 리마인더를 보내드려요.'}
             </p>
-          )}
-          {push.state === 'error' && push.error && (
-            <p style={{ margin: '6px 0 0', fontSize: 11, color: '#b8231f' }}>
-              오류: {push.error}
-            </p>
-          )}
+            {push.state === 'error' && push.error && (
+              <p style={{ margin: '6px 0 0', fontSize: 11, color: '#b8231f' }}>
+                오류: {push.error}
+              </p>
+            )}
+          </div>
+          <button
+            type="button"
+            role="switch"
+            aria-checked={isOn}
+            aria-label={isOn ? '알림 끄기' : '알림 켜기'}
+            onClick={handleToggle}
+            disabled={pending}
+            style={{
+              position: 'relative',
+              width: 52, height: 30,
+              borderRadius: 999,
+              border: 'none',
+              background: pending ? '#bbb' : (isOn ? '#1e7e34' : '#d6d6d6'),
+              cursor: pending ? 'not-allowed' : 'pointer',
+              transition: 'background-color 0.2s',
+              padding: 0, flexShrink: 0,
+            }}
+          >
+            <span
+              style={{
+                position: 'absolute',
+                top: 3, left: isOn ? 25 : 3,
+                width: 24, height: 24,
+                borderRadius: '50%',
+                background: '#fff',
+                transition: 'left 0.2s',
+                boxShadow: '0 1px 3px rgba(0,0,0,0.2)',
+              }}
+            />
+          </button>
         </div>
-        <button
-          type="button"
-          onClick={handleClick}
-          disabled={push.state === 'pending'}
-          style={{
-            padding: '10px 16px',
-            background: push.state === 'pending' ? '#888' : '#111',
-            color: '#fff',
-            border: 'none',
-            borderRadius: 10,
-            fontSize: 13,
-            fontWeight: 600,
-            fontFamily: FONT,
-            cursor: push.state === 'pending' ? 'not-allowed' : 'pointer',
-            whiteSpace: 'nowrap',
-          }}
-        >
-          {push.state === 'pending' ? '처리 중...' : '알림 허용'}
-        </button>
-      </div>
-    </section>
-    <IOSInstallGuideSheet open={showIosSheet} onClose={() => setShowIosSheet(false)} />
+      </section>
+      <IOSInstallGuideSheet open={showIosSheet} onClose={() => setShowIosSheet(false)} />
     </>
   )
 }

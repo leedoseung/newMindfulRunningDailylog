@@ -65,7 +65,7 @@ export function NotificationSettings() {
     )
   }
 
-  if (status === 'granted' && push.state === 'subscribed') {
+  if (status === 'granted' && (push.state === 'subscribed' || push.state === 'idle')) {
     return (
       <section style={baseCard}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 12 }}>

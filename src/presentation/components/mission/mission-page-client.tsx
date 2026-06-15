@@ -1,6 +1,6 @@
 'use client'
 
-import { useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { MissionBoard } from './mission-board'
 import { ChallengeHeader } from './challenge-header'
@@ -72,6 +72,18 @@ export function MissionPageClient(props: Props) {
   const [completionDismissed, setCompletionDismissed] = useState(false)
   const inFlightRef = useRef(false)
   const push = usePushSubscribe()
+
+  // Auto-refresh server data every 30s so the roster + today-done list
+  // reflect other members' progress without manual reload.
+  useEffect(() => {
+    if (props.mode !== 'enrolled') return
+    const id = setInterval(() => {
+      if (document.visibilityState === 'visible' && !inFlightRef.current) {
+        router.refresh()
+      }
+    }, 30000)
+    return () => clearInterval(id)
+  }, [props.mode, router])
 
   async function addCount(delta: number, prevCount: number, note: string | null) {
     if (inFlightRef.current) return

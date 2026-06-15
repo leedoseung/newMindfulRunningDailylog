@@ -41,7 +41,21 @@ describe('ChallengeAnnouncementBanner', () => {
     expect(container.firstChild).toBeNull()
   })
 
-  it('renders 오늘 시작 when today == startDate', () => {
+  it('renders 오늘 시작 when today == startDate and registration is already closed', () => {
+    render(
+      <ChallengeAnnouncementBanner
+        challenge={{
+          id: 'c1', title: '시즌1', description: '',
+          startDate: '2026-07-01', registrationDeadline: '2026-06-30',
+        }}
+        today="2026-07-01"
+        enrolled={false}
+      />
+    )
+    expect(screen.getByText(/오늘 시작/)).toBeInTheDocument()
+  })
+
+  it('flips to 추가 모집 중 when started but recruiting window still open and user is not enrolled', () => {
     render(
       <ChallengeAnnouncementBanner
         challenge={{
@@ -52,6 +66,22 @@ describe('ChallengeAnnouncementBanner', () => {
         enrolled={false}
       />
     )
-    expect(screen.getByText(/오늘 시작/)).toBeInTheDocument()
+    expect(screen.getByText('추가 모집 중')).toBeInTheDocument()
+    expect(screen.getByText(/지금 합류하기/)).toBeInTheDocument()
+    expect(screen.getByText(/D-3 마감/)).toBeInTheDocument()
+  })
+
+  it('shows 오늘 마감 chip when deadline is today', () => {
+    render(
+      <ChallengeAnnouncementBanner
+        challenge={{
+          id: 'c1', title: '시즌1', description: '',
+          startDate: '2026-07-01', registrationDeadline: '2026-07-01',
+        }}
+        today="2026-07-01"
+        enrolled={false}
+      />
+    )
+    expect(screen.getByText('오늘 마감')).toBeInTheDocument()
   })
 })

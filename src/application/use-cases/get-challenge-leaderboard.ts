@@ -80,7 +80,7 @@ export class GetChallengeLeaderboardUseCase {
       byPart.set(l.participation_id, arr)
     }
 
-    return partRows.map((p) => {
+    const rows = partRows.map((p) => {
       const myLogs = byPart.get(p.id) ?? []
       const byDate = new Map<string, LogRow>(myLogs.map(l => [l.log_date, l]))
       const todayLog = byDate.get(input.today)
@@ -123,5 +123,17 @@ export class GetChallengeLeaderboardUseCase {
         isCompleted: !!p.completed_at,
       }
     })
+
+    // Sort: completed > active by completedDays desc > streak desc > todayCount desc,
+    // failed sink to the bottom. Joined order as final tie-breaker.
+    rows.sort((a, b) => {
+      if (a.isFailed !== b.isFailed) return a.isFailed ? 1 : -1
+      if (a.isCompleted !== b.isCompleted) return a.isCompleted ? -1 : 1
+      if (b.completedDays !== a.completedDays) return b.completedDays - a.completedDays
+      if (b.streak !== a.streak) return b.streak - a.streak
+      if (b.todayCount !== a.todayCount) return b.todayCount - a.todayCount
+      return a.joinedAt.localeCompare(b.joinedAt)
+    })
+    return rows
   }
 }

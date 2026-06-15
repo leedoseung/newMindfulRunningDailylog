@@ -2,6 +2,8 @@ import { createServerClient } from '@/infrastructure/supabase/client'
 import { SupabaseChallengeRepository } from '@/infrastructure/supabase/challenge-repository'
 import { SupabaseChallengeParticipationRepository } from '@/infrastructure/supabase/challenge-participation-repository'
 import { SupabaseMissionLogRepository } from '@/infrastructure/supabase/mission-log-repository'
+export const dynamic = 'force-dynamic'
+
 import { GetActiveChallengeUseCase } from '@/application/use-cases/get-active-challenge'
 import { GetMissionBoardUseCase } from '@/application/use-cases/get-mission-board'
 import { GetChallengeParticipantsUseCase } from '@/application/use-cases/get-challenge-participants'

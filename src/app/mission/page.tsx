@@ -5,6 +5,7 @@ import { SupabaseMissionLogRepository } from '@/infrastructure/supabase/mission-
 import { GetActiveChallengeUseCase } from '@/application/use-cases/get-active-challenge'
 import { GetMissionBoardUseCase } from '@/application/use-cases/get-mission-board'
 import { GetChallengeParticipantsUseCase } from '@/application/use-cases/get-challenge-participants'
+import { GetChallengeLeaderboardUseCase } from '@/application/use-cases/get-challenge-leaderboard'
 import { MissionPageClient } from '@/presentation/components/mission/mission-page-client'
 import { redirect } from 'next/navigation'
 import { kstToday } from '@/lib/kst'
@@ -77,6 +78,15 @@ export default async function MissionPage() {
     participation: active.participation, today,
   })
 
+  const leaderboard = !preStart
+    ? await new GetChallengeLeaderboardUseCase(supabase).execute({
+        challengeId: active.challenge.id,
+        today,
+        startDate: active.challenge.startDate,
+        goalMin: active.challenge.goalMin ?? 10,
+      })
+    : []
+
   return (
     <MissionPageClient
       mode="enrolled"
@@ -84,6 +94,7 @@ export default async function MissionPage() {
       participation={active.participation}
       board={board}
       participants={preStart ? participants : undefined}
+      leaderboard={!preStart ? leaderboard : undefined}
       currentMemberId={memberId}
     />
   )

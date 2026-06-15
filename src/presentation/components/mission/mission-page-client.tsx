@@ -12,10 +12,12 @@ import { PushConsentSheet } from './push-consent-sheet'
 import { usePushSubscribe } from './use-push-subscribe'
 import { CompletionSheet } from './completion-sheet'
 import { ParticipantList } from './participant-list'
+import { ChallengeRoster } from './challenge-roster'
 import type { Challenge } from '@/domain/entities/challenge'
 import type { MissionDayCell } from '@/domain/entities/mission-day-cell'
 import type { ChallengeParticipation } from '@/domain/entities/challenge-participation'
 import type { ChallengeParticipantView } from '@/application/use-cases/get-challenge-participants'
+import type { ChallengeLeaderRow } from '@/application/use-cases/get-challenge-leaderboard'
 
 type EnrolledProps = {
   mode: 'enrolled'
@@ -30,6 +32,7 @@ type EnrolledProps = {
     challengeId: string
   }
   participants?: ChallengeParticipantView[]
+  leaderboard?: ChallengeLeaderRow[]
   currentMemberId?: string
 }
 
@@ -299,6 +302,14 @@ export function MissionPageClient(props: Props) {
       {props.participants && (
         <ParticipantList
           participants={props.participants}
+          currentMemberId={props.currentMemberId}
+        />
+      )}
+      {props.leaderboard && (
+        <ChallengeRoster
+          rows={props.leaderboard}
+          durationDays={challenge.durationDays}
+          goal={challenge.goalPerDay}
           currentMemberId={props.currentMemberId}
         />
       )}

@@ -373,7 +373,7 @@ export function MissionPageClient(props: Props) {
           챌린지 종료. 면죄권 모두 소진.
         </div>
       )}
-      <MissionBoard cells={board.cells} />
+      <MissionBoard cells={board.cells} goal={challenge.goalPerDay} />
       {isCompleted && !completionDismissed && (
         <CompletionSheet
           open

@@ -1,6 +1,6 @@
 import type { MissionDayCell } from '@/domain/entities/mission-day-cell'
 
-type Props = { cell: MissionDayCell }
+type Props = { cell: MissionDayCell; onClick?: (cell: MissionDayCell) => void }
 
 function seededRotation(date: string): number {
   let hash = 0
@@ -9,7 +9,9 @@ function seededRotation(date: string): number {
   return (norm - 0.5) * 16  // -8 ~ +8 deg
 }
 
-export function StampCell({ cell }: Props) {
+export function StampCell({ cell, onClick }: Props) {
+  const interactive = !!onClick && cell.state !== 'future'
+  const handleClick = interactive ? () => onClick!(cell) : undefined
   const rotation = seededRotation(cell.date)
 
   const base: React.CSSProperties = {
@@ -17,13 +19,17 @@ export function StampCell({ cell }: Props) {
     position: 'relative',
     borderRadius: '50%',
     transform: `rotate(${rotation}deg)`,
+    cursor: interactive ? 'pointer' : 'default',
   }
 
   if (cell.state === 'done') {
     return (
       <div
         data-state="done"
-        role="img"
+        role={interactive ? 'button' : 'img'}
+        tabIndex={interactive ? 0 : -1}
+        onClick={handleClick}
+        onKeyDown={interactive ? (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); handleClick?.() } } : undefined}
         style={{
           aspectRatio: base.aspectRatio,
           position: 'relative',
@@ -76,7 +82,10 @@ export function StampCell({ cell }: Props) {
     return (
       <div
         data-state="today"
-        role="img"
+        role={interactive ? 'button' : 'img'}
+        tabIndex={interactive ? 0 : -1}
+        onClick={handleClick}
+        onKeyDown={interactive ? (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); handleClick?.() } } : undefined}
         style={{
           ...base,
           border: '2px dashed #111',
@@ -91,7 +100,10 @@ export function StampCell({ cell }: Props) {
     return (
       <div
         data-state="partial"
-        role="img"
+        role={interactive ? 'button' : 'img'}
+        tabIndex={interactive ? 0 : -1}
+        onClick={handleClick}
+        onKeyDown={interactive ? (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); handleClick?.() } } : undefined}
         style={{
           ...base,
           border: '1px solid #c8c8c4',
@@ -110,7 +122,10 @@ export function StampCell({ cell }: Props) {
     return (
       <div
         data-state="rest"
-        role="img"
+        role={interactive ? 'button' : 'img'}
+        tabIndex={interactive ? 0 : -1}
+        onClick={handleClick}
+        onKeyDown={interactive ? (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); handleClick?.() } } : undefined}
         style={{
           ...base,
           border: '1.5px solid #1e7e34',
@@ -133,7 +148,10 @@ export function StampCell({ cell }: Props) {
     return (
       <div
         data-state="pass"
-        role="img"
+        role={interactive ? 'button' : 'img'}
+        tabIndex={interactive ? 0 : -1}
+        onClick={handleClick}
+        onKeyDown={interactive ? (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); handleClick?.() } } : undefined}
         style={{
           ...base,
           border: '1px solid #c8c8c4',
@@ -148,7 +166,10 @@ export function StampCell({ cell }: Props) {
     return (
       <div
         data-state="miss"
-        role="img"
+        role={interactive ? 'button' : 'img'}
+        tabIndex={interactive ? 0 : -1}
+        onClick={handleClick}
+        onKeyDown={interactive ? (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); handleClick?.() } } : undefined}
         style={{
           ...base,
           border: '1px solid #f0e0e0',

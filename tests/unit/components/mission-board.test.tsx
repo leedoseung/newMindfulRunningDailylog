@@ -14,12 +14,12 @@ function makeCells(): MissionDayCell[] {
 
 describe('MissionBoard', () => {
   it('renders 100 cells in a 10-column grid', () => {
-    const { container } = render(<MissionBoard cells={makeCells()} />)
+    const { container } = render(<MissionBoard cells={makeCells()} goal={100} />)
     const cells = container.querySelectorAll('[data-state]')
     expect(cells).toHaveLength(100)
   })
 
   it('throws when cells.length !== 100', () => {
-    expect(() => render(<MissionBoard cells={[]} />)).toThrow(/100/)
+    expect(() => render(<MissionBoard cells={[]} goal={100} />)).toThrow(/100/)
   })
 })

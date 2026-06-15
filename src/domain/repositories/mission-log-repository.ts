@@ -4,6 +4,7 @@ export type UpsertCountInput = {
   participationId: string
   logDate: string   // 'YYYY-MM-DD'
   delta: number     // +N (negative not allowed)
+  note?: string | null
 }
 
 export type SetCountInput = {

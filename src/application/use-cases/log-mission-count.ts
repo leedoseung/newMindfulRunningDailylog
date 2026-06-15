@@ -8,6 +8,7 @@ export type LogMissionCountInput = {
   participation: ChallengeParticipation
   delta: number
   today: string   // 'YYYY-MM-DD' KST
+  note?: string | null
 }
 
 export type LogMissionErrorCode =
@@ -56,6 +57,7 @@ export class LogMissionCountUseCase {
       participationId: input.participation.id,
       logDate: input.today,
       delta: input.delta,
+      note: input.note ?? null,
     })
   }
 }

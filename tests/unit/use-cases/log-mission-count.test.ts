@@ -65,6 +65,7 @@ describe('LogMissionCountUseCase', () => {
       participationId: 'p1',
       logDate: '2026-07-05',
       delta: 10,
+      note: null,
     })
   })
 

@@ -71,6 +71,7 @@ export class SupabaseMissionLogRepository implements IMissionLogRepository {
       p_participation_id: input.participationId,
       p_log_date: input.logDate,
       p_delta: input.delta,
+      p_note: input.note ?? null,
     })
 
     if (error) throw new Error(`upsertCount failed: ${error.message}`)

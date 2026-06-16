@@ -278,7 +278,7 @@ export function MissionPageClient(props: Props) {
   // enrolled
   const { challenge, board, participation } = props
   const todayCell = board.todayIndex >= 0 ? board.cells[board.todayIndex] : null
-  const todayCount = todayCell?.count ?? 0
+  const todayCount = todayCell ? todayCell.count + (todayCell.excess ?? 0) : 0
   const isCompleted = !!participation.completedAt
   const isFailed = !!participation.failedAt
   const canLog = board.todayIndex >= 0 && !isCompleted && !isFailed

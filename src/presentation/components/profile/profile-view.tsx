@@ -70,14 +70,15 @@ export function ProfileView({ member, allRuns, memberId, memberName, memberAvata
     setCropSrc(null)
     setUploading(true)
     try {
-      const supabase = createBrowserClient()
-      const path = `${Date.now()}.jpg`
-      const { data: uploadData, error: uploadError } = await supabase.storage
-        .from('avatars')
-        .upload(path, blob, { contentType: 'image/jpeg', cacheControl: '3600', upsert: false })
-      if (uploadError) throw new Error(uploadError.message)
-      const { data: urlData } = supabase.storage.from('avatars').getPublicUrl(uploadData.path)
-      const newUrl = urlData.publicUrl
+      const fd = new FormData()
+      fd.append('file', blob, 'avatar.jpg')
+      fd.append('kind', 'avatar')
+      const upRes = await fetch('/api/upload-photo', { method: 'POST', body: fd })
+      if (!upRes.ok) {
+        const err = await upRes.json().catch(() => ({})) as { error?: string }
+        throw new Error(err.error ?? '업로드 실패')
+      }
+      const { url: newUrl } = await upRes.json() as { url: string }
       const res = await fetch('/api/profile/avatar', {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },

@@ -6,7 +6,6 @@ import { DurationPicker } from './duration-picker'
 import { ThoughtInputs } from './thought-inputs'
 import { PhotoUpload } from './photo-upload'
 import { DetailSheet } from '../feed/detail-sheet'
-import { createBrowserClient } from '@/infrastructure/supabase/browser-client'
 import { LoadingOverlay } from '../shared/loading-overlay'
 
 async function compressImage(file: File, maxWidth: number, quality: number): Promise<Blob> {
@@ -167,14 +166,16 @@ export function RunLogForm({ memberId, memberName = '', memberAvatarUrl = '', mo
       let photoUrl = initialData?.photoUrl ?? ''
       if (photoFile) {
         const compressed = await compressImage(photoFile, 1200, 0.82)
-        const supabase = createBrowserClient()
-        const path = `${Date.now()}.jpg`
-        const { data: uploadData, error: uploadError } = await supabase.storage
-          .from('run-photos')
-          .upload(path, compressed, { contentType: 'image/jpeg', cacheControl: '31536000', upsert: false })
-        if (uploadError) throw new Error(`사진 업로드 실패: ${uploadError.message}`)
-        const { data: urlData } = supabase.storage.from('run-photos').getPublicUrl(uploadData.path)
-        photoUrl = urlData.publicUrl
+        const fd = new FormData()
+        fd.append('file', compressed, 'photo.jpg')
+        fd.append('kind', 'run-photo')
+        const upRes = await fetch('/api/upload-photo', { method: 'POST', body: fd })
+        if (!upRes.ok) {
+          const err = await upRes.json().catch(() => ({})) as { error?: string }
+          throw new Error(`사진 업로드 실패: ${err.error ?? upRes.statusText}`)
+        }
+        const { url: uploaded } = await upRes.json() as { url: string }
+        photoUrl = uploaded
       }
 
       const payload = { memberId, date, runTime: runTime || null, durationMin, title, thoughtBefore, thoughtDuring, thoughtAfter, location, photoUrl }

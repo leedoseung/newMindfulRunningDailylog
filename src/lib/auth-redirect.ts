@@ -1,4 +1,4 @@
-const PUBLIC_PREFIXES = ['/login', '/auth/']
+const PUBLIC_PREFIXES = ['/login', '/auth/', '/diary/', '/api/og/diary/']
 
 function isPublic(pathname: string): boolean {
   return PUBLIC_PREFIXES.some(prefix => pathname.startsWith(prefix))

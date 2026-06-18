@@ -2,9 +2,9 @@
 
 import { useState, type ReactNode } from 'react'
 
-type Props = { url: string; title: string; text: string; children?: ReactNode }
+type Props = { url: string; title: string; text: string; children?: ReactNode; variant?: 'light' | 'dark' }
 
-export function ShareButton({ url, title, text, children }: Props) {
+export function ShareButton({ url, title, text, children, variant = 'dark' }: Props) {
   const [toast, setToast] = useState<string | null>(null)
 
   async function onClick() {
@@ -26,11 +26,15 @@ export function ShareButton({ url, title, text, children }: Props) {
     }
   }
 
+  const variantStyles = variant === 'light'
+    ? { background: 'rgba(0,0,0,0.05)', color: '#444', border: '1px solid rgba(0,0,0,0.08)', padding: '8px 14px' }
+    : { background: 'rgba(255,255,255,0.12)', color: '#fff', border: '1px solid rgba(255,255,255,0.3)', padding: '12px 24px' }
+
   return (
     <>
       <button type="button" onClick={onClick} style={{
-        background: 'rgba(255,255,255,0.12)', color: '#fff', border: '1px solid rgba(255,255,255,0.3)',
-        borderRadius: 999, padding: '12px 24px', fontSize: '0.95rem', fontWeight: 600, cursor: 'pointer',
+        ...variantStyles,
+        borderRadius: 999, fontSize: '0.95rem', fontWeight: 600, cursor: 'pointer',
         minHeight: 44, fontFamily: "'Pretendard Variable', Pretendard, sans-serif",
       }}>
         {children ?? '↗ 공유하기'}

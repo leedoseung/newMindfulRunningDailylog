@@ -53,6 +53,20 @@ export class SupabaseMemberRepository implements IMemberRepository {
     return (data as MemberRow[]).map(toMember)
   }
 
+  async getById(memberId: string): Promise<Member | null> {
+    const { data, error } = await this.supabase
+      .from('members')
+      .select('id, name, group_name, generation, insta_id, avatar_url')
+      .eq('id', memberId)
+      .single()
+
+    if (error) {
+      if (error.code === 'PGRST116') return null
+      throw new Error(`getById failed: ${error.message}`)
+    }
+    return toMember(data as MemberRow)
+  }
+
   async getLeaderboard(): Promise<MemberStats[]> {
     const [statsRes, avatarRes] = await Promise.all([
       this.supabase

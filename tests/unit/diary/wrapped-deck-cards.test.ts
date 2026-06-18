@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { buildCardSequence } from '@/presentation/components/diary/wrapped-deck'
+import { buildCardSequence } from '@/domain/diary/card-sequence'
 
 const base = {
   totalRuns: 0,
@@ -20,6 +20,11 @@ describe('buildCardSequence', () => {
   it('skips streak when runs < 3', () => {
     const s = { ...base, totalRuns: 2, longestRun: { id: 'a' } as never }
     expect(buildCardSequence(s)).not.toContain('streak')
+  })
+
+  it('includes streak when runs >= 3, even with maxStreak=1 (spec §5: threshold is totalRuns, not maxStreak)', () => {
+    const s = { ...base, totalRuns: 3, maxStreak: 1, longestRun: { id: 'a' } as never }
+    expect(buildCardSequence(s)).toContain('streak')
   })
 
   it('skips voice when voicePool empty', () => {

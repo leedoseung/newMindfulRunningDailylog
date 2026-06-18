@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef, useMemo, useCallback, type TouchEvent } from 'react'
 import type { WrappedStats } from '@/domain/diary/wrapped-stats'
 import type { RunLog } from '@/domain/entities/run-log'
+import { buildCardSequence } from '@/domain/diary/card-sequence'
 import { IntroCard } from './wrapped-cards/intro-card'
 import { TotalCard } from './wrapped-cards/total-card'
 import { StreakCard } from './wrapped-cards/streak-card'
@@ -12,20 +13,7 @@ import { AlbumCard } from './wrapped-cards/album-card'
 import { ShareCard } from './wrapped-cards/share-card'
 import { RestCard } from './wrapped-cards/rest-card'
 
-export type CardKey = 'intro' | 'total' | 'streak' | 'longest' | 'voice' | 'album' | 'share' | 'rest'
-
 const AUTO_MS = 4500
-
-export function buildCardSequence(stats: WrappedStats): CardKey[] {
-  if (stats.totalRuns === 0) return ['intro', 'rest', 'share']
-  const seq: CardKey[] = ['intro', 'total']
-  if (stats.totalRuns >= 3 && stats.maxStreak >= 2) seq.push('streak')
-  if (stats.longestRun) seq.push('longest')
-  if (stats.voicePool.length > 0) seq.push('voice')
-  if (stats.albumPhotos.length > 0) seq.push('album')
-  seq.push('share')
-  return seq
-}
 
 type Props = {
   member: { id: string; name: string }

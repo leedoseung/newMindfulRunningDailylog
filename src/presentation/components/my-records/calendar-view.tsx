@@ -81,6 +81,7 @@ export function CalendarView({ runs, memberId }: Props) {
           }}>
             {viewYear}년 {viewMonth + 1}월
           </div>
+          {/* memberId is always the viewing user's own ID — CalendarView is only mounted by MyRecordsTab for the authenticated user. */}
           <ShareButton
             url={`${typeof window !== 'undefined' ? window.location.origin : ''}/diary/${memberId}/${viewYear}-${String(viewMonth + 1).padStart(2, '0')}`}
             title={`${viewYear}.${viewMonth + 1} 달리기 일기`}

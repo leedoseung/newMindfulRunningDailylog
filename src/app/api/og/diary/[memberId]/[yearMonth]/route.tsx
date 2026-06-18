@@ -6,6 +6,24 @@ import { parseYearMonth, isValidMonth } from '@/domain/diary/month-range'
 
 export const runtime = 'nodejs'
 
+// Allowlist of trusted photo hosts (defense-in-depth against SSRF).
+// Derived from NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_R2_PUBLIC_URL in .env.local.
+const ALLOWED_PHOTO_HOSTS = [
+  'hirljfwzignkehulchpj.supabase.co', // Supabase Storage
+  'pub-f85277209ed54f1da9f285aad41c', // Cloudflare R2 public bucket (prefix match)
+] as const
+
+function isAllowedPhotoUrl(url: string): boolean {
+  try {
+    const u = new URL(url)
+    if (u.protocol !== 'https:') return false
+    if (ALLOWED_PHOTO_HOSTS.some(h => u.hostname === h || u.hostname.startsWith(h))) return true
+    return false
+  } catch {
+    return false
+  }
+}
+
 export async function GET(
   _req: Request,
   { params }: { params: Promise<{ memberId: string; yearMonth: string }> },
@@ -27,7 +45,8 @@ export async function GET(
   }
 
   const runs = await runLogRepo.getByMemberAndMonth(memberId, parsed.year, parsed.month)
-  const firstPhotoUrl = runs.find((r) => r.photoUrl)?.photoUrl ?? null
+  const candidate = runs.find((r) => r.photoUrl)?.photoUrl
+  const firstPhotoUrl = candidate && isAllowedPhotoUrl(candidate) ? candidate : null
 
   const { year, month } = parsed
   const label = `${year}.${String(month).padStart(2, '0')} 일기`

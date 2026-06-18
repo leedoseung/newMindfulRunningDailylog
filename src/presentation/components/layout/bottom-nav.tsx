@@ -70,7 +70,7 @@ const NAV_ITEMS = [
   { href: '/profile',     Icon: IconPerson, label: '프로필' },
 ]
 
-const HIDDEN_PATHS = ['/login', '/link-member', '/auth']
+const HIDDEN_PATHS = ['/login', '/link-member', '/auth', '/diary/']
 
 export function BottomNav() {
   const pathname = usePathname()

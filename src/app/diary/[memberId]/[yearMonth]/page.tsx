@@ -1,9 +1,11 @@
 import { notFound } from 'next/navigation'
+import { headers } from 'next/headers'
 import { createServerClient } from '@/infrastructure/supabase/client'
 import { SupabaseMemberRepository } from '@/infrastructure/supabase/member-repository'
 import { SupabaseRunLogRepository } from '@/infrastructure/supabase/run-log-repository'
 import { parseYearMonth, isValidMonth } from '@/domain/diary/month-range'
 import { computeWrappedStats } from '@/domain/diary/wrapped-stats'
+import { WrappedDeck } from '@/presentation/components/diary/wrapped-deck'
 
 export const revalidate = 3600
 
@@ -31,14 +33,20 @@ export default async function DiaryWrappedPage({ params }: Props) {
   const runs = await runLogRepo.getByMemberAndMonth(memberId, parsed.year, parsed.month)
   const stats = computeWrappedStats(runs)
 
-  // Phase 2 will replace this with <WrappedDeck member={member} year={parsed.year} month={parsed.month} stats={stats} runs={runs} />
+  const h = await headers()
+  const host = h.get('host') ?? ''
+  const proto = h.get('x-forwarded-proto') ?? 'https'
+  const shareUrl = `${proto}://${host}/diary/${memberId}/${yearMonth}`
+  const allUrl = `${shareUrl}/all`
+
   return (
-    <pre style={{ padding: 20, fontSize: 12 }}>
-      {JSON.stringify(
-        { memberName: member.name, year: parsed.year, month: parsed.month, stats },
-        null,
-        2,
-      )}
-    </pre>
+    <WrappedDeck
+      member={{ id: member.id, name: member.name }}
+      year={parsed.year}
+      month={parsed.month}
+      stats={stats}
+      shareUrl={shareUrl}
+      allUrl={allUrl}
+    />
   )
 }

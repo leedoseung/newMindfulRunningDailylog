@@ -15,16 +15,19 @@ export type WrappedStats = {
 }
 
 function computeMaxStreak(uniqueDates: string[]): { len: number; endDate: string | null } {
-  if (uniqueDates.length === 0) return { len: 0, endDate: null }
+  const first = uniqueDates[0]
+  if (uniqueDates.length === 0 || first === undefined) return { len: 0, endDate: null }
   const sorted = [...uniqueDates].sort()
-  let best = 1, cur = 1, bestEnd = sorted[0]
+  let best = 1, cur = 1, bestEnd: string = sorted[0] ?? first
   for (let i = 1; i < sorted.length; i++) {
-    const prev = new Date(`${sorted[i - 1]}T00:00:00`)
-    const curD = new Date(`${sorted[i]}T00:00:00`)
+    const prevStr = sorted[i - 1]!
+    const curStr = sorted[i]!
+    const prev = new Date(`${prevStr}T00:00:00`)
+    const curD = new Date(`${curStr}T00:00:00`)
     const diffDays = Math.round((curD.getTime() - prev.getTime()) / 86400000)
     if (diffDays === 1) cur++
     else cur = 1
-    if (cur > best) { best = cur; bestEnd = sorted[i] }
+    if (cur > best) { best = cur; bestEnd = curStr }
   }
   return { len: best, endDate: bestEnd }
 }
@@ -35,7 +38,7 @@ function lastStreakDows(endDate: string, len: number): string[] {
   const end = new Date(`${endDate}T00:00:00`)
   for (let i = take - 1; i >= 0; i--) {
     const d = new Date(end.getTime() - i * 86400000)
-    out.push(DOW_KO[d.getDay()])
+    out.push(DOW_KO[d.getDay()] ?? '')
   }
   return out
 }

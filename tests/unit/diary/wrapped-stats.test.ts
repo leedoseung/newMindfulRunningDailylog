@@ -87,7 +87,7 @@ describe('computeWrappedStats', () => {
     runs.push(mk({ id: 'nophoto', date: '2026-06-13', photoUrl: '' }))
     const s = computeWrappedStats(runs)
     expect(s.albumPhotos.length).toBe(9)
-    expect(s.albumPhotos[0].date).toBe('2026-06-12') // newest with photo
+    expect(s.albumPhotos[0]?.date).toBe('2026-06-12') // newest with photo
     expect(s.albumOverflowCount).toBe(3) // 12 with photos - 9 shown
   })
 })

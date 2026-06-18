@@ -2,7 +2,7 @@
 
 import { useState, type ReactNode } from 'react'
 
-type Props = { url: string; title: string; text: string; children?: ReactNode; variant?: 'light' | 'dark' }
+type Props = { url: string; title: string; text: string; children?: ReactNode; variant?: 'light' | 'dark' | 'icon-dark' }
 
 export function ShareButton({ url, title, text, children, variant = 'dark' }: Props) {
   const [toast, setToast] = useState<string | null>(null)
@@ -26,16 +26,19 @@ export function ShareButton({ url, title, text, children, variant = 'dark' }: Pr
     }
   }
 
+  const isIconOnly = variant === 'icon-dark'
   const variantStyles = variant === 'light'
     ? { background: 'rgba(0,0,0,0.05)', color: '#444', border: '1px solid rgba(0,0,0,0.08)', padding: '8px 14px' }
+    : variant === 'icon-dark'
+    ? { background: '#111111', color: '#fff', border: 'none', padding: '0', width: 36, height: 36, display: 'flex', alignItems: 'center', justifyContent: 'center' }
     : { background: 'rgba(255,255,255,0.12)', color: '#fff', border: '1px solid rgba(255,255,255,0.3)', padding: '12px 24px' }
 
   return (
     <>
-      <button type="button" onClick={onClick} style={{
+      <button type="button" onClick={onClick} aria-label="이 달 일기 공유" style={{
         ...variantStyles,
-        borderRadius: 999, fontSize: '0.95rem', fontWeight: 600, cursor: 'pointer',
-        minHeight: 44, fontFamily: "'Pretendard Variable', Pretendard, sans-serif",
+        borderRadius: 999, fontSize: isIconOnly ? '1rem' : '0.95rem', fontWeight: 600, cursor: 'pointer',
+        minHeight: isIconOnly ? 36 : 44, fontFamily: "'Pretendard Variable', Pretendard, sans-serif",
       }}>
         {children ?? '↗ 공유하기'}
       </button>

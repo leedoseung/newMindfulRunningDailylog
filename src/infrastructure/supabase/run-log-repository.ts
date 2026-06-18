@@ -4,6 +4,7 @@ import type { IRunLogRepository } from '@/domain/repositories/run-log-repository
 import type { RunLog } from '@/domain/entities/run-log'
 import type { RunLogInput } from '@/domain/entities/run-log-input'
 import { toTransformedUrl } from './image-url'
+import { monthDateRange } from '@/domain/diary/month-range'
 
 type RunLogRow = {
   id: string
@@ -105,6 +106,20 @@ export class SupabaseRunLogRepository implements IRunLogRepository {
       .order('date', { ascending: false })
 
     if (error) throw new Error(`getByMemberId failed: ${error.message}`)
+    return (data as unknown as RunLogRow[]).map(toRunLog)
+  }
+
+  async getByMemberAndMonth(memberId: string, year: number, month: number): Promise<RunLog[]> {
+    const { start, end } = monthDateRange(year, month)
+    const { data, error } = await this.supabase
+      .from('run_logs')
+      .select(SELECT_FIELDS)
+      .eq('member_id', memberId)
+      .gte('date', start)
+      .lte('date', end)
+      .order('date', { ascending: true })
+
+    if (error) throw new Error(`getByMemberAndMonth failed: ${error.message}`)
     return (data as unknown as RunLogRow[]).map(toRunLog)
   }
 

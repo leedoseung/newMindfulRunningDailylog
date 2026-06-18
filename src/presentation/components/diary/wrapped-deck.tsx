@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef, useMemo, useCallback, type TouchEvent } from 'react'
 import type { WrappedStats } from '@/domain/diary/wrapped-stats'
+import type { RunLog } from '@/domain/entities/run-log'
 import { IntroCard } from './wrapped-cards/intro-card'
 import { TotalCard } from './wrapped-cards/total-card'
 import { StreakCard } from './wrapped-cards/streak-card'
@@ -43,14 +44,13 @@ export function WrappedDeck({ member, year, month, stats, shareUrl, allUrl }: Pr
   const reduced = useReducedMotion()
   const audioRef = useRef<HTMLAudioElement | null>(null)
 
-  // Session-stable voice quote — deterministic seed (year*31+month) mod pool length
-  // Pure derivation: no Math.random, no ref, stable across replays
-  const voiceQuote = useMemo(() => {
+  // Session-stable voice quote — Math.random on mount, never re-runs on replay
+  const [voiceQuote] = useState<{ run: RunLog; text: string } | null>(() => {
     if (stats.voicePool.length === 0) return null
-    const pick = stats.voicePool[(year * 31 + month) % stats.voicePool.length]
+    const pick = stats.voicePool[Math.floor(Math.random() * stats.voicePool.length)]
     if (!pick) return null
     return { run: pick, text: pick.thoughtAfter ?? '' }
-  }, [stats.voicePool, year, month])
+  })
 
   // Auto-advance (skip if reduced motion or paused)
   useEffect(() => {
@@ -166,17 +166,17 @@ export function WrappedDeck({ member, year, month, stats, shareUrl, allUrl }: Pr
 }
 
 function useReducedMotion(): boolean {
-  // SSR-safe: starts false, syncs to real value in effect via change listener only
-  const [reduced, setReduced] = useState(false)
+  // Lazy initialiser reads the real value on mount (client only); SSR receives false
+  const [reduced, setReduced] = useState<boolean>(() =>
+    typeof window !== 'undefined'
+      ? window.matchMedia('(prefers-reduced-motion: reduce)').matches
+      : false,
+  )
   useEffect(() => {
     const mq = window.matchMedia('(prefers-reduced-motion: reduce)')
-    // Register change listener (setState in callback is allowed by react-hooks/set-state-in-effect)
     const fn = (e: MediaQueryListEvent) => setReduced(e.matches)
     mq.addEventListener('change', fn)
-    // Sync initial value by dispatching a synthetic event (avoids direct setState in body)
-    if (mq.matches !== reduced) fn({ matches: mq.matches } as MediaQueryListEvent)
     return () => mq.removeEventListener('change', fn)
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
   return reduced
 }
@@ -185,6 +185,7 @@ function ProgressBars({ total, current }: { total: number; current: number }) {
   return (
     <div
       role="progressbar"
+      aria-valuemin={1}
       aria-valuenow={current + 1}
       aria-valuemax={total}
       style={{

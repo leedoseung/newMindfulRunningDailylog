@@ -3,6 +3,7 @@ import { SaveRunLogUseCase } from '@/application/use-cases/save-run-log'
 import { SupabaseRunLogRepository } from '@/infrastructure/supabase/run-log-repository'
 import { createServerClient } from '@/infrastructure/supabase/client'
 import type { RunLogInput } from '@/domain/entities/run-log-input'
+import { revalidateDiaryMonth } from '@/app/api/_lib/diary-revalidate'
 
 export async function POST(req: Request) {
   const supabase = await createServerClient()
@@ -21,6 +22,7 @@ export async function POST(req: Request) {
     const repo = new SupabaseRunLogRepository(supabase)
     const useCase = new SaveRunLogUseCase(repo)
     const runLog = await useCase.execute(body)
+    revalidateDiaryMonth(runLog.memberId, runLog.date)
     return NextResponse.json(runLog, { status: 201 })
   } catch (err) {
     const msg = String(err)

@@ -24,7 +24,7 @@ function computeStats(runs: RunLog[]) {
   return { monthlyCount, totalHours, remainMin }
 }
 
-export function MyRecordsTab({ runs, memberId: _memberId }: Props) {
+export function MyRecordsTab({ runs, memberId }: Props) {
   const router = useRouter()
   const [deleting, setDeleting] = useState<string | null>(null)
   const [subView, setSubView]   = useState<SubView>('feed')
@@ -129,7 +129,7 @@ export function MyRecordsTab({ runs, memberId: _memberId }: Props) {
         )
       ) : (
         /* Calendar view */
-        <CalendarView runs={runs} />
+        <CalendarView runs={runs} memberId={memberId} />
       )}
     </div>
     </>

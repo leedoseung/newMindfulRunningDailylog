@@ -3,10 +3,12 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { MyRecordCard } from './my-record-card'
+import { ShareButton } from '@/presentation/components/diary/share-button'
 import type { RunLog } from '@/domain/entities/run-log'
 
 type Props = {
   runs: RunLog[]
+  memberId: string
 }
 
 const DAY_LABELS = ['일', '월', '화', '수', '목', '금', '토']
@@ -20,7 +22,7 @@ function todayStr() {
   return toDateStr(d.getFullYear(), d.getMonth(), d.getDate())
 }
 
-export function CalendarView({ runs }: Props) {
+export function CalendarView({ runs, memberId }: Props) {
   const router = useRouter()
   const now = new Date()
   const [viewYear, setViewYear]   = useState(now.getFullYear())
@@ -73,10 +75,21 @@ export function CalendarView({ runs }: Props) {
           background: 'none', border: 'none', cursor: 'pointer',
           fontSize: '1.4rem', color: '#888', lineHeight: 1, padding: '2px 6px',
         }}>‹</button>
-        <div style={{
-          fontFamily: "'Pretendard Variable', Pretendard, -apple-system, sans-serif", fontSize: '0.9rem', fontWeight: 500, color: '#111111',
-        }}>
-          {viewYear}년 {viewMonth + 1}월
+        <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+          <div style={{
+            fontFamily: "'Pretendard Variable', Pretendard, -apple-system, sans-serif", fontSize: '0.9rem', fontWeight: 500, color: '#111111',
+          }}>
+            {viewYear}년 {viewMonth + 1}월
+          </div>
+          {/* memberId is always the viewing user's own ID — CalendarView is only mounted by MyRecordsTab for the authenticated user. */}
+          <ShareButton
+            url={`${typeof window !== 'undefined' ? window.location.origin : ''}/diary/${memberId}/${viewYear}-${String(viewMonth + 1).padStart(2, '0')}`}
+            title={`${viewYear}.${viewMonth + 1} 달리기 일기`}
+            text={`${viewYear}.${viewMonth + 1} 한 달 기록을 봐줘`}
+            variant="light"
+          >
+            <span aria-label="이 달 일기 공유" style={{ fontSize: '1.1rem' }}>↗</span>
+          </ShareButton>
         </div>
         <button type="button" onClick={nextMonth} style={{
           background: 'none', border: 'none', cursor: 'pointer',

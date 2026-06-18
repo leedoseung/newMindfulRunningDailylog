@@ -3,6 +3,7 @@ import { createServerClient } from '@/infrastructure/supabase/client'
 import { createAdminClient } from '@/infrastructure/supabase/admin-client'
 import type { RunLogInput } from '@/domain/entities/run-log-input'
 import type { RunLog } from '@/domain/entities/run-log'
+import { revalidateDiaryMonth } from '@/app/api/_lib/diary-revalidate'
 
 async function getAuthMemberId(supabase: Awaited<ReturnType<typeof createServerClient>>) {
   const { data: { user } } = await supabase.auth.getUser()
@@ -79,11 +80,21 @@ export async function DELETE(
   const memberId = await getAuthMemberId(supabase)
   if (!memberId) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
-  const isOwner = await verifyOwnership(supabase, id, memberId)
-  if (!isOwner) return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
+  // Fetch member_id + date BEFORE deleting so we can revalidate after
+  const { data: runRow } = await supabase
+    .from('run_logs')
+    .select('member_id, date')
+    .eq('id', id)
+    .single()
+
+  if (!runRow || runRow.member_id !== memberId) {
+    return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
+  }
 
   const { error } = await supabase.from('run_logs').delete().eq('id', id)
   if (error) return NextResponse.json({ error: error.message }, { status: 500 })
+
+  revalidateDiaryMonth(runRow.member_id as string, runRow.date as string)
 
   return new NextResponse(null, { status: 204 })
 }
@@ -119,5 +130,6 @@ export async function PUT(
     .single()
 
   if (error) return NextResponse.json({ error: error.message }, { status: 500 })
+  revalidateDiaryMonth(data.member_id as string, data.date as string)
   return NextResponse.json(data)
 }

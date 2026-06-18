@@ -21,6 +21,7 @@ describe('GetLeaderboardUseCase', () => {
     const mockRepo: IMemberRepository = {
       getAll: vi.fn(),
       getLeaderboard: vi.fn().mockResolvedValue([makeStats()]),
+      getById: vi.fn(),
     }
     const useCase = new GetLeaderboardUseCase(mockRepo)
     await useCase.execute()
@@ -32,6 +33,7 @@ describe('GetLeaderboardUseCase', () => {
     const mockRepo: IMemberRepository = {
       getAll: vi.fn(),
       getLeaderboard: vi.fn().mockResolvedValue(stats),
+      getById: vi.fn(),
     }
     const useCase = new GetLeaderboardUseCase(mockRepo)
     const result = await useCase.execute()

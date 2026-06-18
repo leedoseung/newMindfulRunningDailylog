@@ -130,6 +130,6 @@ export async function PUT(
     .single()
 
   if (error) return NextResponse.json({ error: error.message }, { status: 500 })
-  revalidateDiaryMonth(body.memberId, body.date)
+  revalidateDiaryMonth(data.member_id as string, data.date as string)
   return NextResponse.json(data)
 }

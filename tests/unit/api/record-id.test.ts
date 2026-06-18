@@ -22,6 +22,8 @@ vi.mock('@/infrastructure/supabase/client', () => ({
   }),
 }))
 
+vi.mock('next/cache', () => ({ revalidatePath: vi.fn() }))
+
 const { DELETE, PUT } = await import('@/app/api/record/[id]/route')
 
 const makeParams = (id: string) => ({ params: Promise.resolve({ id }) })
@@ -46,7 +48,7 @@ describe('DELETE /api/record/[id]', () => {
 
   it('returns 204 when deleting own record', async () => {
     mockGetUser.mockResolvedValue({ data: { user: { id: 'u1', user_metadata: { member_id: 'm1' } } } })
-    mockSingle.mockResolvedValue({ data: { member_id: 'm1' }, error: null })
+    mockSingle.mockResolvedValue({ data: { member_id: 'm1', date: '2026-06-15' }, error: null })
     // After verifyOwnership calls eq+single, delete chain calls eq again — make it resolve
     mockEq
       .mockReturnValueOnce({ single: mockSingle }) // verifyOwnership: select().eq() → chainable for .single()

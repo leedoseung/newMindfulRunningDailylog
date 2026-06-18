@@ -85,6 +85,7 @@ export function CalendarView({ runs, memberId }: Props) {
             url={`${typeof window !== 'undefined' ? window.location.origin : ''}/diary/${memberId}/${viewYear}-${String(viewMonth + 1).padStart(2, '0')}`}
             title={`${viewYear}.${viewMonth + 1} 달리기 일기`}
             text={`${viewYear}.${viewMonth + 1} 한 달 기록을 봐줘`}
+            variant="light"
           >
             <span aria-label="이 달 일기 공유" style={{ fontSize: '1.1rem' }}>↗</span>
           </ShareButton>

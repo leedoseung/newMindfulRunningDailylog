@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect, useRef, useMemo, useCallback, type TouchEvent } from 'react'
-import { useRouter } from 'next/navigation'
+import { createPortal } from 'react-dom'
 import type { WrappedStats } from '@/domain/diary/wrapped-stats'
 import type { RunLog } from '@/domain/entities/run-log'
 import { buildCardSequence } from '@/domain/diary/card-sequence'
@@ -228,27 +228,25 @@ function ProgressBars({ total, current }: { total: number; current: number }) {
 }
 
 function CloseButton() {
-  const router = useRouter()
-  const go = (e: React.SyntheticEvent) => {
-    e.preventDefault()
-    e.stopPropagation()
-    router.push('/home')
-  }
-  return (
+  const [mounted, setMounted] = useState(false)
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setMounted(true)
+  }, [])
+  if (!mounted) return null
+
+  const node = (
     <button
       type="button"
-      onClick={go}
-      onTouchStart={e => e.stopPropagation()}
-      onTouchEnd={go}
-      onPointerDown={e => e.stopPropagation()}
+      onClick={() => { window.location.href = '/home' }}
       aria-label="홈으로 닫기"
       style={{
         position: 'fixed',
         top: 'calc(env(safe-area-inset-top) + 12px)',
         right: 12,
-        background: 'rgba(0,0,0,0.55)',
+        background: 'rgba(0,0,0,0.6)',
         color: '#fff',
-        border: 'none',
+        border: '1px solid rgba(255,255,255,0.15)',
         borderRadius: 999,
         width: 44,
         height: 44,
@@ -256,17 +254,18 @@ function CloseButton() {
         placeItems: 'center',
         fontSize: '1.1rem',
         cursor: 'pointer',
-        zIndex: 100,
+        zIndex: 2147483646,
         fontFamily: "'Pretendard Variable', Pretendard, sans-serif",
-        textDecoration: 'none',
         lineHeight: 1,
         WebkitTapHighlightColor: 'transparent',
         touchAction: 'manipulation',
+        pointerEvents: 'auto',
       }}
     >
       ✕
     </button>
   )
+  return createPortal(node, document.body)
 }
 
 function BgmToggle({ on, onToggle }: { on: boolean; onToggle: () => void }) {

@@ -18,6 +18,17 @@ import { TitleCard } from './wrapped-cards/title-card'
 import { HeatmapCard } from './wrapped-cards/heatmap-card'
 
 const AUTO_MS = 4500
+// Must match STAGE_INTERVAL_MS in AlbumCard so each photo gets one full beat
+const ALBUM_PHOTO_MS = 3200
+const ALBUM_MAX_MS = 30000
+
+function durationForCard(card: string | undefined, photoCount: number): number {
+  if (card === 'album' && photoCount > 0) {
+    // Give every photo at least one stage rotation, plus a 600ms tail.
+    return Math.min(ALBUM_MAX_MS, photoCount * ALBUM_PHOTO_MS + 600)
+  }
+  return AUTO_MS
+}
 
 type Props = {
   member: { id: string; name: string }
@@ -48,9 +59,10 @@ export function WrappedDeck({ member, year, month, stats, shareUrl, allUrl }: Pr
   useEffect(() => {
     if (reduced || paused) return
     if (idx >= cards.length - 1) return
-    const t = window.setTimeout(() => setIdx(i => Math.min(cards.length - 1, i + 1)), AUTO_MS)
+    const ms = durationForCard(cards[idx], stats.albumPhotos.length)
+    const t = window.setTimeout(() => setIdx(i => Math.min(cards.length - 1, i + 1)), ms)
     return () => window.clearTimeout(t)
-  }, [idx, paused, reduced, cards.length])
+  }, [idx, paused, reduced, cards, stats.albumPhotos.length])
 
   // Keyboard navigation
   useEffect(() => {

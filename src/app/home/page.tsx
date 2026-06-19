@@ -7,6 +7,7 @@ import { createServerClient } from '@/infrastructure/supabase/client'
 import { HomeFeed } from '@/presentation/components/home/home-feed'
 import type { CrewMember, WeeklyBar } from '@/presentation/components/home/home-feed'
 import { ChallengeAnnouncementBanner } from '@/presentation/components/home/challenge-announcement-banner'
+import { DiaryEntryBanner } from '@/presentation/components/home/diary-entry-banner'
 import { AppHeader } from '@/presentation/components/layout/app-header'
 import { kstToday } from '@/lib/kst'
 import type { RunLog } from '@/domain/entities/run-log'
@@ -76,6 +77,26 @@ export default async function HomePage() {
   const memberAvatarUrl = (memberRow.data?.avatar_url as string | undefined) ?? myRuns[0]?.memberAvatarUrl ?? ''
   const recentRuns = initialGridRuns
 
+  // Diary entry banner: show only late in month (day >= 25) and if user ran this month.
+  // Admins (testing) always see the banner regardless of date — set ADMIN_EMAILS env (comma-separated)
+  // or fall back to the hardcoded admin email for QA visibility.
+  const todayKst = kstToday()
+  const [yStr, mStr, dStr] = todayKst.split('-')
+  const curYear = Number(yStr)
+  const curMonth = Number(mStr)
+  const curDay = Number(dStr)
+  const monthPrefix = `${yStr}-${mStr}`
+  const thisMonthRunCount = memberId
+    ? myRuns.filter(r => r.date.startsWith(monthPrefix)).length
+    : 0
+  const adminEmails = (process.env.ADMIN_EMAILS ?? 'leedoseu@gmail.com')
+    .split(',')
+    .map(s => s.trim().toLowerCase())
+    .filter(Boolean)
+  const isAdmin = !!user?.email && adminEmails.includes(user.email.toLowerCase())
+  const showDiaryBanner =
+    memberId !== '' && (isAdmin || (curDay >= 25 && thisMonthRunCount > 0))
+
   // Challenge banner: active OR upcoming
   let bannerChallenge: { id: string; title: string; description: string; startDate: string; registrationDeadline: string; imageUrl: string | null } | null = null
   let bannerEnrolled = false
@@ -111,6 +132,15 @@ export default async function HomePage() {
         <div style={{ padding: '12px 16px 0' }}>
           <ChallengeAnnouncementBanner challenge={bannerChallenge} today={today} enrolled={bannerEnrolled} />
         </div>
+      )}
+
+      {showDiaryBanner && (
+        <DiaryEntryBanner
+          memberId={memberId}
+          year={curYear}
+          month={curMonth}
+          thisMonthRunCount={thisMonthRunCount}
+        />
       )}
 
       <HomeFeed

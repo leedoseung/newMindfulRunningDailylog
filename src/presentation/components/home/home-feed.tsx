@@ -8,7 +8,11 @@ import { DetailSheet } from '../feed/detail-sheet'
 import { AvatarImage } from '../shared/avatar-image'
 import { DonationBanner } from './donation-banner'
 import { InsightsBanner } from './insights-banner'
+import { MilestoneToast } from './milestone-toast'
 import type { RunLog } from '@/domain/entities/run-log'
+
+type MilestoneKind = 'first' | 'five' | 'ten'
+type MilestoneState = { kind: MilestoneKind; year: number; month: number; count: number }
 
 const FONT = "'Pretendard Variable', Pretendard, -apple-system, sans-serif"
 const DAY_LABELS = ['일', '월', '화', '수', '목', '금', '토']
@@ -207,6 +211,7 @@ export function HomeFeed({ recentRuns, myRuns, memberId, crew, weeklyBars, weekl
   const isPulling = useRef(false)
   const [triggerRun, setTriggerRun] = useState<RunLog | null>(null)
   const [autoOpenRun, setAutoOpenRun] = useState<RunLog | null>(null)
+  const [milestone, setMilestone] = useState<MilestoneState | null>(null)
 
   const todayCount = crew.filter(c => c.ranToday).length
   const todayStr = new Date().toISOString().split('T')[0]!
@@ -241,8 +246,31 @@ export function HomeFeed({ recentRuns, myRuns, memberId, crew, weeklyBars, weekl
     const stored = sessionStorage.getItem('openRun')
     if (!stored) return
     sessionStorage.removeItem('openRun')
-    try { setAutoOpenRun(JSON.parse(stored) as RunLog) } catch {}
-  }, [])
+    let saved: RunLog | null = null
+    try { saved = JSON.parse(stored) as RunLog } catch { return }
+    if (!saved) return
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setAutoOpenRun(saved)
+
+    if (!saved.date || saved.memberId !== memberId) return
+    const [yStr, mStr] = saved.date.split('-')
+    if (!yStr || !mStr) return
+    const ym = `${yStr}-${mStr}`
+    const monthRuns = myRuns.filter(r => r.date.startsWith(ym))
+    const count = monthRuns.length
+    let kind: MilestoneKind | null = null
+    if (count === 1) kind = 'first'
+    else if (count === 5) kind = 'five'
+    else if (count === 10) kind = 'ten'
+    if (!kind) return
+
+    const flagKey = `milestone-${ym}-${kind}`
+    try {
+      if (localStorage.getItem(flagKey)) return
+      localStorage.setItem(flagKey, '1')
+    } catch { /* ignore */ }
+    setMilestone({ kind, year: Number(yStr), month: Number(mStr), count })
+  }, [memberId, myRuns])
 
   // visibilitychange: 앱 복귀 시 자동 갱신
   useEffect(() => {
@@ -391,6 +419,16 @@ export function HomeFeed({ recentRuns, myRuns, memberId, crew, weeklyBars, weekl
         onClose={() => setAutoOpenRun(null)}
         memberId={memberId}
       />
+
+      {milestone && (
+        <MilestoneToast
+          memberId={memberId}
+          year={milestone.year}
+          month={milestone.month}
+          kind={milestone.kind}
+          onClose={() => setMilestone(null)}
+        />
+      )}
     </>
   )
 }

@@ -119,7 +119,7 @@ export function WrappedDeck({ member, year, month, stats, shareUrl, allUrl }: Pr
       <ProgressBars total={cards.length} current={idx} />
       <BgmToggle on={bgmOn} onToggle={() => setBgmOn(v => !v)} />
       <CloseButton />
-      {/* Source: "Relax(atwork)" by ISC666, CC0 1.0 — see public/audio/LICENSE.md */}
+      {/* Source: "vampire's piano" by Tad Miller, CC0 1.0 — see public/audio/LICENSE.md */}
       <audio ref={audioRef} src="/audio/diary-ambient.m4a" loop preload="none" />
 
       {current === 'intro' && (

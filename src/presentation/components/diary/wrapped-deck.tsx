@@ -19,7 +19,7 @@ import { HeatmapCard } from './wrapped-cards/heatmap-card'
 
 const AUTO_MS = 4500
 // Must match STAGE_INTERVAL_MS in AlbumCard so each photo gets one full beat
-const ALBUM_PHOTO_MS = 3200
+const ALBUM_PHOTO_MS = 1800
 const ALBUM_MAX_MS = 30000
 
 function durationForCard(card: string | undefined, photoCount: number): number {

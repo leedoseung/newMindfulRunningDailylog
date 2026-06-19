@@ -16,7 +16,7 @@ type Props = {
 }
 
 const FONT = "'Pretendard Variable', Pretendard, -apple-system, sans-serif"
-const STAGE_INTERVAL_MS = 3200
+const STAGE_INTERVAL_MS = 1800
 
 export function AlbumCard({ photos, overflow }: Props) {
   const [stageIdx, setStageIdx] = useState(0)
@@ -111,10 +111,10 @@ export function AlbumCard({ photos, overflow }: Props) {
                 height: '100%',
                 objectFit: 'cover',
                 opacity: i === stageIdx ? 1 : 0,
-                transition: 'opacity 700ms ease',
-                transform: i === stageIdx ? 'scale(1.08)' : 'scale(1)',
+                transition: 'opacity 450ms ease',
+                transform: i === stageIdx ? 'scale(1.06)' : 'scale(1)',
                 transitionProperty: 'opacity, transform',
-                transitionDuration: '700ms, 3200ms',
+                transitionDuration: '450ms, 1800ms',
                 transitionTimingFunction: 'ease, linear',
               }}
             />

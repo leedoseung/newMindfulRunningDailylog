@@ -117,13 +117,9 @@ export function WrappedDeck({ member, year, month, stats, shareUrl, allUrl }: Pr
       style={{ position: 'relative' }}
     >
       <ProgressBars total={cards.length} current={idx} />
-      {/* BGM hidden until a real audio file is uploaded — opt-in via NEXT_PUBLIC_DIARY_BGM_ENABLED */}
-      {process.env.NEXT_PUBLIC_DIARY_BGM_ENABLED === 'true' && (
-        <>
-          <BgmToggle on={bgmOn} onToggle={() => setBgmOn(v => !v)} />
-          <audio ref={audioRef} src="/audio/diary-ambient.mp3" loop preload="none" />
-        </>
-      )}
+      <BgmToggle on={bgmOn} onToggle={() => setBgmOn(v => !v)} />
+      {/* Source: "Relax(atwork)" by ISC666, CC0 1.0 — see public/audio/LICENSE.md */}
+      <audio ref={audioRef} src="/audio/diary-ambient.m4a" loop preload="none" />
 
       {current === 'intro' && (
         <IntroCard memberName={member.name} year={year} month={month} />

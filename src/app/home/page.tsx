@@ -89,11 +89,13 @@ export default async function HomePage() {
   const thisMonthRunCount = memberId
     ? myRuns.filter(r => r.date.startsWith(monthPrefix)).length
     : 0
-  const adminEmails = (process.env.ADMIN_EMAILS ?? 'leedoseu@gmail.com')
+  // Admin override (testing): force-show banner regardless of date.
+  // 이두승 hardcoded as fallback; override via ADMIN_MEMBER_IDS env (comma-separated UUIDs).
+  const adminMemberIds = (process.env.ADMIN_MEMBER_IDS ?? '90d2a65e-ffd1-49de-adce-4aa36cdbd347')
     .split(',')
-    .map(s => s.trim().toLowerCase())
+    .map(s => s.trim())
     .filter(Boolean)
-  const isAdmin = !!user?.email && adminEmails.includes(user.email.toLowerCase())
+  const isAdmin = memberId !== '' && adminMemberIds.includes(memberId)
   const showDiaryBanner =
     memberId !== '' && (isAdmin || (curDay >= 25 && thisMonthRunCount > 0))
 

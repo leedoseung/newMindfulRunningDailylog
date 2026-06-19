@@ -12,6 +12,9 @@ import { VoiceCard } from './wrapped-cards/voice-card'
 import { AlbumCard } from './wrapped-cards/album-card'
 import { ShareCard } from './wrapped-cards/share-card'
 import { RestCard } from './wrapped-cards/rest-card'
+import { WeekdayCard } from './wrapped-cards/weekday-card'
+import { TitleCard } from './wrapped-cards/title-card'
+import { HeatmapCard } from './wrapped-cards/heatmap-card'
 
 const AUTO_MS = 4500
 
@@ -114,9 +117,13 @@ export function WrappedDeck({ member, year, month, stats, shareUrl, allUrl }: Pr
       style={{ position: 'relative' }}
     >
       <ProgressBars total={cards.length} current={idx} />
-      <BgmToggle on={bgmOn} onToggle={() => setBgmOn(v => !v)} />
-      {/* audio 404 acceptable in dev until Task 8 provides the file */}
-      <audio ref={audioRef} src="/audio/diary-ambient.mp3" loop preload="none" />
+      {/* BGM hidden until a real audio file is uploaded — opt-in via NEXT_PUBLIC_DIARY_BGM_ENABLED */}
+      {process.env.NEXT_PUBLIC_DIARY_BGM_ENABLED === 'true' && (
+        <>
+          <BgmToggle on={bgmOn} onToggle={() => setBgmOn(v => !v)} />
+          <audio ref={audioRef} src="/audio/diary-ambient.mp3" loop preload="none" />
+        </>
+      )}
 
       {current === 'intro' && (
         <IntroCard memberName={member.name} year={year} month={month} />
@@ -124,8 +131,14 @@ export function WrappedDeck({ member, year, month, stats, shareUrl, allUrl }: Pr
       {current === 'total' && (
         <TotalCard totalRuns={stats.totalRuns} totalMinutes={stats.totalMinutes} />
       )}
+      {current === 'heatmap' && (
+        <HeatmapCard year={year} month={month} runDates={stats.runDates} totalRuns={stats.totalRuns} />
+      )}
       {current === 'streak' && (
         <StreakCard maxStreak={stats.maxStreak} streakLastDows={stats.streakLastDows} />
+      )}
+      {current === 'weekday' && (
+        <WeekdayCard weekdayCounts={stats.weekdayCounts} topWeekday={stats.topWeekday} />
       )}
       {current === 'longest' && stats.longestRun && (
         <LongestCard run={stats.longestRun} />
@@ -135,6 +148,9 @@ export function WrappedDeck({ member, year, month, stats, shareUrl, allUrl }: Pr
       )}
       {current === 'album' && (
         <AlbumCard photos={stats.albumPhotos} overflow={stats.albumOverflowCount} />
+      )}
+      {current === 'title' && (
+        <TitleCard title={stats.title} />
       )}
       {current === 'share' && (
         <ShareCard

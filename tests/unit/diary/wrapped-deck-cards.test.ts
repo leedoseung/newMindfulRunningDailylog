@@ -10,6 +10,10 @@ const base = {
   voicePool: [],
   albumPhotos: [],
   albumOverflowCount: 0,
+  weekdayCounts: [0, 0, 0, 0, 0, 0, 0],
+  topWeekday: null,
+  runDates: [],
+  title: { key: 'starter' as const, label: '쉬어가는 달', subtitle: '다음 달, 다시 시작해요' },
 }
 
 describe('buildCardSequence', () => {
@@ -37,8 +41,9 @@ describe('buildCardSequence', () => {
     expect(buildCardSequence(s)).not.toContain('album')
   })
 
-  it('full 7-card sequence when all data present', () => {
+  it('full sequence when all data present', () => {
     const s = {
+      ...base,
       totalRuns: 10,
       totalMinutes: 300,
       maxStreak: 4,
@@ -47,14 +52,21 @@ describe('buildCardSequence', () => {
       voicePool: [{ id: 'b' } as never],
       albumPhotos: [{ runId: 'a', photoUrl: 'p', date: '2026-06-01' }],
       albumOverflowCount: 0,
+      weekdayCounts: [1, 2, 2, 1, 1, 2, 1],
+      topWeekday: { dow: 1, label: '월', count: 2 },
+      runDates: ['2026-06-01'],
+      title: { key: 'consistent' as const, label: '꾸준한 페이스메이커', subtitle: '10번 달린 한 달' },
     }
     expect(buildCardSequence(s)).toEqual([
       'intro',
       'total',
+      'heatmap',
       'streak',
+      'weekday',
       'longest',
       'voice',
       'album',
+      'title',
       'share',
     ])
   })

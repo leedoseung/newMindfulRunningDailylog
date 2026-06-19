@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect, useRef, useMemo, useCallback, type TouchEvent } from 'react'
+import { useRouter } from 'next/navigation'
 import type { WrappedStats } from '@/domain/diary/wrapped-stats'
 import type { RunLog } from '@/domain/entities/run-log'
 import { buildCardSequence } from '@/domain/diary/card-sequence'
@@ -215,15 +216,25 @@ function ProgressBars({ total, current }: { total: number; current: number }) {
 }
 
 function CloseButton() {
+  const router = useRouter()
+  const go = (e: React.SyntheticEvent) => {
+    e.preventDefault()
+    e.stopPropagation()
+    router.push('/home')
+  }
   return (
-    <a
-      href="/home"
+    <button
+      type="button"
+      onClick={go}
+      onTouchStart={e => e.stopPropagation()}
+      onTouchEnd={go}
+      onPointerDown={e => e.stopPropagation()}
       aria-label="홈으로 닫기"
       style={{
         position: 'fixed',
         top: 'calc(env(safe-area-inset-top) + 12px)',
         right: 12,
-        background: 'rgba(0,0,0,0.4)',
+        background: 'rgba(0,0,0,0.55)',
         color: '#fff',
         border: 'none',
         borderRadius: 999,
@@ -233,14 +244,16 @@ function CloseButton() {
         placeItems: 'center',
         fontSize: '1.1rem',
         cursor: 'pointer',
-        zIndex: 10,
+        zIndex: 100,
         fontFamily: "'Pretendard Variable', Pretendard, sans-serif",
         textDecoration: 'none',
         lineHeight: 1,
+        WebkitTapHighlightColor: 'transparent',
+        touchAction: 'manipulation',
       }}
     >
       ✕
-    </a>
+    </button>
   )
 }
 

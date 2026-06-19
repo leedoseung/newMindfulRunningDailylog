@@ -68,6 +68,58 @@ function computeStreak(runs: RunLog[]): number {
   return streak
 }
 
+type Prs = {
+  longestRun: { minutes: number; date: string } | null
+  longestStreak: { days: number; endDate: string } | null
+  bestMonth: { ym: string; count: number } | null
+}
+
+function computePrs(runs: RunLog[]): Prs {
+  if (runs.length === 0) {
+    return { longestRun: null, longestStreak: null, bestMonth: null }
+  }
+
+  let longestRun: { minutes: number; date: string } = { minutes: -1, date: '' }
+  const monthCount = new Map<string, number>()
+  for (const r of runs) {
+    if (r.durationMin > longestRun.minutes) {
+      longestRun = { minutes: r.durationMin, date: r.date }
+    }
+    const ym = r.date.slice(0, 7)
+    monthCount.set(ym, (monthCount.get(ym) ?? 0) + 1)
+  }
+
+  let bestMonth: { ym: string; count: number } = { ym: '', count: 0 }
+  for (const [ym, count] of monthCount) {
+    if (count > bestMonth.count) bestMonth = { ym, count }
+  }
+
+  // longest historical streak
+  const sortedDates = Array.from(new Set(runs.map(r => r.date))).sort()
+  let best = 0
+  let cur = 0
+  let bestEnd = ''
+  let prev: string | null = null
+  for (const d of sortedDates) {
+    if (prev === null) {
+      cur = 1
+    } else {
+      const prevDate = new Date(prev + 'T00:00:00')
+      prevDate.setDate(prevDate.getDate() + 1)
+      const expected = `${prevDate.getFullYear()}-${String(prevDate.getMonth() + 1).padStart(2, '0')}-${String(prevDate.getDate()).padStart(2, '0')}`
+      cur = d === expected ? cur + 1 : 1
+    }
+    if (cur > best) { best = cur; bestEnd = d }
+    prev = d
+  }
+
+  return {
+    longestRun,
+    longestStreak: { days: best, endDate: bestEnd },
+    bestMonth,
+  }
+}
+
 export function MyRecordsTab({ runs, memberId }: Props) {
   const router = useRouter()
   const [deleting, setDeleting] = useState<string | null>(null)
@@ -76,6 +128,7 @@ export function MyRecordsTab({ runs, memberId }: Props) {
   const [openRun, setOpenRun] = useState<RunLog | null>(null)
   const stats = useMemo(() => computeStats(runs), [runs])
   const trend = useMemo(() => computeMonthlyTrend(runs), [runs])
+  const prs = useMemo(() => computePrs(runs), [runs])
 
   async function handleDelete(id: string) {
     if (!confirm('이 기록을 삭제할까요?')) return
@@ -117,6 +170,8 @@ export function MyRecordsTab({ runs, memberId }: Props) {
           <Stat num={stats.streak} unit="일" label="🔥 스트릭" />
         </div>
       </div>
+
+      {runs.length > 0 && <PrBadges prs={prs} />}
 
       <div style={{ padding: '0 16px 14px' }}>
         <div style={{ display: 'flex', background: 'var(--mr-track)', borderRadius: 10, padding: 3 }}>
@@ -193,6 +248,83 @@ function Stat({ num, unit, label, divider }: { num: number | string; unit?: stri
         {unit && <span style={{ fontSize: '0.75rem', fontWeight: 500, color: 'var(--mr-text-2)', marginLeft: 2 }}>{unit}</span>}
       </div>
       <div style={{ fontSize: '0.7rem', color: 'var(--mr-text-2)', marginTop: 6, fontWeight: 500 }}>{label}</div>
+    </div>
+  )
+}
+
+function PrBadges({ prs }: { prs: Prs }) {
+  const items: Array<{ icon: string; value: string; label: string; meta?: string }> = []
+
+  if (prs.longestRun && prs.longestRun.minutes > 0) {
+    items.push({
+      icon: '⏱',
+      value: `${prs.longestRun.minutes}분`,
+      label: '최장 시간',
+      meta: prs.longestRun.date.slice(5).replace('-', '.'),
+    })
+  }
+  if (prs.longestStreak && prs.longestStreak.days > 0) {
+    items.push({
+      icon: '🔥',
+      value: `${prs.longestStreak.days}일`,
+      label: '최장 스트릭',
+      meta: prs.longestStreak.endDate.slice(5).replace('-', '.'),
+    })
+  }
+  if (prs.bestMonth && prs.bestMonth.count > 0) {
+    const [y, m] = prs.bestMonth.ym.split('-')
+    items.push({
+      icon: '🏆',
+      value: `${prs.bestMonth.count}회`,
+      label: '최다 월',
+      meta: `${y?.slice(2) ?? ''}.${m ?? ''}`,
+    })
+  }
+
+  if (items.length === 0) return null
+
+  return (
+    <div style={{ padding: '0 16px 12px', fontFamily: FONT }}>
+      <div style={{
+        display: 'flex', alignItems: 'center', gap: 6,
+        fontSize: '0.65rem', color: 'var(--mr-text-2)', fontWeight: 600,
+        letterSpacing: 1, textTransform: 'uppercase',
+        padding: '0 4px 8px',
+      }}>
+        <span>개인 최고 기록</span>
+      </div>
+      <div style={{ display: 'grid', gridTemplateColumns: `repeat(${items.length}, 1fr)`, gap: 8 }}>
+        {items.map((it, i) => (
+          <div key={i} style={{
+            background: 'var(--mr-surface)',
+            border: '1px solid var(--mr-border)',
+            borderRadius: 14,
+            padding: '12px 10px 10px',
+            textAlign: 'center',
+            position: 'relative',
+            overflow: 'hidden',
+          }}>
+            <div aria-hidden style={{
+              position: 'absolute', top: -10, right: -10, fontSize: '2.6rem',
+              opacity: 0.08, lineHeight: 1, userSelect: 'none', pointerEvents: 'none',
+            }}>{it.icon}</div>
+            <div style={{ fontSize: '1rem', marginBottom: 4 }}>{it.icon}</div>
+            <div style={{
+              fontSize: '1.05rem', fontWeight: 700, color: 'var(--mr-text-1)',
+              letterSpacing: '-0.02em', lineHeight: 1.1,
+              fontVariantNumeric: 'tabular-nums',
+            }}>{it.value}</div>
+            <div style={{ fontSize: '0.65rem', color: 'var(--mr-text-2)', marginTop: 4, fontWeight: 500 }}>
+              {it.label}
+            </div>
+            {it.meta && (
+              <div style={{ fontSize: '0.6rem', color: 'var(--mr-text-3)', marginTop: 2, fontVariantNumeric: 'tabular-nums' }}>
+                {it.meta}
+              </div>
+            )}
+          </div>
+        ))}
+      </div>
     </div>
   )
 }

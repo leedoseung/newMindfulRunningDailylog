@@ -113,6 +113,13 @@ body.detail-open nav {
   transition: opacity 0.25s ease, transform 0.25s ease !important;
 }
 
+/* keyboard focus ring for tappable rows/icon buttons */
+.focus-ring:focus-visible {
+  outline: 2px solid #111;
+  outline-offset: 2px;
+  border-radius: 12px;
+}
+
 @layer base {
   * {
     @apply border-border outline-ring/50;

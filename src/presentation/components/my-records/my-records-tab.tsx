@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { MyRecordCard } from './my-record-card'
 import { CalendarView } from './calendar-view'
@@ -53,7 +53,7 @@ export function MyRecordsTab({ runs, memberId }: Props) {
   const [subView, setSubView] = useState<SubView>('feed')
   const [overlay, setOverlay] = useState<{ success: boolean; message: string } | null>(null)
   const [openRun, setOpenRun] = useState<RunLog | null>(null)
-  const stats = computeStats(runs)
+  const stats = useMemo(() => computeStats(runs), [runs])
 
   async function handleDelete(id: string) {
     if (!confirm('이 기록을 삭제할까요?')) return
@@ -100,6 +100,7 @@ export function MyRecordsTab({ runs, memberId }: Props) {
             <button
               key={v}
               type="button"
+              className="focus-ring"
               onClick={() => setSubView(v)}
               style={{
                 flex: 1, padding: '7px 0', border: 'none', borderRadius: 8,

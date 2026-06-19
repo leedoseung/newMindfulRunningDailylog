@@ -98,7 +98,7 @@ export function CalendarView({ runs, memberId, onOpenRun }: Props) {
       }}>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
           <button type="button" onClick={prevMonth}
-            aria-label="이전 달"
+            aria-label="이전 달" className="focus-ring"
             style={{
               background: 'none', border: 'none', cursor: 'pointer',
               fontSize: '1.4rem', color: '#888', lineHeight: 1, padding: '2px 8px',
@@ -119,7 +119,7 @@ export function CalendarView({ runs, memberId, onOpenRun }: Props) {
           </div>
 
           <button type="button" onClick={nextMonth}
-            aria-label="다음 달"
+            aria-label="다음 달" className="focus-ring"
             style={{
               background: 'none', border: 'none', cursor: 'pointer',
               fontSize: '1.4rem', color: '#888', lineHeight: 1, padding: '2px 8px',
@@ -166,6 +166,7 @@ export function CalendarView({ runs, memberId, onOpenRun }: Props) {
                 key={idx}
                 type="button"
                 disabled={count === 0}
+                className={count > 0 ? 'focus-ring' : undefined}
                 onClick={() => setSelected(isSel ? null : dateStr)}
                 style={{
                   aspectRatio: '1', display: 'flex', alignItems: 'center', justifyContent: 'center',

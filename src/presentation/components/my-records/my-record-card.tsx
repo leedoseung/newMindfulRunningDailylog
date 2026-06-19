@@ -47,6 +47,7 @@ export function MyRecordCard({ run, deleting, onEdit, onDelete, onOpen }: Props)
       role={onOpen ? 'button' : undefined}
       tabIndex={onOpen ? 0 : undefined}
       onKeyDown={onOpen ? (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onOpen() } } : undefined}
+      className={onOpen ? 'focus-ring' : undefined}
       style={{
         position: 'relative',
         display: 'grid', gridTemplateColumns: '52px 1fr auto',
@@ -95,6 +96,7 @@ export function MyRecordCard({ run, deleting, onEdit, onDelete, onOpen }: Props)
           type="button"
           aria-label="메뉴"
           data-row-stop
+          className="focus-ring"
           onClick={() => setMenuOpen(v => !v)}
           style={{
             background: 'none', border: 'none', cursor: 'pointer',

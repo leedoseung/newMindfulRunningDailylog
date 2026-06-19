@@ -2,7 +2,8 @@
 
 import { useState, useCallback, useEffect, useMemo, useRef } from 'react'
 import { useRouter } from 'next/navigation'
-import { RunFeed, PhotoGrid } from '../feed/run-feed'
+import { PhotoGrid } from '../feed/run-feed'
+import { MyRecordsTab } from '../my-records/my-records-tab'
 import { TodayCardDeck } from '../feed/today-card-deck'
 import { DetailSheet } from '../feed/detail-sheet'
 import { AvatarImage } from '../shared/avatar-image'
@@ -410,7 +411,7 @@ export function HomeFeed({ recentRuns, myRuns, memberId, crew, weeklyBars, weekl
           initialOffset={initialOffset}
         />
       ) : (
-        <RunFeed runs={myRuns} memberId={memberId} memberName={memberName} memberAvatarUrl={memberAvatarUrl} />
+        <MyRecordsTab runs={myRuns} memberId={memberId} />
       )}
 
       <DetailSheet

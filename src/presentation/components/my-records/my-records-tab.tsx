@@ -14,21 +14,43 @@ type Props = {
 
 type SubView = 'feed' | 'calendar'
 
+const FONT = "'Pretendard Variable', Pretendard, -apple-system, sans-serif"
+
 function computeStats(runs: RunLog[]) {
   const now = new Date()
   const month = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`
   const monthlyCount = runs.filter(r => r.date.startsWith(month)).length
   const totalMinutes = runs.reduce((sum, r) => sum + r.durationMin, 0)
-  const totalHours   = Math.floor(totalMinutes / 60)
-  const remainMin    = totalMinutes % 60
-  return { monthlyCount, totalHours, remainMin }
+  const totalHours = Math.floor(totalMinutes / 60)
+  const remainMin = totalMinutes % 60
+  const streak = computeStreak(runs)
+  return { monthlyCount, totalHours, remainMin, streak }
+}
+
+function computeStreak(runs: RunLog[]): number {
+  const dates = new Set(runs.map(r => r.date))
+  let streak = 0
+  const cursor = new Date()
+  // include today only if there's a record today; otherwise start from yesterday
+  for (let i = 0; i < 366; i++) {
+    const key = `${cursor.getFullYear()}-${String(cursor.getMonth() + 1).padStart(2, '0')}-${String(cursor.getDate()).padStart(2, '0')}`
+    if (dates.has(key)) {
+      streak += 1
+    } else if (i === 0) {
+      // ok to skip today if user hasn't run yet
+    } else {
+      break
+    }
+    cursor.setDate(cursor.getDate() - 1)
+  }
+  return streak
 }
 
 export function MyRecordsTab({ runs, memberId }: Props) {
   const router = useRouter()
   const [deleting, setDeleting] = useState<string | null>(null)
-  const [subView, setSubView]   = useState<SubView>('feed')
-  const [overlay, setOverlay]   = useState<{ success: boolean; message: string } | null>(null)
+  const [subView, setSubView] = useState<SubView>('feed')
+  const [overlay, setOverlay] = useState<{ success: boolean; message: string } | null>(null)
   const stats = computeStats(runs)
 
   async function handleDelete(id: string) {
@@ -52,86 +74,103 @@ export function MyRecordsTab({ runs, memberId }: Props) {
 
   return (
     <>
-    <LoadingOverlay
-      show={overlay !== null}
-      success={overlay?.success ?? false}
-      message={overlay?.message}
-    />
-    <div style={{ paddingBottom: 40 }}>
-      {/* Stats summary card */}
-      <div style={{
-        margin: '0 22px 16px', background: '#111111', borderRadius: 20,
-        padding: '20px 22px', display: 'flex', justifyContent: 'space-between', alignItems: 'center',
-      }}>
-        <div>
-          <div style={{ fontFamily: "'Pretendard Variable', Pretendard, -apple-system, sans-serif", fontSize: '0.58rem', color: '#666', letterSpacing: '2px', textTransform: 'uppercase', marginBottom: 4 }}>
-            이번달
-          </div>
-          <div style={{ fontFamily: "'Pretendard Variable', Pretendard, -apple-system, sans-serif", fontSize: '2.2rem', fontWeight: 300, color: '#fff', lineHeight: 1 }}>
-            {stats.monthlyCount}
-            <span style={{ fontSize: '0.8rem', fontWeight: 400, color: '#888', marginLeft: 4 }}>회</span>
-          </div>
-        </div>
-        <div style={{ textAlign: 'right' }}>
-          <div style={{ fontFamily: "'Pretendard Variable', Pretendard, -apple-system, sans-serif", fontSize: '0.58rem', color: '#666', letterSpacing: '2px', textTransform: 'uppercase', marginBottom: 4 }}>
-            누적 시간
-          </div>
-          <div style={{ fontFamily: "'Pretendard Variable', Pretendard, -apple-system, sans-serif", fontSize: '2.2rem', fontWeight: 300, color: '#fff', lineHeight: 1 }}>
-            {stats.totalHours}
-            <span style={{ fontSize: '0.8rem', fontWeight: 400, color: '#888', marginLeft: 2 }}>h</span>
-            {stats.remainMin > 0 && (
-              <span style={{ fontSize: '1.1rem', fontWeight: 400, color: '#888', marginLeft: 4 }}>{stats.remainMin}m</span>
-            )}
-          </div>
+      <LoadingOverlay
+        show={overlay !== null}
+        success={overlay?.success ?? false}
+        message={overlay?.message}
+      />
+
+      <div style={{ background: '#fff', borderRadius: 16, margin: '0 16px 12px', overflow: 'hidden', border: '1px solid #f0f0f3' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', padding: '18px 12px' }}>
+          <Stat num={stats.monthlyCount} unit="회" label="이번달" />
+          <Stat
+            num={`${stats.totalHours}h${stats.remainMin > 0 ? ' ' + stats.remainMin + 'm' : ''}`}
+            label="누적"
+            divider
+          />
+          <Stat num={stats.streak} unit="일" label="🔥 스트릭" />
         </div>
       </div>
 
-      {/* Feed / Calendar sub-tab */}
-      <div style={{
-        display: 'flex', margin: '0 22px 16px',
-        background: '#fff', borderRadius: 10, padding: '3px',
-      }}>
-        {(['feed', 'calendar'] as SubView[]).map(v => (
-          <button
-            key={v}
-            type="button"
-            onClick={() => setSubView(v)}
-            style={{
-              flex: 1, padding: '7px', textAlign: 'center',
-              fontFamily: "'Pretendard Variable', Pretendard, -apple-system, sans-serif", fontSize: '0.65rem', fontWeight: 500,
-              color: subView === v ? '#fff' : '#888',
-              background: subView === v ? '#111111' : 'transparent',
-              borderRadius: 8, border: 'none', cursor: 'pointer',
-              transition: 'all 0.2s',
-            }}
-          >
-            {v === 'feed' ? '피드' : '달력'}
-          </button>
-        ))}
+      <div style={{ padding: '0 16px 14px' }}>
+        <div style={{ display: 'flex', background: '#f2f2f7', borderRadius: 10, padding: 3 }}>
+          {(['feed', 'calendar'] as SubView[]).map(v => (
+            <button
+              key={v}
+              type="button"
+              onClick={() => setSubView(v)}
+              style={{
+                flex: 1, padding: '7px 0', border: 'none', borderRadius: 8,
+                background: subView === v ? '#fff' : 'transparent',
+                boxShadow: subView === v ? '0 1px 2px rgba(0,0,0,0.08)' : 'none',
+                color: '#111', fontFamily: FONT, fontSize: '0.82rem', fontWeight: 600,
+                cursor: 'pointer', transition: 'all 0.15s',
+              }}
+            >
+              {v === 'feed' ? '피드' : '달력'}
+            </button>
+          ))}
+        </div>
       </div>
 
       {subView === 'feed' ? (
-        /* Feed view: record list */
-        runs.length === 0 ? (
-          <p style={{ textAlign: 'center', color: '#888', padding: '40px 0', fontSize: '0.875rem' }}>
-            아직 기록이 없습니다
-          </p>
-        ) : (
-          runs.map(run => (
-            <MyRecordCard
-              key={run.id}
-              run={run}
-              deleting={deleting === run.id}
-              onEdit={() => router.push(`/record?edit=${run.id}`)}
-              onDelete={() => handleDelete(run.id)}
-            />
-          ))
-        )
+        <div style={{
+          background: '#fff', margin: '0 16px 40px',
+          borderRadius: 16, border: '1px solid #f0f0f3', overflow: 'hidden',
+        }}>
+          {runs.length === 0 ? (
+            <EmptyState />
+          ) : (
+            runs.map((run, i) => (
+              <div key={run.id} style={i === runs.length - 1 ? { borderBottom: 'none' } as React.CSSProperties : undefined}>
+                <MyRecordCard
+                  run={run}
+                  deleting={deleting === run.id}
+                  onEdit={() => router.push(`/record?edit=${run.id}`)}
+                  onDelete={() => handleDelete(run.id)}
+                />
+              </div>
+            ))
+          )}
+        </div>
       ) : (
-        /* Calendar view */
         <CalendarView runs={runs} memberId={memberId} />
       )}
-    </div>
     </>
+  )
+}
+
+function Stat({ num, unit, label, divider }: { num: number | string; unit?: string; label: string; divider?: boolean }) {
+  return (
+    <div style={{
+      textAlign: 'center', padding: '2px 4px',
+      borderLeft: divider ? '1px solid #f0f0f3' : 'none',
+      borderRight: divider ? '1px solid #f0f0f3' : 'none',
+      fontFamily: FONT,
+    }}>
+      <div style={{
+        fontSize: '1.5rem', fontWeight: 700, color: '#111',
+        letterSpacing: '-0.02em', lineHeight: 1.1,
+        fontVariantNumeric: 'tabular-nums',
+      }}>
+        {num}
+        {unit && <span style={{ fontSize: '0.75rem', fontWeight: 500, color: '#888', marginLeft: 2 }}>{unit}</span>}
+      </div>
+      <div style={{ fontSize: '0.7rem', color: '#888', marginTop: 6, fontWeight: 500 }}>{label}</div>
+    </div>
+  )
+}
+
+function EmptyState() {
+  return (
+    <div style={{ padding: '48px 20px', textAlign: 'center', fontFamily: FONT }}>
+      <div style={{ fontSize: '2rem', marginBottom: 10, opacity: 0.5 }}>🏃</div>
+      <div style={{ fontSize: '0.92rem', fontWeight: 600, color: '#111', marginBottom: 4 }}>
+        아직 기록이 없어요
+      </div>
+      <div style={{ fontSize: '0.78rem', color: '#888' }}>
+        첫 러닝 기록을 남겨보세요
+      </div>
+    </div>
   )
 }

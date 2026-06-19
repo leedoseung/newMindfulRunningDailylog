@@ -113,9 +113,32 @@ body.detail-open nav {
   transition: opacity 0.25s ease, transform 0.25s ease !important;
 }
 
+/* ---- design tokens (light) ---------------------------------------------- */
+:root {
+  --mr-bg:           #f7f7f5;
+  --mr-surface:      #ffffff;
+  --mr-surface-2:    #fafafa;
+  --mr-text-1:       #111111;
+  --mr-text-2:       #888888;
+  --mr-text-3:       #aaaaaa;
+  --mr-border:       #f0f0f3;
+  --mr-divider:      #f1f1f4;
+  --mr-track:        #f2f2f7;
+  --mr-accent:       #ff5a36;
+  --mr-danger:       #ef4444;
+  --mr-sun:          #fc5252;
+  --mr-heat-0:       #f2f2f7;
+  --mr-heat-1:       #d6efdc;
+  --mr-heat-2:       #9ad9a8;
+  --mr-heat-3:       #4cb867;
+  --mr-heat-4:       #1f9d49;
+  --mr-shadow-sm:    0 1px 2px rgba(0,0,0,0.08);
+  --mr-shadow-pop:   0 6px 24px rgba(0,0,0,0.12);
+}
+
 /* keyboard focus ring for tappable rows/icon buttons */
 .focus-ring:focus-visible {
-  outline: 2px solid #111;
+  outline: 2px solid var(--mr-text-1);
   outline-offset: 2px;
   border-radius: 12px;
 }

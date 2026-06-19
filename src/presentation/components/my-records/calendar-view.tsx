@@ -15,8 +15,14 @@ type Props = {
 const DAY_LABELS = ['일', '월', '화', '수', '목', '금', '토']
 const FONT = "'Pretendard Variable', Pretendard, -apple-system, sans-serif"
 
-// Strava-ish heatmap palette (green ramp)
-const BUCKETS = ['#f2f2f7', '#d6efdc', '#9ad9a8', '#4cb867', '#1f9d49']
+// Strava-ish heatmap palette (green ramp) — sourced from CSS tokens
+const BUCKETS = [
+  'var(--mr-heat-0)',
+  'var(--mr-heat-1)',
+  'var(--mr-heat-2)',
+  'var(--mr-heat-3)',
+  'var(--mr-heat-4)',
+]
 
 function toDateStr(year: number, month: number, day: number) {
   return `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`
@@ -93,19 +99,19 @@ export function CalendarView({ runs, memberId, onOpenRun }: Props) {
   return (
     <div style={{ paddingBottom: 40, fontFamily: FONT }}>
       <div style={{
-        margin: '0 16px 10px', background: '#fff', borderRadius: 16,
-        border: '1px solid #f0f0f3', padding: '14px 18px',
+        margin: '0 16px 10px', background: 'var(--mr-surface)', borderRadius: 16,
+        border: '1px solid var(--mr-border)', padding: '14px 18px',
       }}>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
           <button type="button" onClick={prevMonth}
             aria-label="이전 달" className="focus-ring"
             style={{
               background: 'none', border: 'none', cursor: 'pointer',
-              fontSize: '1.4rem', color: '#888', lineHeight: 1, padding: '2px 8px',
+              fontSize: '1.4rem', color: 'var(--mr-text-2)', lineHeight: 1, padding: '2px 8px',
             }}>‹</button>
 
           <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-            <div style={{ fontSize: '0.95rem', fontWeight: 700, color: '#111', letterSpacing: '-0.01em' }}>
+            <div style={{ fontSize: '0.95rem', fontWeight: 700, color: 'var(--mr-text-1)', letterSpacing: '-0.01em' }}>
               {viewYear}.{String(viewMonth + 1).padStart(2, '0')}
             </div>
             <ShareButton
@@ -122,26 +128,26 @@ export function CalendarView({ runs, memberId, onOpenRun }: Props) {
             aria-label="다음 달" className="focus-ring"
             style={{
               background: 'none', border: 'none', cursor: 'pointer',
-              fontSize: '1.4rem', color: '#888', lineHeight: 1, padding: '2px 8px',
+              fontSize: '1.4rem', color: 'var(--mr-text-2)', lineHeight: 1, padding: '2px 8px',
             }}>›</button>
         </div>
 
-        <div style={{ display: 'flex', justifyContent: 'center', gap: 16, marginTop: 8, fontSize: '0.72rem', color: '#888' }}>
-          <span><b style={{ color: '#111', fontWeight: 700 }}>{monthCount}</b>회</span>
-          <span style={{ color: '#e5e5ea' }}>·</span>
-          <span><b style={{ color: '#111', fontWeight: 700 }}>{monthHours}h{monthRemain > 0 ? ` ${monthRemain}m` : ''}</b></span>
+        <div style={{ display: 'flex', justifyContent: 'center', gap: 16, marginTop: 8, fontSize: '0.72rem', color: 'var(--mr-text-2)' }}>
+          <span><b style={{ color: 'var(--mr-text-1)', fontWeight: 700 }}>{monthCount}</b>회</span>
+          <span style={{ color: 'var(--mr-border)' }}>·</span>
+          <span><b style={{ color: 'var(--mr-text-1)', fontWeight: 700 }}>{monthHours}h{monthRemain > 0 ? ` ${monthRemain}m` : ''}</b></span>
         </div>
       </div>
 
       <div style={{
-        margin: '0 16px 14px', background: '#fff', borderRadius: 16,
-        border: '1px solid #f0f0f3', padding: '14px 14px 12px',
+        margin: '0 16px 14px', background: 'var(--mr-surface)', borderRadius: 16,
+        border: '1px solid var(--mr-border)', padding: '14px 14px 12px',
       }}>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: 6, marginBottom: 6 }}>
           {DAY_LABELS.map((d, i) => (
             <div key={d} style={{
               textAlign: 'center', fontSize: '0.65rem', fontWeight: 600,
-              color: i === 0 ? '#fc5252' : '#888',
+              color: i === 0 ? 'var(--mr-sun)' : 'var(--mr-text-2)',
               paddingBottom: 4,
             }}>{d}</div>
           ))}
@@ -171,8 +177,8 @@ export function CalendarView({ runs, memberId, onOpenRun }: Props) {
                 style={{
                   aspectRatio: '1', display: 'flex', alignItems: 'center', justifyContent: 'center',
                   background: bg, borderRadius: 8,
-                  border: isSel ? '2px solid #111' : isTdy ? '2px solid #ff5a36' : '1px solid transparent',
-                  color: textOnFill ? '#fff' : '#111',
+                  border: isSel ? '2px solid var(--mr-text-1)' : isTdy ? '2px solid var(--mr-accent)' : '1px solid transparent',
+                  color: textOnFill ? 'var(--mr-surface)' : 'var(--mr-text-1)',
                   fontSize: '0.78rem', fontWeight: count > 0 ? 700 : 400,
                   fontFamily: FONT, fontVariantNumeric: 'tabular-nums',
                   cursor: count > 0 ? 'pointer' : 'default',
@@ -187,11 +193,11 @@ export function CalendarView({ runs, memberId, onOpenRun }: Props) {
 
         <div style={{
           display: 'flex', justifyContent: 'flex-end', alignItems: 'center',
-          gap: 4, marginTop: 12, fontSize: '0.62rem', color: '#888',
+          gap: 4, marginTop: 12, fontSize: '0.62rem', color: 'var(--mr-text-2)',
         }}>
           <span>적게</span>
           {BUCKETS.map((c, i) => (
-            <div key={i} style={{ width: 11, height: 11, borderRadius: 3, background: c, border: '1px solid #ebebef' }} />
+            <div key={i} style={{ width: 11, height: 11, borderRadius: 3, background: c, border: '1px solid var(--mr-border)' }} />
           ))}
           <span>많이</span>
         </div>
@@ -199,20 +205,20 @@ export function CalendarView({ runs, memberId, onOpenRun }: Props) {
 
       {selected ? (
         <div style={{
-          background: '#fff', margin: '0 16px',
-          borderRadius: 16, border: '1px solid #f0f0f3', overflow: 'hidden',
+          background: 'var(--mr-surface)', margin: '0 16px',
+          borderRadius: 16, border: '1px solid var(--mr-border)', overflow: 'hidden',
         }}>
           <div style={{
             padding: '12px 20px',
-            fontSize: '0.72rem', fontWeight: 600, color: '#666',
+            fontSize: '0.72rem', fontWeight: 600, color: 'var(--mr-text-2)',
             letterSpacing: '0.5px',
-            borderBottom: '1px solid #f1f1f4',
-            background: '#fafafa',
+            borderBottom: '1px solid var(--mr-divider)',
+            background: 'var(--mr-surface-2)',
           }}>
             {selected}
           </div>
           {selectedRuns.length === 0 ? (
-            <p style={{ textAlign: 'center', color: '#888', padding: '24px 0', fontSize: '0.85rem' }}>
+            <p style={{ textAlign: 'center', color: 'var(--mr-text-2)', padding: '24px 0', fontSize: '0.85rem' }}>
               이 날은 기록이 없습니다
             </p>
           ) : (
@@ -229,7 +235,7 @@ export function CalendarView({ runs, memberId, onOpenRun }: Props) {
           )}
         </div>
       ) : (
-        <p style={{ textAlign: 'center', color: '#aaa', padding: '8px 16px 0', fontSize: '0.72rem' }}>
+        <p style={{ textAlign: 'center', color: 'var(--mr-text-3)', padding: '8px 16px 0', fontSize: '0.72rem' }}>
           색칠된 날짜를 탭하면 기록을 볼 수 있어요
         </p>
       )}

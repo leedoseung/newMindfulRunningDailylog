@@ -82,7 +82,7 @@ export function MyRecordsTab({ runs, memberId }: Props) {
         message={overlay?.message}
       />
 
-      <div style={{ background: '#fff', borderRadius: 16, margin: '0 16px 12px', overflow: 'hidden', border: '1px solid #f0f0f3' }}>
+      <div style={{ background: 'var(--mr-surface)', borderRadius: 16, margin: '0 16px 12px', overflow: 'hidden', border: '1px solid var(--mr-border)' }}>
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', padding: '18px 12px' }}>
           <Stat num={stats.monthlyCount} unit="회" label="이번달" />
           <Stat
@@ -95,7 +95,7 @@ export function MyRecordsTab({ runs, memberId }: Props) {
       </div>
 
       <div style={{ padding: '0 16px 14px' }}>
-        <div style={{ display: 'flex', background: '#f2f2f7', borderRadius: 10, padding: 3 }}>
+        <div style={{ display: 'flex', background: 'var(--mr-track)', borderRadius: 10, padding: 3 }}>
           {(['feed', 'calendar'] as SubView[]).map(v => (
             <button
               key={v}
@@ -104,9 +104,9 @@ export function MyRecordsTab({ runs, memberId }: Props) {
               onClick={() => setSubView(v)}
               style={{
                 flex: 1, padding: '7px 0', border: 'none', borderRadius: 8,
-                background: subView === v ? '#fff' : 'transparent',
-                boxShadow: subView === v ? '0 1px 2px rgba(0,0,0,0.08)' : 'none',
-                color: '#111', fontFamily: FONT, fontSize: '0.82rem', fontWeight: 600,
+                background: subView === v ? 'var(--mr-surface)' : 'transparent',
+                boxShadow: subView === v ? 'var(--mr-shadow-sm)' : 'none',
+                color: 'var(--mr-text-1)', fontFamily: FONT, fontSize: '0.82rem', fontWeight: 600,
                 cursor: 'pointer', transition: 'all 0.15s',
               }}
             >
@@ -118,8 +118,8 @@ export function MyRecordsTab({ runs, memberId }: Props) {
 
       {subView === 'feed' ? (
         <div style={{
-          background: '#fff', margin: '0 16px 40px',
-          borderRadius: 16, border: '1px solid #f0f0f3', overflow: 'hidden',
+          background: 'var(--mr-surface)', margin: '0 16px 40px',
+          borderRadius: 16, border: '1px solid var(--mr-border)', overflow: 'hidden',
         }}>
           {runs.length === 0 ? (
             <EmptyState />
@@ -156,19 +156,19 @@ function Stat({ num, unit, label, divider }: { num: number | string; unit?: stri
   return (
     <div style={{
       textAlign: 'center', padding: '2px 4px',
-      borderLeft: divider ? '1px solid #f0f0f3' : 'none',
-      borderRight: divider ? '1px solid #f0f0f3' : 'none',
+      borderLeft: divider ? '1px solid var(--mr-border)' : 'none',
+      borderRight: divider ? '1px solid var(--mr-border)' : 'none',
       fontFamily: FONT,
     }}>
       <div style={{
-        fontSize: '1.5rem', fontWeight: 700, color: '#111',
+        fontSize: '1.5rem', fontWeight: 700, color: 'var(--mr-text-1)',
         letterSpacing: '-0.02em', lineHeight: 1.1,
         fontVariantNumeric: 'tabular-nums',
       }}>
         {num}
-        {unit && <span style={{ fontSize: '0.75rem', fontWeight: 500, color: '#888', marginLeft: 2 }}>{unit}</span>}
+        {unit && <span style={{ fontSize: '0.75rem', fontWeight: 500, color: 'var(--mr-text-2)', marginLeft: 2 }}>{unit}</span>}
       </div>
-      <div style={{ fontSize: '0.7rem', color: '#888', marginTop: 6, fontWeight: 500 }}>{label}</div>
+      <div style={{ fontSize: '0.7rem', color: 'var(--mr-text-2)', marginTop: 6, fontWeight: 500 }}>{label}</div>
     </div>
   )
 }
@@ -177,10 +177,10 @@ function EmptyState() {
   return (
     <div style={{ padding: '48px 20px', textAlign: 'center', fontFamily: FONT }}>
       <div style={{ fontSize: '2rem', marginBottom: 10, opacity: 0.5 }}>🏃</div>
-      <div style={{ fontSize: '0.92rem', fontWeight: 600, color: '#111', marginBottom: 4 }}>
+      <div style={{ fontSize: '0.92rem', fontWeight: 600, color: 'var(--mr-text-1)', marginBottom: 4 }}>
         아직 기록이 없어요
       </div>
-      <div style={{ fontSize: '0.78rem', color: '#888' }}>
+      <div style={{ fontSize: '0.78rem', color: 'var(--mr-text-2)' }}>
         첫 러닝 기록을 남겨보세요
       </div>
     </div>

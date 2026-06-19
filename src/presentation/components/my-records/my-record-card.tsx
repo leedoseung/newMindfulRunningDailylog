@@ -53,8 +53,8 @@ export function MyRecordCard({ run, deleting, onEdit, onDelete, onOpen }: Props)
         display: 'grid', gridTemplateColumns: '52px 1fr auto',
         gap: 14, alignItems: 'center',
         padding: '14px 20px',
-        background: '#fff',
-        borderBottom: '1px solid #f1f1f4',
+        background: 'var(--mr-surface)',
+        borderBottom: '1px solid var(--mr-divider)',
         opacity: deleting ? 0.5 : 1, transition: 'opacity 0.2s',
         fontFamily: FONT,
         cursor: onOpen ? 'pointer' : 'default',
@@ -62,23 +62,23 @@ export function MyRecordCard({ run, deleting, onEdit, onDelete, onOpen }: Props)
     >
       <div style={{
         textAlign: 'center', padding: '8px 0',
-        background: '#fafafa', borderRadius: 10, border: '1px solid #f0f0f3',
+        background: 'var(--mr-surface-2)', borderRadius: 10, border: '1px solid var(--mr-border)',
         lineHeight: 1.2,
       }}>
-        <div style={{ fontSize: '0.6rem', color: '#888', fontWeight: 600, letterSpacing: 0.2 }}>{month}</div>
-        <div style={{ fontSize: '1.05rem', fontWeight: 700, color: '#111', lineHeight: 1 }}>{day}</div>
+        <div style={{ fontSize: '0.6rem', color: 'var(--mr-text-2)', fontWeight: 600, letterSpacing: 0.2 }}>{month}</div>
+        <div style={{ fontSize: '1.05rem', fontWeight: 700, color: 'var(--mr-text-1)', lineHeight: 1 }}>{day}</div>
       </div>
 
       <div style={{ minWidth: 0 }}>
         <div style={{
-          fontSize: '0.95rem', fontWeight: 600, color: '#111',
+          fontSize: '0.95rem', fontWeight: 600, color: 'var(--mr-text-1)',
           marginBottom: 3,
           whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',
         }}>
           {run.title || '제목 없음'}
         </div>
         <div style={{
-          fontSize: '0.75rem', color: '#888',
+          fontSize: '0.75rem', color: 'var(--mr-text-2)',
           whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',
         }}>
           {weekday} · {run.location || '장소 미입력'}
@@ -88,9 +88,9 @@ export function MyRecordCard({ run, deleting, onEdit, onDelete, onOpen }: Props)
       <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
         <div style={{ textAlign: 'right' }}>
           <div style={{
-            fontSize: '0.95rem', fontWeight: 700, color: '#111',
+            fontSize: '0.95rem', fontWeight: 700, color: 'var(--mr-text-1)',
             fontVariantNumeric: 'tabular-nums', lineHeight: 1,
-          }}>{run.durationMin}<span style={{ fontSize: '0.7rem', fontWeight: 500, color: '#888', marginLeft: 2 }}>분</span></div>
+          }}>{run.durationMin}<span style={{ fontSize: '0.7rem', fontWeight: 500, color: 'var(--mr-text-2)', marginLeft: 2 }}>분</span></div>
         </div>
         <button
           type="button"
@@ -100,7 +100,7 @@ export function MyRecordCard({ run, deleting, onEdit, onDelete, onOpen }: Props)
           onClick={() => setMenuOpen(v => !v)}
           style={{
             background: 'none', border: 'none', cursor: 'pointer',
-            color: '#bbb', padding: '6px 4px 6px 8px', lineHeight: 1,
+            color: 'var(--mr-text-3)', padding: '6px 4px 6px 8px', lineHeight: 1,
             fontSize: '1.1rem', letterSpacing: 1,
           }}
         >
@@ -111,18 +111,18 @@ export function MyRecordCard({ run, deleting, onEdit, onDelete, onOpen }: Props)
       {menuOpen && (
         <div data-row-stop style={{
           position: 'absolute', top: '52px', right: '12px', zIndex: 20,
-          background: '#fff', borderRadius: 12,
-          boxShadow: '0 6px 24px rgba(0,0,0,0.12)',
+          background: 'var(--mr-surface)', borderRadius: 12,
+          boxShadow: 'var(--mr-shadow-pop)',
           overflow: 'hidden', minWidth: 120,
-          border: '1px solid #f0f0f3',
+          border: '1px solid var(--mr-border)',
         }}>
           <button type="button" onClick={() => { setMenuOpen(false); onEdit() }}
-            style={{ display: 'block', width: '100%', padding: '12px 18px', textAlign: 'left', border: 'none', background: 'none', fontSize: '0.85rem', color: '#111', cursor: 'pointer', fontFamily: FONT }}>
+            style={{ display: 'block', width: '100%', padding: '12px 18px', textAlign: 'left', border: 'none', background: 'none', fontSize: '0.85rem', color: 'var(--mr-text-1)', cursor: 'pointer', fontFamily: FONT }}>
             수정
           </button>
-          <div style={{ height: 1, background: '#f3f3f6' }} />
+          <div style={{ height: 1, background: 'var(--mr-divider)' }} />
           <button type="button" onClick={() => { setMenuOpen(false); onDelete() }}
-            style={{ display: 'block', width: '100%', padding: '12px 18px', textAlign: 'left', border: 'none', background: 'none', fontSize: '0.85rem', color: '#ef4444', cursor: 'pointer', fontFamily: FONT }}>
+            style={{ display: 'block', width: '100%', padding: '12px 18px', textAlign: 'left', border: 'none', background: 'none', fontSize: '0.85rem', color: 'var(--mr-danger)', cursor: 'pointer', fontFamily: FONT }}>
             삭제
           </button>
         </div>

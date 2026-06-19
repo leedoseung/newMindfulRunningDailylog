@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { MyRecordCard } from './my-record-card'
 import { CalendarView } from './calendar-view'
+import { DetailSheet } from '../feed/detail-sheet'
 import type { RunLog } from '@/domain/entities/run-log'
 import { LoadingOverlay } from '../shared/loading-overlay'
 
@@ -51,6 +52,7 @@ export function MyRecordsTab({ runs, memberId }: Props) {
   const [deleting, setDeleting] = useState<string | null>(null)
   const [subView, setSubView] = useState<SubView>('feed')
   const [overlay, setOverlay] = useState<{ success: boolean; message: string } | null>(null)
+  const [openRun, setOpenRun] = useState<RunLog | null>(null)
   const stats = computeStats(runs)
 
   async function handleDelete(id: string) {
@@ -128,14 +130,23 @@ export function MyRecordsTab({ runs, memberId }: Props) {
                   deleting={deleting === run.id}
                   onEdit={() => router.push(`/record?edit=${run.id}`)}
                   onDelete={() => handleDelete(run.id)}
+                  onOpen={() => setOpenRun(run)}
                 />
               </div>
             ))
           )}
         </div>
       ) : (
-        <CalendarView runs={runs} memberId={memberId} />
+        <CalendarView runs={runs} memberId={memberId} onOpenRun={setOpenRun} />
       )}
+
+      <DetailSheet
+        run={openRun}
+        open={openRun !== null}
+        onClose={() => setOpenRun(null)}
+        memberId={memberId}
+        onDeleted={() => { setOpenRun(null); router.refresh() }}
+      />
     </>
   )
 }

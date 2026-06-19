@@ -9,6 +9,7 @@ import type { RunLog } from '@/domain/entities/run-log'
 type Props = {
   runs: RunLog[]
   memberId: string
+  onOpenRun?: (run: RunLog) => void
 }
 
 const DAY_LABELS = ['일', '월', '화', '수', '목', '금', '토']
@@ -34,7 +35,7 @@ function bucketFor(count: number): number {
   return 4
 }
 
-export function CalendarView({ runs, memberId }: Props) {
+export function CalendarView({ runs, memberId, onOpenRun }: Props) {
   const router = useRouter()
   const now = new Date()
   const [viewYear, setViewYear] = useState(now.getFullYear())
@@ -221,6 +222,7 @@ export function CalendarView({ runs, memberId }: Props) {
                 deleting={deleting === run.id}
                 onEdit={() => router.push(`/record?edit=${run.id}`)}
                 onDelete={() => handleDelete(run.id)}
+                onOpen={onOpenRun ? () => onOpenRun(run) : undefined}
               />
             ))
           )}

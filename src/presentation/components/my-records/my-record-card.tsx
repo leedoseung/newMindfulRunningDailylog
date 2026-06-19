@@ -8,13 +8,14 @@ type Props = {
   deleting: boolean
   onEdit: () => void
   onDelete: () => void
+  onOpen?: () => void
 }
 
 const FONT = "'Pretendard Variable', Pretendard, -apple-system, sans-serif"
 
 const SHORT_MONTH = ['1월','2월','3월','4월','5월','6월','7월','8월','9월','10월','11월','12월']
 
-export function MyRecordCard({ run, deleting, onEdit, onDelete }: Props) {
+export function MyRecordCard({ run, deleting, onEdit, onDelete, onOpen }: Props) {
   const [menuOpen, setMenuOpen] = useState(false)
   const rootRef = useRef<HTMLDivElement>(null)
 
@@ -32,9 +33,20 @@ export function MyRecordCard({ run, deleting, onEdit, onDelete }: Props) {
   const day = d.getDate()
   const weekday = d.toLocaleDateString('ko-KR', { weekday: 'short' })
 
+  function handleRowClick(e: React.MouseEvent) {
+    if (!onOpen) return
+    const target = e.target as HTMLElement
+    if (target.closest('[data-row-stop]')) return
+    onOpen()
+  }
+
   return (
     <div
       ref={rootRef}
+      onClick={handleRowClick}
+      role={onOpen ? 'button' : undefined}
+      tabIndex={onOpen ? 0 : undefined}
+      onKeyDown={onOpen ? (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onOpen() } } : undefined}
       style={{
         position: 'relative',
         display: 'grid', gridTemplateColumns: '52px 1fr auto',
@@ -44,6 +56,7 @@ export function MyRecordCard({ run, deleting, onEdit, onDelete }: Props) {
         borderBottom: '1px solid #f1f1f4',
         opacity: deleting ? 0.5 : 1, transition: 'opacity 0.2s',
         fontFamily: FONT,
+        cursor: onOpen ? 'pointer' : 'default',
       }}
     >
       <div style={{
@@ -81,6 +94,7 @@ export function MyRecordCard({ run, deleting, onEdit, onDelete }: Props) {
         <button
           type="button"
           aria-label="메뉴"
+          data-row-stop
           onClick={() => setMenuOpen(v => !v)}
           style={{
             background: 'none', border: 'none', cursor: 'pointer',
@@ -93,7 +107,7 @@ export function MyRecordCard({ run, deleting, onEdit, onDelete }: Props) {
       </div>
 
       {menuOpen && (
-        <div style={{
+        <div data-row-stop style={{
           position: 'absolute', top: '52px', right: '12px', zIndex: 20,
           background: '#fff', borderRadius: 12,
           boxShadow: '0 6px 24px rgba(0,0,0,0.12)',

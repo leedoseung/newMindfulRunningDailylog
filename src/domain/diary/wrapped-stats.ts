@@ -156,8 +156,11 @@ export function computeWrappedStats(runs: RunLog[]): WrappedStats {
   const withPhoto = runs
     .filter(r => r.photoUrl)
     .sort((a, b) => (a.date < b.date ? 1 : -1))
-  const albumPhotos = withPhoto.slice(0, 9).map(r => ({ runId: r.id, photoUrl: r.photoUrl, date: r.date }))
-  const albumOverflowCount = Math.max(0, withPhoto.length - 9)
+  // R2 egress is free — no real cost cap. Hard limit at 100 as a safety net
+  // for the unlikely runner who logs more than 100 photo-bearing runs in a month.
+  const ALBUM_CAP = 100
+  const albumPhotos = withPhoto.slice(0, ALBUM_CAP).map(r => ({ runId: r.id, photoUrl: r.photoUrl, date: r.date }))
+  const albumOverflowCount = Math.max(0, withPhoto.length - ALBUM_CAP)
 
   const weekdayCounts = computeWeekdayCounts(runs)
   const topWeekday = pickTopWeekday(weekdayCounts)

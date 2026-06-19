@@ -80,14 +80,28 @@ describe('computeWrappedStats', () => {
     expect(pool.map(r => r.id).sort()).toEqual(['a', 'c'])
   })
 
-  it('albumPhotos returns newest-first, max 9, with overflow count', () => {
+  it('albumPhotos returns newest-first, full set when within cap, no overflow', () => {
     const runs = Array.from({ length: 12 }, (_, i) =>
       mk({ id: `r${i}`, date: `2026-06-${String(i + 1).padStart(2, '0')}`, photoUrl: `p${i}.jpg` })
     )
     runs.push(mk({ id: 'nophoto', date: '2026-06-13', photoUrl: '' }))
     const s = computeWrappedStats(runs)
-    expect(s.albumPhotos.length).toBe(9)
+    expect(s.albumPhotos.length).toBe(12)
     expect(s.albumPhotos[0]?.date).toBe('2026-06-12') // newest with photo
-    expect(s.albumOverflowCount).toBe(3) // 12 with photos - 9 shown
+    expect(s.albumOverflowCount).toBe(0)
+  })
+
+  it('albumPhotos applies the 100-photo safety cap with overflow count', () => {
+    // 101 photo-bearing runs over distinct dates — exceeds the cap by 1.
+    // Use a Date object so we don't depend on month boundaries.
+    const runs = Array.from({ length: 101 }, (_, i) => {
+      const d = new Date(2026, 5, 1)
+      d.setDate(d.getDate() + i)
+      const date = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`
+      return mk({ id: `r${i}`, date, photoUrl: `p${i}.jpg` })
+    })
+    const s = computeWrappedStats(runs)
+    expect(s.albumPhotos.length).toBe(100)
+    expect(s.albumOverflowCount).toBe(1)
   })
 })

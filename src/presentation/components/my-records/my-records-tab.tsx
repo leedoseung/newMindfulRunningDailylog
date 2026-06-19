@@ -28,6 +28,27 @@ function computeStats(runs: RunLog[]) {
   return { monthlyCount, totalHours, remainMin, streak }
 }
 
+function computeMonthlyTrend(runs: RunLog[], months = 6): Array<{ key: string; label: string; count: number; minutes: number }> {
+  const now = new Date()
+  const buckets: Array<{ key: string; label: string; count: number; minutes: number }> = []
+  for (let i = months - 1; i >= 0; i--) {
+    const d = new Date(now.getFullYear(), now.getMonth() - i, 1)
+    const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`
+    buckets.push({ key, label: `${d.getMonth() + 1}월`, count: 0, minutes: 0 })
+  }
+  const idx = new Map(buckets.map((b, i) => [b.key, i]))
+  for (const r of runs) {
+    const k = r.date.slice(0, 7)
+    const i = idx.get(k)
+    if (i === undefined) continue
+    const b = buckets[i]
+    if (!b) continue
+    b.count += 1
+    b.minutes += r.durationMin
+  }
+  return buckets
+}
+
 function computeStreak(runs: RunLog[]): number {
   const dates = new Set(runs.map(r => r.date))
   let streak = 0
@@ -54,6 +75,7 @@ export function MyRecordsTab({ runs, memberId }: Props) {
   const [overlay, setOverlay] = useState<{ success: boolean; message: string } | null>(null)
   const [openRun, setOpenRun] = useState<RunLog | null>(null)
   const stats = useMemo(() => computeStats(runs), [runs])
+  const trend = useMemo(() => computeMonthlyTrend(runs), [runs])
 
   async function handleDelete(id: string) {
     if (!confirm('이 기록을 삭제할까요?')) return
@@ -83,6 +105,8 @@ export function MyRecordsTab({ runs, memberId }: Props) {
       />
 
       <div style={{ background: 'var(--mr-surface)', borderRadius: 16, margin: '0 16px 12px', overflow: 'hidden', border: '1px solid var(--mr-border)' }}>
+        <TrendChart data={trend} />
+        <div style={{ height: 1, background: 'var(--mr-border)' }} />
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', padding: '18px 12px' }}>
           <Stat num={stats.monthlyCount} unit="회" label="이번달" />
           <Stat
@@ -169,6 +193,69 @@ function Stat({ num, unit, label, divider }: { num: number | string; unit?: stri
         {unit && <span style={{ fontSize: '0.75rem', fontWeight: 500, color: 'var(--mr-text-2)', marginLeft: 2 }}>{unit}</span>}
       </div>
       <div style={{ fontSize: '0.7rem', color: 'var(--mr-text-2)', marginTop: 6, fontWeight: 500 }}>{label}</div>
+    </div>
+  )
+}
+
+function TrendChart({ data }: { data: Array<{ key: string; label: string; count: number; minutes: number }> }) {
+  const max = Math.max(1, ...data.map(d => d.count))
+  const last = data[data.length - 1]
+  return (
+    <div style={{ padding: '14px 18px 10px', fontFamily: FONT }}>
+      <div style={{
+        display: 'flex', justifyContent: 'space-between', alignItems: 'baseline',
+        marginBottom: 10,
+      }}>
+        <div style={{ fontSize: '0.7rem', color: 'var(--mr-text-2)', fontWeight: 600, letterSpacing: 0.4 }}>
+          최근 6개월 추이
+        </div>
+        <div style={{ fontSize: '0.7rem', color: 'var(--mr-text-2)' }}>
+          이번달 <b style={{ color: 'var(--mr-text-1)', fontWeight: 700, fontVariantNumeric: 'tabular-nums' }}>{last?.count ?? 0}</b>회
+        </div>
+      </div>
+
+      <div style={{
+        display: 'grid', gridTemplateColumns: `repeat(${data.length}, 1fr)`,
+        gap: 8, alignItems: 'end', height: 56,
+      }}>
+        {data.map((d, i) => {
+          const ratio = d.count / max
+          const isCurrent = i === data.length - 1
+          return (
+            <div key={d.key} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', height: '100%' }}>
+              <div style={{
+                flex: 1, width: '100%', display: 'flex', alignItems: 'flex-end',
+              }}>
+                <div style={{
+                  width: '100%',
+                  height: `${Math.max(d.count > 0 ? 8 : 3, ratio * 100)}%`,
+                  background: d.count === 0
+                    ? 'var(--mr-border)'
+                    : isCurrent ? 'var(--mr-text-1)' : 'var(--mr-heat-3)',
+                  borderRadius: 4,
+                  transition: 'height 0.2s',
+                }} />
+              </div>
+            </div>
+          )
+        })}
+      </div>
+
+      <div style={{
+        display: 'grid', gridTemplateColumns: `repeat(${data.length}, 1fr)`,
+        gap: 8, marginTop: 6,
+      }}>
+        {data.map((d, i) => (
+          <div key={d.key} style={{
+            textAlign: 'center', fontSize: '0.62rem',
+            color: i === data.length - 1 ? 'var(--mr-text-1)' : 'var(--mr-text-2)',
+            fontWeight: i === data.length - 1 ? 700 : 500,
+            fontVariantNumeric: 'tabular-nums',
+          }}>
+            {d.label}
+          </div>
+        ))}
+      </div>
     </div>
   )
 }

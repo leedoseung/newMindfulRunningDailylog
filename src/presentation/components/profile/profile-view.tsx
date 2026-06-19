@@ -11,7 +11,6 @@ const AvatarCropModal = dynamic(
 )
 import { ProfileEditSheet } from './profile-edit-sheet'
 import { DonationCard } from './donation-card'
-import { CalendarView } from '../my-records/calendar-view'
 import { createBrowserClient } from '@/infrastructure/supabase/browser-client'
 import type { RunLog } from '@/domain/entities/run-log'
 
@@ -552,15 +551,6 @@ export function ProfileView({ member, allRuns, memberId, memberName, memberAvata
         memberAvatarUrl={memberAvatarUrl ?? member.avatarUrl}
       />
 
-      {/* 월간 일기장 — 달력 뷰 + 월 공유 진입점 */}
-      <div style={{ padding: '24px 0 40px' }}>
-        <div style={{
-          padding: '0 22px 12px',
-          fontFamily: FONT, fontSize: '0.65rem', fontWeight: 500,
-          color: '#888', letterSpacing: '1.8px', textTransform: 'uppercase',
-        }}>월간 일기장</div>
-        <CalendarView runs={allRuns} memberId={memberId} />
-      </div>
     </main>
   )
 }

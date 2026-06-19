@@ -118,6 +118,7 @@ export function WrappedDeck({ member, year, month, stats, shareUrl, allUrl }: Pr
     >
       <ProgressBars total={cards.length} current={idx} />
       <BgmToggle on={bgmOn} onToggle={() => setBgmOn(v => !v)} />
+      <CloseButton />
       {/* Source: "Relax(atwork)" by ISC666, CC0 1.0 — see public/audio/LICENSE.md */}
       <audio ref={audioRef} src="/audio/diary-ambient.m4a" loop preload="none" />
 
@@ -210,6 +211,36 @@ function ProgressBars({ total, current }: { total: number; current: number }) {
         />
       ))}
     </div>
+  )
+}
+
+function CloseButton() {
+  return (
+    <a
+      href="/home"
+      aria-label="홈으로 닫기"
+      style={{
+        position: 'fixed',
+        top: 'calc(env(safe-area-inset-top) + 12px)',
+        right: 12,
+        background: 'rgba(0,0,0,0.4)',
+        color: '#fff',
+        border: 'none',
+        borderRadius: 999,
+        width: 44,
+        height: 44,
+        display: 'grid',
+        placeItems: 'center',
+        fontSize: '1.1rem',
+        cursor: 'pointer',
+        zIndex: 10,
+        fontFamily: "'Pretendard Variable', Pretendard, sans-serif",
+        textDecoration: 'none',
+        lineHeight: 1,
+      }}
+    >
+      ✕
+    </a>
   )
 }
 

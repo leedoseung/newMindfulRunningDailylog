@@ -48,24 +48,25 @@ const part: PartRow = {
   members: { name: '이두승', avatar_url: null },
 }
 
-describe('GetChallengeLeaderboardUseCase — streak', () => {
-  it('breaks streak on pass-used day (do not count face-save as did-it)', async () => {
-    // 07-01 done, 07-02 used pass, 07-03 done, today 07-03
+describe('GetChallengeLeaderboardUseCase — maxStreak', () => {
+  it('pass-used day breaks the run (longest window excludes it)', async () => {
+    // 07-01 done, 07-02 pass, 07-03 done, 07-04 done, today 07-04
     const logs: LogRow[] = [
       { participation_id: 'p1', log_date: '2026-07-01', count: 100, used_pass: false, is_rest_day: false },
       { participation_id: 'p1', log_date: '2026-07-02', count: 0,   used_pass: true,  is_rest_day: false },
       { participation_id: 'p1', log_date: '2026-07-03', count: 100, used_pass: false, is_rest_day: false },
+      { participation_id: 'p1', log_date: '2026-07-04', count: 100, used_pass: false, is_rest_day: false },
     ]
     const uc = new GetChallengeLeaderboardUseCase(makeSupabase([part], logs))
     const rows = await uc.execute({
-      challengeId: 'c1', today: '2026-07-03', startDate: '2026-07-01', goalMin: 100,
+      challengeId: 'c1', today: '2026-07-04', startDate: '2026-07-01', goalMin: 100,
     })
     const row = rows[0]!
-    expect(row.streak).toBe(1)              // only today; 07-02 pass breaks chain
-    expect(row.completedDays).toBe(3)       // pass still counts toward completion
+    expect(row.maxStreak).toBe(2)            // 07-03..07-04 is longest window
+    expect(row.completedDays).toBe(4)        // pass still counts toward completion
   })
 
-  it('keeps streak across rest days', async () => {
+  it('rest day counts toward run (continuous through 휴가)', async () => {
     const logs: LogRow[] = [
       { participation_id: 'p1', log_date: '2026-07-01', count: 100, used_pass: false, is_rest_day: false },
       { participation_id: 'p1', log_date: '2026-07-02', count: 0,   used_pass: false, is_rest_day: true },
@@ -76,19 +77,26 @@ describe('GetChallengeLeaderboardUseCase — streak', () => {
       challengeId: 'c1', today: '2026-07-03', startDate: '2026-07-01', goalMin: 100,
     })
     const row = rows[0]!
-    expect(row.streak).toBe(3)
+    expect(row.maxStreak).toBe(3)
   })
 
-  it('today missing is graced (does not reset streak from yesterday)', async () => {
+  it('returns longest window, not current tail', async () => {
+    // 5-day window then 2-day gap then 2-day tail — max should be 5
     const logs: LogRow[] = [
       { participation_id: 'p1', log_date: '2026-07-01', count: 100, used_pass: false, is_rest_day: false },
       { participation_id: 'p1', log_date: '2026-07-02', count: 100, used_pass: false, is_rest_day: false },
+      { participation_id: 'p1', log_date: '2026-07-03', count: 100, used_pass: false, is_rest_day: false },
+      { participation_id: 'p1', log_date: '2026-07-04', count: 100, used_pass: false, is_rest_day: false },
+      { participation_id: 'p1', log_date: '2026-07-05', count: 100, used_pass: false, is_rest_day: false },
+      // 07-06, 07-07 missing (gap)
+      { participation_id: 'p1', log_date: '2026-07-08', count: 100, used_pass: false, is_rest_day: false },
+      { participation_id: 'p1', log_date: '2026-07-09', count: 100, used_pass: false, is_rest_day: false },
     ]
     const uc = new GetChallengeLeaderboardUseCase(makeSupabase([part], logs))
     const rows = await uc.execute({
-      challengeId: 'c1', today: '2026-07-03', startDate: '2026-07-01', goalMin: 100,
+      challengeId: 'c1', today: '2026-07-09', startDate: '2026-07-01', goalMin: 100,
     })
     const row = rows[0]!
-    expect(row.streak).toBe(2)
+    expect(row.maxStreak).toBe(5)
   })
 })

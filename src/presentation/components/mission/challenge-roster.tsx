@@ -162,7 +162,7 @@ export function ChallengeRoster({ rows, durationDays, goal, currentMemberId }: P
                     )}
                   </div>
                   <div style={{ fontSize: 11, color: '#666', marginTop: 2, display: 'flex', gap: 8, flexWrap: 'wrap' }}>
-                    <span>🔥 연속 {r.streak}일</span>
+                    <span>🔥 최대 연속 {r.maxStreak}일</span>
                     <span>🏷 {r.completedDays}/{durationDays}일</span>
                     <span>면죄권 {r.passesRemaining}</span>
                   </div>

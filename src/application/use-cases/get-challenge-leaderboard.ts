@@ -9,7 +9,7 @@ export type ChallengeLeaderRow = {
   todayDone: boolean        // today stamped (count >= goalMin OR rest OR pass)
   todayRest: boolean
   completedDays: number     // total days kept across season
-  streak: number            // tail streak ending today/yesterday
+  maxStreak: number         // longest consecutive run (start..today), excludes pass-used days
   passesRemaining: number
   isFailed: boolean
   isCompleted: boolean
@@ -99,18 +99,17 @@ export class GetChallengeLeaderboardUseCase {
         if (isKept(l, input.goalMin)) completedDays++
       }
 
-      let streak = 0
-      let cursor = input.today
-      while (cursor >= input.startDate) {
+      // Max streak: longest consecutive isStreakKept window in [startDate, today].
+      // Walk forward day-by-day so gaps reset the run. Excludes used_pass days.
+      let maxStreak = 0
+      let run = 0
+      for (let cursor = input.startDate; cursor <= input.today; cursor = addDays(cursor, 1)) {
         const l = byDate.get(cursor)
         if (isStreakKept(l, input.goalMin)) {
-          streak++
-          cursor = addDays(cursor, -1)
-        } else if (cursor === input.today) {
-          cursor = addDays(cursor, -1)
-          continue
+          run++
+          if (run > maxStreak) maxStreak = run
         } else {
-          break
+          run = 0
         }
       }
 
@@ -123,19 +122,19 @@ export class GetChallengeLeaderboardUseCase {
         todayDone,
         todayRest,
         completedDays,
-        streak,
+        maxStreak,
         passesRemaining: p.passes_remaining,
         isFailed: !!p.failed_at,
         isCompleted: !!p.completed_at,
       }
     })
 
-    // Sort: failed sink to bottom, then completedDays desc > streak desc > passesRemaining desc.
+    // Sort: failed sink to bottom, then completedDays desc > maxStreak desc > passesRemaining desc.
     // Joined order as final tie-breaker.
     rows.sort((a, b) => {
       if (a.isFailed !== b.isFailed) return a.isFailed ? 1 : -1
       if (b.completedDays !== a.completedDays) return b.completedDays - a.completedDays
-      if (b.streak !== a.streak) return b.streak - a.streak
+      if (b.maxStreak !== a.maxStreak) return b.maxStreak - a.maxStreak
       if (b.passesRemaining !== a.passesRemaining) return b.passesRemaining - a.passesRemaining
       return a.joinedAt.localeCompare(b.joinedAt)
     })

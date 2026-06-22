@@ -129,12 +129,12 @@ export class GetChallengeLeaderboardUseCase {
       }
     })
 
-    // Sort: failed sink to bottom, then completedDays desc > maxStreak desc > passesRemaining desc.
+    // Sort: failed sink to bottom, then maxStreak desc > completedDays desc > passesRemaining desc.
     // Joined order as final tie-breaker.
     rows.sort((a, b) => {
       if (a.isFailed !== b.isFailed) return a.isFailed ? 1 : -1
-      if (b.completedDays !== a.completedDays) return b.completedDays - a.completedDays
       if (b.maxStreak !== a.maxStreak) return b.maxStreak - a.maxStreak
+      if (b.completedDays !== a.completedDays) return b.completedDays - a.completedDays
       if (b.passesRemaining !== a.passesRemaining) return b.passesRemaining - a.passesRemaining
       return a.joinedAt.localeCompare(b.joinedAt)
     })

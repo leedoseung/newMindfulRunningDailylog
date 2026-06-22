@@ -45,6 +45,12 @@ function isKept(l: LogRow | undefined, goalMin: number): boolean {
   return !!l.is_rest_day || l.used_pass || l.count >= goalMin
 }
 
+// Streak excludes pass-used days — face-save kept the run alive but is not "did it".
+function isStreakKept(l: LogRow | undefined, goalMin: number): boolean {
+  if (!l) return false
+  return !!l.is_rest_day || l.count >= goalMin
+}
+
 export class GetChallengeLeaderboardUseCase {
   constructor(private supabase: SupabaseClient) {}
 
@@ -97,7 +103,7 @@ export class GetChallengeLeaderboardUseCase {
       let cursor = input.today
       while (cursor >= input.startDate) {
         const l = byDate.get(cursor)
-        if (isKept(l, input.goalMin)) {
+        if (isStreakKept(l, input.goalMin)) {
           streak++
           cursor = addDays(cursor, -1)
         } else if (cursor === input.today) {
@@ -124,14 +130,13 @@ export class GetChallengeLeaderboardUseCase {
       }
     })
 
-    // Sort: completed > active by completedDays desc > streak desc > todayCount desc,
-    // failed sink to the bottom. Joined order as final tie-breaker.
+    // Sort: failed sink to bottom, then completedDays desc > streak desc > passesRemaining desc.
+    // Joined order as final tie-breaker.
     rows.sort((a, b) => {
       if (a.isFailed !== b.isFailed) return a.isFailed ? 1 : -1
-      if (a.isCompleted !== b.isCompleted) return a.isCompleted ? -1 : 1
       if (b.completedDays !== a.completedDays) return b.completedDays - a.completedDays
       if (b.streak !== a.streak) return b.streak - a.streak
-      if (b.todayCount !== a.todayCount) return b.todayCount - a.todayCount
+      if (b.passesRemaining !== a.passesRemaining) return b.passesRemaining - a.passesRemaining
       return a.joinedAt.localeCompare(b.joinedAt)
     })
     return rows

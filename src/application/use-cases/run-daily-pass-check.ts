@@ -48,6 +48,11 @@ export class RunDailyPassCheckUseCase {
       }
       result.processed++
       const log = await this.missionLogRepo.getOne(p.id, yesterday)
+      if (log?.isRestDay) {
+        result.skipped++
+        result.processed--
+        continue
+      }
       const missed = !log || (log.count === 0 && !log.usedPass)
       if (!missed) continue
 

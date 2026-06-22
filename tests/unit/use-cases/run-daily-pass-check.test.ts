@@ -94,6 +94,36 @@ describe('RunDailyPassCheckUseCase', () => {
     expect(result.failed).toBe(1)
   })
 
+  it('skips rest day — no pass decrement, no markFailed', async () => {
+    const p = makeParticipation({ passesRemaining: 0 })
+    const cRepo = { getActive: vi.fn().mockResolvedValue(challenge), getById: vi.fn(), getUpcoming: vi.fn() } as unknown as IChallengeRepository
+    const pRepo = {
+      listForChallenge: vi.fn().mockResolvedValue([p]), delete: vi.fn(),
+      decrementPass: vi.fn(), markFailed: vi.fn(),
+      enroll: vi.fn(), getByMember: vi.fn(), markCompleted: vi.fn(),
+    } as unknown as IChallengeParticipationRepository
+    const mRepo = {
+      getOne: vi.fn().mockResolvedValue({
+        id: 'l1', participationId: 'p1', logDate: '2026-07-04',
+        count: 0, completed: false, usedPass: false, isRestDay: true,
+        updatedAt: '2026-07-04T10:00:00Z',
+      }),
+      markPass: vi.fn(),
+      getByParticipation: vi.fn(), upsertCount: vi.fn(), setCount: vi.fn(), markRestDay: vi.fn(),
+    } as IMissionLogRepository
+
+    const uc = new RunDailyPassCheckUseCase(cRepo, pRepo, mRepo)
+    const result = await uc.execute({ today: '2026-07-05' })
+
+    expect(pRepo.decrementPass).not.toHaveBeenCalled()
+    expect(mRepo.markPass).not.toHaveBeenCalled()
+    expect(pRepo.markFailed).not.toHaveBeenCalled()
+    expect(result.decremented).toBe(0)
+    expect(result.failed).toBe(0)
+    expect(result.skipped).toBe(1)
+    expect(result.processed).toBe(0)
+  })
+
   it('skips already-failed and already-completed participants', async () => {
     const failed = makeParticipation({ id: 'p_failed', failedAt: '2026-07-03T00:00:00Z' })
     const done = makeParticipation({ id: 'p_done', completedAt: '2026-07-03T00:00:00Z' })

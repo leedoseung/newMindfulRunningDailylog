@@ -8,16 +8,36 @@ import { PhotoUpload } from './photo-upload'
 import { DetailSheet } from '../feed/detail-sheet'
 import { LoadingOverlay } from '../shared/loading-overlay'
 
+// Some Android files (Samsung Motion Photo, malformed EXIF, oversized) make createImageBitmap throw
+// "The source image could not be decoded". <img>.decode() is more permissive — falls back to whatever
+// the browser can render in an <img> tag. Modern browsers auto-orient <img> via EXIF since 2020.
+async function decodeImage(file: File): Promise<{ source: CanvasImageSource, width: number, height: number, close: () => void }> {
+  try {
+    const bitmap = await createImageBitmap(file, { imageOrientation: 'from-image' })
+    return { source: bitmap, width: bitmap.width, height: bitmap.height, close: () => bitmap.close() }
+  } catch {
+    const url = URL.createObjectURL(file)
+    const img = new Image()
+    img.src = url
+    try {
+      await img.decode()
+    } catch (err) {
+      URL.revokeObjectURL(url)
+      throw err
+    }
+    return { source: img, width: img.naturalWidth, height: img.naturalHeight, close: () => URL.revokeObjectURL(url) }
+  }
+}
+
 async function compressImage(file: File, maxWidth: number, quality: number): Promise<Blob> {
-  // createImageBitmap reads EXIF orientation so portrait iPhone photos aren't stored rotated
-  const bitmap = await createImageBitmap(file, { imageOrientation: 'from-image' })
-  const scale = bitmap.width > maxWidth ? maxWidth / bitmap.width : 1
+  const decoded = await decodeImage(file)
+  const scale = decoded.width > maxWidth ? maxWidth / decoded.width : 1
   const canvas = document.createElement('canvas')
-  canvas.width = Math.round(bitmap.width * scale)
-  canvas.height = Math.round(bitmap.height * scale)
+  canvas.width = Math.round(decoded.width * scale)
+  canvas.height = Math.round(decoded.height * scale)
   const ctx = canvas.getContext('2d')!
-  ctx.drawImage(bitmap, 0, 0, canvas.width, canvas.height)
-  bitmap.close()
+  ctx.drawImage(decoded.source, 0, 0, canvas.width, canvas.height)
+  decoded.close()
   return new Promise((resolve, reject) => {
     canvas.toBlob(blob => blob ? resolve(blob) : reject(new Error('canvas toBlob failed')), 'image/jpeg', quality)
   })

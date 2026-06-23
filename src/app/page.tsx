@@ -1,4 +1,5 @@
 import { createServerClient } from '@/infrastructure/supabase/client'
+import { getAuthFromHeaders } from '@/infrastructure/supabase/server-auth'
 import { RunLogForm } from '@/presentation/components/form/run-log-form'
 import { AppHeader } from '@/presentation/components/layout/app-header'
 
@@ -14,8 +15,11 @@ export default async function RootPage({
 }) {
   const { edit } = await searchParams
   const supabase = await createServerClient()
-  const { data: { user } } = await supabase.auth.getUser()
-  const memberId = (user?.user_metadata?.member_id as string | undefined) ?? ''
+  let memberId = (await getAuthFromHeaders())?.memberId ?? ''
+  if (!memberId) {
+    const { data: { user } } = await supabase.auth.getUser()
+    memberId = (user?.user_metadata?.member_id as string | undefined) ?? ''
+  }
 
   const [memberRow, editData] = await Promise.all([
     memberId

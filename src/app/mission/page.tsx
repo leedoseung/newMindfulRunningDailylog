@@ -1,4 +1,5 @@
 import { createServerClient } from '@/infrastructure/supabase/client'
+import { getAuthFromHeaders } from '@/infrastructure/supabase/server-auth'
 import { SupabaseChallengeRepository } from '@/infrastructure/supabase/challenge-repository'
 import { SupabaseChallengeParticipationRepository } from '@/infrastructure/supabase/challenge-participation-repository'
 import { SupabaseMissionLogRepository } from '@/infrastructure/supabase/mission-log-repository'
@@ -14,10 +15,13 @@ import { kstToday } from '@/lib/kst'
 
 export default async function MissionPage() {
   const supabase = await createServerClient()
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user) redirect('/login')
-
-  const memberId = (user.user_metadata?.member_id as string | undefined) ?? ''
+  // Auth pre-validated by middleware; skip /auth/v1/user round trip.
+  let memberId = (await getAuthFromHeaders())?.memberId ?? ''
+  if (!memberId) {
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) redirect('/login')
+    memberId = (user.user_metadata?.member_id as string | undefined) ?? ''
+  }
   if (!memberId) redirect('/link-member')
 
   const cRepo = new SupabaseChallengeRepository(supabase)
@@ -33,8 +37,11 @@ export default async function MissionPage() {
     const upcoming = await cRepo.getUpcoming()
     if (upcoming.length > 0) {
       const next = upcoming[0]!
-      const participants = await participantsUC.execute(next.id)
-      const existing = await pRepo.getByMember(next.id, memberId)
+      // participants + existing-participation are independent → run in parallel.
+      const [participants, existing] = await Promise.all([
+        participantsUC.execute(next.id),
+        pRepo.getByMember(next.id, memberId),
+      ])
       if (existing) {
         const board = await new GetMissionBoardUseCase(cRepo, mRepo).execute({
           participation: existing, today,
@@ -63,9 +70,9 @@ export default async function MissionPage() {
   }
 
   const preStart = today < active.challenge.startDate
-  const participants = preStart ? await participantsUC.execute(active.challenge.id) : []
 
   if (!active.participation) {
+    const participants = preStart ? await participantsUC.execute(active.challenge.id) : []
     return (
       <MissionPageClient
         mode="not-enrolled"
@@ -76,18 +83,21 @@ export default async function MissionPage() {
     )
   }
 
-  const board = await new GetMissionBoardUseCase(cRepo, mRepo).execute({
-    participation: active.participation, today,
-  })
-
-  const leaderboard = !preStart
-    ? await new GetChallengeLeaderboardUseCase(supabase).execute({
-        challengeId: active.challenge.id,
-        today,
-        startDate: active.challenge.startDate,
-        goalMin: active.challenge.goalMin ?? 10,
-      })
-    : []
+  // participants + board + leaderboard are all independent → parallel waterfall collapse.
+  const [participants, board, leaderboard] = await Promise.all([
+    preStart ? participantsUC.execute(active.challenge.id) : Promise.resolve([]),
+    new GetMissionBoardUseCase(cRepo, mRepo).execute({
+      participation: active.participation, today,
+    }),
+    !preStart
+      ? new GetChallengeLeaderboardUseCase(supabase).execute({
+          challengeId: active.challenge.id,
+          today,
+          startDate: active.challenge.startDate,
+          goalMin: active.challenge.goalMin ?? 10,
+        })
+      : Promise.resolve([]),
+  ])
 
   return (
     <MissionPageClient

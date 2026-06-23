@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server'
+import { revalidateTag } from 'next/cache'
 import { SaveRunLogUseCase } from '@/application/use-cases/save-run-log'
 import { SupabaseRunLogRepository } from '@/infrastructure/supabase/run-log-repository'
 import { createServerClient } from '@/infrastructure/supabase/client'
@@ -23,6 +24,7 @@ export async function POST(req: Request) {
     const useCase = new SaveRunLogUseCase(repo)
     const runLog = await useCase.execute(body)
     revalidateDiaryMonth(runLog.memberId, runLog.date)
+    revalidateTag('leaderboard', 'max')
     return NextResponse.json(runLog, { status: 201 })
   } catch (err) {
     const msg = String(err)

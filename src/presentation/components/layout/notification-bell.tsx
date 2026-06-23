@@ -44,10 +44,34 @@ export function NotificationBell({ memberId, memberName, memberAvatarUrl }: Prop
     } catch { /* silent */ }
   }, [])
 
+  // Poll only when tab is visible; fetch immediately on focus/visibilitychange.
+  // Cuts CPU on Vercel Fluid by skipping background tabs (idle users were the main burner).
   useEffect(() => {
     fetchNotifications()
-    const id = setInterval(fetchNotifications, 30000)
-    return () => clearInterval(id)
+    let id: ReturnType<typeof setInterval> | null = null
+    const start = () => {
+      if (id) return
+      id = setInterval(fetchNotifications, 180000) // 3 min
+    }
+    const stop = () => {
+      if (id) { clearInterval(id); id = null }
+    }
+    const onVisibility = () => {
+      if (document.visibilityState === 'visible') {
+        fetchNotifications()
+        start()
+      } else {
+        stop()
+      }
+    }
+    if (document.visibilityState === 'visible') start()
+    document.addEventListener('visibilitychange', onVisibility)
+    window.addEventListener('focus', fetchNotifications)
+    return () => {
+      stop()
+      document.removeEventListener('visibilitychange', onVisibility)
+      window.removeEventListener('focus', fetchNotifications)
+    }
   }, [fetchNotifications])
 
   async function handleOpen() {

@@ -4,6 +4,7 @@ import { SupabaseRunLogRepository } from '@/infrastructure/supabase/run-log-repo
 import { SupabaseChallengeRepository } from '@/infrastructure/supabase/challenge-repository'
 import { SupabaseChallengeParticipationRepository } from '@/infrastructure/supabase/challenge-participation-repository'
 import { createServerClient } from '@/infrastructure/supabase/client'
+import { getAuthFromHeaders } from '@/infrastructure/supabase/server-auth'
 import { HomeFeed } from '@/presentation/components/home/home-feed'
 import type { CrewMember, WeeklyBar } from '@/presentation/components/home/home-feed'
 import { ChallengeAnnouncementBanner } from '@/presentation/components/home/challenge-announcement-banner'
@@ -57,8 +58,12 @@ function computeWeeklyBars(runs: RunLog[]): WeeklyBar[] {
 
 export default async function HomePage() {
   const supabase = await createServerClient()
-  const { data: { user } } = await supabase.auth.getUser()
-  const memberId = (user?.user_metadata?.member_id as string | undefined) ?? ''
+  // Auth pre-validated by middleware; skip /auth/v1/user round trip.
+  let memberId = (await getAuthFromHeaders())?.memberId ?? ''
+  if (!memberId) {
+    const { data: { user } } = await supabase.auth.getUser()
+    memberId = (user?.user_metadata?.member_id as string | undefined) ?? ''
+  }
 
   const repo = new SupabaseRunLogRepository(supabase)
   const [crewRuns, initialGridRuns, myRuns, memberRow] = await Promise.all([

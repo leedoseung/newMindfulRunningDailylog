@@ -1,4 +1,5 @@
 import { createServerClient } from '@/infrastructure/supabase/client'
+import { getAuthFromHeaders } from '@/infrastructure/supabase/server-auth'
 import { SupabaseRunLogRepository } from '@/infrastructure/supabase/run-log-repository'
 import { GetMemberRecordsUseCase } from '@/application/use-cases/get-member-records'
 import { ProfileView } from '@/presentation/components/profile/profile-view'
@@ -35,8 +36,11 @@ function computeMonthlyChart(runs: RunLog[]) {
 
 export default async function ProfilePage() {
   const supabase = await createServerClient()
-  const { data: { user } } = await supabase.auth.getUser()
-  const memberId = (user?.user_metadata?.member_id as string | undefined) ?? ''
+  let memberId = (await getAuthFromHeaders())?.memberId ?? ''
+  if (!memberId) {
+    const { data: { user } } = await supabase.auth.getUser()
+    memberId = (user?.user_metadata?.member_id as string | undefined) ?? ''
+  }
   if (!memberId) redirect('/')
 
   const [memberRes, myRuns] = await Promise.all([

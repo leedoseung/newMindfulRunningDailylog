@@ -1,18 +1,12 @@
 import { NextResponse } from 'next/server'
-import { createServerClient } from '@/infrastructure/supabase/client'
 import { createAdminClient } from '@/infrastructure/supabase/admin-client'
+import { getServerAuth } from '@/infrastructure/supabase/server-auth'
 import type { Notification, NotificationType, ChallengeAnnouncementPayload } from '@/domain/entities/notification'
 
-async function getAuthMemberId(): Promise<string | null> {
-  const supabase = await createServerClient()
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user) return null
-  return (user.user_metadata?.member_id as string | undefined) ?? null
-}
-
 export async function GET() {
-  const memberId = await getAuthMemberId()
-  if (!memberId) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  const auth = await getServerAuth()
+  if (!auth?.memberId) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  const memberId = auth.memberId
 
   const admin = createAdminClient()
   const { data, error } = await admin

@@ -1,16 +1,32 @@
+import { unstable_cache } from 'next/cache'
 import { GetLeaderboardUseCase } from '@/application/use-cases/get-leaderboard'
 import { SupabaseMemberRepository } from '@/infrastructure/supabase/member-repository'
 import { LeaderboardList } from '@/presentation/components/leaderboard/leaderboard-list'
 import { AppHeader } from '@/presentation/components/layout/app-header'
 import { createServerClient } from '@/infrastructure/supabase/client'
+import { getAuthFromHeaders } from '@/infrastructure/supabase/server-auth'
+
+// Shared across all users; cache 60s so leaderboard doesn't hit Supabase per request.
+// Invalidate explicitly via revalidateTag('leaderboard') when a run is saved.
+const getCachedLeaderboard = unstable_cache(
+  async () => {
+    const supabase = await createServerClient()
+    return new GetLeaderboardUseCase(new SupabaseMemberRepository(supabase)).execute()
+  },
+  ['leaderboard-stats'],
+  { revalidate: 60, tags: ['leaderboard'] },
+)
 
 export default async function LeaderboardPage() {
   const supabase = await createServerClient()
-  const { data: { user } } = await supabase.auth.getUser()
-  const memberId = (user?.user_metadata?.member_id as string | undefined) ?? ''
+  let memberId = (await getAuthFromHeaders())?.memberId ?? ''
+  if (!memberId) {
+    const { data: { user } } = await supabase.auth.getUser()
+    memberId = (user?.user_metadata?.member_id as string | undefined) ?? ''
+  }
 
   const [stats, memberRow] = await Promise.all([
-    new GetLeaderboardUseCase(new SupabaseMemberRepository(supabase)).execute(),
+    getCachedLeaderboard(),
     memberId
       ? supabase.from('members').select('name, avatar_url').eq('id', memberId).single()
       : Promise.resolve({ data: null }),

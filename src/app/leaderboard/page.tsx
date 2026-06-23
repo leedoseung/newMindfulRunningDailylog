@@ -4,14 +4,17 @@ import { SupabaseMemberRepository } from '@/infrastructure/supabase/member-repos
 import { LeaderboardList } from '@/presentation/components/leaderboard/leaderboard-list'
 import { AppHeader } from '@/presentation/components/layout/app-header'
 import { createServerClient } from '@/infrastructure/supabase/client'
+import { createAdminClient } from '@/infrastructure/supabase/admin-client'
 import { getAuthFromHeaders } from '@/infrastructure/supabase/server-auth'
 
 // Shared across all users; cache 60s so leaderboard doesn't hit Supabase per request.
 // Invalidate explicitly via revalidateTag('leaderboard') when a run is saved.
+// IMPORTANT: unstable_cache runs OUTSIDE request context — cookies()/headers() throw inside.
+// Use the service-role admin client (no cookies) since leaderboard data is fully public.
 const getCachedLeaderboard = unstable_cache(
   async () => {
-    const supabase = await createServerClient()
-    return new GetLeaderboardUseCase(new SupabaseMemberRepository(supabase)).execute()
+    const admin = createAdminClient()
+    return new GetLeaderboardUseCase(new SupabaseMemberRepository(admin)).execute()
   },
   ['leaderboard-stats'],
   { revalidate: 60, tags: ['leaderboard'] },

@@ -368,7 +368,7 @@ export function MissionPageClient(props: Props) {
           )}
         </>
       )}
-      {isFailed && (
+      {isFailed && participation.revivedAt && (
         <div role="alert" style={{
           background: '#fff', border: '1px solid #f0e0e0', borderRadius: 18,
           padding: 20, textAlign: 'center', color: '#b8231f', fontSize: 13,

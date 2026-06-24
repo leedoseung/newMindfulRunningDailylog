@@ -31,6 +31,7 @@ function makeRepos() {
       markFailed: vi.fn(),
       markCompleted: vi.fn(),
       listForChallenge: vi.fn(), delete: vi.fn(),
+      revive: vi.fn(),
     } as IChallengeParticipationRepository,
   }
 }

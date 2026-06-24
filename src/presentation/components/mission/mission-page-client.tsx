@@ -13,6 +13,8 @@ import { usePushSubscribe } from './use-push-subscribe'
 import { CompletionSheet } from './completion-sheet'
 import { ParticipantList } from './participant-list'
 import { ChallengeRoster } from './challenge-roster'
+import { RevivalCta } from './revival-cta'
+import { kstToday } from '@/lib/kst'
 import type { Challenge } from '@/domain/entities/challenge'
 import type { MissionDayCell } from '@/domain/entities/mission-day-cell'
 import type { ChallengeParticipation } from '@/domain/entities/challenge-participation'
@@ -303,6 +305,7 @@ export function MissionPageClient(props: Props) {
 
   return (
     <main style={wrap}>
+      <RevivalCta participation={participation} challenge={challenge} today={kstToday()} />
       <ChallengeHeader
         title={challenge.title}
         todayIndex={board.todayIndex}
@@ -365,7 +368,7 @@ export function MissionPageClient(props: Props) {
           )}
         </>
       )}
-      {isFailed && (
+      {isFailed && participation.revivedAt && (
         <div role="alert" style={{
           background: '#fff', border: '1px solid #f0e0e0', borderRadius: 18,
           padding: 20, textAlign: 'center', color: '#b8231f', fontSize: 13,
@@ -373,7 +376,7 @@ export function MissionPageClient(props: Props) {
           챌린지 종료. 면죄권 모두 소진.
         </div>
       )}
-      <MissionBoard cells={board.cells} goal={challenge.goalPerDay} />
+      <MissionBoard cells={board.cells} goal={challenge.goalPerDay} revivedAt={participation.revivedAt} />
       {isCompleted && !completionDismissed && (
         <CompletionSheet
           open

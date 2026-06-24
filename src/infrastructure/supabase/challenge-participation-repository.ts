@@ -13,6 +13,7 @@ type Row = {
   passes_remaining: number
   completed_at: string | null
   failed_at: string | null
+  revived_at: string | null
 }
 
 function toEntity(row: Row): ChallengeParticipation {
@@ -24,10 +25,11 @@ function toEntity(row: Row): ChallengeParticipation {
     passesRemaining: row.passes_remaining,
     completedAt: row.completed_at,
     failedAt: row.failed_at,
+    revivedAt: row.revived_at,
   }
 }
 
-const SELECT = 'id, challenge_id, member_id, joined_at, passes_remaining, completed_at, failed_at'
+const SELECT = 'id, challenge_id, member_id, joined_at, passes_remaining, completed_at, failed_at, revived_at'
 
 export class SupabaseChallengeParticipationRepository
   implements IChallengeParticipationRepository
@@ -88,6 +90,20 @@ export class SupabaseChallengeParticipationRepository
       .update({ completed_at: new Date().toISOString() })
       .eq('id', participationId)
     if (error) throw new Error(`markCompleted failed: ${error.message}`)
+  }
+
+  async revive(participationId: string, passCount: number): Promise<void> {
+    const { error } = await this.supabase
+      .from('challenge_participations')
+      .update({
+        revived_at: new Date().toISOString(),
+        failed_at: null,
+        passes_remaining: passCount,
+      })
+      .eq('id', participationId)
+      .is('revived_at', null)
+      .not('failed_at', 'is', null)
+    if (error) throw new Error(`revive failed: ${error.message}`)
   }
 
   async listForChallenge(challengeId: string): Promise<ChallengeParticipation[]> {

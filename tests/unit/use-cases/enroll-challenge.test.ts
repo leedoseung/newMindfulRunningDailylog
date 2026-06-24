@@ -14,7 +14,7 @@ const challenge: Challenge = {
 const participation: ChallengeParticipation = {
   id: 'p1', challengeId: 'c1', memberId: 'm1',
   joinedAt: '2026-06-15T00:00:00Z', passesRemaining: 5,
-  completedAt: null, failedAt: null,
+  completedAt: null, failedAt: null, revivedAt: null,
 }
 
 function makeRepos() {
@@ -31,6 +31,7 @@ function makeRepos() {
       markFailed: vi.fn(),
       markCompleted: vi.fn(),
       listForChallenge: vi.fn(), delete: vi.fn(),
+      revive: vi.fn(),
     } as IChallengeParticipationRepository,
   }
 }

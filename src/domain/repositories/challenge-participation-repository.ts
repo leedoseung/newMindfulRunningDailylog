@@ -14,4 +14,5 @@ export interface IChallengeParticipationRepository {
   markCompleted(participationId: string): Promise<void>
   listForChallenge(challengeId: string): Promise<ChallengeParticipation[]>
   delete(participationId: string): Promise<void>
+  revive(participationId: string, passCount: number): Promise<void>
 }

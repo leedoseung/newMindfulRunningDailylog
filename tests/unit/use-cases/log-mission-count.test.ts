@@ -16,7 +16,7 @@ const challenge: Challenge = {
 const participation: ChallengeParticipation = {
   id: 'p1', challengeId: 'c1', memberId: 'm1',
   joinedAt: '2026-07-01T00:00:00Z', passesRemaining: 5,
-  completedAt: null, failedAt: null,
+  completedAt: null, failedAt: null, revivedAt: null,
 }
 
 const log: MissionLog = {
@@ -39,6 +39,7 @@ function makeRepos(overrides: { challenge?: Challenge | null; participation?: Ch
       markFailed: vi.fn(),
       markCompleted: vi.fn(),
       listForChallenge: vi.fn(), delete: vi.fn(),
+      revive: vi.fn(),
     } as IChallengeParticipationRepository,
     mRepo: {
       getByParticipation: vi.fn(),

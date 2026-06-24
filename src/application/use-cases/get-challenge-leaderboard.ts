@@ -1,15 +1,17 @@
 import type { SupabaseClient } from '@supabase/supabase-js'
+import { kstDateOf } from '@/lib/kst'
 
 export type ChallengeLeaderRow = {
   memberId: string
   name: string
   avatarUrl: string | null
   joinedAt: string
+  revivedAt: string | null
   todayCount: number
   todayDone: boolean        // today stamped (count >= goalMin OR rest OR pass)
   todayRest: boolean
-  completedDays: number     // total days kept across season
-  maxStreak: number         // longest consecutive run (start..today), excludes pass-used days
+  completedDays: number     // total days kept since anchor (revived_at KST or startDate)
+  maxStreak: number         // longest consecutive run (anchor..today), excludes pass-used days
   passesRemaining: number
   isFailed: boolean
   isCompleted: boolean
@@ -22,6 +24,7 @@ type PartRow = {
   joined_at: string
   failed_at: string | null
   completed_at: string | null
+  revived_at: string | null
   members: { name: string | null; avatar_url: string | null } | null
 }
 
@@ -62,7 +65,7 @@ export class GetChallengeLeaderboardUseCase {
   }): Promise<ChallengeLeaderRow[]> {
     const { data: parts, error: pErr } = await this.supabase
       .from('challenge_participations')
-      .select('id, member_id, passes_remaining, joined_at, failed_at, completed_at, members ( name, avatar_url )')
+      .select('id, member_id, passes_remaining, joined_at, failed_at, completed_at, revived_at, members ( name, avatar_url )')
       .eq('challenge_id', input.challengeId)
       .order('joined_at', { ascending: true })
 
@@ -94,16 +97,23 @@ export class GetChallengeLeaderboardUseCase {
       const todayCount = todayLog?.count ?? 0
       const todayRest = todayLog?.is_rest_day ?? false
 
+      // Anchor: when revived, ignore pre-revival logs and start streak/completedDays from
+      // the KST calendar date of revived_at (UTC + 9 h → take date portion).
+      const anchorDate = p.revived_at
+        ? kstDateOf(p.revived_at)
+        : input.startDate
+
       let completedDays = 0
       for (const l of myLogs) {
+        if (l.log_date < anchorDate) continue
         if (isKept(l, input.goalMin)) completedDays++
       }
 
-      // Max streak: longest consecutive isStreakKept window in [startDate, today].
+      // Max streak: longest consecutive isStreakKept window in [anchorDate, today].
       // Walk forward day-by-day so gaps reset the run. Excludes used_pass days.
       let maxStreak = 0
       let run = 0
-      for (let cursor = input.startDate; cursor <= input.today; cursor = addDays(cursor, 1)) {
+      for (let cursor = anchorDate; cursor <= input.today; cursor = addDays(cursor, 1)) {
         const l = byDate.get(cursor)
         if (isStreakKept(l, input.goalMin)) {
           run++
@@ -118,6 +128,7 @@ export class GetChallengeLeaderboardUseCase {
         name: p.members?.name ?? '익명',
         avatarUrl: p.members?.avatar_url ?? null,
         joinedAt: p.joined_at,
+        revivedAt: p.revived_at,
         todayCount,
         todayDone,
         todayRest,

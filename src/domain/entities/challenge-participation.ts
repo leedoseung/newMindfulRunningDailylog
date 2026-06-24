@@ -6,4 +6,5 @@ export type ChallengeParticipation = {
   passesRemaining: number
   completedAt: string | null   // ISO timestamptz
   failedAt: string | null      // ISO timestamptz
+  revivedAt: string | null     // ISO timestamptz
 }

@@ -1,6 +1,7 @@
 'use client'
 
 import type { MissionDayCell } from '@/domain/entities/mission-day-cell'
+import { kstDateOf } from '@/lib/kst'
 
 const FONT = "'Pretendard Variable', Pretendard, -apple-system, sans-serif"
 const RED = '#b8231f'
@@ -11,6 +12,7 @@ type Props = {
   cell: MissionDayCell | null
   goal: number
   onClose: () => void
+  revivedAt?: string | null
 }
 
 function formatDate(iso: string): string {
@@ -32,9 +34,11 @@ function statusLabel(cell: MissionDayCell, goal: number): { text: string; color:
   return { text: '예정', color: '#999', bg: '#f3f3ef' }
 }
 
-export function DayDetailSheet({ cell, goal, onClose }: Props) {
+export function DayDetailSheet({ cell, goal, onClose, revivedAt = null }: Props) {
   if (!cell) return null
   const status = statusLabel(cell, goal)
+  // KST anchor matches leaderboard streak anchor
+  const isPreRevival = revivedAt != null && cell.date < kstDateOf(revivedAt)
 
   return (
     <div
@@ -74,6 +78,17 @@ export function DayDetailSheet({ cell, goal, onClose }: Props) {
             }}>
               {formatDate(cell.date)}
             </h2>
+            {isPreRevival && (
+              <span style={{
+                display: 'inline-block',
+                marginTop: 6,
+                fontSize: 11, fontWeight: 600,
+                background: '#EDE9FE', color: '#7C3AED',
+                padding: '2px 8px', borderRadius: 999,
+              }}>
+                재도전 이전 기록
+              </span>
+            )}
           </div>
           <span style={{
             fontSize: 12, fontWeight: 600,

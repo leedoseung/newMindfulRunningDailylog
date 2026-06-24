@@ -360,6 +360,7 @@ export function MissionPageClient(props: Props) {
             onRest={markRest}
             disabled={countPending}
             restAvailable={!todayCell?.isRestDay && restRemainingThisWeek > 0}
+            restRemaining={restRemainingThisWeek}
           />
           {overrideError && (
             <div role="alert" style={{ color: '#b8231f', fontSize: 12, textAlign: 'center' }}>

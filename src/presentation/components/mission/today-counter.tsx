@@ -12,6 +12,7 @@ type Props = {
   onRest?: () => void
   disabled?: boolean
   restAvailable?: boolean
+  restRemaining?: number      // for confirm modal copy
 }
 
 const FONT = "'Pretendard Variable', Pretendard, -apple-system, sans-serif"
@@ -22,12 +23,13 @@ const NOTE_MAX = 50
 
 export function TodayCounter({
   count, goal, goalMin = 10, note = null, onAdd, onSetAbsolute, onRest,
-  disabled = false, restAvailable = true,
+  disabled = false, restAvailable = true, restRemaining,
 }: Props) {
   const [delta, setDelta] = useState<string>('')
   const [noteInput, setNoteInput] = useState<string>(note ?? '')
   const [editMode, setEditMode] = useState(false)
   const [editValue, setEditValue] = useState<string>(String(count))
+  const [confirmingRest, setConfirmingRest] = useState(false)
 
   useEffect(() => { setNoteInput(note ?? '') }, [note])
   useEffect(() => { setEditValue(String(count)) }, [count])
@@ -154,24 +156,35 @@ export function TodayCounter({
             />
           </div>
 
-          {onRest && (
-            <button
-              type="button"
-              onClick={onRest}
-              disabled={disabled || !restAvailable}
-              style={{
-                width: '100%', padding: '10px 0',
-                fontSize: 13, fontWeight: 600, fontFamily: FONT,
-                background: 'transparent',
-                color: restAvailable ? GREEN : '#bbb',
-                border: `1px dashed ${restAvailable ? GREEN : '#ddd'}`,
-                borderRadius: 12,
-                cursor: !disabled && restAvailable ? 'pointer' : 'not-allowed',
-              }}
-            >
-              {restAvailable ? '🌿 오늘은 쉬어가요' : '이번 주 휴식 끝'}
-            </button>
-          )}
+          {onRest && (() => {
+            const pendingInput = delta.trim() !== ''
+            const blocked = disabled || !restAvailable || pendingInput
+            const label = pendingInput
+              ? '입력한 횟수를 먼저 저장하세요'
+              : restAvailable
+                ? '🌿 오늘은 쉬어가요'
+                : '이번 주 휴식 끝'
+            return (
+              <button
+                type="button"
+                onClick={() => { if (!blocked) setConfirmingRest(true) }}
+                disabled={blocked}
+                aria-disabled={blocked}
+                title={pendingInput ? '입력한 횟수를 먼저 저장하세요' : undefined}
+                style={{
+                  width: '100%', padding: '10px 0', marginTop: 6,
+                  fontSize: 13, fontWeight: 600, fontFamily: FONT,
+                  background: 'transparent',
+                  color: blocked ? '#bbb' : GREEN,
+                  border: `1px dashed ${blocked ? '#ddd' : GREEN}`,
+                  borderRadius: 12,
+                  cursor: blocked ? 'not-allowed' : 'pointer',
+                }}
+              >
+                {label}
+              </button>
+            )
+          })()}
 
           {onSetAbsolute && (
             <button
@@ -245,6 +258,66 @@ export function TodayCounter({
       {!editMode && delta && !validDelta && (
         <div role="alert" style={{ fontSize: 12, color: RED }}>
           1 이상 숫자를 입력하세요
+        </div>
+      )}
+
+      {confirmingRest && onRest && (
+        <div
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="rest-confirm-title"
+          onClick={() => setConfirmingRest(false)}
+          style={{
+            position: 'fixed', inset: 0, zIndex: 1000,
+            background: 'rgba(0,0,0,0.45)',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            padding: 16, fontFamily: FONT,
+          }}
+        >
+          <div
+            onClick={(e) => e.stopPropagation()}
+            style={{
+              width: '100%', maxWidth: 320, background: '#fff',
+              borderRadius: 16, padding: 20,
+              display: 'flex', flexDirection: 'column', gap: 14,
+            }}
+          >
+            <div id="rest-confirm-title" style={{ fontSize: 16, fontWeight: 700, color: '#111' }}>
+              오늘 휴식권을 사용할까요?
+            </div>
+            <div style={{ fontSize: 13, color: '#555', lineHeight: 1.5 }}>
+              {typeof restRemaining === 'number'
+                ? `이번 주 남은 휴식: ${restRemaining}회. `
+                : ''}
+              한 번 사용하면 오늘은 횟수를 추가할 수 없어요.
+            </div>
+            <div style={{ display: 'flex', gap: 8 }}>
+              <button
+                type="button"
+                onClick={() => setConfirmingRest(false)}
+                style={{
+                  flex: 1, padding: '12px 0',
+                  fontSize: 14, fontWeight: 600, fontFamily: FONT,
+                  background: '#f0f0ee', color: '#333',
+                  border: 'none', borderRadius: 12, cursor: 'pointer',
+                }}
+              >
+                취소
+              </button>
+              <button
+                type="button"
+                onClick={() => { setConfirmingRest(false); onRest() }}
+                style={{
+                  flex: 1, padding: '12px 0',
+                  fontSize: 14, fontWeight: 600, fontFamily: FONT,
+                  background: GREEN, color: '#fff',
+                  border: 'none', borderRadius: 12, cursor: 'pointer',
+                }}
+              >
+                휴식 사용
+              </button>
+            </div>
+          </div>
         </div>
       )}
     </section>

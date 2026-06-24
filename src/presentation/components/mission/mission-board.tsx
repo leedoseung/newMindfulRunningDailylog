@@ -4,6 +4,7 @@ import { useState } from 'react'
 import type { MissionDayCell } from '@/domain/entities/mission-day-cell'
 import { StampCell } from './stamp-cell'
 import { DayDetailSheet } from './day-detail-sheet'
+import { kstDateOf } from '@/lib/kst'
 
 type Props = { cells: MissionDayCell[]; goal: number; revivedAt?: string | null }
 
@@ -13,7 +14,8 @@ export function MissionBoard({ cells, goal, revivedAt = null }: Props) {
   }
 
   const [selected, setSelected] = useState<MissionDayCell | null>(null)
-  const revivalAnchor = revivedAt ? revivedAt.slice(0, 10) : null
+  // KST anchor matches leaderboard streak anchor
+  const revivalAnchor = revivedAt ? kstDateOf(revivedAt) : null
 
   return (
     <>

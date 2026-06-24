@@ -1,4 +1,5 @@
 import type { SupabaseClient } from '@supabase/supabase-js'
+import { kstDateOf } from '@/lib/kst'
 
 export type ChallengeLeaderRow = {
   memberId: string
@@ -99,7 +100,7 @@ export class GetChallengeLeaderboardUseCase {
       // Anchor: when revived, ignore pre-revival logs and start streak/completedDays from
       // the KST calendar date of revived_at (UTC + 9 h → take date portion).
       const anchorDate = p.revived_at
-        ? new Date(new Date(p.revived_at).getTime() + 9 * 60 * 60 * 1000).toISOString().slice(0, 10)
+        ? kstDateOf(p.revived_at)
         : input.startDate
 
       let completedDays = 0

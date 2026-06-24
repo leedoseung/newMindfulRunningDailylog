@@ -1,6 +1,7 @@
 'use client'
 
 import type { MissionDayCell } from '@/domain/entities/mission-day-cell'
+import { kstDateOf } from '@/lib/kst'
 
 const FONT = "'Pretendard Variable', Pretendard, -apple-system, sans-serif"
 const RED = '#b8231f'
@@ -36,7 +37,8 @@ function statusLabel(cell: MissionDayCell, goal: number): { text: string; color:
 export function DayDetailSheet({ cell, goal, onClose, revivedAt = null }: Props) {
   if (!cell) return null
   const status = statusLabel(cell, goal)
-  const isPreRevival = revivedAt != null && cell.date < revivedAt.slice(0, 10)
+  // KST anchor matches leaderboard streak anchor
+  const isPreRevival = revivedAt != null && cell.date < kstDateOf(revivedAt)
 
   return (
     <div

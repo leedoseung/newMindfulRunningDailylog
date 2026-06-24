@@ -8,6 +8,7 @@ type PartRow = {
   joined_at: string
   failed_at: string | null
   completed_at: string | null
+  revived_at: string | null
   members: { name: string; avatar_url: string | null } | null
 }
 type LogRow = {
@@ -45,6 +46,7 @@ function makeSupabase(parts: PartRow[], logs: LogRow[]) {
 const part: PartRow = {
   id: 'p1', member_id: 'm1', passes_remaining: 2,
   joined_at: '2026-07-01T00:00:00Z', failed_at: null, completed_at: null,
+  revived_at: null,
   members: { name: '이두승', avatar_url: null },
 }
 
@@ -98,5 +100,42 @@ describe('GetChallengeLeaderboardUseCase — maxStreak', () => {
     })
     const row = rows[0]!
     expect(row.maxStreak).toBe(5)
+  })
+
+  it('anchors streak/completedDays from KST date of revived_at, ignores pre-revival logs', async () => {
+    // revived_at = 2026-06-07T16:00:00Z  →  KST 2026-06-08T01:00:00+09:00  →  anchorDate = '2026-06-08'
+    // 3 pre-revival logs (06-05, 06-06, 06-07) must be ignored.
+    // 2 post-revival logs (06-08, 06-09) → maxStreak=2, completedDays=2
+    const revivedPart: PartRow = {
+      id: 'p2', member_id: 'm2', passes_remaining: 3,
+      joined_at: '2026-06-01T00:00:00Z', failed_at: null, completed_at: null,
+      revived_at: '2026-06-07T16:00:00Z',
+      members: { name: 'B', avatar_url: null },
+    }
+    const logs: LogRow[] = [
+      // Pre-revival — must be ignored
+      { participation_id: 'p2', log_date: '2026-06-05', count: 30, used_pass: false, is_rest_day: false },
+      { participation_id: 'p2', log_date: '2026-06-06', count: 30, used_pass: false, is_rest_day: false },
+      { participation_id: 'p2', log_date: '2026-06-07', count: 30, used_pass: false, is_rest_day: false },
+      // Post-revival — counted
+      { participation_id: 'p2', log_date: '2026-06-08', count: 30, used_pass: false, is_rest_day: false },
+      { participation_id: 'p2', log_date: '2026-06-09', count: 30, used_pass: false, is_rest_day: false },
+    ]
+    const uc = new GetChallengeLeaderboardUseCase(makeSupabase([revivedPart], logs))
+    const rows = await uc.execute({
+      challengeId: 'c1', today: '2026-06-09', startDate: '2026-06-01', goalMin: 10,
+    })
+    const row = rows[0]!
+    expect(row.maxStreak).toBe(2)
+    expect(row.completedDays).toBe(2)
+    expect(row.revivedAt).toBe('2026-06-07T16:00:00Z')
+  })
+
+  it('exposes revivedAt: null on non-revived participant', async () => {
+    const uc = new GetChallengeLeaderboardUseCase(makeSupabase([part], []))
+    const rows = await uc.execute({
+      challengeId: 'c1', today: '2026-07-01', startDate: '2026-07-01', goalMin: 100,
+    })
+    expect(rows[0]!.revivedAt).toBeNull()
   })
 })

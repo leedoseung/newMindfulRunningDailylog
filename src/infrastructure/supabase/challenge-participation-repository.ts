@@ -13,6 +13,7 @@ type Row = {
   passes_remaining: number
   completed_at: string | null
   failed_at: string | null
+  revived_at: string | null
 }
 
 function toEntity(row: Row): ChallengeParticipation {
@@ -24,10 +25,11 @@ function toEntity(row: Row): ChallengeParticipation {
     passesRemaining: row.passes_remaining,
     completedAt: row.completed_at,
     failedAt: row.failed_at,
+    revivedAt: row.revived_at,
   }
 }
 
-const SELECT = 'id, challenge_id, member_id, joined_at, passes_remaining, completed_at, failed_at'
+const SELECT = 'id, challenge_id, member_id, joined_at, passes_remaining, completed_at, failed_at, revived_at'
 
 export class SupabaseChallengeParticipationRepository
   implements IChallengeParticipationRepository

@@ -16,7 +16,7 @@ const challenge: Challenge = {
 const participation: ChallengeParticipation = {
   id: 'p1', challengeId: 'c1', memberId: 'm1',
   joinedAt: '2026-07-01T00:00:00Z', passesRemaining: 4,
-  completedAt: null, failedAt: null,
+  completedAt: null, failedAt: null, revivedAt: null,
 }
 
 function mkLog(date: string, count: number, usedPass = false): MissionLog {

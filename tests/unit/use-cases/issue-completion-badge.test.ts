@@ -34,7 +34,7 @@ describe('IssueCompletionBadgeUseCase', () => {
     const p: ChallengeParticipation = {
       id: 'p1', challengeId: 'c1', memberId: 'm1',
       joinedAt: '2026-07-01T00:00:00Z', passesRemaining: 5,
-      completedAt: null, failedAt: null,
+      completedAt: null, failedAt: null, revivedAt: null,
     }
     const cRepo = { getActive: vi.fn().mockResolvedValue(challenge), getById: vi.fn(), getUpcoming: vi.fn() } as unknown as IChallengeRepository
     const pRepo = {
@@ -58,7 +58,7 @@ describe('IssueCompletionBadgeUseCase', () => {
     const p: ChallengeParticipation = {
       id: 'p1', challengeId: 'c1', memberId: 'm1',
       joinedAt: '2026-07-01T00:00:00Z', passesRemaining: 5,
-      completedAt: null, failedAt: null,
+      completedAt: null, failedAt: null, revivedAt: null,
     }
     const logs = fullSeasonLogs()
     logs[50] = mkLog(logs[50]!.logDate, 50)
@@ -85,7 +85,7 @@ describe('IssueCompletionBadgeUseCase', () => {
     const p: ChallengeParticipation = {
       id: 'p1', challengeId: 'c1', memberId: 'm1',
       joinedAt: '2026-07-01T00:00:00Z', passesRemaining: 0,
-      completedAt: null, failedAt: null,
+      completedAt: null, failedAt: null, revivedAt: null,
     }
     const logs = fullSeasonLogs()
     for (let i = 0; i < 5; i++) {
@@ -130,12 +130,12 @@ describe('IssueCompletionBadgeUseCase', () => {
     const failed: ChallengeParticipation = {
       id: 'pf', challengeId: 'c1', memberId: 'mf',
       joinedAt: '2026-07-01T00:00:00Z', passesRemaining: 0,
-      completedAt: null, failedAt: '2026-08-15T00:00:00Z',
+      completedAt: null, failedAt: '2026-08-15T00:00:00Z', revivedAt: null,
     }
     const done: ChallengeParticipation = {
       id: 'pd', challengeId: 'c1', memberId: 'md',
       joinedAt: '2026-07-01T00:00:00Z', passesRemaining: 3,
-      completedAt: '2026-10-09T00:00:00Z', failedAt: null,
+      completedAt: '2026-10-09T00:00:00Z', failedAt: null, revivedAt: null,
     }
     const cRepo = { getActive: vi.fn().mockResolvedValue(challenge), getById: vi.fn(), getUpcoming: vi.fn() } as unknown as IChallengeRepository
     const pRepo = {

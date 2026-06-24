@@ -26,8 +26,8 @@
 
 ### New files
 - `supabase/migrations/20260624_challenge_revive.sql` — add `revived_at` column
-- `src/domain/challenge/halfway.ts` — `halfwayDate(c)` + `canRevive(p, c, today)` shared predicates
-- `tests/unit/domain/challenge/halfway.test.ts` — predicate unit tests
+- `src/domain/entities/challenge-halfway.ts` — `halfwayDate(c)` + `canRevive(p, c, today)` shared predicates
+- `tests/unit/domain/entities/challenge-halfway.test.ts` — predicate unit tests
 - `src/application/use-cases/revive-challenge-participation.ts` — use case
 - `tests/unit/use-cases/revive-challenge-participation.test.ts` — use case unit tests
 - `src/app/api/challenges/[id]/revive/route.ts` — POST handler
@@ -35,7 +35,7 @@
 - `src/presentation/components/mission/revival-cta.tsx` — UI card + confirm modal
 
 ### Modified files
-- `src/domain/challenge/types.ts` — add `revivedAt: string | null` to `ChallengeParticipation`
+- `src/domain/entities/challenge-participation.ts` — add `revivedAt: string | null` to `ChallengeParticipation`
 - `src/infrastructure/supabase/challenge-participation-repository.ts` — extend `SELECT`, `toEntity`, add `revive()` method
 - `src/application/use-cases/get-challenge-leaderboard.ts` — read `revived_at`, anchor streak/maxStreak from revival date, expose `revivedAt` on `ChallengeLeaderRow`
 - `tests/unit/use-cases/get-challenge-leaderboard.test.ts` — revived-participant test cases
@@ -54,7 +54,7 @@
 
 **Files:**
 - Create: `supabase/migrations/20260624_challenge_revive.sql`
-- Modify: `src/domain/challenge/types.ts` (add `revivedAt` field)
+- Modify: `src/domain/entities/challenge-participation.ts` (add `revivedAt` field)
 - Modify: `src/infrastructure/supabase/challenge-participation-repository.ts:1-30` (extend `SELECT` + `toEntity`)
 
 **Interfaces:**
@@ -74,7 +74,7 @@ COMMENT ON COLUMN challenge_participations.revived_at IS
 
 - [ ] **Step 2: Update domain type**
 
-Open `src/domain/challenge/types.ts`. Locate `ChallengeParticipation`. Add `revivedAt: string | null` as the last field, preserving existing ordering.
+Open `src/domain/entities/challenge-participation.ts`. Locate `ChallengeParticipation`. Add `revivedAt: string | null` as the last field, preserving existing ordering.
 
 ```ts
 export interface ChallengeParticipation {
@@ -136,7 +136,7 @@ If tests that build `ChallengeParticipation` fixtures fail compilation, add `rev
 
 ```bash
 git add supabase/migrations/20260624_challenge_revive.sql \
-        src/domain/challenge/types.ts \
+        src/domain/entities/challenge-participation.ts \
         src/infrastructure/supabase/challenge-participation-repository.ts \
         tests
 git commit -m "feat(challenge): add revived_at column + domain field for one-shot revive"
@@ -147,11 +147,11 @@ git commit -m "feat(challenge): add revived_at column + domain field for one-sho
 ## Task 2: Halfway + canRevive predicates
 
 **Files:**
-- Create: `src/domain/challenge/halfway.ts`
-- Create: `tests/unit/domain/challenge/halfway.test.ts`
+- Create: `src/domain/entities/challenge-halfway.ts`
+- Create: `tests/unit/domain/entities/challenge-halfway.test.ts`
 
 **Interfaces:**
-- Consumes: `ChallengeParticipation` from Task 1, `Challenge` from `src/domain/challenge/types.ts` (existing).
+- Consumes: `ChallengeParticipation` from Task 1 (`src/domain/entities/challenge-participation.ts`), `Challenge` from `src/domain/entities/challenge.ts` (existing).
 - Produces:
   - `halfwayDate(c: Challenge): string` — returns YYYY-MM-DD (KST), inclusive last revive-eligible day
   - `canRevive(p: ChallengeParticipation, c: Challenge, today: string): boolean`
@@ -159,10 +159,11 @@ git commit -m "feat(challenge): add revived_at column + domain field for one-sho
 - [ ] **Step 1: Write failing tests**
 
 ```ts
-// tests/unit/domain/challenge/halfway.test.ts
+// tests/unit/domain/entities/challenge-halfway.test.ts
 import { describe, it, expect } from 'vitest'
-import { halfwayDate, canRevive } from '@/domain/challenge/halfway'
-import type { Challenge, ChallengeParticipation } from '@/domain/challenge/types'
+import { halfwayDate, canRevive } from '@/domain/entities/challenge-halfway'
+import type { Challenge } from '@/domain/entities/challenge'
+import type { ChallengeParticipation } from '@/domain/entities/challenge-participation'
 
 const challenge: Challenge = {
   id: 'c1',
@@ -239,14 +240,15 @@ describe('canRevive', () => {
 
 - [ ] **Step 2: Run tests to verify they fail**
 
-Run: `npx vitest run tests/unit/domain/challenge/halfway.test.ts`
-Expected: FAIL with "Cannot find module '@/domain/challenge/halfway'" or similar.
+Run: `npx vitest run tests/unit/domain/entities/challenge-halfway.test.ts`
+Expected: FAIL with "Cannot find module '@/domain/entities/challenge-halfway'" or similar.
 
 - [ ] **Step 3: Write the implementation**
 
 ```ts
-// src/domain/challenge/halfway.ts
-import type { Challenge, ChallengeParticipation } from './types'
+// src/domain/entities/challenge-halfway.ts
+import type { Challenge } from './challenge'
+import type { ChallengeParticipation } from './challenge-participation'
 
 // startDate is YYYY-MM-DD (KST). durationDays >= 1.
 // Halfway day index = floor((durationDays - 1) / 2). Inclusive — today equal to this is still eligible.
@@ -280,13 +282,13 @@ function addDaysKst(date: string, n: number): string {
 
 - [ ] **Step 4: Run tests to verify they pass**
 
-Run: `npx vitest run tests/unit/domain/challenge/halfway.test.ts`
+Run: `npx vitest run tests/unit/domain/entities/challenge-halfway.test.ts`
 Expected: 9 tests pass.
 
 - [ ] **Step 5: Commit**
 
 ```bash
-git add src/domain/challenge/halfway.ts tests/unit/domain/challenge/halfway.test.ts
+git add src/domain/entities/challenge-halfway.ts tests/unit/domain/entities/challenge-halfway.test.ts
 git commit -m "feat(challenge): halfwayDate + canRevive shared predicates"
 ```
 
@@ -297,7 +299,7 @@ git commit -m "feat(challenge): halfwayDate + canRevive shared predicates"
 **Files:**
 - Create: `src/application/use-cases/revive-challenge-participation.ts`
 - Create: `tests/unit/use-cases/revive-challenge-participation.test.ts`
-- Modify: `src/domain/challenge/types.ts` — add `revive` method signature to `IChallengeParticipationRepository`
+- Modify: `src/domain/repositories/challenge-participation-repository.ts` — add `revive` method signature to `IChallengeParticipationRepository`
 
 **Interfaces:**
 - Consumes: `canRevive` from Task 2, `IChallengeRepository.getById`, existing `IChallengeParticipationRepository.getByMember`.
@@ -308,7 +310,7 @@ git commit -m "feat(challenge): halfwayDate + canRevive shared predicates"
 
 - [ ] **Step 1: Extend the repository interface**
 
-In `src/domain/challenge/types.ts`, locate `IChallengeParticipationRepository` and add:
+In `src/domain/repositories/challenge-participation-repository.ts`, locate `IChallengeParticipationRepository` and add:
 
 ```ts
 revive(participationId: string, passCount: number): Promise<void>
@@ -322,12 +324,10 @@ revive(participationId: string, passCount: number): Promise<void>
 // tests/unit/use-cases/revive-challenge-participation.test.ts
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { ReviveChallengeParticipationUseCase } from '@/application/use-cases/revive-challenge-participation'
-import type {
-  Challenge,
-  ChallengeParticipation,
-  IChallengeRepository,
-  IChallengeParticipationRepository,
-} from '@/domain/challenge/types'
+import type { Challenge } from '@/domain/entities/challenge'
+import type { ChallengeParticipation } from '@/domain/entities/challenge-participation'
+import type { IChallengeRepository } from '@/domain/repositories/challenge-repository'
+import type { IChallengeParticipationRepository } from '@/domain/repositories/challenge-participation-repository'
 
 const challenge: Challenge = {
   id: 'c1', title: 't', description: '', goalPerDay: 1, durationDays: 30,
@@ -433,11 +433,9 @@ describe('ReviveChallengeParticipationUseCase', () => {
 
 ```ts
 // src/application/use-cases/revive-challenge-participation.ts
-import { canRevive } from '@/domain/challenge/halfway'
-import type {
-  IChallengeRepository,
-  IChallengeParticipationRepository,
-} from '@/domain/challenge/types'
+import { canRevive } from '@/domain/entities/challenge-halfway'
+import type { IChallengeRepository } from '@/domain/repositories/challenge-repository'
+import type { IChallengeParticipationRepository } from '@/domain/repositories/challenge-participation-repository'
 
 export type ReviveResult =
   | { ok: true }
@@ -480,7 +478,7 @@ Expected: 8 tests pass.
 - [ ] **Step 5: Commit**
 
 ```bash
-git add src/domain/challenge/types.ts \
+git add src/domain/repositories/challenge-participation-repository.ts \
         src/application/use-cases/revive-challenge-participation.ts \
         tests/unit/use-cases/revive-challenge-participation.test.ts
 git commit -m "feat(challenge): ReviveChallengeParticipationUseCase with eligibility matrix"
@@ -567,7 +565,7 @@ vi.mock('@/infrastructure/supabase/challenge-participation-repository', () => ({
 }))
 
 const createServerClient = vi.fn()
-vi.mock('@/infrastructure/supabase/server-client', () => ({
+vi.mock('@/infrastructure/supabase/client', () => ({
   createServerClient: (...args: unknown[]) => createServerClient(...args),
 }))
 
@@ -654,7 +652,7 @@ Expected: FAIL with "Cannot find module '@/app/api/challenges/[id]/revive/route'
 ```ts
 // src/app/api/challenges/[id]/revive/route.ts
 import { NextResponse } from 'next/server'
-import { createServerClient } from '@/infrastructure/supabase/server-client'
+import { createServerClient } from '@/infrastructure/supabase/client'
 import { SupabaseChallengeRepository } from '@/infrastructure/supabase/challenge-repository'
 import { SupabaseChallengeParticipationRepository } from '@/infrastructure/supabase/challenge-participation-repository'
 import { ReviveChallengeParticipationUseCase } from '@/application/use-cases/revive-challenge-participation'
@@ -877,8 +875,9 @@ git commit -m "feat(leaderboard): anchor streak from revived_at when participant
 
 import { useState, useTransition } from 'react'
 import { useRouter } from 'next/navigation'
-import { canRevive, halfwayDate } from '@/domain/challenge/halfway'
-import type { Challenge, ChallengeParticipation } from '@/domain/challenge/types'
+import { canRevive, halfwayDate } from '@/domain/entities/challenge-halfway'
+import type { Challenge } from '@/domain/entities/challenge'
+import type { ChallengeParticipation } from '@/domain/entities/challenge-participation'
 
 interface Props {
   participation: ChallengeParticipation

@@ -20,6 +20,9 @@ function StatusBadge({ row, goal }: { row: ChallengeLeaderRow; goal: number }) {
   if (row.isCompleted) {
     return <span style={chip(GOLD, '#fff')}>완주 🏆</span>
   }
+  if (row.revivedAt && !row.isFailed && !row.isCompleted) {
+    return <span style={chip('#EDE9FE', '#7C3AED')}>★재도전</span>
+  }
   if (row.isFailed) {
     return <span style={chip('#888', '#fff')}>중도이탈</span>
   }

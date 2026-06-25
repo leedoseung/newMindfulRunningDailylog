@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server'
+import { revalidateTag } from 'next/cache'
 import { createServerClient } from '@/infrastructure/supabase/client'
 import { createAdminClient } from '@/infrastructure/supabase/admin-client'
 import type { RunLogInput } from '@/domain/entities/run-log-input'
@@ -95,6 +96,8 @@ export async function DELETE(
   if (error) return NextResponse.json({ error: error.message }, { status: 500 })
 
   revalidateDiaryMonth(runRow.member_id as string, runRow.date as string)
+  revalidateTag('leaderboard', 'max')
+  revalidateTag('home-feed', 'max')
 
   return new NextResponse(null, { status: 204 })
 }
@@ -131,5 +134,7 @@ export async function PUT(
 
   if (error) return NextResponse.json({ error: error.message }, { status: 500 })
   revalidateDiaryMonth(data.member_id as string, data.date as string)
+  revalidateTag('leaderboard', 'max')
+  revalidateTag('home-feed', 'max')
   return NextResponse.json(data)
 }

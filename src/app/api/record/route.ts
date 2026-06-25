@@ -25,6 +25,7 @@ export async function POST(req: Request) {
     const runLog = await useCase.execute(body)
     revalidateDiaryMonth(runLog.memberId, runLog.date)
     revalidateTag('leaderboard', 'max')
+    revalidateTag('home-feed', 'max')
     return NextResponse.json(runLog, { status: 201 })
   } catch (err) {
     const msg = String(err)

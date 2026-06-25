@@ -1,7 +1,9 @@
+import { unstable_cache } from 'next/cache'
 import { GetRecentRunsUseCase } from '@/application/use-cases/get-recent-runs'
 import { GetMemberRecordsUseCase } from '@/application/use-cases/get-member-records'
 import { SupabaseRunLogRepository } from '@/infrastructure/supabase/run-log-repository'
 import { createServerClient } from '@/infrastructure/supabase/client'
+import { createAdminClient } from '@/infrastructure/supabase/admin-client'
 import { getAuthFromHeaders } from '@/infrastructure/supabase/server-auth'
 import { HomeFeed } from '@/presentation/components/home/home-feed'
 import type { CrewMember, WeeklyBar } from '@/presentation/components/home/home-feed'
@@ -9,6 +11,22 @@ import { DiaryEntryBanner } from '@/presentation/components/home/diary-entry-ban
 import { AppHeader } from '@/presentation/components/layout/app-header'
 import { kstToday } from '@/lib/kst'
 import type { RunLog } from '@/domain/entities/run-log'
+
+// Shared across all users — crew activity + first feed page.
+// unstable_cache runs OUTSIDE request context; cookies()/headers() throw inside.
+// Use service-role admin client (no cookies). Invalidate via revalidateTag('home-feed') on writes.
+const getCachedFeed = unstable_cache(
+  async (): Promise<{ crewRuns: RunLog[]; initialGridRuns: RunLog[] }> => {
+    const repo = new SupabaseRunLogRepository(createAdminClient())
+    const [crewRuns, initialGridRuns] = await Promise.all([
+      new GetRecentRunsUseCase(repo).execute(7),
+      repo.getRunsPage(0, 20),
+    ])
+    return { crewRuns, initialGridRuns }
+  },
+  ['home-feed-v1'],
+  { revalidate: 60, tags: ['home-feed'] },
+)
 
 const DAY_LABELS = ['일', '월', '화', '수', '목', '금', '토']
 
@@ -63,14 +81,14 @@ export default async function HomePage() {
   }
 
   const repo = new SupabaseRunLogRepository(supabase)
-  const [crewRuns, initialGridRuns, myRuns, memberRow] = await Promise.all([
-    new GetRecentRunsUseCase(repo).execute(7),
-    repo.getRunsPage(0, 20),
+  const [cachedFeed, myRuns, memberRow] = await Promise.all([
+    getCachedFeed(),
     memberId ? new GetMemberRecordsUseCase(repo).execute(memberId) : Promise.resolve([]),
     memberId
       ? supabase.from('members').select('name, avatar_url').eq('id', memberId).single()
       : Promise.resolve({ data: null }),
   ])
+  const { crewRuns, initialGridRuns } = cachedFeed
 
   const crew = computeCrew(crewRuns)
   const weeklyBars = computeWeeklyBars(crewRuns)

@@ -238,7 +238,11 @@ function CloseButton() {
   const node = (
     <button
       type="button"
-      onClick={() => { window.location.href = '/home' }}
+      onClick={(e) => { e.stopPropagation(); window.location.href = '/home' }}
+      onTouchStart={(e) => e.stopPropagation()}
+      onTouchEnd={(e) => { e.stopPropagation(); window.location.href = '/home' }}
+      onPointerDown={(e) => e.stopPropagation()}
+      onPointerUp={(e) => e.stopPropagation()}
       aria-label="홈으로 닫기"
       style={{
         position: 'fixed',

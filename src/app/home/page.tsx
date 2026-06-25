@@ -1,13 +1,10 @@
 import { GetRecentRunsUseCase } from '@/application/use-cases/get-recent-runs'
 import { GetMemberRecordsUseCase } from '@/application/use-cases/get-member-records'
 import { SupabaseRunLogRepository } from '@/infrastructure/supabase/run-log-repository'
-import { SupabaseChallengeRepository } from '@/infrastructure/supabase/challenge-repository'
-import { SupabaseChallengeParticipationRepository } from '@/infrastructure/supabase/challenge-participation-repository'
 import { createServerClient } from '@/infrastructure/supabase/client'
 import { getAuthFromHeaders } from '@/infrastructure/supabase/server-auth'
 import { HomeFeed } from '@/presentation/components/home/home-feed'
 import type { CrewMember, WeeklyBar } from '@/presentation/components/home/home-feed'
-import { ChallengeAnnouncementBanner } from '@/presentation/components/home/challenge-announcement-banner'
 import { DiaryEntryBanner } from '@/presentation/components/home/diary-entry-banner'
 import { AppHeader } from '@/presentation/components/layout/app-header'
 import { kstToday } from '@/lib/kst'
@@ -104,42 +101,9 @@ export default async function HomePage() {
   const showDiaryBanner =
     memberId !== '' && (isAdmin || (curDay >= 25 && thisMonthRunCount > 0))
 
-  // Challenge banner: active OR upcoming
-  let bannerChallenge: { id: string; title: string; description: string; startDate: string; registrationDeadline: string; imageUrl: string | null } | null = null
-  let bannerEnrolled = false
-  const today = kstToday()
-  if (memberId) {
-    const cRepo = new SupabaseChallengeRepository(supabase)
-    const pRepo = new SupabaseChallengeParticipationRepository(supabase)
-    const active = await cRepo.getActive()
-    const candidate = active ?? (await cRepo.getUpcoming())[0] ?? null
-    if (candidate) {
-      const part = await pRepo.getByMember(candidate.id, memberId)
-      bannerEnrolled = !!part
-      const showWhenActive = !!active
-      const showWhenUpcoming = !active && today <= candidate.registrationDeadline
-      if (showWhenActive || showWhenUpcoming) {
-        bannerChallenge = {
-          id: candidate.id,
-          title: candidate.title,
-          description: candidate.description,
-          startDate: candidate.startDate,
-          registrationDeadline: candidate.registrationDeadline,
-          imageUrl: candidate.imageUrl ?? null,
-        }
-      }
-    }
-  }
-
   return (
     <main style={{ minHeight: '100vh', background: '#F7F7F5', position: 'relative' }}>
       <AppHeader memberName={memberName || '?'} memberAvatarUrl={memberAvatarUrl} memberId={memberId} />
-
-      {bannerChallenge && (
-        <div style={{ padding: '12px 16px 0' }}>
-          <ChallengeAnnouncementBanner challenge={bannerChallenge} today={today} enrolled={bannerEnrolled} />
-        </div>
-      )}
 
       {showDiaryBanner && (
         <DiaryEntryBanner

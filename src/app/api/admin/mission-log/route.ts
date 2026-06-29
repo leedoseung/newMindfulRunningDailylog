@@ -89,7 +89,7 @@ export async function POST(req: Request) {
         return NextResponse.json({ passesRemaining })
       }
       default:
-        return NextResponse.json({ error: 'UNHANDLED_OP' }, { status: 500 })
+        return NextResponse.json({ error: 'UNHANDLED_OP' }, { status: 400 })
     }
   } catch (err) {
     const msg = err instanceof Error ? err.message : String(err)

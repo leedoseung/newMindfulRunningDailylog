@@ -4,6 +4,7 @@ CREATE OR REPLACE FUNCTION admin_adjust_participation_passes(
 )
 RETURNS int
 LANGUAGE plpgsql
+SET search_path = public
 SECURITY DEFINER
 AS $$
 DECLARE

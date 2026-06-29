@@ -25,6 +25,7 @@ export function MissionFixPage() {
   const [status, setStatus] = useState<string>('')
 
   async function searchMembers() {
+    if (q.trim() === '') { setStatus('회원 이름을 입력하세요'); return }
     setStatus('검색 중…')
     const res = await fetch(`/api/admin/members/search?q=${encodeURIComponent(q)}`)
     const body = await res.json()

@@ -1,5 +1,6 @@
 // tests/unit/infrastructure/admin-mission-log-repository.test.ts
 import { describe, it, expect, vi, beforeEach } from 'vitest'
+import type { SupabaseClient } from '@supabase/supabase-js'
 import { AdminMissionLogRepository } from '@/infrastructure/supabase/admin-mission-log-repository'
 
 const sampleRow = {
@@ -21,7 +22,7 @@ function makeClient() {
   const eq = vi.fn().mockReturnThis()
   const update = vi.fn().mockReturnValue({ eq, select })
   const from = vi.fn().mockReturnValue({ update })
-  return { rpc, from, update, eq, select, single, client: { rpc, from } as any }
+  return { rpc, from, update, eq, select, single, client: { rpc, from } as unknown as SupabaseClient }
 }
 
 beforeEach(() => vi.clearAllMocks())
@@ -58,7 +59,7 @@ describe('AdminMissionLogRepository', () => {
 
   it('adjustPassesRemaining +1 increments and returns new value', async () => {
     const rpc = vi.fn().mockResolvedValue({ data: 3, error: null })
-    const client = { rpc } as any
+    const client = { rpc } as unknown as SupabaseClient
     const repo = new AdminMissionLogRepository(client)
     const out = await repo.adjustPassesRemaining({ participationId: 'p1', delta: 1 })
     expect(rpc).toHaveBeenCalledWith('admin_adjust_participation_passes', {

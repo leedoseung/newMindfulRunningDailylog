@@ -8,7 +8,7 @@ vi.mock('@/infrastructure/supabase/admin-client', () => ({
   createAdminClient: vi.fn(),
 }))
 
-import { requireAdmin, AdminGuardError } from '@/infrastructure/supabase/require-admin'
+import { requireAdmin } from '@/infrastructure/supabase/require-admin'
 import { getServerAuth } from '@/infrastructure/supabase/server-auth'
 import { createAdminClient } from '@/infrastructure/supabase/admin-client'
 

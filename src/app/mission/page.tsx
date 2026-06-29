@@ -10,6 +10,7 @@ import { GetMissionBoardUseCase } from '@/application/use-cases/get-mission-boar
 import { GetChallengeParticipantsUseCase } from '@/application/use-cases/get-challenge-participants'
 import { GetChallengeLeaderboardUseCase } from '@/application/use-cases/get-challenge-leaderboard'
 import { MissionPageClient } from '@/presentation/components/mission/mission-page-client'
+import { AdminEntryButton } from '@/presentation/components/admin/admin-entry-button'
 import { redirect } from 'next/navigation'
 import { kstToday } from '@/lib/kst'
 
@@ -100,14 +101,17 @@ export default async function MissionPage() {
   ])
 
   return (
-    <MissionPageClient
-      mode="enrolled"
-      challenge={active.challenge}
-      participation={active.participation}
-      board={board}
-      participants={preStart ? participants : undefined}
-      leaderboard={!preStart ? leaderboard : undefined}
-      currentMemberId={memberId}
-    />
+    <>
+      <AdminEntryButton />
+      <MissionPageClient
+        mode="enrolled"
+        challenge={active.challenge}
+        participation={active.participation}
+        board={board}
+        participants={preStart ? participants : undefined}
+        leaderboard={!preStart ? leaderboard : undefined}
+        currentMemberId={memberId}
+      />
+    </>
   )
 }

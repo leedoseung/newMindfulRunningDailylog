@@ -48,26 +48,37 @@ export default async function MissionPage() {
           participation: existing, today,
         })
         return (
-          <MissionPageClient
-            mode="enrolled"
-            challenge={next}
-            participation={existing}
-            board={board}
-            participants={today < next.startDate ? participants : undefined}
-            currentMemberId={memberId}
-          />
+          <>
+            <AdminEntryButton />
+            <MissionPageClient
+              mode="enrolled"
+              challenge={next}
+              participation={existing}
+              board={board}
+              participants={today < next.startDate ? participants : undefined}
+              currentMemberId={memberId}
+            />
+          </>
         )
       }
       return (
-        <MissionPageClient
-          mode="not-enrolled"
-          challenge={next}
-          participants={participants}
-          currentMemberId={memberId}
-        />
+        <>
+          <AdminEntryButton />
+          <MissionPageClient
+            mode="not-enrolled"
+            challenge={next}
+            participants={participants}
+            currentMemberId={memberId}
+          />
+        </>
       )
     }
-    return <MissionPageClient mode="no-challenge" />
+    return (
+      <>
+        <AdminEntryButton />
+        <MissionPageClient mode="no-challenge" />
+      </>
+    )
   }
 
   const preStart = today < active.challenge.startDate
@@ -75,12 +86,15 @@ export default async function MissionPage() {
   if (!active.participation) {
     const participants = preStart ? await participantsUC.execute(active.challenge.id) : []
     return (
-      <MissionPageClient
-        mode="not-enrolled"
-        challenge={active.challenge}
-        participants={participants}
-        currentMemberId={memberId}
-      />
+      <>
+        <AdminEntryButton />
+        <MissionPageClient
+          mode="not-enrolled"
+          challenge={active.challenge}
+          participants={participants}
+          currentMemberId={memberId}
+        />
+      </>
     )
   }
 

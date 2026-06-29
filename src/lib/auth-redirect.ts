@@ -11,6 +11,8 @@ export function getRedirectPath(
 ): string | null {
   if (isPublic(pathname)) return null
   if (!userId) return '/login'
+  // Admin paths: authenticated users pass through; the layout's requireAdmin() handles 404 for non-admins.
+  if (pathname.startsWith('/admin')) return null
   if (!memberId && !pathname.startsWith('/link-member') && !pathname.startsWith('/api/auth/')) return '/link-member'
   return null
 }

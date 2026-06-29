@@ -10,6 +10,7 @@ import { GetMissionBoardUseCase } from '@/application/use-cases/get-mission-boar
 import { GetChallengeParticipantsUseCase } from '@/application/use-cases/get-challenge-participants'
 import { GetChallengeLeaderboardUseCase } from '@/application/use-cases/get-challenge-leaderboard'
 import { MissionPageClient } from '@/presentation/components/mission/mission-page-client'
+import { AdminEntryButton } from '@/presentation/components/admin/admin-entry-button'
 import { redirect } from 'next/navigation'
 import { kstToday } from '@/lib/kst'
 
@@ -47,26 +48,37 @@ export default async function MissionPage() {
           participation: existing, today,
         })
         return (
-          <MissionPageClient
-            mode="enrolled"
-            challenge={next}
-            participation={existing}
-            board={board}
-            participants={today < next.startDate ? participants : undefined}
-            currentMemberId={memberId}
-          />
+          <>
+            <AdminEntryButton />
+            <MissionPageClient
+              mode="enrolled"
+              challenge={next}
+              participation={existing}
+              board={board}
+              participants={today < next.startDate ? participants : undefined}
+              currentMemberId={memberId}
+            />
+          </>
         )
       }
       return (
-        <MissionPageClient
-          mode="not-enrolled"
-          challenge={next}
-          participants={participants}
-          currentMemberId={memberId}
-        />
+        <>
+          <AdminEntryButton />
+          <MissionPageClient
+            mode="not-enrolled"
+            challenge={next}
+            participants={participants}
+            currentMemberId={memberId}
+          />
+        </>
       )
     }
-    return <MissionPageClient mode="no-challenge" />
+    return (
+      <>
+        <AdminEntryButton />
+        <MissionPageClient mode="no-challenge" />
+      </>
+    )
   }
 
   const preStart = today < active.challenge.startDate
@@ -74,12 +86,15 @@ export default async function MissionPage() {
   if (!active.participation) {
     const participants = preStart ? await participantsUC.execute(active.challenge.id) : []
     return (
-      <MissionPageClient
-        mode="not-enrolled"
-        challenge={active.challenge}
-        participants={participants}
-        currentMemberId={memberId}
-      />
+      <>
+        <AdminEntryButton />
+        <MissionPageClient
+          mode="not-enrolled"
+          challenge={active.challenge}
+          participants={participants}
+          currentMemberId={memberId}
+        />
+      </>
     )
   }
 
@@ -100,14 +115,17 @@ export default async function MissionPage() {
   ])
 
   return (
-    <MissionPageClient
-      mode="enrolled"
-      challenge={active.challenge}
-      participation={active.participation}
-      board={board}
-      participants={preStart ? participants : undefined}
-      leaderboard={!preStart ? leaderboard : undefined}
-      currentMemberId={memberId}
-    />
+    <>
+      <AdminEntryButton />
+      <MissionPageClient
+        mode="enrolled"
+        challenge={active.challenge}
+        participation={active.participation}
+        board={board}
+        participants={preStart ? participants : undefined}
+        leaderboard={!preStart ? leaderboard : undefined}
+        currentMemberId={memberId}
+      />
+    </>
   )
 }

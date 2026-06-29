@@ -96,3 +96,48 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: msg }, { status: 500 })
   }
 }
+
+// participation 의 모든 mission_log를 log_date 오름차순으로 반환
+export async function GET(req: Request) {
+  // 어드민 인증 — 미인증 401, 비어드민 403
+  try {
+    await requireAdmin()
+  } catch (err) {
+    if (err instanceof AdminGuardError) {
+      const status = err.code === 'UNAUTHENTICATED' ? 401 : 403
+      return NextResponse.json({ error: err.code }, { status })
+    }
+    throw err
+  }
+
+  const participationId = new URL(req.url).searchParams.get('participationId')
+  if (!participationId) return NextResponse.json({ error: 'MISSING_PARTICIPATION_ID' }, { status: 400 })
+
+  // 서비스 롤 admin client만 사용 (cookie SSR 클라이언트 사용 금지)
+  const admin = createAdminClient()
+  const { data, error } = await admin
+    .from('mission_logs')
+    .select('id, participation_id, log_date, count, completed, used_pass, is_rest_day, note, updated_at')
+    .eq('participation_id', participationId)
+    .order('log_date', { ascending: true })
+
+  if (error) return NextResponse.json({ error: error.message }, { status: 500 })
+
+  type Row = {
+    id: string; participation_id: string; log_date: string; count: number
+    completed: boolean; used_pass: boolean; is_rest_day: boolean | null
+    note: string | null; updated_at: string
+  }
+  const logs = (data as Row[]).map((r) => ({
+    id: r.id,
+    participationId: r.participation_id,
+    logDate: r.log_date,
+    count: r.count,
+    completed: r.completed,
+    usedPass: r.used_pass,
+    isRestDay: r.is_rest_day ?? false,
+    note: r.note,
+    updatedAt: r.updated_at,
+  }))
+  return NextResponse.json({ logs })
+}

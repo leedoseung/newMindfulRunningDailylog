@@ -14,8 +14,9 @@ vi.mock('@/infrastructure/supabase/admin-mission-log-repository', () => ({
   AdminMissionLogRepository: vi.fn(),
 }))
 
-import { POST } from '@/app/api/admin/mission-log/route'
+import { POST, GET } from '@/app/api/admin/mission-log/route'
 import { requireAdmin, AdminGuardError } from '@/infrastructure/supabase/require-admin'
+import { createAdminClient } from '@/infrastructure/supabase/admin-client'
 import { AdminMissionLogRepository } from '@/infrastructure/supabase/admin-mission-log-repository'
 
 beforeEach(() => vi.clearAllMocks())
@@ -68,5 +69,33 @@ describe('POST /api/admin/mission-log', () => {
     expect(res.status).toBe(200)
     const body = await res.json()
     expect(body.passesRemaining).toBe(4)
+  })
+})
+
+describe('GET /api/admin/mission-log', () => {
+  it('400 on missing participationId', async () => {
+    ;(requireAdmin as ReturnType<typeof vi.fn>).mockResolvedValue({ userId: 'u', memberId: 'm' })
+    const res = await GET(new Request('http://x/api/admin/mission-log'))
+    expect(res.status).toBe(400)
+  })
+
+  it('200 returns logs ordered by date', async () => {
+    ;(requireAdmin as ReturnType<typeof vi.fn>).mockResolvedValue({ userId: 'u', memberId: 'm' })
+    const order = vi.fn().mockResolvedValue({
+      data: [{
+        id: 'l1', participation_id: 'p1', log_date: '2026-06-28', count: 110,
+        completed: true, used_pass: false, is_rest_day: false, note: null,
+        updated_at: '2026-06-29T00:00:00Z',
+      }],
+      error: null,
+    })
+    const eq = vi.fn().mockReturnValue({ order })
+    const select = vi.fn().mockReturnValue({ eq })
+    const from = vi.fn().mockReturnValue({ select })
+    ;(createAdminClient as unknown as ReturnType<typeof vi.fn>).mockReturnValue({ from })
+    const res = await GET(new Request('http://x/api/admin/mission-log?participationId=p1'))
+    expect(res.status).toBe(200)
+    const body = await res.json()
+    expect(body.logs[0].count).toBe(110)
   })
 })

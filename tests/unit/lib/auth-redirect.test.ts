@@ -27,4 +27,14 @@ describe('getRedirectPath', () => {
     expect(getRedirectPath('/record', 'user-123', 'member-456')).toBeNull()
     expect(getRedirectPath('/leaderboard', 'user-123', 'member-456')).toBeNull()
   })
+
+  it('does not redirect authenticated user visiting /admin/* (even without memberId)', () => {
+    // Authenticated admin users pass through; layout's requireAdmin() handles non-admin 404.
+    expect(getRedirectPath('/admin/mission-fix', 'user-123', 'member-456')).toBeNull()
+    expect(getRedirectPath('/admin/mission-fix', 'user-123', undefined)).toBeNull()
+  })
+
+  it('redirects unauthenticated user visiting /admin/* to /login', () => {
+    expect(getRedirectPath('/admin/mission-fix', undefined, undefined)).toBe('/login')
+  })
 })

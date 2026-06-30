@@ -17,10 +17,7 @@ function getBannerContext(): { show: boolean; month: string; label: string; subl
   const thisMonth = `${year}-${pad(month + 1)}`
 
   if (day >= 25) {
-    const lastDay = new Date(year, month + 1, 0).getDate()
-    const daysLeft = lastDay - day
-    const label = daysLeft === 0 ? '오늘 기부 마감!' : `기부 마감 D-${daysLeft}`
-    return { show: true, month: thisMonth, label, sublabel: '이번 달 기부자' }
+    return { show: true, month: thisMonth, label: '이번 달 기부', sublabel: '이번 달 기부자' }
   }
 
   if (day <= 5) {
@@ -30,7 +27,7 @@ function getBannerContext(): { show: boolean; month: string; label: string; subl
     return {
       show: true,
       month: prevMonth,
-      label: '지난달 기부 감사합니다 🙏',
+      label: '지난달 기부 아직 가능해요',
       sublabel: `${py}년 ${Number(pm)}월 기부자`,
     }
   }

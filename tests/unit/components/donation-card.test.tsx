@@ -13,15 +13,15 @@ vi.setSystemTime(FIXED_DATE)
 
 const makeRun = (overrides: Partial<RunLog> = {}): RunLog => ({
   id: 'r1', memberId: 'm1', memberName: '이두승', memberAvatarUrl: '',
-  memberInstaId: '', date: '2026-05-15', runTime: null, durationMin: 30,
+  memberInstaId: '', date: '2026-06-15', runTime: null, durationMin: 30,
   title: '', thoughtBefore: '', thoughtDuring: '', thoughtAfter: '',
-  location: '', photoUrl: '', rawPhotoUrl: null, createdAt: '2026-05-15T00:00:00Z',
+  location: '', photoUrl: '', rawPhotoUrl: null, createdAt: '2026-06-15T00:00:00Z',
   likeCount: 0, commentCount: 0,
   ...overrides,
 })
 
 const mockDonors = [
-  { id: 'd1', memberId: 'm2', memberName: '김민지', memberAvatarUrl: '', yearMonth: '2026-05', durationMin: 60, amount: 60000, createdAt: '2026-06-01T00:00:00Z' },
+  { id: 'd1', memberId: 'm2', memberName: '김민지', memberAvatarUrl: '', yearMonth: '2026-06', durationMin: 60, amount: 60000, createdAt: '2026-06-15T00:00:00Z' },
 ]
 
 describe('DonationCard', () => {
@@ -35,9 +35,9 @@ describe('DonationCard', () => {
     expect(screen.getByText(/달리기 기부 마일리지/)).toBeInTheDocument()
   })
 
-  it('defaults to previous month (2026-05 when current is 2026-06)', () => {
+  it('defaults to current month (2026-06)', () => {
     render(<DonationCard allRuns={[]} />)
-    expect(screen.getByText('2026년 5월')).toBeInTheDocument()
+    expect(screen.getByText('2026년 6월')).toBeInTheDocument()
   })
 
   it('calculates amount from allRuns for selected month', () => {
@@ -56,7 +56,7 @@ describe('DonationCard', () => {
 
   it('fetches donors on mount for the default month', async () => {
     render(<DonationCard allRuns={[]} />)
-    await waitFor(() => expect(fetchMock).toHaveBeenCalledWith('/api/donations?month=2026-05'))
+    await waitFor(() => expect(fetchMock).toHaveBeenCalledWith('/api/donations?month=2026-06'))
   })
 
   it('renders donor names from API response', async () => {
@@ -82,7 +82,7 @@ describe('DonationCard', () => {
   it('calls POST /api/donations on 기부했어요 click', async () => {
     fetchMock
       .mockResolvedValueOnce({ ok: true, json: () => Promise.resolve({ donations: [] }) }) // GET for donors
-      .mockResolvedValueOnce({ ok: true, json: () => Promise.resolve({ id: 'd2', memberId: 'm1', memberName: '이두승', memberAvatarUrl: '', yearMonth: '2026-05', durationMin: 45, amount: 45000, createdAt: '2026-06-01T00:00:00Z' }) }) // POST
+      .mockResolvedValueOnce({ ok: true, json: () => Promise.resolve({ id: 'd2', memberId: 'm1', memberName: '이두승', memberAvatarUrl: '', yearMonth: '2026-06', durationMin: 45, amount: 45000, createdAt: '2026-06-15T00:00:00Z' }) }) // POST
       .mockResolvedValue({ ok: true, json: () => Promise.resolve({ donations: [] }) }) // subsequent GETs
 
     const runs = [makeRun({ durationMin: 45 })]
@@ -96,6 +96,6 @@ describe('DonationCard', () => {
     render(<DonationCard allRuns={[]} />)
     const prevBtn = screen.getByRole('button', { name: '←' })
     await userEvent.click(prevBtn)
-    expect(screen.getByText('2026년 4월')).toBeInTheDocument()
+    expect(screen.getByText('2026년 5월')).toBeInTheDocument()
   })
 })

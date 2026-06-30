@@ -18,10 +18,8 @@ const BANK_NAMES: Record<string, string> = {
   '089': '케이뱅크', '090': '카카오뱅크', '092': '토스뱅크',
 }
 
-function prevMonth(): string {
+function currentMonth(): string {
   const d = new Date()
-  d.setDate(1)
-  d.setMonth(d.getMonth() - 1)
   return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`
 }
 
@@ -188,7 +186,7 @@ function DonationInfoModal({ onClose }: { onClose: () => void }) {
 }
 
 export function DonationCard({ allRuns, memberId, memberName = '', memberAvatarUrl = '' }: Props) {
-  const maxMonth = prevMonth()
+  const maxMonth = currentMonth()
   const minMonth = addMonths(maxMonth, -23)
 
   const [selectedMonth, setSelectedMonth] = useState(maxMonth)

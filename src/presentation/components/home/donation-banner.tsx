@@ -57,7 +57,6 @@ export function DonationBanner() {
 
   if (!ctx.show) return null
   if (!loaded) return null
-  if (donors.length === 0) return null
 
   return (
     <div
@@ -102,6 +101,11 @@ export function DonationBanner() {
           <div style={{ fontFamily: FONT, fontSize: '0.52rem', color: 'rgba(255,255,255,0.4)', letterSpacing: '1.2px', textTransform: 'uppercase', marginBottom: 2 }}>
             {ctx.sublabel} · {donors.length}명
           </div>
+          {donors.length === 0 ? (
+            <div style={{ fontFamily: FONT, fontSize: '0.75rem', fontWeight: 500, color: 'rgba(255,255,255,0.85)', padding: '4px 0' }}>
+              아직 기부자가 없어요 — 첫 번째가 되어보세요 ✨
+            </div>
+          ) : (
           <div style={{ display: 'flex', gap: -6, overflowX: 'hidden' }}>
             {/* 아바타 스택 */}
             <div style={{ display: 'flex', marginRight: 12 }}>
@@ -138,6 +142,7 @@ export function DonationBanner() {
               </div>
             </div>
           </div>
+          )}
         </div>
 
         {/* 하단 CTA */}

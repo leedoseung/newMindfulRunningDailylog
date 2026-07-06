@@ -138,18 +138,19 @@ function BrandCard({ run }: Props) {
           <span style={{
             fontSize: 9, fontWeight: 700, letterSpacing: '2.5px',
             textTransform: 'uppercase', color: 'rgba(255,255,255,0.4)', fontFamily: FONT,
+            lineHeight: 1,
           }}>Mindful Running</span>
         </div>
 
         {/* 달린 시간 — 큼직하게 */}
-        <div style={{ marginBottom: 6 }}>
+        <div style={{ marginBottom: 6, lineHeight: 1, height: 72 }}>
           <span style={{
             fontSize: 72, fontWeight: 200, color: '#fff', lineHeight: 1,
             letterSpacing: '-3px', fontFamily: FONT,
           }}>{run.durationMin}</span>
           <span style={{
             fontSize: 18, fontWeight: 300, color: 'rgba(255,255,255,0.4)',
-            marginLeft: 6, fontFamily: FONT,
+            marginLeft: 6, fontFamily: FONT, lineHeight: 1,
           }}>분</span>
         </div>
 
@@ -162,21 +163,23 @@ function BrandCard({ run }: Props) {
         )}
 
         {/* 메타 칩 */}
-        <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', marginBottom: 32 }}>
+        <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', marginBottom: 32, alignItems: 'center' }}>
           <span style={{
             fontSize: 9, color: 'rgba(255,255,255,0.35)', fontFamily: FONT,
-            background: 'rgba(255,255,255,0.08)', borderRadius: 20, padding: '4px 10px',
-            letterSpacing: '0.3px',
+            background: 'rgba(255,255,255,0.08)', borderRadius: 20, padding: '5px 10px',
+            letterSpacing: '0.3px', lineHeight: 1, display: 'inline-block',
           }}>{run.memberName}</span>
           {run.location && (
             <span style={{
               fontSize: 9, color: 'rgba(255,255,255,0.35)', fontFamily: FONT,
-              background: 'rgba(255,255,255,0.08)', borderRadius: 20, padding: '4px 10px',
+              background: 'rgba(255,255,255,0.08)', borderRadius: 20, padding: '5px 10px',
+              lineHeight: 1, display: 'inline-block',
             }}>{run.location}</span>
           )}
           <span style={{
             fontSize: 9, color: 'rgba(255,255,255,0.35)', fontFamily: FONT,
-            background: 'rgba(255,255,255,0.08)', borderRadius: 20, padding: '4px 10px',
+            background: 'rgba(255,255,255,0.08)', borderRadius: 20, padding: '5px 10px',
+            lineHeight: 1, display: 'inline-block',
           }}>{formatDate(run.date)}</span>
         </div>
       </div>
@@ -185,20 +188,21 @@ function BrandCard({ run }: Props) {
       <div style={{ height: 1, background: 'rgba(255,255,255,0.07)', margin: '0 26px' }} />
 
       {/* 생각 기록 */}
-      <div style={{ padding: '20px 26px 32px', position: 'relative' }}>
+      <div style={{ padding: '20px 26px 32px', position: 'relative', lineHeight: 1.7 }}>
         {thoughts.length > 0 ? (
           thoughts.map(({ label, text }, i) => (
             <div key={label} style={{
-              display: 'flex', gap: 14, padding: '11px 0',
+              display: 'flex', gap: 14, padding: '11px 0', lineHeight: 1.7,
               borderTop: i > 0 ? '1px solid rgba(255,255,255,0.05)' : 'none',
             }}>
-              <span style={{
+              <div style={{
                 fontSize: 7, fontWeight: 700, letterSpacing: '1.5px', textTransform: 'uppercase',
                 color: 'rgba(255,255,255,0.22)', width: 18, flexShrink: 0, paddingTop: 3, fontFamily: FONT,
-              }}>{label}</span>
-              <span style={{
-                fontSize: 11.5, color: 'rgba(255,255,255,0.62)', lineHeight: 1.7, fontFamily: FONT,
-              }}>{text}</span>
+                lineHeight: 1,
+              }}>{label}</div>
+              <div style={{
+                fontSize: 11.5, color: 'rgba(255,255,255,0.62)', lineHeight: 1.7, fontFamily: FONT, flex: 1,
+              }}>{text}</div>
             </div>
           ))
         ) : (
@@ -223,7 +227,7 @@ function BrandCard({ run }: Props) {
         />
         <span style={{
           fontSize: 7.5, letterSpacing: '2.5px', textTransform: 'uppercase',
-          color: 'rgba(255,255,255,0.18)', fontFamily: FONT,
+          color: 'rgba(255,255,255,0.18)', fontFamily: FONT, lineHeight: 1,
         }}>Mindful Running</span>
       </div>
     </div>

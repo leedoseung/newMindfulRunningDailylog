@@ -1,0 +1,2 @@
+- [Supabase downgrade is immediate](supabase-downgrade-immediate.md) — Pro→Free 즉시 적용, cycle 끝 대기 X. 한도 초과 시 read-only/차단
+- [Supabase image transformations policy](supabase-image-transformations.md) — render/image 대신 raw object/public URL 서빙, 업로드 시점에 client compress

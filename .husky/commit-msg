@@ -1,0 +1,35 @@
+#!/usr/bin/env bash
+# commit-msg: Conventional Commits + 72자 제한
+
+COMMIT_MSG_FILE="$1"
+FIRST_LINE=$(head -1 "$COMMIT_MSG_FILE" | tr -d '\r')
+
+case "$FIRST_LINE" in
+  Merge*|Revert*|"fixup!"*|"squash!"*) exit 0 ;;
+esac
+
+PATTERN='^(feat|fix|docs|refactor|test|chore|perf|build|ci|revert|style)(\([a-z0-9._-]+\))?!?: .+'
+
+if ! echo "$FIRST_LINE" | grep -qE "$PATTERN"; then
+  echo ""
+  echo "❌ 커밋 메시지 형식 오류."
+  echo ""
+  echo "형식: <type>(<scope>?)!?: <subject>"
+  echo "type: feat|fix|docs|refactor|test|chore|perf|build|ci|revert|style"
+  echo ""
+  echo "예:"
+  echo "  feat(auth): oauth 흐름 추가"
+  echo "  fix(hooks): 무한루프 방지"
+  echo ""
+  echo "받은 메시지: $FIRST_LINE"
+  exit 1
+fi
+
+LINE_LEN=$(echo -n "$FIRST_LINE" | wc -c | tr -d ' ')
+if [ "$LINE_LEN" -gt 72 ]; then
+  echo ""
+  echo "❌ 첫 줄 ${LINE_LEN}자 (72자 초과)."
+  exit 1
+fi
+
+exit 0

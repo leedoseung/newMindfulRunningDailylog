@@ -41,3 +41,8 @@ yarn-error.log*
 next-env.d.ts
 .superpowers/sdd/
 .superpowers/brainstorm/*/state/
+
+# harness
+*.bak.*
+.serena/
+supabase/.temp/

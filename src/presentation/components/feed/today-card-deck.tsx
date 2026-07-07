@@ -43,7 +43,7 @@ type Props = {
   onRunClick: (run: RunLog) => void
 }
 
-export function TodayCardDeck({ todayRuns, memberId, onRunClick }: Props) {
+export function TodayCardDeck({ todayRuns, memberId: _memberId, onRunClick }: Props) {
   const [currentIdx, setCurrentIdx] = useState(0)
 
   const deckRef = useRef<HTMLDivElement>(null)

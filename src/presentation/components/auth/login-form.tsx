@@ -2,6 +2,7 @@
 
 import { createBrowserClient } from '@/infrastructure/supabase/browser-client'
 import Image from 'next/image'
+import Link from 'next/link'
 
 type Props = {
   error?: string
@@ -73,11 +74,11 @@ export function LoginForm({ error }: Props) {
           color: 'rgba(255,255,255,0.8)', textAlign: 'center',
           lineHeight: 1.8, maxWidth: '255px',
         }}>
-          "할 수 있는 달리기를 하다보면<br />
+          &quot;할 수 있는 달리기를 하다보면<br />
           <strong style={{ fontStyle: 'normal', fontWeight: 700, color: '#ffffff' }}>
             할 수 없던 달리기를
           </strong>
-          <br />하게된다"
+          <br />하게된다&quot;
         </div>
 
         {error === 'expired' && (
@@ -120,7 +121,7 @@ export function LoginForm({ error }: Props) {
         </div>
 
         {process.env.NEXT_PUBLIC_DEV_BYPASS === 'true' && (
-          <a
+          <Link
             href="/"
             style={{
               fontSize: '0.6rem', color: 'rgba(255,255,255,0.2)',
@@ -128,7 +129,7 @@ export function LoginForm({ error }: Props) {
             }}
           >
             개발 환경 임시 접근
-          </a>
+          </Link>
         )}
       </div>
     </div>

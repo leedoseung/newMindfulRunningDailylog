@@ -24,7 +24,7 @@ vi.mock('@/infrastructure/supabase/client', () => ({
 
 vi.mock('next/cache', () => ({ revalidatePath: vi.fn() }))
 
-const { DELETE, PUT } = await import('@/app/api/record/[id]/route')
+const { DELETE } = await import('@/app/api/record/[id]/route')
 
 const makeParams = (id: string) => ({ params: Promise.resolve({ id }) })
 

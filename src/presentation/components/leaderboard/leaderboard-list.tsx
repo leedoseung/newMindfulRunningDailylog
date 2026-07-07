@@ -50,7 +50,7 @@ function PodItem({ s, rank, tab }: { s: MemberStats; rank: PodRank; tab: Tab }) 
   const avatarBg   = rank === 1 ? '#111111' : rank === 2 ? '#555555' : '#999999'
   const barHeight  = rank === 1 ? 52 : rank === 2 ? 36 : 26
   const barBg      = rank === 1 ? '#111111' : rank === 2 ? '#dddddd' : '#eeeeee'
-  const fontSize   = rank === 1 ? '1rem' : rank === 2 ? '0.85rem' : '0.8rem'
+  const _fontSize  = rank === 1 ? '1rem' : rank === 2 ? '0.85rem' : '0.8rem'
   const stat       = formatStat(s, tab)
 
   return (

@@ -65,7 +65,7 @@ function PhotoCard({ run }: Props) {
           <div style={{
             fontSize: 20, fontWeight: 700, color: '#fff', fontFamily: FONT,
             lineHeight: 1.25, letterSpacing: '-0.3px', marginBottom: 8,
-          }}>"{run.title}"</div>
+          }}>&quot;{run.title}&quot;</div>
         )}
         <div style={{
           fontSize: 11, color: 'rgba(255,255,255,0.55)', fontFamily: FONT,
@@ -159,7 +159,7 @@ function BrandCard({ run }: Props) {
           <div style={{
             fontSize: 18, fontWeight: 600, color: 'rgba(255,255,255,0.85)',
             lineHeight: 1.3, letterSpacing: '-0.2px', marginBottom: 10, fontFamily: FONT,
-          }}>"{run.title}"</div>
+          }}>&quot;{run.title}&quot;</div>
         )}
 
         {/* 메타 칩 */}

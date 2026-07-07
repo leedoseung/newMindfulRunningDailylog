@@ -101,7 +101,7 @@ function GridCell({ run, height, onClick }: { run: RunLog; height: number; onCli
             WebkitBoxOrient: 'vertical',
             overflow: 'hidden',
           }}>
-            "{run.title}"
+            &quot;{run.title}&quot;
           </div>
         )}
         <div style={{

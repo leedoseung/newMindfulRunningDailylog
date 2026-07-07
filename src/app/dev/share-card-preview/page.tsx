@@ -29,7 +29,7 @@ function PhotoVariant({ run, photoHeight, label }: { run: RunLog; photoHeight: n
           <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: 80, background: 'linear-gradient(to bottom, rgba(10,10,10,0), rgba(10,10,10,1))' }} />
         </div>
         <div style={{ padding: '16px 22px 28px' }}>
-          {run.title && <div style={{ fontSize: 20, fontWeight: 700, color: '#fff', fontFamily: FONT, lineHeight: 1.25, letterSpacing: '-0.3px', marginBottom: 8 }}>"{run.title}"</div>}
+          {run.title && <div style={{ fontSize: 20, fontWeight: 700, color: '#fff', fontFamily: FONT, lineHeight: 1.25, letterSpacing: '-0.3px', marginBottom: 8 }}>&quot;{run.title}&quot;</div>}
           <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.55)', fontFamily: FONT, marginBottom: 16 }}>
             {[`${run.durationMin}분`, run.location, run.memberName].filter(Boolean).join(' · ')}
           </div>
@@ -54,7 +54,7 @@ const base = {
   createdAt: '2026-06-05T07:30:00Z', likeCount: 5, commentCount: 2,
 }
 
-const short = {
+const _short = {
   ...base,
   title: '바람이 시원하다',
   thoughtBefore: '나가기 싫었지만 신발을 신었다.',

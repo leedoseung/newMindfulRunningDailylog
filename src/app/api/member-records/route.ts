@@ -15,7 +15,7 @@ export async function GET(request: NextRequest) {
     const useCase = new GetMemberRecordsUseCase(repo)
     const records = await useCase.execute(memberId)
     return NextResponse.json(records)
-  } catch (err) {
+  } catch {
     return NextResponse.json(
       { error: 'Failed to fetch member records' },
       { status: 500 }

@@ -102,7 +102,7 @@ export function RunCard({ run, cardType, onClick }: Props) {
             fontFamily: "'Pretendard Variable', Pretendard, -apple-system, sans-serif", fontSize: '1.05rem', fontWeight: 500,
             color: t.quote, lineHeight: 1.45, wordBreak: 'keep-all',
           }}>
-            "{run.title}"
+            &quot;{run.title}&quot;
           </div>
         )}
         {(run.thoughtBefore || run.thoughtDuring || run.thoughtAfter) && (

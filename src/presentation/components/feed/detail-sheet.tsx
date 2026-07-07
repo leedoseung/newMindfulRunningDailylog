@@ -602,7 +602,7 @@ ${run.thoughtAfter}`
             <div style={{
               fontFamily: FONT, fontSize: '1.15rem', fontWeight: 500,
               color: titleColor, lineHeight: 1.35, marginBottom: 24, textShadow: txtShadow,
-            }}>"{run.title}"</div>
+            }}>&quot;{run.title}&quot;</div>
           )}
 
           {thoughts.length > 0 && (

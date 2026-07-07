@@ -1,5 +1,5 @@
 import type { RunLog } from '@/domain/entities/run-log'
-import type { Member, MemberStats } from '@/domain/entities/member'
+import type { MemberStats } from '@/domain/entities/member'
 
 describe('RunLog entity', () => {
   it('has required fields', () => {

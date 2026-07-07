@@ -20,7 +20,7 @@ const makeRun = (overrides: Partial<RunLog> = {}): RunLog => ({
 describe('MyRecordsTab', () => {
   it('shows empty state when no runs', () => {
     render(<MyRecordsTab runs={[]} memberId="m1" />)
-    expect(screen.getByText('아직 기록이 없습니다')).toBeInTheDocument()
+    expect(screen.getByText('아직 기록이 없어요')).toBeInTheDocument()
   })
 
   it('renders a card for each run', () => {

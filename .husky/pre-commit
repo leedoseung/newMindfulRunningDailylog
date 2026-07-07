@@ -14,10 +14,10 @@ fi
 STAGED_COUNT=$(echo "$STAGED_TS" | wc -l | tr -d ' ')
 echo "🔍 pre-commit: TS 파일 ${STAGED_COUNT}개 검사"
 
-echo "→ Lint (staged only)..."
-if ! echo "$STAGED_TS" | xargs npx eslint --max-warnings=0 2>&1; then
+echo "→ Lint (staged only, errors block)..."
+if ! echo "$STAGED_TS" | xargs npx eslint 2>&1; then
   echo ""
-  echo "❌ Lint 실패 (staged 파일)."
+  echo "❌ Lint errors (staged 파일)."
   exit 1
 fi
 

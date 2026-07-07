@@ -13,7 +13,7 @@ export async function GET(req: NextRequest) {
     const runs = await repo.getRunsPage(offset, limit)
 
     return NextResponse.json({ runs, hasMore: runs.length === limit })
-  } catch (err) {
+  } catch {
     return NextResponse.json({ error: 'Failed to fetch runs' }, { status: 500 })
   }
 }

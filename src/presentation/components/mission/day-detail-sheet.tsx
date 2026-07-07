@@ -20,7 +20,7 @@ function formatDate(iso: string): string {
   return `${y}년 ${Number(m)}월 ${Number(d)}일`
 }
 
-function statusLabel(cell: MissionDayCell, goal: number): { text: string; color: string; bg: string } {
+function statusLabel(cell: MissionDayCell, _goal: number): { text: string; color: string; bg: string } {
   if (cell.state === 'rest') return { text: '🌿 휴식', color: '#fff', bg: GREEN }
   if (cell.state === 'pass') return { text: '면죄권 사용', color: '#fff', bg: '#888' }
   if (cell.state === 'done') {

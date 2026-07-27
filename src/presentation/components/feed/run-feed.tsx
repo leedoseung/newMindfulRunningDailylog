@@ -134,6 +134,15 @@ export function PhotoGrid({ runs: initialRuns, memberId, memberName = '', member
   const [loading, setLoading] = useState(false)
   const sentinelRef = useRef<HTMLDivElement>(null)
 
+  // Sync with refreshed server payload (pull-to-refresh, router.refresh, etc.).
+  // Without this, useState freezes to the first render's initialRuns and later
+  // saves/edits from the server never surface in the grid.
+  useEffect(() => {
+    setRuns(initialRuns)
+    setOffset(initialOffset)
+    setHasMore(initialRuns.length === PAGE_LIMIT)
+  }, [initialRuns, initialOffset])
+
   useEffect(() => {
     if (!triggerRun) return
     setSelected(triggerRun)

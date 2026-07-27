@@ -74,13 +74,22 @@ export class GetChallengeLeaderboardUseCase {
     if (partRows.length === 0) return []
 
     const partIds = partRows.map(p => p.id)
-    const { data: logs, error: lErr } = await this.supabase
-      .from('mission_logs')
-      .select('participation_id, log_date, count, used_pass, is_rest_day')
-      .in('participation_id', partIds)
-
-    if (lErr) throw new Error(`leaderboard logs: ${lErr.message}`)
-    const logRows = (logs as unknown as LogRow[]) ?? []
+    // PostgREST caps a single response at db-max-rows (default 1000). Over a 100-day challenge with
+    // dozens of participants this truncates late-inserted participants to empty log lists, silently
+    // zeroing their streak/completedDays. Page explicitly until the current batch under-fills.
+    const PAGE_SIZE = 1000
+    const logRows: LogRow[] = []
+    for (let offset = 0; ; offset += PAGE_SIZE) {
+      const { data, error } = await this.supabase
+        .from('mission_logs')
+        .select('participation_id, log_date, count, used_pass, is_rest_day')
+        .in('participation_id', partIds)
+        .range(offset, offset + PAGE_SIZE - 1)
+      if (error) throw new Error(`leaderboard logs: ${error.message}`)
+      const batch = (data as unknown as LogRow[]) ?? []
+      logRows.push(...batch)
+      if (batch.length < PAGE_SIZE) break
+    }
 
     const byPart = new Map<string, LogRow[]>()
     for (const l of logRows) {

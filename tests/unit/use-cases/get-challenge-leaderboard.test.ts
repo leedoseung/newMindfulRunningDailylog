@@ -19,7 +19,8 @@ type LogRow = {
   is_rest_day: boolean | null
 }
 
-function makeSupabase(parts: PartRow[], logs: LogRow[]) {
+function makeSupabase(parts: PartRow[], logs: LogRow[], opts?: { pageSize?: number }) {
+  const pageSize = opts?.pageSize ?? 100_000
   return {
     from(table: string) {
       if (table === 'challenge_participations') {
@@ -34,7 +35,13 @@ function makeSupabase(parts: PartRow[], logs: LogRow[]) {
       if (table === 'mission_logs') {
         return {
           select: () => ({
-            in: () => Promise.resolve({ data: logs, error: null }),
+            in: () => {
+              const rangeFn = (from: number, to: number) =>
+                Promise.resolve({ data: logs.slice(from, Math.min(to + 1, from + pageSize)), error: null })
+              // Also thenable — if consumer awaits without .range(), return capped page from 0.
+              const base = Promise.resolve({ data: logs.slice(0, pageSize), error: null })
+              return Object.assign(base, { range: rangeFn })
+            },
           }),
         }
       }
@@ -137,5 +144,32 @@ describe('GetChallengeLeaderboardUseCase — maxStreak', () => {
       challengeId: 'c1', today: '2026-07-01', startDate: '2026-07-01', goalMin: 100,
     })
     expect(rows[0]!.revivedAt).toBeNull()
+  })
+
+  it('paginates mission_logs beyond PostgREST default 1000-row cap', async () => {
+    // Two participants, 1200 total logs, mock page cap 1000 → simulates production PostgREST behavior.
+    // Without pagination, second participant loses all logs → streak/count fall to 0.
+    const p1: PartRow = { ...part, id: 'p1', member_id: 'm1', joined_at: '2026-01-01T00:00:00Z' }
+    const p2: PartRow = { ...part, id: 'p2', member_id: 'm2', joined_at: '2026-01-02T00:00:00Z',
+      members: { name: '이두승', avatar_url: null } }
+    const logs: LogRow[] = []
+    const start = new Date(Date.UTC(2026, 0, 1))
+    // p1 gets first 1000 slots (fills the first PostgREST page)
+    for (let i = 0; i < 1000; i++) {
+      const d = new Date(start); d.setUTCDate(d.getUTCDate() + i)
+      logs.push({ participation_id: 'p1', log_date: d.toISOString().slice(0, 10), count: 20, used_pass: false, is_rest_day: false })
+    }
+    // p2 gets the next 200 — these disappear without pagination
+    for (let i = 0; i < 200; i++) {
+      const d = new Date(start); d.setUTCDate(d.getUTCDate() + i)
+      logs.push({ participation_id: 'p2', log_date: d.toISOString().slice(0, 10), count: 20, used_pass: false, is_rest_day: false })
+    }
+    const uc = new GetChallengeLeaderboardUseCase(makeSupabase([p1, p2], logs, { pageSize: 1000 }))
+    const rows = await uc.execute({
+      challengeId: 'c1', today: '2028-09-27', startDate: '2026-01-01', goalMin: 10,
+    })
+    const p2Row = rows.find(r => r.memberId === 'm2')!
+    expect(p2Row.completedDays).toBe(200)
+    expect(p2Row.maxStreak).toBe(200)
   })
 })

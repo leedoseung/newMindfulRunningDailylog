@@ -57,13 +57,14 @@ Deno.serve(async (req: Request) => {
     processed++
     const { data: log, error: lErr } = await supabase
       .from('mission_logs')
-      .select('count, used_pass')
+      .select('count, used_pass, is_rest_day')
       .eq('participation_id', p.id)
       .eq('log_date', yesterday)
       .maybeSingle()
     if (lErr) continue
 
-    const missed = !log || (log.count === 0 && !log.used_pass)
+    // Rest day = user opted out of that day; pass must not fire.
+    const missed = !log || (log.count === 0 && !log.used_pass && !log.is_rest_day)
     if (!missed) continue
 
     if (p.passes_remaining > 0) {

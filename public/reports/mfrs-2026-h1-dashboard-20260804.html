@@ -1,0 +1,906 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<meta name="referrer" content="no-referrer">
+<title>MFRS 2026 상반기 누적 대시보드 (회원 전용)</title>
+<style>
+:root{
+  /* MFRS 정본 팔레트 — 라이트·저채도·숲(forest) 계열.
+     SSoT: mindfulrunning/strategy/business-model/publish-hub/index.html (analytics·리포트 계열 정본)
+     + analytics/advance-cohorts/gen_html.py 확장 액센트.
+     브랜드 가드레일: 빨강 절대 금지 · 고채도/네온 금지 → 최강 부정 신호는 코랄(#b85f4d). */
+  --bg:#fafafa; --panel:#ffffff; --panel2:#f3f6f4; --line:#e5e7eb;
+  --tx:#1a1a1a; --tx2:#4a4a4a; --tx3:#888888;
+  --a1:#2d6a4f; --a2:#2c6da6; --a3:#b86a2c; --a4:#146780; --a5:#6c4a7f; --a6:#b85f4d;
+  --ok:#2d6a4f; --warn:#b86a2c; --bad:#b85f4d;
+  --soft:#e9f1ec; --ink-brand:#1d4a2e; --neutral:#a3aeaa;
+  --sh:0 1px 3px rgba(0,0,0,.04); --sh-lg:0 6px 18px rgba(0,0,0,.06);
+  --f-serif:"Noto Serif KR","Apple SD Gothic Neo",serif;
+  --r:14px;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--tx);
+  font-family:-apple-system,BlinkMacSystemFont,"Pretendard","Apple SD Gothic Neo","Noto Sans KR",sans-serif;
+  line-height:1.65;-webkit-font-smoothing:antialiased}
+.wrap{max-width:1240px;margin:0 auto;padding:40px 22px 80px}
+h1{font-family:var(--f-serif);font-size:clamp(24px,3.4vw,36px);margin:0 0 8px;
+  letter-spacing:-.02em;font-weight:700;color:var(--ink-brand)}
+h2{font-family:var(--f-serif);font-size:20px;margin:0 0 4px;letter-spacing:-.01em;font-weight:700}
+h3{font-size:15px;margin:0 0 10px;color:var(--tx2);font-weight:650}
+p{margin:0 0 10px}
+.sub{color:var(--tx2);font-size:14px}
+.hero{border-bottom:1px solid var(--line);padding-bottom:26px;margin-bottom:30px}
+.badges{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}
+.badge{font-size:12px;padding:4px 11px;border-radius:999px;background:var(--panel2);
+  border:1px solid var(--line);color:var(--tx2)}
+.badge.ok{color:var(--ok);border-color:#b5d4c3;background:var(--soft)}
+.badge.priv{color:#8f4535;border-color:#e0c0b6;background:#f8ece8}
+.privbar{background:#f8ece8;border:1px solid #e0c0b6;border-radius:12px;padding:11px 15px;
+  margin-top:16px;font-size:12.5px;color:#8f4535}
+.privbar b{color:#6d3427}
+
+section{margin:44px 0 0}
+.shead{display:flex;align-items:baseline;gap:12px;margin-bottom:16px;
+  border-left:3px solid var(--a1);padding-left:12px}
+.shead .n{font-size:12px;color:var(--a1);font-weight:700;letter-spacing:.08em}
+
+.grid{display:grid;gap:14px}
+.k7{grid-template-columns:repeat(auto-fit,minmax(150px,1fr))}
+.c2{grid-template-columns:repeat(auto-fit,minmax(330px,1fr))}
+.c3{grid-template-columns:repeat(auto-fit,minmax(220px,1fr))}
+.c6{grid-template-columns:repeat(auto-fit,minmax(178px,1fr))}
+
+.card{background:var(--panel);border:1px solid var(--line);border-radius:var(--r);padding:18px 20px;
+  box-shadow:var(--sh)}
+.kpi .v{font-family:var(--f-serif);font-size:27px;font-weight:700;letter-spacing:-.02em;
+  line-height:1.2;color:var(--a1)}
+.kpi .l{font-size:12px;color:var(--tx2);margin-top:3px}
+.kpi .d{font-size:11px;color:var(--tx3);margin-top:6px}
+
+.chart{width:100%;overflow-x:auto}
+svg{display:block}
+.lg{display:flex;gap:14px;flex-wrap:wrap;font-size:12px;color:var(--tx2);margin-top:10px}
+.lg i{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:5px;vertical-align:-1px}
+
+table{width:100%;border-collapse:collapse;font-size:13px}
+th,td{padding:8px 9px;text-align:right;border-bottom:1px solid var(--line);white-space:nowrap}
+th{color:var(--tx2);font-weight:600;font-size:11.5px;text-align:right;
+  position:sticky;top:0;background:var(--panel);cursor:pointer;user-select:none}
+th:first-child,td:first-child{text-align:left}
+th.l,td.l{text-align:left}
+tbody tr:hover{background:var(--panel2)}
+.tbox{max-height:520px;overflow:auto;border:1px solid var(--line);border-radius:var(--r);
+  background:var(--panel);box-shadow:var(--sh)}
+
+.tag{display:inline-block;font-size:11px;padding:2px 8px;border-radius:6px;font-weight:650}
+.t-항상성{background:#e9f1ec;color:#1d4a2e}
+.t-성장{background:#e1edf6;color:#245a89}
+.t-유지{background:#eef0ef;color:#4a4a4a}
+.t-중도합류{background:#ede4f3;color:#5a3d6b}
+.t-감쇠{background:#f6ead9;color:#8f5220}
+.t-이탈위험{background:#fbe9dc;color:#a1560f}
+.t-이탈{background:#f8ece8;color:#8f4535}
+.t-스팟{background:#e6eef1;color:#3f6b7c}
+
+.chips{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}
+.chip{font-size:11.5px;padding:3px 9px;border-radius:7px;background:var(--panel2);color:var(--tx2);
+  border:1px solid var(--line)}
+.chip b{color:var(--a3);font-weight:700}
+
+.mcard{background:var(--panel);border:1px solid var(--line);border-radius:var(--r);padding:15px 16px;
+  box-shadow:var(--sh)}
+.mcard .m{font-family:var(--f-serif);font-size:19px;font-weight:700}
+.mcard .s{font-size:11.5px;color:var(--a2);margin-bottom:9px}
+.mrow{display:flex;justify-content:space-between;font-size:12.5px;color:var(--tx2);padding:2.5px 0}
+.mrow b{color:var(--tx);font-weight:650}
+
+.quote{background:var(--panel2);border-left:3px solid var(--a5);border-radius:0 10px 10px 0;
+  padding:12px 15px;margin:9px 0;font-size:13px}
+.quote .who{font-size:11.5px;color:var(--tx3);margin-bottom:5px}
+.quote .b{color:var(--tx2)}
+.quote .a{color:var(--a1);margin-top:5px}
+.quote .arrow{color:var(--tx3);margin:0 4px}
+
+.ins{background:linear-gradient(180deg,#f2f6f4,#ffffff);border:1px solid #d7e3dc;
+  border-radius:var(--r);padding:16px 19px;margin-top:14px;box-shadow:var(--sh)}
+.ins .h{font-size:13px;color:var(--a2);font-weight:700;margin-bottom:6px;
+  letter-spacing:.02em}
+.ins p{font-size:13.5px;color:var(--tx);margin:0}
+.ins .cav{font-size:12px;color:var(--tx3);margin-top:8px}
+
+.mat{display:grid;grid-template-columns:auto 1fr 1fr;gap:8px;font-size:13px}
+.mat .hd{color:var(--tx2);font-size:11.5px;display:flex;align-items:center;justify-content:center;
+  text-align:center}
+.cell{border-radius:10px;padding:13px;text-align:center;border:1px solid var(--line)}
+.cell .p{font-family:var(--f-serif);font-size:23px;font-weight:700}
+.cell .n{font-size:11px;color:var(--tx3);margin-top:2px}
+.rl{writing-mode:vertical-rl;transform:rotate(180deg);color:var(--tx2);font-size:11.5px;
+  display:flex;align-items:center;justify-content:center}
+
+ul{margin:6px 0 0;padding-left:19px;font-size:13.5px;color:var(--tx2)}
+li{margin-bottom:5px}
+li b{color:var(--tx)}
+code{background:var(--panel2);padding:1px 6px;border-radius:5px;font-size:12px;color:var(--a1)}
+.foot{margin-top:56px;padding-top:22px;border-top:1px solid var(--line);
+  font-size:12px;color:var(--tx3)}
+.foot b{color:var(--tx2)}
+.spark{vertical-align:middle}
+.sc{display:flex;gap:5px;align-items:center;font-size:12px;color:var(--tx2);margin-bottom:10px}
+.sc input{background:var(--panel2);border:1px solid var(--line);color:var(--tx);
+  padding:6px 10px;border-radius:8px;font-size:13px;width:190px;font-family:inherit}
+.sc select{background:var(--panel2);border:1px solid var(--line);color:var(--tx);
+  padding:6px 10px;border-radius:8px;font-size:13px;font-family:inherit}
+@media (max-width:640px){ .wrap{padding:26px 14px 60px} th,td{padding:6px} }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<div class="hero">
+  <h1>MFRS 2026 상반기 누적 대시보드</h1>
+  <p class="sub" id="hsub"></p>
+  <div class="badges" id="hbadge"></div>
+  <div class="privbar">
+    <b>🔒 회원 전용 · 외부 배포 금지</b> — 회원 실명과 일지 원문(verbatim)이 포함되어 있습니다.
+    외부 공유가 필요하면 실명 익명화 + 원문 제거 후 별도 빌드하십시오.
+    개인 지표는 <b>순위표가 아니라 1:1 체크인 우선순위</b>를 위한 것이며,
+    비교 기준은 타인이 아니라 <b>본인의 지난달</b>입니다(MFRS 비경쟁 "두레곳간" 원칙).
+  </div>
+</div>
+
+<!-- 1. KPI -->
+<section>
+  <div class="shead"><span class="n">01</span><h2>6개월 누적 스냅샷</h2></div>
+  <div class="grid k7" id="kpis"></div>
+</section>
+
+<!-- 2. 월별 궤적 -->
+<section>
+  <div class="shead"><span class="n">02</span><h2>월별 궤적 — 볼륨은 줄고, 1회는 길어졌다</h2></div>
+  <div class="card">
+    <div class="chart" id="ch-monthly"></div>
+    <div class="lg" id="lg-monthly"></div>
+  </div>
+  <div class="ins" id="ins-monthly"></div>
+</section>
+
+<!-- 3. 계절 카드 -->
+<section>
+  <div class="shead"><span class="n">03</span><h2>계절 서사 — 6개월의 얼굴</h2></div>
+  <div class="grid c6" id="mcards"></div>
+</section>
+
+<!-- 4. 리텐션 -->
+<section>
+  <div class="shead"><span class="n">04</span><h2>잔존과 이탈 — 시작 강도가 6개월 뒤를 가른다</h2></div>
+  <div class="grid c2">
+    <div class="card">
+      <h3>월간 잔존율 / 신규 · 이탈 · 복귀</h3>
+      <div class="chart" id="ch-ret"></div>
+      <div class="lg" id="lg-ret"></div>
+    </div>
+    <div class="card">
+      <h3>2월 시작 강도별 생존 곡선 <span style="color:var(--tx3);font-weight:400">(각 코호트에서 그 달에 1회 이상 기록한 비율)</span></h3>
+      <div class="chart" id="ch-coh"></div>
+      <div class="lg" id="lg-coh"></div>
+    </div>
+  </div>
+  <div class="ins" id="ins-ret"></div>
+</section>
+
+<!-- 5. 집중도 -->
+<section>
+  <div class="shead"><span class="n">05</span><h2>볼륨 집중도 — 코어가 짊어지는 무게</h2></div>
+  <div class="grid c2">
+    <div class="card">
+      <h3>상위 20%(14명)의 월별 기록 점유율</h3>
+      <div class="chart" id="ch-conc"></div>
+    </div>
+    <div class="card">
+      <h3>궤적 유형 분포 (70명)</h3>
+      <div class="chart" id="ch-arch"></div>
+    </div>
+  </div>
+  <div class="ins" id="ins-conc"></div>
+</section>
+
+<!-- 6. 선행지표 -->
+<section>
+  <div class="shead"><span class="n">06</span><h2>무엇이 7월 잔존을 예측했나 — 2월 행동 → 7월 생존</h2></div>
+  <div class="grid c2">
+    <div class="card">
+      <h3>2월 지표 상·하위 50% 분할별 7월 생존율</h3>
+      <div class="chart" id="ch-pred"></div>
+      <div class="lg" id="lg-pred"></div>
+    </div>
+    <div class="card">
+      <h3>빈도 × 기록량 2×2 — 7월 생존율</h3>
+      <div class="mat" id="mat2x2"></div>
+      <p class="sub" style="margin-top:12px;font-size:12px" id="mat-note"></p>
+    </div>
+  </div>
+  <div class="ins" id="ins-pred"></div>
+</section>
+
+<!-- 7. 정성: 감정 아크 -->
+<section>
+  <div class="shead"><span class="n">07</span><h2>정성 분석 ① 감정의 3단 아크 — 나가기 전 → 달리는 중 → 끝난 후</h2></div>
+  <div class="grid c2">
+    <div class="card">
+      <h3>월별 순감정 점수 (긍정어−부정어, 기록 1건당)</h3>
+      <div class="chart" id="ch-arc"></div>
+      <div class="lg" id="lg-arc"></div>
+    </div>
+    <div class="card">
+      <h3>출발 저항 → 사후 보상</h3>
+      <div id="arcbox"></div>
+    </div>
+  </div>
+  <div class="ins" id="ins-arc"></div>
+</section>
+
+<!-- 7b. 회복 전환 -->
+<section>
+  <div class="shead"><span class="n">07b</span><h2>정성 분석 ①-2 회복 전환율 — 부정으로 출발한 날, 몇 %가 긍정으로 끝났나</h2></div>
+  <div class="grid c2">
+    <div class="card">
+      <h3>월별 회복 전환율 <span style="color:var(--tx3);font-weight:400">(출발 부정 우위 기록 중 사후 긍정 우위로 끝난 비율)</span></h3>
+      <div class="chart" id="ch-rec"></div>
+    </div>
+    <div class="card">
+      <h3>계절 3구간 <span style="color:var(--tx3);font-weight:400">(MFRS 정본 경계 — 경칩 3/6 기준)</span></h3>
+      <div id="seasonbox"></div>
+    </div>
+  </div>
+  <div class="ins" id="ins-rec"></div>
+</section>
+
+<!-- 8. 정성: 주제 -->
+<section>
+  <div class="shead"><span class="n">08</span><h2>정성 분석 ② 주제 어휘의 계절 이동</h2></div>
+  <div class="card">
+    <h3>계절·날씨 축 <span style="color:var(--tx3);font-weight:400">(본 대시보드 사전)</span></h3>
+    <div class="chart" id="ch-theme"></div>
+    <div class="lg" id="lg-theme"></div>
+  </div>
+  <div class="card" style="margin-top:14px">
+    <h3>MFRS 정본 어휘 11주제 <span style="color:var(--tx3);font-weight:400">(SSoT: running-log <code>analyze.py</code> LEXICON · 계절 3구간, 해당 어휘가 등장한 기록 비중 %)</span></h3>
+    <div class="chart" id="ch-canon"></div>
+    <div class="lg" id="lg-canon"></div>
+  </div>
+  <div class="ins" id="ins-theme"></div>
+  <div class="ins" id="ins-lex" style="border-color:#e2cdb0;background:linear-gradient(180deg,#faf4ea,#ffffff)"></div>
+</section>
+
+<!-- 8b. Russell -->
+<section>
+  <div class="shead"><span class="n">08b</span><h2>정성 분석 ②-2 러셀 감정 원형 — 각성이 아니라 진정으로 갑니다</h2></div>
+  <div class="grid c2">
+    <div class="card">
+      <h3>시점별 4분면 분포 (%)</h3>
+      <div class="chart" id="ch-rus"></div>
+      <div class="lg" id="lg-rus"></div>
+    </div>
+    <div class="card">
+      <h3>달린 후 4분면 — 월별 추이 (%)</h3>
+      <div class="chart" id="ch-rusm"></div>
+    </div>
+  </div>
+  <div class="ins" id="ins-rus"></div>
+</section>
+
+<!-- 8c. 기수 -->
+<section>
+  <div class="shead"><span class="n">08c</span><h2>기수별 층위 — 소수의 다기수 회원이 만드는 밀도</h2></div>
+  <div class="card">
+    <div class="tbox" style="max-height:none">
+      <table id="gentbl">
+        <thead><tr><th class="l">기수</th><th>회원</th><th>기록</th><th>비중</th>
+          <th>평균(분)</th><th class="l">월별 1인당 기록 (2→7월)</th></tr></thead>
+        <tbody></tbody>
+      </table>
+    </div>
+  </div>
+  <div class="ins" id="ins-gen"></div>
+</section>
+
+<!-- 9. 정성: 키워드 -->
+<section>
+  <div class="shead"><span class="n">09</span><h2>정성 분석 ③ 그 달에만 튀어오른 말들</h2></div>
+  <div class="grid c6" id="kwcards"></div>
+  <p class="sub" style="margin-top:12px;font-size:12px">
+    lift = 해당 월 출현 비중 ÷ 전체 기간 출현 비중. 값이 클수록 그 달에만 집중된 어휘.
+    (전체 25회 이상·해당 월 12회 이상 등장한 단어만 대상)</p>
+</section>
+
+<!-- 10. 계절 전환 -->
+<section>
+  <div class="shead"><span class="n">10</span><h2>계절 전환기 개인 반응 — 봄(3·4월) 대비 여름(6·7월)</h2></div>
+  <div class="grid c2">
+    <div class="card"><h3>여름에 늘린 사람</h3><div id="gainers"></div></div>
+    <div class="card"><h3>여름에 줄인 사람</h3><div id="losers"></div></div>
+  </div>
+  <div class="ins" id="ins-season"></div>
+</section>
+
+<!-- 11. 개인 테이블 -->
+<section>
+  <div class="shead"><span class="n">11</span><h2>개인별 변화 추이 (70명 전원)</h2></div>
+  <div class="sc">
+    <input id="q" placeholder="이름 검색">
+    <select id="fa"><option value="">전체 유형</option></select>
+    <span id="cnt" style="color:var(--tx3)"></span>
+  </div>
+  <div class="tbox">
+    <table id="tbl">
+      <thead><tr>
+        <th class="l" data-k="name">회원</th>
+        <th class="l" data-k="archetype">유형</th>
+        <th data-k="runs">기록</th>
+        <th data-k="hours">시간</th>
+        <th data-k="avg_dur">평균(분)</th>
+        <th class="l" data-k="series">월별 추이 (2→7월)</th>
+        <th data-k="delta_pct">하반기Δ</th>
+        <th data-k="active_months">활동월</th>
+        <th data-k="journal_avg">저널(자)</th>
+        <th data-k="social_rate">동반%</th>
+        <th data-k="mood_lift">기분상승</th>
+      </tr></thead>
+      <tbody></tbody>
+    </table>
+  </div>
+  <p class="sub" style="margin-top:10px;font-size:12px">
+    <b>기본 정렬은 이름 가나다순입니다</b> — 볼륨 순위표가 아니라 1:1 체크인 대상을 찾기 위한 표입니다.
+    하반기Δ = (5·6·7월 기록수 − 2·3·4월 기록수) ÷ 2·3·4월 기록수 ·
+    기분상승 = 사후 순감정 − 사전 순감정 (기록 1건당) ·
+    동반% = 동반러닝 어휘가 등장한 기록 비중. 열 제목을 누르면 정렬됩니다.</p>
+</section>
+
+<!-- 12. 리듬 -->
+<section>
+  <div class="shead"><span class="n">12</span><h2>달리기의 리듬 — 요일 · 길이 · 장소</h2></div>
+  <div class="grid c3">
+    <div class="card"><h3>요일별 기록 수</h3><div class="chart" id="ch-wd"></div></div>
+    <div class="card"><h3>1회 지속시간 분포 (월별 %)</h3><div class="chart" id="ch-dur"></div>
+      <div class="lg" id="lg-dur"></div></div>
+    <div class="card"><h3>장소 유형 점유율 (월별 %)</h3><div class="chart" id="ch-loc"></div>
+      <div class="lg" id="lg-loc"></div></div>
+  </div>
+  <div class="ins" id="ins-rhythm"></div>
+</section>
+
+<!-- 13. 품질 -->
+<section>
+  <div class="shead"><span class="n">13</span><h2>데이터 품질과 해석의 한계</h2></div>
+  <div class="grid c3">
+    <div class="card"><h3>원천 대조 검증</h3><div id="qcbox"></div></div>
+    <div class="card"><h3>무결성 검사</h3><div id="intbox"></div></div>
+    <div class="card"><h3>해석 시 유의</h3><ul id="cavbox"></ul></div>
+  </div>
+</section>
+
+<div class="foot" id="foot"></div>
+</div>
+
+<script>
+const D = {"meta":{"title":"MFRS 2026 상반기 누적 대시보드","period":"2026-02-01 ~ 2026-07-31 (6개월)","generated_at":"2026-08-04T13:17:56+09:00","engine":"claude"},"overall":{"runs":3405,"minutes":206106,"hours":3435.1,"members":70,"months":6,"avg_dur":60.5,"median_dur":45,"active_days":181,"period_days":181,"journal_chars":802819,"avg_journal":235.8,"photo_runs":792},"monthly":[{"month":"2026-02","label":"2월","season":"늦겨울","runs":695,"minutes":37408,"hours":623.5,"active_members":63,"runs_per_member":11.03,"min_per_member":594,"avg_dur":53.8,"median_dur":43,"p90_dur":97,"days_in_month":28,"runs_per_day":24.8,"avg_journal":185.8,"long_runs_90":81,"long_runs_180":15,"short_runs_30":179,"photo_rate":0.0,"locations":{"하천·강변":20.4,"공원·호수":15.0,"트레일·산":14.5,"(미기입)":14.4,"동네·로드":13.8,"기타":10.1,"트레드밀·실내":7.9,"트랙·운동장":1.9,"바다·해안":1.6,"해외·원정":0.4},"sentiment":{"thought_before":{"pos_per_100":16.8,"neg_per_100":17.0,"net":-0.0},"thought_during":{"pos_per_100":64.3,"neg_per_100":29.2,"net":0.35},"thought_after":{"pos_per_100":63.5,"neg_per_100":8.1,"net":0.55}},"themes":{"heat":5.3,"cold":16.1,"rain":5.9,"body":22.9,"social":18.8,"mindful":45.5,"achieve":17.0,"reluctance":5.9}},{"month":"2026-03","label":"3월","season":"초봄","runs":643,"minutes":37566,"hours":626.1,"active_members":54,"runs_per_member":11.91,"min_per_member":696,"avg_dur":58.4,"median_dur":45,"p90_dur":99,"days_in_month":31,"runs_per_day":20.7,"avg_journal":233.9,"long_runs_90":88,"long_runs_180":18,"short_runs_30":123,"photo_rate":0.2,"locations":{"하천·강변":26.9,"공원·호수":21.3,"트레일·산":15.6,"동네·로드":12.8,"기타":9.6,"트레드밀·실내":6.5,"트랙·운동장":2.6,"바다·해안":2.5,"해외·원정":2.2},"sentiment":{"thought_before":{"pos_per_100":17.9,"neg_per_100":19.8,"net":-0.02},"thought_during":{"pos_per_100":78.8,"neg_per_100":32.5,"net":0.46},"thought_after":{"pos_per_100":67.5,"neg_per_100":12.3,"net":0.55}},"themes":{"heat":5.0,"cold":11.4,"rain":10.7,"body":24.0,"social":24.3,"mindful":42.9,"achieve":16.2,"reluctance":8.1}},{"month":"2026-04","label":"4월","season":"봄","runs":532,"minutes":31109,"hours":518.5,"active_members":46,"runs_per_member":11.57,"min_per_member":676,"avg_dur":58.5,"median_dur":42.0,"p90_dur":93,"days_in_month":30,"runs_per_day":17.7,"avg_journal":246.3,"long_runs_90":56,"long_runs_180":23,"short_runs_30":124,"photo_rate":0.0,"locations":{"하천·강변":25.9,"공원·호수":24.2,"트레일·산":15.2,"동네·로드":11.1,"기타":9.4,"트레드밀·실내":7.3,"트랙·운동장":4.7,"바다·해안":1.5,"해외·원정":0.4,"(미기입)":0.2},"sentiment":{"thought_before":{"pos_per_100":21.6,"neg_per_100":16.5,"net":0.05},"thought_during":{"pos_per_100":91.0,"neg_per_100":34.2,"net":0.57},"thought_after":{"pos_per_100":65.0,"neg_per_100":11.3,"net":0.54}},"themes":{"heat":9.0,"cold":8.1,"rain":9.8,"body":25.9,"social":30.1,"mindful":44.7,"achieve":22.9,"reluctance":6.6}},{"month":"2026-05","label":"5월","season":"늦봄","runs":573,"minutes":37962,"hours":632.7,"active_members":44,"runs_per_member":13.02,"min_per_member":863,"avg_dur":66.3,"median_dur":49,"p90_dur":121,"days_in_month":31,"runs_per_day":18.5,"avg_journal":275.1,"long_runs_90":108,"long_runs_180":25,"short_runs_30":120,"photo_rate":6.6,"locations":{"하천·강변":28.8,"공원·호수":21.5,"트레일·산":19.5,"동네·로드":10.6,"기타":7.0,"트레드밀·실내":5.9,"트랙·운동장":4.7,"바다·해안":1.0,"해외·원정":0.9},"sentiment":{"thought_before":{"pos_per_100":26.5,"neg_per_100":15.2,"net":0.11},"thought_during":{"pos_per_100":104.0,"neg_per_100":39.8,"net":0.64},"thought_after":{"pos_per_100":76.4,"neg_per_100":16.8,"net":0.6}},"themes":{"heat":12.6,"cold":5.4,"rain":12.7,"body":27.1,"social":33.9,"mindful":36.5,"achieve":21.3,"reluctance":5.4}},{"month":"2026-06","label":"6월","season":"초여름","runs":482,"minutes":32453,"hours":540.9,"active_members":44,"runs_per_member":10.95,"min_per_member":738,"avg_dur":67.3,"median_dur":45.0,"p90_dur":120,"days_in_month":30,"runs_per_day":16.1,"avg_journal":247.8,"long_runs_90":87,"long_runs_180":25,"short_runs_30":103,"photo_rate":75.3,"locations":{"하천·강변":28.8,"트레일·산":22.8,"공원·호수":22.0,"동네·로드":11.4,"기타":8.1,"트레드밀·실내":3.5,"(미기입)":1.0,"트랙·운동장":0.8,"바다·해안":0.8,"해외·원정":0.6},"sentiment":{"thought_before":{"pos_per_100":21.6,"neg_per_100":21.4,"net":0.0},"thought_during":{"pos_per_100":91.3,"neg_per_100":31.7,"net":0.6},"thought_after":{"pos_per_100":64.9,"neg_per_100":8.7,"net":0.56}},"themes":{"heat":22.4,"cold":3.3,"rain":10.0,"body":21.0,"social":32.2,"mindful":33.8,"achieve":16.8,"reluctance":5.4}},{"month":"2026-07","label":"7월","season":"한여름·장마","runs":480,"minutes":29608,"hours":493.5,"active_members":33,"runs_per_member":14.55,"min_per_member":897,"avg_dur":61.7,"median_dur":45.0,"p90_dur":120,"days_in_month":31,"runs_per_day":15.5,"avg_journal":239.9,"long_runs_90":78,"long_runs_180":20,"short_runs_30":97,"photo_rate":81.2,"locations":{"트레일·산":25.4,"하천·강변":23.8,"공원·호수":22.7,"기타":10.8,"동네·로드":8.8,"트레드밀·실내":4.6,"트랙·운동장":1.9,"해외·원정":0.8,"바다·해안":0.8,"(미기입)":0.4},"sentiment":{"thought_before":{"pos_per_100":15.6,"neg_per_100":13.5,"net":0.02},"thought_during":{"pos_per_100":89.8,"neg_per_100":39.4,"net":0.5},"thought_after":{"pos_per_100":52.7,"neg_per_100":6.9,"net":0.46}},"themes":{"heat":36.5,"cold":0.8,"rain":24.0,"body":14.8,"social":24.0,"mindful":31.0,"achieve":12.1,"reluctance":6.0}}],"weekday":{"labels":["월","화","수","목","금","토","일"],"overall":[458,480,507,468,443,486,563],"by_month":{"2026-02":[96,107,97,92,87,106,110],"2026-03":[85,106,82,85,65,90,130],"2026-04":[67,68,99,71,61,78,88],"2026-05":[83,64,66,78,100,89,93],"2026-06":[68,74,83,61,56,67,73],"2026-07":[59,61,80,81,74,56,69]}},"dur_dist":{"labels":["≤30분","31–45분","46–60분","61–90분","91–150분","150분+"],"by_month":{"2026-02":[25.8,29.2,19.1,15.0,8.5,2.4],"2026-03":[19.1,31.4,19.3,17.6,8.4,4.2],"2026-04":[23.3,33.8,20.7,12.0,4.9,5.3],"2026-05":[20.9,25.7,21.3,14.1,12.6,5.4],"2026-06":[21.4,31.7,17.6,12.7,10.2,6.4],"2026-07":[20.2,31.7,18.5,15.2,9.0,5.4]}},"retention":{"months":["2026-02","2026-03","2026-04","2026-05","2026-06","2026-07"],"labels":["2월","3월","4월","5월","6월","7월"],"retained":[0,52,43,41,38,33],"new":[63,2,0,2,3,0],"churned":[0,11,11,5,6,11],"returned":[0,0,3,1,3,0],"rate":[null,82.5,79.6,89.1,86.4,75.0]},"members":[{"name":"백미라","generation":"5기","runs":180,"minutes":11276,"hours":187.9,"series":[28,31,30,31,29,31],"minutes_series":[1454,1450,1636,2338,2774,1624],"avg_dur":62.6,"max_dur":1440,"active_months":6,"first_month":"2026-02","last_month":"2026-07","archetype":"항상성","archetype_why":"6개월 내내 고른 볼륨","slope":0.29,"h1":89,"h2":91,"delta_pct":2.2,"journal_avg":377.7,"journal_total":67994,"sent_before_net":-0.03,"sent_after_net":0.86,"mood_lift":0.89,"long_runs_90":20,"social_rate":37.2},{"name":"이세영","generation":"5기","runs":172,"minutes":11056,"hours":184.3,"series":[25,26,25,30,34,32],"minutes_series":[1559,1556,2077,2321,1707,1836],"avg_dur":64.3,"max_dur":372,"active_months":6,"first_month":"2026-02","last_month":"2026-07","archetype":"성장","archetype_why":"하반기 볼륨 증가","slope":1.83,"h1":76,"h2":96,"delta_pct":26.3,"journal_avg":263.2,"journal_total":45266,"sent_before_net":0.0,"sent_after_net":0.47,"mood_lift":0.47,"long_runs_90":30,"social_rate":33.7},{"name":"신순주","generation":"3기, 4기, 5기","runs":151,"minutes":7408,"hours":123.5,"series":[22,26,27,24,24,28],"minutes_series":[1161,1349,1590,1159,980,1169],"avg_dur":49.1,"max_dur":303,"active_months":6,"first_month":"2026-02","last_month":"2026-07","archetype":"항상성","archetype_why":"6개월 내내 고른 볼륨","slope":0.6,"h1":75,"h2":76,"delta_pct":1.3,"journal_avg":87.8,"journal_total":13260,"sent_before_net":-0.05,"sent_after_net":0.12,"mood_lift":0.17,"long_runs_90":7,"social_rate":11.9},{"name":"황유숙","generation":"5기","runs":148,"minutes":8002,"hours":133.4,"series":[24,23,19,27,27,28],"minutes_series":[902,1116,1264,1606,1602,1512],"avg_dur":54.1,"max_dur":435,"active_months":6,"first_month":"2026-02","last_month":"2026-07","archetype":"항상성","archetype_why":"6개월 내내 고른 볼륨","slope":1.14,"h1":66,"h2":82,"delta_pct":24.2,"journal_avg":215.3,"journal_total":31863,"sent_before_net":0.11,"sent_after_net":0.72,"mood_lift":0.6,"long_runs_90":15,"social_rate":35.1},{"name":"이두승","generation":"3기,4기,5기","runs":119,"minutes":9649,"hours":160.8,"series":[22,20,19,19,18,21],"minutes_series":[1666,1456,1698,1957,1441,1431],"avg_dur":81.1,"max_dur":417,"active_months":6,"first_month":"2026-02","last_month":"2026-07","archetype":"항상성","archetype_why":"6개월 내내 고른 볼륨","slope":-0.31,"h1":61,"h2":58,"delta_pct":-4.9,"journal_avg":189.9,"journal_total":22597,"sent_before_net":0.0,"sent_after_net":0.3,"mood_lift":0.3,"long_runs_90":27,"social_rate":26.1},{"name":"김종훈","generation":"5기","runs":118,"minutes":5388,"hours":89.8,"series":[22,22,27,23,10,14],"minutes_series":[1161,893,817,1185,535,797],"avg_dur":45.7,"max_dur":226,"active_months":6,"first_month":"2026-02","last_month":"2026-07","archetype":"감쇠","archetype_why":"하반기 볼륨 감소","slope":-2.29,"h1":71,"h2":47,"delta_pct":-33.8,"journal_avg":184.7,"journal_total":21795,"sent_before_net":-0.11,"sent_after_net":0.29,"mood_lift":0.4,"long_runs_90":6,"social_rate":15.3},{"name":"전영호","generation":"5기","runs":112,"minutes":6099,"hours":101.7,"series":[24,27,22,28,11,0],"minutes_series":[1349,1644,985,1587,534,0],"avg_dur":54.5,"max_dur":143,"active_months":5,"first_month":"2026-02","last_month":"2026-06","archetype":"이탈위험","archetype_why":"7월 무기록","slope":-4.63,"h1":73,"h2":39,"delta_pct":-46.6,"journal_avg":185.4,"journal_total":20761,"sent_before_net":0.21,"sent_after_net":0.14,"mood_lift":-0.06,"long_runs_90":14,"social_rate":10.7},{"name":"이예정","generation":"5기","runs":109,"minutes":8177,"hours":136.3,"series":[17,18,19,21,11,23],"minutes_series":[1193,1224,1175,2004,1064,1517],"avg_dur":75.0,"max_dur":456,"active_months":6,"first_month":"2026-02","last_month":"2026-07","archetype":"항상성","archetype_why":"6개월 내내 고른 볼륨","slope":0.31,"h1":54,"h2":55,"delta_pct":1.9,"journal_avg":628.9,"journal_total":68551,"sent_before_net":0.1,"sent_after_net":0.75,"mood_lift":0.65,"long_runs_90":24,"social_rate":56.0},{"name":"설재영","generation":"5기","runs":109,"minutes":9529,"hours":158.8,"series":[10,20,20,23,19,17],"minutes_series":[1164,1380,1303,1929,2184,1569],"avg_dur":87.4,"max_dur":363,"active_months":6,"first_month":"2026-02","last_month":"2026-07","archetype":"항상성","archetype_why":"6개월 내내 고른 볼륨","slope":1.0,"h1":50,"h2":59,"delta_pct":18.0,"journal_avg":156.9,"journal_total":17098,"sent_before_net":0.05,"sent_after_net":0.62,"mood_lift":0.58,"long_runs_90":35,"social_rate":21.1},{"name":"이훈영","generation":"5기","runs":100,"minutes":3093,"hours":51.5,"series":[21,21,20,13,14,11],"minutes_series":[760,552,627,478,392,284],"avg_dur":30.9,"max_dur":120,"active_months":6,"first_month":"2026-02","last_month":"2026-07","archetype":"감쇠","archetype_why":"하반기 볼륨 감소","slope":-2.23,"h1":62,"h2":38,"delta_pct":-38.7,"journal_avg":223.2,"journal_total":22324,"sent_before_net":-0.16,"sent_after_net":0.75,"mood_lift":0.91,"long_runs_90":1,"social_rate":25.0},{"name":"김찬현","generation":"5기","runs":100,"minutes":5636,"hours":93.9,"series":[12,22,5,20,17,24],"minutes_series":[516,1219,217,1146,1152,1386],"avg_dur":56.4,"max_dur":251,"active_months":6,"first_month":"2026-02","last_month":"2026-07","archetype":"성장","archetype_why":"하반기 볼륨 증가","slope":1.71,"h1":39,"h2":61,"delta_pct":56.4,"journal_avg":252.2,"journal_total":25221,"sent_before_net":-0.04,"sent_after_net":0.48,"mood_lift":0.52,"long_runs_90":12,"social_rate":30.0},{"name":"임자영","generation":"5기","runs":95,"minutes":3996,"hours":66.6,"series":[18,20,8,17,21,11],"minutes_series":[777,906,303,683,939,388],"avg_dur":42.1,"max_dur":150,"active_months":6,"first_month":"2026-02","last_month":"2026-07","archetype":"항상성","archetype_why":"6개월 내내 고른 볼륨","slope":-0.66,"h1":46,"h2":49,"delta_pct":6.5,"journal_avg":354.1,"journal_total":33644,"sent_before_net":-0.09,"sent_after_net":0.35,"mood_lift":0.44,"long_runs_90":3,"social_rate":51.6},{"name":"정남C","generation":"5기","runs":92,"minutes":4662,"hours":77.7,"series":[12,20,24,20,5,11],"minutes_series":[434,747,945,1271,456,809],"avg_dur":50.7,"max_dur":225,"active_months":6,"first_month":"2026-02","last_month":"2026-07","archetype":"감쇠","archetype_why":"하반기 볼륨 감소","slope":-1.54,"h1":56,"h2":36,"delta_pct":-35.7,"journal_avg":600.5,"journal_total":55243,"sent_before_net":0.11,"sent_after_net":0.48,"mood_lift":0.37,"long_runs_90":13,"social_rate":45.7},{"name":"장미순","generation":"5기","runs":91,"minutes":4675,"hours":77.9,"series":[11,9,18,10,20,23],"minutes_series":[669,462,750,417,1109,1268],"avg_dur":51.4,"max_dur":185,"active_months":6,"first_month":"2026-02","last_month":"2026-07","archetype":"성장","archetype_why":"하반기 볼륨 증가","slope":2.43,"h1":38,"h2":53,"delta_pct":39.5,"journal_avg":143.5,"journal_total":13058,"sent_before_net":-0.05,"sent_after_net":0.7,"mood_lift":0.76,"long_runs_90":8,"social_rate":17.6},{"name":"박경애","generation":"5기","runs":91,"minutes":5917,"hours":98.6,"series":[10,17,10,19,16,19],"minutes_series":[465,1310,848,1364,895,1035],"avg_dur":65.0,"max_dur":340,"active_months":6,"first_month":"2026-02","last_month":"2026-07","archetype":"성장","archetype_why":"하반기 볼륨 증가","slope":1.46,"h1":37,"h2":54,"delta_pct":45.9,"journal_avg":146.3,"journal_total":13317,"sent_before_net":-0.04,"sent_after_net":0.65,"mood_lift":0.69,"long_runs_90":19,"social_rate":26.4},{"name":"임상범","generation":"5기","runs":91,"minutes":3796,"hours":63.3,"series":[15,22,27,21,6,0],"minutes_series":[634,1348,824,486,504,0],"avg_dur":41.7,"max_dur":220,"active_months":5,"first_month":"2026-02","last_month":"2026-06","archetype":"이탈위험","archetype_why":"7월 무기록","slope":-3.69,"h1":64,"h2":27,"delta_pct":-57.8,"journal_avg":133.6,"journal_total":12161,"sent_before_net":-0.03,"sent_after_net":0.36,"mood_lift":0.4,"long_runs_90":7,"social_rate":20.9},{"name":"김훈범","generation":"5기","runs":90,"minutes":7469,"hours":124.5,"series":[15,13,18,16,12,16],"minutes_series":[1103,1023,1439,1551,1258,1095],"avg_dur":83.0,"max_dur":231,"active_months":6,"first_month":"2026-02","last_month":"2026-07","archetype":"항상성","archetype_why":"6개월 내내 고른 볼륨","slope":0.0,"h1":46,"h2":44,"delta_pct":-4.3,"journal_avg":174.8,"journal_total":15732,"sent_before_net":0.23,"sent_after_net":0.64,"mood_lift":0.41,"long_runs_90":33,"social_rate":23.3},{"name":"심혜원","generation":"5기","runs":87,"minutes":4843,"hours":80.7,"series":[11,16,14,13,17,16],"minutes_series":[814,875,762,852,762,778],"avg_dur":55.7,"max_dur":230,"active_months":6,"first_month":"2026-02","last_month":"2026-07","archetype":"항상성","archetype_why":"6개월 내내 고른 볼륨","slope":0.77,"h1":41,"h2":46,"delta_pct":12.2,"journal_avg":306.2,"journal_total":26643,"sent_before_net":0.08,"sent_after_net":0.53,"mood_lift":0.45,"long_runs_90":16,"social_rate":39.1},{"name":"이유진","generation":"5기","runs":83,"minutes":5776,"hours":96.3,"series":[14,8,13,16,11,21],"minutes_series":[552,705,1070,1145,650,1654],"avg_dur":69.6,"max_dur":300,"active_months":6,"first_month":"2026-02","last_month":"2026-07","archetype":"유지","archetype_why":"완만한 등락","slope":1.34,"h1":35,"h2":48,"delta_pct":37.1,"journal_avg":167.2,"journal_total":13876,"sent_before_net":0.06,"sent_after_net":0.27,"mood_lift":0.2,"long_runs_90":19,"social_rate":31.3},{"name":"이미애","generation":"5기","runs":78,"minutes":3550,"hours":59.2,"series":[14,13,10,13,14,14],"minutes_series":[604,631,407,572,678,658],"avg_dur":45.5,"max_dur":83,"active_months":6,"first_month":"2026-02","last_month":"2026-07","archetype":"항상성","archetype_why":"6개월 내내 고른 볼륨","slope":0.17,"h1":37,"h2":41,"delta_pct":10.8,"journal_avg":239.4,"journal_total":18676,"sent_before_net":0.15,"sent_after_net":0.71,"mood_lift":0.55,"long_runs_90":0,"social_rate":25.6},{"name":"김희은","generation":"5기","runs":74,"minutes":4195,"hours":69.9,"series":[8,8,8,16,19,15],"minutes_series":[336,428,313,1165,1183,770],"avg_dur":56.7,"max_dur":145,"active_months":6,"first_month":"2026-02","last_month":"2026-07","archetype":"성장","archetype_why":"하반기 볼륨 증가","slope":2.17,"h1":24,"h2":50,"delta_pct":108.3,"journal_avg":210.3,"journal_total":15559,"sent_before_net":0.19,"sent_after_net":0.77,"mood_lift":0.58,"long_runs_90":16,"social_rate":16.2},{"name":"이지윤","generation":"5기","runs":72,"minutes":1955,"hours":32.6,"series":[13,13,14,11,9,12],"minutes_series":[401,399,400,269,209,277],"avg_dur":27.2,"max_dur":45,"active_months":6,"first_month":"2026-02","last_month":"2026-07","archetype":"항상성","archetype_why":"6개월 내내 고른 볼륨","slope":-0.57,"h1":40,"h2":32,"delta_pct":-20.0,"journal_avg":297.1,"journal_total":21390,"sent_before_net":-0.19,"sent_after_net":0.69,"mood_lift":0.89,"long_runs_90":0,"social_rate":12.5},{"name":"박기영","generation":"5기","runs":67,"minutes":3001,"hours":50.0,"series":[19,20,14,14,0,0],"minutes_series":[770,939,585,707,0,0],"avg_dur":44.8,"max_dur":87,"active_months":4,"first_month":"2026-02","last_month":"2026-05","archetype":"이탈","archetype_why":"6·7월 연속 무기록","slope":-4.43,"h1":53,"h2":14,"delta_pct":-73.6,"journal_avg":313.8,"journal_total":21023,"sent_before_net":-0.03,"sent_after_net":1.13,"mood_lift":1.16,"long_runs_90":0,"social_rate":29.9},{"name":"로함/김성우","generation":"5기","runs":65,"minutes":14273,"hours":237.9,"series":[13,9,5,14,9,15],"minutes_series":[1577,1754,1874,2823,2940,3305],"avg_dur":219.6,"max_dur":993,"active_months":6,"first_month":"2026-02","last_month":"2026-07","archetype":"성장","archetype_why":"하반기 볼륨 증가","slope":0.54,"h1":27,"h2":38,"delta_pct":40.7,"journal_avg":158.6,"journal_total":10311,"sent_before_net":0.05,"sent_after_net":0.51,"mood_lift":0.46,"long_runs_90":46,"social_rate":18.5},{"name":"송승진","generation":"5기","runs":63,"minutes":3839,"hours":64.0,"series":[2,10,1,15,18,17],"minutes_series":[70,770,58,957,1117,867],"avg_dur":60.9,"max_dur":153,"active_months":6,"first_month":"2026-02","last_month":"2026-07","archetype":"성장","archetype_why":"하반기 볼륨 증가","slope":3.23,"h1":13,"h2":50,"delta_pct":284.6,"journal_avg":194.6,"journal_total":12261,"sent_before_net":0.0,"sent_after_net":0.41,"mood_lift":0.41,"long_runs_90":10,"social_rate":27.0},{"name":"조예쁜성아","generation":"5기","runs":56,"minutes":3150,"hours":52.5,"series":[10,14,15,13,4,0],"minutes_series":[747,797,757,714,135,0],"avg_dur":56.2,"max_dur":160,"active_months":5,"first_month":"2026-02","last_month":"2026-06","archetype":"이탈위험","archetype_why":"7월 무기록","slope":-2.34,"h1":39,"h2":17,"delta_pct":-56.4,"journal_avg":158.9,"journal_total":8901,"sent_before_net":-0.12,"sent_after_net":1.05,"mood_lift":1.18,"long_runs_90":9,"social_rate":25.0},{"name":"이현주","generation":"5기","runs":55,"minutes":2344,"hours":39.1,"series":[3,8,9,12,13,10],"minutes_series":[90,336,374,441,624,479],"avg_dur":42.6,"max_dur":90,"active_months":6,"first_month":"2026-02","last_month":"2026-07","archetype":"성장","archetype_why":"하반기 볼륨 증가","slope":1.51,"h1":20,"h2":35,"delta_pct":75.0,"journal_avg":209.4,"journal_total":11515,"sent_before_net":0.13,"sent_after_net":0.85,"mood_lift":0.73,"long_runs_90":3,"social_rate":41.8},{"name":"김소영","generation":"4기,5기,평생","runs":53,"minutes":2366,"hours":39.4,"series":[5,0,5,15,14,14],"minutes_series":[183,0,173,837,584,589],"avg_dur":44.6,"max_dur":170,"active_months":5,"first_month":"2026-02","last_month":"2026-07","archetype":"성장","archetype_why":"하반기 볼륨 증가","slope":2.77,"h1":10,"h2":43,"delta_pct":330.0,"journal_avg":331.3,"journal_total":17559,"sent_before_net":0.02,"sent_after_net":0.57,"mood_lift":0.55,"long_runs_90":4,"social_rate":26.4},{"name":"이남순","generation":"5기","runs":48,"minutes":4314,"hours":71.9,"series":[7,13,6,4,12,6],"minutes_series":[430,1115,1045,215,772,737],"avg_dur":89.9,"max_dur":384,"active_months":6,"first_month":"2026-02","last_month":"2026-07","archetype":"유지","archetype_why":"완만한 등락","slope":-0.29,"h1":26,"h2":22,"delta_pct":-15.4,"journal_avg":469.3,"journal_total":22525,"sent_before_net":0.1,"sent_after_net":0.52,"mood_lift":0.42,"long_runs_90":15,"social_rate":33.3},{"name":"고진수","generation":"5기","runs":48,"minutes":2121,"hours":35.4,"series":[18,16,13,1,0,0],"minutes_series":[838,750,495,38,0,0],"avg_dur":44.2,"max_dur":85,"active_months":4,"first_month":"2026-02","last_month":"2026-05","archetype":"이탈","archetype_why":"6·7월 연속 무기록","slope":-4.29,"h1":47,"h2":1,"delta_pct":-97.9,"journal_avg":75.2,"journal_total":3608,"sent_before_net":0.08,"sent_after_net":1.0,"mood_lift":0.92,"long_runs_90":0,"social_rate":10.4},{"name":"류순영","generation":"5기","runs":43,"minutes":3111,"hours":51.9,"series":[12,10,2,3,3,13],"minutes_series":[655,957,122,210,359,808],"avg_dur":72.3,"max_dur":191,"active_months":6,"first_month":"2026-02","last_month":"2026-07","archetype":"유지","archetype_why":"완만한 등락","slope":-0.43,"h1":24,"h2":19,"delta_pct":-20.8,"journal_avg":262.4,"journal_total":11285,"sent_before_net":0.0,"sent_after_net":0.77,"mood_lift":0.77,"long_runs_90":14,"social_rate":48.8},{"name":"크리스킴","generation":"5기","runs":36,"minutes":1315,"hours":21.9,"series":[7,13,9,7,0,0],"minutes_series":[221,454,349,291,0,0],"avg_dur":36.5,"max_dur":80,"active_months":4,"first_month":"2026-02","last_month":"2026-05","archetype":"이탈","archetype_why":"6·7월 연속 무기록","slope":-2.17,"h1":29,"h2":7,"delta_pct":-75.9,"journal_avg":320.3,"journal_total":11532,"sent_before_net":0.14,"sent_after_net":0.39,"mood_lift":0.25,"long_runs_90":0,"social_rate":30.6},{"name":"정경원","generation":"5기","runs":34,"minutes":3732,"hours":62.2,"series":[17,17,0,0,0,0],"minutes_series":[2294,1438,0,0,0,0],"avg_dur":109.8,"max_dur":597,"active_months":2,"first_month":"2026-02","last_month":"2026-03","archetype":"이탈","archetype_why":"6·7월 연속 무기록","slope":-3.89,"h1":34,"h2":0,"delta_pct":-100.0,"journal_avg":189.3,"journal_total":6436,"sent_before_net":-0.06,"sent_after_net":0.56,"mood_lift":0.62,"long_runs_90":19,"social_rate":29.4},{"name":"신승엽","generation":"5기","runs":34,"minutes":2710,"hours":45.2,"series":[4,2,7,10,9,2],"minutes_series":[73,150,318,897,1054,218],"avg_dur":79.7,"max_dur":277,"active_months":6,"first_month":"2026-02","last_month":"2026-07","archetype":"성장","archetype_why":"하반기 볼륨 증가","slope":0.4,"h1":13,"h2":21,"delta_pct":61.5,"journal_avg":63.6,"journal_total":2163,"sent_before_net":0.12,"sent_after_net":0.12,"mood_lift":0.0,"long_runs_90":9,"social_rate":14.7},{"name":"모니카염","generation":"5기","runs":29,"minutes":1522,"hours":25.4,"series":[7,7,5,6,1,3],"minutes_series":[299,420,266,372,50,115],"avg_dur":52.5,"max_dur":122,"active_months":6,"first_month":"2026-02","last_month":"2026-07","archetype":"감쇠","archetype_why":"하반기 볼륨 감소","slope":-1.06,"h1":19,"h2":10,"delta_pct":-47.4,"journal_avg":303.6,"journal_total":8804,"sent_before_net":0.07,"sent_after_net":0.14,"mood_lift":0.07,"long_runs_90":2,"social_rate":20.7},{"name":"이영화","generation":"5기","runs":28,"minutes":1003,"hours":16.7,"series":[15,10,3,0,0,0],"minutes_series":[434,393,176,0,0,0],"avg_dur":35.8,"max_dur":77,"active_months":3,"first_month":"2026-02","last_month":"2026-04","archetype":"이탈","archetype_why":"6·7월 연속 무기록","slope":-3.09,"h1":28,"h2":0,"delta_pct":-100.0,"journal_avg":26.4,"journal_total":738,"sent_before_net":0.11,"sent_after_net":0.46,"mood_lift":0.36,"long_runs_90":0,"social_rate":14.3},{"name":"추재연","generation":"5기","runs":25,"minutes":1394,"hours":23.2,"series":[15,5,0,4,1,0],"minutes_series":[742,273,0,317,62,0],"avg_dur":55.8,"max_dur":105,"active_months":4,"first_month":"2026-02","last_month":"2026-06","archetype":"이탈위험","archetype_why":"7월 무기록","slope":-2.37,"h1":20,"h2":5,"delta_pct":-75.0,"journal_avg":237.7,"journal_total":5943,"sent_before_net":0.4,"sent_after_net":0.96,"mood_lift":0.56,"long_runs_90":2,"social_rate":24.0},{"name":"윤정원","generation":"5기","runs":25,"minutes":991,"hours":16.5,"series":[11,3,5,6,0,0],"minutes_series":[406,134,197,254,0,0],"avg_dur":39.6,"max_dur":67,"active_months":4,"first_month":"2026-02","last_month":"2026-05","archetype":"이탈","archetype_why":"6·7월 연속 무기록","slope":-1.8,"h1":19,"h2":6,"delta_pct":-68.4,"journal_avg":149.3,"journal_total":3733,"sent_before_net":0.12,"sent_after_net":0.84,"mood_lift":0.72,"long_runs_90":0,"social_rate":24.0},{"name":"김지훈","generation":"5기","runs":23,"minutes":3477,"hours":58.0,"series":[9,7,5,2,0,0],"minutes_series":[475,872,1500,630,0,0],"avg_dur":151.2,"max_dur":500,"active_months":4,"first_month":"2026-02","last_month":"2026-05","archetype":"이탈","archetype_why":"6·7월 연속 무기록","slope":-1.97,"h1":21,"h2":2,"delta_pct":-90.5,"journal_avg":52.7,"journal_total":1211,"sent_before_net":0.3,"sent_after_net":0.26,"mood_lift":-0.04,"long_runs_90":10,"social_rate":4.3},{"name":"박건희","generation":"5기","runs":22,"minutes":619,"hours":10.3,"series":[9,9,4,0,0,0],"minutes_series":[281,258,80,0,0,0],"avg_dur":28.1,"max_dur":50,"active_months":3,"first_month":"2026-02","last_month":"2026-04","archetype":"이탈","archetype_why":"6·7월 연속 무기록","slope":-2.17,"h1":22,"h2":0,"delta_pct":-100.0,"journal_avg":118.6,"journal_total":2609,"sent_before_net":0.0,"sent_after_net":0.0,"mood_lift":0.0,"long_runs_90":0,"social_rate":9.1},{"name":"김수진","generation":"5기","runs":22,"minutes":1239,"hours":20.6,"series":[9,10,1,1,1,0],"minutes_series":[511,583,75,35,35,0],"avg_dur":56.3,"max_dur":170,"active_months":5,"first_month":"2026-02","last_month":"2026-06","archetype":"이탈위험","archetype_why":"7월 무기록","slope":-2.06,"h1":20,"h2":2,"delta_pct":-90.0,"journal_avg":209.4,"journal_total":4607,"sent_before_net":-0.14,"sent_after_net":0.95,"mood_lift":1.09,"long_runs_90":3,"social_rate":18.2},{"name":"박히준","generation":"5기","runs":21,"minutes":933,"hours":15.6,"series":[5,0,5,3,8,0],"minutes_series":[205,0,168,185,375,0],"avg_dur":44.4,"max_dur":75,"active_months":4,"first_month":"2026-02","last_month":"2026-06","archetype":"이탈위험","archetype_why":"7월 무기록","slope":-0.09,"h1":10,"h2":11,"delta_pct":10.0,"journal_avg":121.1,"journal_total":2544,"sent_before_net":-0.1,"sent_after_net":0.29,"mood_lift":0.38,"long_runs_90":0,"social_rate":33.3},{"name":"이새롭","generation":"5기","runs":20,"minutes":770,"hours":12.8,"series":[13,7,0,0,0,0],"minutes_series":[527,243,0,0,0,0],"avg_dur":38.5,"max_dur":108,"active_months":2,"first_month":"2026-02","last_month":"2026-03","archetype":"이탈","archetype_why":"6·7월 연속 무기록","slope":-2.46,"h1":20,"h2":0,"delta_pct":-100.0,"journal_avg":155.6,"journal_total":3111,"sent_before_net":0.0,"sent_after_net":0.55,"mood_lift":0.55,"long_runs_90":1,"social_rate":15.0},{"name":"한채원","generation":"5기","runs":20,"minutes":991,"hours":16.5,"series":[10,0,5,5,0,0],"minutes_series":[485,0,255,251,0,0],"avg_dur":49.5,"max_dur":83,"active_months":3,"first_month":"2026-02","last_month":"2026-05","archetype":"이탈","archetype_why":"6·7월 연속 무기록","slope":-1.43,"h1":15,"h2":5,"delta_pct":-66.7,"journal_avg":241.1,"journal_total":4822,"sent_before_net":0.35,"sent_after_net":0.5,"mood_lift":0.15,"long_runs_90":0,"social_rate":35.0},{"name":"김경욱","generation":"5기","runs":18,"minutes":817,"hours":13.6,"series":[0,5,7,1,2,3],"minutes_series":[0,201,320,44,146,106],"avg_dur":45.4,"max_dur":100,"active_months":5,"first_month":"2026-03","last_month":"2026-07","archetype":"감쇠","archetype_why":"하반기 볼륨 감소","slope":0.0,"h1":12,"h2":6,"delta_pct":-50.0,"journal_avg":112.9,"journal_total":2033,"sent_before_net":0.06,"sent_after_net":0.22,"mood_lift":0.17,"long_runs_90":1,"social_rate":16.7},{"name":"엄지선","generation":"5기","runs":17,"minutes":578,"hours":9.6,"series":[6,6,2,2,1,0],"minutes_series":[158,215,65,74,66,0],"avg_dur":34,"max_dur":66,"active_months":5,"first_month":"2026-02","last_month":"2026-06","archetype":"이탈위험","archetype_why":"7월 무기록","slope":-1.29,"h1":14,"h2":3,"delta_pct":-78.6,"journal_avg":236.5,"journal_total":4020,"sent_before_net":-0.06,"sent_after_net":0.47,"mood_lift":0.53,"long_runs_90":0,"social_rate":17.6},{"name":"안신해","generation":"5기","runs":17,"minutes":1148,"hours":19.1,"series":[9,7,1,0,0,0],"minutes_series":[550,470,128,0,0,0],"avg_dur":67.5,"max_dur":128,"active_months":3,"first_month":"2026-02","last_month":"2026-04","archetype":"이탈","archetype_why":"6·7월 연속 무기록","slope":-1.91,"h1":17,"h2":0,"delta_pct":-100.0,"journal_avg":205.7,"journal_total":3497,"sent_before_net":0.29,"sent_after_net":0.35,"mood_lift":0.06,"long_runs_90":3,"social_rate":52.9},{"name":"신한주","generation":"5기","runs":17,"minutes":929,"hours":15.5,"series":[0,0,0,3,8,6],"minutes_series":[0,0,0,160,387,382],"avg_dur":54.6,"max_dur":144,"active_months":3,"first_month":"2026-05","last_month":"2026-07","archetype":"중도합류","archetype_why":"5월 첫 기록","slope":1.63,"h1":0,"h2":17,"delta_pct":null,"journal_avg":113.7,"journal_total":1933,"sent_before_net":-0.06,"sent_after_net":0.59,"mood_lift":0.65,"long_runs_90":1,"social_rate":11.8},{"name":"이수응","generation":"5기","runs":16,"minutes":1153,"hours":19.2,"series":[16,0,0,0,0,0],"minutes_series":[1153,0,0,0,0,0],"avg_dur":72.1,"max_dur":180,"active_months":1,"first_month":"2026-02","last_month":"2026-02","archetype":"이탈","archetype_why":"6·7월 연속 무기록","slope":-2.29,"h1":16,"h2":0,"delta_pct":-100.0,"journal_avg":43.2,"journal_total":692,"sent_before_net":0.12,"sent_after_net":0.38,"mood_lift":0.25,"long_runs_90":5,"social_rate":6.2},{"name":"변진환","generation":"5기","runs":16,"minutes":1073,"hours":17.9,"series":[12,2,2,0,0,0],"minutes_series":[799,150,124,0,0,0],"avg_dur":67.1,"max_dur":111,"active_months":3,"first_month":"2026-02","last_month":"2026-04","archetype":"이탈","archetype_why":"6·7월 연속 무기록","slope":-1.94,"h1":16,"h2":0,"delta_pct":-100.0,"journal_avg":220.6,"journal_total":3529,"sent_before_net":0.06,"sent_after_net":0.5,"mood_lift":0.44,"long_runs_90":4,"social_rate":6.2},{"name":"김미혜","generation":"5기","runs":13,"minutes":645,"hours":10.8,"series":[9,4,0,0,0,0],"minutes_series":[399,246,0,0,0,0],"avg_dur":49.6,"max_dur":98,"active_months":2,"first_month":"2026-02","last_month":"2026-03","archetype":"이탈","archetype_why":"6·7월 연속 무기록","slope":-1.63,"h1":13,"h2":0,"delta_pct":-100.0,"journal_avg":100.9,"journal_total":1312,"sent_before_net":-0.23,"sent_after_net":0.08,"mood_lift":0.31,"long_runs_90":1,"social_rate":7.7},{"name":"윤정화","generation":"5기","runs":13,"minutes":156,"hours":2.6,"series":[5,2,0,0,4,2],"minutes_series":[62,34,0,0,45,15],"avg_dur":12,"max_dur":22,"active_months":4,"first_month":"2026-02","last_month":"2026-07","archetype":"유지","archetype_why":"완만한 등락","slope":-0.26,"h1":7,"h2":6,"delta_pct":-14.3,"journal_avg":160,"journal_total":2080,"sent_before_net":0.15,"sent_after_net":0.31,"mood_lift":0.15,"long_runs_90":0,"social_rate":7.7},{"name":"우경호","generation":"5기","runs":13,"minutes":554,"hours":9.2,"series":[7,2,4,0,0,0],"minutes_series":[310,89,155,0,0,0],"avg_dur":42.6,"max_dur":77,"active_months":3,"first_month":"2026-02","last_month":"2026-04","archetype":"이탈","archetype_why":"6·7월 연속 무기록","slope":-1.29,"h1":13,"h2":0,"delta_pct":-100.0,"journal_avg":124.4,"journal_total":1617,"sent_before_net":0.08,"sent_after_net":0.31,"mood_lift":0.23,"long_runs_90":0,"social_rate":15.4},{"name":"김태영","generation":"5기","runs":11,"minutes":1226,"hours":20.4,"series":[8,1,0,0,2,0],"minutes_series":[586,280,0,0,360,0],"avg_dur":111.5,"max_dur":280,"active_months":3,"first_month":"2026-02","last_month":"2026-06","archetype":"이탈위험","archetype_why":"7월 무기록","slope":-1.06,"h1":9,"h2":2,"delta_pct":-77.8,"journal_avg":110.1,"journal_total":1211,"sent_before_net":0.09,"sent_after_net":0.64,"mood_lift":0.55,"long_runs_90":6,"social_rate":27.3},{"name":"이상언","generation":"5기","runs":10,"minutes":257,"hours":4.3,"series":[9,1,0,0,0,0],"minutes_series":[217,40,0,0,0,0],"avg_dur":25.7,"max_dur":75,"active_months":2,"first_month":"2026-02","last_month":"2026-03","archetype":"이탈","archetype_why":"6·7월 연속 무기록","slope":-1.37,"h1":10,"h2":0,"delta_pct":-100.0,"journal_avg":99.6,"journal_total":996,"sent_before_net":-0.1,"sent_after_net":0.5,"mood_lift":0.6,"long_runs_90":0,"social_rate":0.0},{"name":"채주경","generation":"5기","runs":7,"minutes":252,"hours":4.2,"series":[5,2,0,0,0,0],"minutes_series":[180,72,0,0,0,0],"avg_dur":36,"max_dur":45,"active_months":2,"first_month":"2026-02","last_month":"2026-03","archetype":"이탈","archetype_why":"6·7월 연속 무기록","slope":-0.89,"h1":7,"h2":0,"delta_pct":-100.0,"journal_avg":174.3,"journal_total":1220,"sent_before_net":0.0,"sent_after_net":0.29,"mood_lift":0.29,"long_runs_90":0,"social_rate":0.0},{"name":"이진우","generation":"5기","runs":6,"minutes":168,"hours":2.8,"series":[6,0,0,0,0,0],"minutes_series":[168,0,0,0,0,0],"avg_dur":28,"max_dur":53,"active_months":1,"first_month":"2026-02","last_month":"2026-02","archetype":"이탈","archetype_why":"6·7월 연속 무기록","slope":-0.86,"h1":6,"h2":0,"delta_pct":-100.0,"journal_avg":133.7,"journal_total":802,"sent_before_net":0.0,"sent_after_net":0.5,"mood_lift":0.5,"long_runs_90":0,"social_rate":16.7},{"name":"최경숙","generation":"5기","runs":6,"minutes":222,"hours":3.7,"series":[6,0,0,0,0,0],"minutes_series":[222,0,0,0,0,0],"avg_dur":37,"max_dur":70,"active_months":1,"first_month":"2026-02","last_month":"2026-02","archetype":"이탈","archetype_why":"6·7월 연속 무기록","slope":-0.86,"h1":6,"h2":0,"delta_pct":-100.0,"journal_avg":83.8,"journal_total":503,"sent_before_net":-0.33,"sent_after_net":1.17,"mood_lift":1.5,"long_runs_90":0,"social_rate":16.7},{"name":"이다원","generation":"5기","runs":4,"minutes":90,"hours":1.5,"series":[1,3,0,0,0,0],"minutes_series":[20,70,0,0,0,0],"avg_dur":22.5,"max_dur":30,"active_months":2,"first_month":"2026-02","last_month":"2026-03","archetype":"이탈위험","archetype_why":"7월 무기록","slope":-0.4,"h1":4,"h2":0,"delta_pct":-100.0,"journal_avg":65.8,"journal_total":263,"sent_before_net":-0.75,"sent_after_net":0.25,"mood_lift":1.0,"long_runs_90":0,"social_rate":0.0},{"name":"이화연","generation":"5기","runs":4,"minutes":634,"hours":10.6,"series":[3,1,0,0,0,0],"minutes_series":[289,345,0,0,0,0],"avg_dur":158.5,"max_dur":345,"active_months":2,"first_month":"2026-02","last_month":"2026-03","archetype":"이탈위험","archetype_why":"7월 무기록","slope":-0.51,"h1":4,"h2":0,"delta_pct":-100.0,"journal_avg":297,"journal_total":1188,"sent_before_net":0.5,"sent_after_net":0.75,"mood_lift":0.25,"long_runs_90":2,"social_rate":25.0},{"name":"황지호","generation":"5기","runs":4,"minutes":67,"hours":1.1,"series":[0,0,0,1,2,1],"minutes_series":[0,0,0,25,22,20],"avg_dur":16.8,"max_dur":25,"active_months":3,"first_month":"2026-05","last_month":"2026-07","archetype":"유지","archetype_why":"완만한 등락","slope":0.34,"h1":0,"h2":4,"delta_pct":null,"journal_avg":142,"journal_total":568,"sent_before_net":-0.5,"sent_after_net":-0.25,"mood_lift":0.25,"long_runs_90":0,"social_rate":0.0},{"name":"달리는 거북이","generation":"","runs":4,"minutes":329,"hours":5.5,"series":[0,0,0,0,3,1],"minutes_series":[0,0,0,0,219,110],"avg_dur":82.2,"max_dur":133,"active_months":2,"first_month":"2026-06","last_month":"2026-07","archetype":"스팟","archetype_why":"1~2개월 간헐 기록","slope":0.4,"h1":0,"h2":4,"delta_pct":null,"journal_avg":287.2,"journal_total":1149,"sent_before_net":0.25,"sent_after_net":1.75,"mood_lift":1.5,"long_runs_90":2,"social_rate":25.0},{"name":"한현철","generation":"3기, 5기","runs":3,"minutes":78,"hours":1.3,"series":[0,2,0,0,1,0],"minutes_series":[0,45,0,0,33,0],"avg_dur":26,"max_dur":33,"active_months":2,"first_month":"2026-03","last_month":"2026-06","archetype":"이탈위험","archetype_why":"7월 무기록","slope":-0.09,"h1":2,"h2":1,"delta_pct":-50.0,"journal_avg":99.7,"journal_total":299,"sent_before_net":-0.67,"sent_after_net":0.67,"mood_lift":1.33,"long_runs_90":0,"social_rate":0.0},{"name":"김지선","generation":"5기","runs":1,"minutes":10,"hours":0.2,"series":[1,0,0,0,0,0],"minutes_series":[10,0,0,0,0,0],"avg_dur":10,"max_dur":10,"active_months":1,"first_month":"2026-02","last_month":"2026-02","archetype":"스팟","archetype_why":"1~2개월 간헐 기록","slope":-0.14,"h1":1,"h2":0,"delta_pct":-100.0,"journal_avg":39,"journal_total":39,"sent_before_net":0.0,"sent_after_net":0.0,"mood_lift":0.0,"long_runs_90":0,"social_rate":0.0},{"name":"백소희","generation":"5기","runs":1,"minutes":1,"hours":0.0,"series":[1,0,0,0,0,0],"minutes_series":[1,0,0,0,0,0],"avg_dur":1,"max_dur":1,"active_months":1,"first_month":"2026-02","last_month":"2026-02","archetype":"스팟","archetype_why":"1~2개월 간헐 기록","slope":-0.14,"h1":1,"h2":0,"delta_pct":-100.0,"journal_avg":24,"journal_total":24,"sent_before_net":0.0,"sent_after_net":1.0,"mood_lift":1.0,"long_runs_90":0,"social_rate":0.0},{"name":"정연훈","generation":"5기","runs":1,"minutes":200,"hours":3.3,"series":[1,0,0,0,0,0],"minutes_series":[200,0,0,0,0,0],"avg_dur":200,"max_dur":200,"active_months":1,"first_month":"2026-02","last_month":"2026-02","archetype":"스팟","archetype_why":"1~2개월 간헐 기록","slope":-0.14,"h1":1,"h2":0,"delta_pct":-100.0,"journal_avg":29,"journal_total":29,"sent_before_net":0.0,"sent_after_net":0.0,"mood_lift":0.0,"long_runs_90":1,"social_rate":0.0},{"name":"박세진","generation":"5기","runs":1,"minutes":60,"hours":1.0,"series":[1,0,0,0,0,0],"minutes_series":[60,0,0,0,0,0],"avg_dur":60,"max_dur":60,"active_months":1,"first_month":"2026-02","last_month":"2026-02","archetype":"스팟","archetype_why":"1~2개월 간헐 기록","slope":-0.14,"h1":1,"h2":0,"delta_pct":-100.0,"journal_avg":29,"journal_total":29,"sent_before_net":0.0,"sent_after_net":0.0,"mood_lift":0.0,"long_runs_90":0,"social_rate":0.0},{"name":"황지은","generation":"5기","runs":1,"minutes":37,"hours":0.6,"series":[1,0,0,0,0,0],"minutes_series":[37,0,0,0,0,0],"avg_dur":37,"max_dur":37,"active_months":1,"first_month":"2026-02","last_month":"2026-02","archetype":"스팟","archetype_why":"1~2개월 간헐 기록","slope":-0.14,"h1":1,"h2":0,"delta_pct":-100.0,"journal_avg":63,"journal_total":63,"sent_before_net":0.0,"sent_after_net":0.0,"mood_lift":0.0,"long_runs_90":0,"social_rate":0.0},{"name":"윤재은","generation":"3,4,5","runs":1,"minutes":30,"hours":0.5,"series":[0,0,0,0,1,0],"minutes_series":[0,0,0,0,30,0],"avg_dur":30,"max_dur":30,"active_months":1,"first_month":"2026-06","last_month":"2026-06","archetype":"스팟","archetype_why":"1~2개월 간헐 기록","slope":0.09,"h1":0,"h2":1,"delta_pct":null,"journal_avg":135,"journal_total":135,"sent_before_net":-1.0,"sent_after_net":-1.0,"mood_lift":0.0,"long_runs_90":0,"social_rate":0.0},{"name":"디아즈대표 이수경","generation":"","runs":1,"minutes":30,"hours":0.5,"series":[0,0,0,0,1,0],"minutes_series":[0,0,0,0,30,0],"avg_dur":30,"max_dur":30,"active_months":1,"first_month":"2026-06","last_month":"2026-06","archetype":"스팟","archetype_why":"1~2개월 간헐 기록","slope":0.09,"h1":0,"h2":1,"delta_pct":null,"journal_avg":318,"journal_total":318,"sent_before_net":0.0,"sent_after_net":3.0,"mood_lift":3.0,"long_runs_90":0,"social_rate":0.0}],"archetypes":{"항상성":11,"성장":10,"감쇠":5,"이탈위험":11,"유지":5,"이탈":19,"중도합류":1,"스팟":8},"tier_trend":{"헤비 시작(2월 20회+)":{"members":8,"runs":[188,196,189,195,167,165],"active":[8,8,8,8,8,7],"survival":[100.0,100.0,100.0,100.0,100.0,87.5],"per_capita":[23.5,24.5,23.6,24.4,20.9,20.6],"share":[27.1,30.5,35.5,34.0,34.6,34.4]},"미들 시작(2월 10–19회)":{"members":26,"runs":[353,324,264,280,195,235],"active":[26,24,22,21,17,14],"survival":[100.0,92.3,84.6,80.8,65.4,53.8],"per_capita":[13.6,12.5,10.2,10.8,7.5,9.0],"share":[50.8,50.4,49.6,48.9,40.5,49.0]},"라이트 시작(2월 1–9회)":{"members":29,"runs":[154,116,72,93,102,69],"active":[29,20,15,12,12,8],"survival":[100.0,69.0,51.7,41.4,41.4,27.6],"per_capita":[5.3,4.0,2.5,3.2,3.5,2.4],"share":[22.2,18.0,13.5,16.2,21.2,14.4]},"2월 미기록":{"members":7,"runs":[0,7,7,5,18,11],"active":[0,2,1,3,7,4],"survival":[0.0,28.6,14.3,42.9,100.0,57.1],"per_capita":[0.0,1.0,1.0,0.7,2.6,1.6],"share":[0.0,1.1,1.3,0.9,3.7,2.3]}},"concentration":{"top20_members":14,"top20_run_share":49.8,"top20_min_share":47.9,"by_month":[38.6,47.4,53.2,53.4,53.9,57.1]},"predictors":[{"label":"2월 기록 횟수","unit":"회","하위 50%":{"n":31,"avg":5.6,"jul_survival":32.3},"상위 50%":{"n":32,"avg":16.3,"jul_survival":59.4},"gap_pp":27.1},{"label":"2월 평균 저널 분량","unit":"자","하위 50%":{"n":31,"avg":89.1,"jul_survival":32.3},"상위 50%":{"n":32,"avg":237.1,"jul_survival":59.4},"gap_pp":27.1},{"label":"2월 동반러닝 언급률","unit":"%","하위 50%":{"n":31,"avg":2.7,"jul_survival":38.7},"상위 50%":{"n":32,"avg":28.4,"jul_survival":53.1},"gap_pp":14.4},{"label":"2월 평균 지속시간","unit":"분","하위 50%":{"n":31,"avg":32.1,"jul_survival":45.2},"상위 50%":{"n":32,"avg":70.5,"jul_survival":46.9},"gap_pp":1.7}],"matrix2x2":{"corr_runs_journal":0.374,"cells":[{"freq":"빈도 상위","journal":"기록 긺","key":"TT","n":21,"jul_survival":71.4},{"freq":"빈도 상위","journal":"기록 짧음","key":"TF","n":11,"jul_survival":36.4},{"freq":"빈도 하위","journal":"기록 긺","key":"FT","n":11,"jul_survival":36.4},{"freq":"빈도 하위","journal":"기록 짧음","key":"FF","n":20,"jul_survival":30.0}]},"season_shift":{"n":46,"gainers":18,"losers":28,"median_delta_pct":-8.1,"top_gainers":[{"name":"김소영","spring":5,"summer":28,"runs_delta":23,"runs_delta_pct":460.0,"min_delta_pct":578.0,"archetype":"성장"},{"name":"송승진","spring":11,"summer":35,"runs_delta":24,"runs_delta_pct":218.2,"min_delta_pct":139.6,"archetype":"성장"},{"name":"윤정화","spring":2,"summer":6,"runs_delta":4,"runs_delta_pct":200.0,"min_delta_pct":76.5,"archetype":"유지"},{"name":"김희은","spring":16,"summer":34,"runs_delta":18,"runs_delta_pct":112.5,"min_delta_pct":163.6,"archetype":"성장"},{"name":"로함/김성우","spring":14,"summer":24,"runs_delta":10,"runs_delta_pct":71.4,"min_delta_pct":72.1,"archetype":"성장"},{"name":"박히준","spring":5,"summer":8,"runs_delta":3,"runs_delta_pct":60.0,"min_delta_pct":123.2,"archetype":"이탈위험"}],"top_losers":[{"name":"신한주","spring":0,"summer":14,"runs_delta":14,"runs_delta_pct":null,"min_delta_pct":null,"archetype":"중도합류"},{"name":"안신해","spring":8,"summer":0,"runs_delta":-8,"runs_delta_pct":-100.0,"min_delta_pct":-100.0,"archetype":"이탈"},{"name":"박건희","spring":13,"summer":0,"runs_delta":-13,"runs_delta_pct":-100.0,"min_delta_pct":-100.0,"archetype":"이탈"},{"name":"김지훈","spring":12,"summer":0,"runs_delta":-12,"runs_delta_pct":-100.0,"min_delta_pct":-100.0,"archetype":"이탈"},{"name":"윤정원","spring":8,"summer":0,"runs_delta":-8,"runs_delta_pct":-100.0,"min_delta_pct":-100.0,"archetype":"이탈"},{"name":"이영화","spring":13,"summer":0,"runs_delta":-13,"runs_delta_pct":-100.0,"min_delta_pct":-100.0,"archetype":"이탈"}]},"keywords":{"2026-02":[{"word":"춥다","count":31,"lift":3.62},{"word":"뛰어야지","count":17,"lift":3.51},{"word":"차다","count":13,"lift":3.22},{"word":"코로","count":35,"lift":3.19},{"word":"할수","count":16,"lift":3.0},{"word":"밖에서","count":19,"lift":2.94},{"word":"콧물이","count":16,"lift":2.91},{"word":"미세먼지","count":22,"lift":2.9},{"word":"종아리","count":19,"lift":2.87},{"word":"코호흡","count":66,"lift":2.82},{"word":"통증","count":14,"lift":2.71},{"word":"봄을","count":17,"lift":2.7}],"2026-03":[{"word":"너무나","count":13,"lift":2.39},{"word":"만나는","count":12,"lift":2.37},{"word":"말이","count":13,"lift":2.31},{"word":"회사","count":13,"lift":2.31},{"word":"퇴근","count":15,"lift":2.29},{"word":"마일","count":15,"lift":2.22},{"word":"봄이","count":26,"lift":2.17},{"word":"미세먼지","count":19,"lift":2.16},{"word":"언제나","count":13,"lift":2.1},{"word":"타고","count":21,"lift":2.08},{"word":"그런가","count":17,"lift":1.89},{"word":"스트레칭을","count":12,"lift":1.88}],"2026-04":[{"word":"벚꽃이","count":23,"lift":5.43},{"word":"하이록스","count":26,"lift":3.55},{"word":"무릎에","count":12,"lift":2.83},{"word":"활짝","count":14,"lift":2.69},{"word":"목이","count":12,"lift":2.63},{"word":"에너지를","count":12,"lift":2.54},{"word":"꽃이","count":12,"lift":2.46},{"word":"코호흡이","count":23,"lift":2.44},{"word":"이지","count":15,"lift":2.36},{"word":"어제보다","count":21,"lift":2.3},{"word":"입을","count":12,"lift":2.11},{"word":"오랫만에","count":13,"lift":2.1}],"2026-05":[{"word":"대면","count":31,"lift":4.8},{"word":"분들","count":16,"lift":3.15},{"word":"인터벌을","count":13,"lift":2.29},{"word":"베어풋","count":19,"lift":2.26},{"word":"이지","count":17,"lift":2.23},{"word":"워킹런지","count":13,"lift":2.21},{"word":"수업","count":25,"lift":2.2},{"word":"자세를","count":12,"lift":2.19},{"word":"코치님이","count":14,"lift":2.17},{"word":"트레일러닝","count":15,"lift":2.07},{"word":"롱런","count":23,"lift":2.06},{"word":"훈련을","count":16,"lift":1.99}],"2026-06":[{"word":"런지","count":94,"lift":3.2},{"word":"워킹런지","count":14,"lift":3.13},{"word":"팔달산","count":12,"lift":3.1},{"word":"런지를","count":14,"lift":2.94},{"word":"웜업하고","count":14,"lift":2.94},{"word":"바라보며","count":13,"lift":2.81},{"word":"인왕산","count":14,"lift":2.76},{"word":"재미있다","count":16,"lift":2.75},{"word":"그늘이","count":13,"lift":2.57},{"word":"오르막","count":26,"lift":2.49},{"word":"런지로","count":22,"lift":2.46},{"word":"업힐","count":19,"lift":2.45}],"2026-07":[{"word":"스트레칭으로","count":19,"lift":4.72},{"word":"런지로","count":37,"lift":4.29},{"word":"덥고","count":22,"lift":4.03},{"word":"습도가","count":21,"lift":3.75},{"word":"여름","count":35,"lift":3.53},{"word":"더워서","count":21,"lift":3.48},{"word":"물이","count":12,"lift":3.21},{"word":"시원해서","count":16,"lift":3.09},{"word":"우중런","count":23,"lift":3.08},{"word":"한잔","count":13,"lift":2.83},{"word":"구름이","count":12,"lift":2.79},{"word":"업힐","count":20,"lift":2.68}]},"arc":{"reluctant_runs":127,"reluctant_rate":3.7,"after_net_reluctant":0.62,"after_net_all":0.55,"after_positive_share_reluctant":49.6,"avg_dur_reluctant":49.7,"avg_dur_all":60.5,"by_month":{"2026-02":3.9,"2026-03":4.8,"2026-04":3.9,"2026-05":2.6,"2026-06":3.7,"2026-07":3.1},"samples":[{"name":"심혜원","date":"2026-07-05","before":"시험준비한다는 핑계로 계속 나가지 않겠다는 녀석에게 한달 내내 귀에 못을 박았다. 시험 끝나자마자 산에 가야 한다고. 기회가 ","after":"청계산 너모 매력적이다! 다음에도 자온에서 또 출발하기로! 남순님 덕분에 즐거운 코스 발견!","min":230},{"name":"백미라","date":"2026-04-25","before":"두달동안 신경쓰이게 했던 신스프린트도 나았고  날씨도 우려했던 것과 달리 덥지도 춥지도 않다. 근데 웜업하는데 몸이 이상하게 ","after":"날씨와 코스, 운영이 참 좋았던 대회였는데.. 몇달간 준비했고, 부상에도 꾸준히 이어와서 기록이 다는 아니지만 그동안의 노력에 대한 결과를 보고 싶었던 대회였다.","min":224},{"name":"정남C","date":"2026-07-05","before":"빗방울이 조금씩 굵어집니다. 얼룩진 차창을 바라보는 마음이 구겨집니다. 레인자켓도 우비도 안챙겼는데 괜찮을까요? 저도 아무것도","after":"포장된 평창마을길 반대로 난 비포장 옛성길로 접어드니 마침내 오늘 달리기가 시작된 기분입니다. 가려진 모든 것들을 걷어 낸 있는 그대로의 북한산에서 있는 그대로의","min":170},{"name":"정남C","date":"2026-05-09","before":"눈을 뜨고도 한참을 망설이는 마음입니다. 혼자서 내마음대로 하느냐 다같이 하기로한걸 해보느냐. 빠질 구실이 없기도 하고, 해보","after":"뛰어준 분들의 관심과 애정 덕분에 지루함도 만나고 용기도 채우고 지침도 없이 함께함만 선명하게 남았습니다. 하늘가득 구름보다 하얗던 아카시아 꽃내음이 아직도 콧잔","min":152},{"name":"심혜원","date":"2026-02-07","before":"이번주 최장거리, 왠지 두근두근- 아이 깨워서 같이 달리기. 나가기 싫은 얼굴이지만 격려독려협박으로 끌어냈다","after":"21km 를 달릴 줄이야. 내가 달릴 수 있을줄이야. 망아지덕분이다. 이제 누워야겠다....","min":148},{"name":"이예정","date":"2026-02-27","before":"피곤하다. 더 누워있고 싶다. 나에게 쉬는 날 롱런은 기쁨인데 이런 감정이 낯설다. 요즘 너무 바빠서 지쳤나보다. 침대에서 더","after":"단백질 쉐이크 마시고 서둘러서 피티 받으러 갔다. 바벨스쿼트랑 런지를 했는데 오래 달린 후인데도 무게있게 하체운동이 가능해서 신기했다. 성장한 것 같다. 보통 피","min":139}]},"recovery":{"overall":{"denominator":469,"recovered":212,"rate":45.2},"before_neg_rate":13.8,"before_pos_rate":15.9,"after_pos_rate":45.0,"after_neg_rate":7.0,"by_month":{"2026-02":{"denominator":92,"recovered":47,"rate":51.1},"2026-03":{"denominator":104,"recovered":44,"rate":42.3},"2026-04":{"denominator":70,"recovered":38,"rate":54.3},"2026-05":{"denominator":67,"recovered":26,"rate":38.8},"2026-06":{"denominator":82,"recovered":34,"rate":41.5},"2026-07":{"denominator":54,"recovered":23,"rate":42.6}},"positive_lift_pp":29.1},"seasons":[{"key":"winter","label":"겨울","emoji":"❄️","range":"02/01~03/05","days":33,"runs":807,"runs_per_day":24.5,"minutes":43861,"hours":731.0,"avg_dur":54.4,"members":63,"recovery":{"denominator":110,"recovered":53,"rate":48.2},"after_pos_rate":45.8,"journal":190.7},{"key":"spring","label":"봄","emoji":"🌸","range":"03/06~05/31","days":87,"runs":1636,"runs_per_day":18.8,"minutes":100184,"hours":1669.7,"avg_dur":61.2,"members":58,"recovery":{"denominator":223,"recovered":102,"rate":45.7},"after_pos_rate":45.8,"journal":253.2},{"key":"summer","label":"여름","emoji":"☀️","range":"06/01~07/31","days":61,"runs":962,"runs_per_day":15.8,"minutes":62061,"hours":1034.3,"avg_dur":64.5,"members":44,"recovery":{"denominator":136,"recovered":57,"rate":41.9},"after_pos_rate":42.8,"journal":243.9}],"canon_themes":{"labels":{"joy":"즐거움·기쁨","gratitude":"감사","together":"함께·공동체","challenge":"힘듦·도전","weather":"날씨·계절감","body":"몸·컨디션","mindful":"마음챙김·평온","achieve":"성취·뿌듯","nature":"자연·풍경","recovery":"회복·천천히","routine":"꾸준함·루틴"},"by_month":{"2026-02":{"joy":29.1,"gratitude":11.5,"together":17.6,"challenge":15.4,"weather":31.8,"body":56.3,"mindful":21.4,"achieve":14.2,"nature":18.1,"recovery":33.7,"routine":20.4},"2026-03":{"joy":31.3,"gratitude":16.5,"together":22.2,"challenge":21.8,"weather":37.0,"body":51.9,"mindful":24.3,"achieve":14.3,"nature":26.0,"recovery":36.7,"routine":18.0},"2026-04":{"joy":36.5,"gratitude":16.4,"together":23.5,"challenge":19.2,"weather":37.6,"body":54.3,"mindful":26.5,"achieve":13.2,"nature":37.0,"recovery":41.5,"routine":19.9},"2026-05":{"joy":38.0,"gratitude":16.9,"together":29.3,"challenge":21.1,"weather":41.7,"body":55.0,"mindful":24.1,"achieve":19.4,"nature":32.6,"recovery":46.6,"routine":16.8},"2026-06":{"joy":32.2,"gratitude":17.2,"together":26.1,"challenge":17.4,"weather":39.6,"body":48.5,"mindful":22.0,"achieve":11.8,"nature":33.8,"recovery":40.9,"routine":18.0},"2026-07":{"joy":28.1,"gratitude":16.9,"together":19.8,"challenge":23.5,"weather":55.2,"body":43.1,"mindful":21.5,"achieve":12.9,"nature":37.3,"recovery":36.7,"routine":21.7}},"by_season":{"winter":{"joy":29.1,"gratitude":12.9,"together":18.0,"challenge":15.6,"weather":32.5,"body":55.8,"mindful":21.3,"achieve":14.6,"nature":18.5,"recovery":34.2,"routine":20.4},"spring":{"joy":35.5,"gratitude":16.3,"together":25.2,"challenge":21.0,"weather":38.9,"body":53.7,"mindful":25.2,"achieve":15.5,"nature":32.3,"recovery":41.7,"routine":18.0},"summer":{"joy":30.1,"gratitude":17.0,"together":23.0,"challenge":20.5,"weather":47.4,"body":45.8,"mindful":21.7,"achieve":12.4,"nature":35.6,"recovery":38.8,"routine":19.9}},"overall":{"joy":32.5,"gratitude":15.7,"together":22.9,"challenge":19.6,"weather":39.8,"body":52.0,"mindful":23.3,"achieve":14.4,"nature":29.9,"recovery":39.1,"routine":19.1},"source":"mindfulrunning/operations/advance-5th/running-log/analyze.py LEXICON (정본)"},"russell":{"labels":{"hp":{"quadrant":"고각성·긍정","desc":"활력·기쁨·호기심"},"lp":{"quadrant":"저각성·긍정","desc":"평온·감사·만족"},"hn":{"quadrant":"고각성·부정","desc":"답답·불안·긴장"},"ln":{"quadrant":"저각성·부정","desc":"우울·외로움·무력"}},"phases":{"thought_before":{"hp":23.9,"lp":38.6,"hn":19.9,"ln":17.6},"thought_during":{"hp":14.4,"lp":67.4,"hn":13.0,"ln":5.2},"thought_after":{"hp":18.3,"lp":70.5,"hn":7.7,"ln":3.5}},"by_month":{"2026-02":{"hp":19.6,"lp":68.5,"hn":8.9,"ln":3.0},"2026-03":{"hp":16.2,"lp":71.3,"hn":9.5,"ln":3.1},"2026-04":{"hp":19.8,"lp":71.0,"hn":5.9,"ln":3.3},"2026-05":{"hp":16.9,"lp":71.9,"hn":7.7,"ln":3.4},"2026-06":{"hp":18.5,"lp":72.6,"hn":5.2,"ln":3.6},"2026-07":{"hp":19.7,"lp":66.8,"hn":7.8,"ln":5.7}},"caveat":"Inferred — 사전 기반 텍스트 추출이며 회원 직접 자기보고(Observed)가 아님 (Core Ontology v2.2 P3)"},"generations":[{"generation":"5기 단독","runs":3073,"members":63,"runs_by_month":[646,595,481,515,420,416],"members_by_month":[60,51,43,41,37,29],"per_capita_by_month":[10.8,11.7,11.2,12.6,11.4,14.3],"avg_dur":60.6,"share":90.2},{"generation":"다기수(3·4·5기)","runs":274,"members":4,"runs_by_month":[44,48,46,43,44,49],"members_by_month":[2,3,2,2,4,2],"per_capita_by_month":[22.0,16.0,23.0,21.5,11.0,24.5],"avg_dur":62.6,"share":8.0},{"generation":"다기수·평생","runs":53,"members":1,"runs_by_month":[5,0,5,15,14,14],"members_by_month":[1,0,1,1,1,1],"per_capita_by_month":[5.0,0,5.0,15.0,14.0,14.0],"avg_dur":44.6,"share":1.6},{"generation":"(미기재)","runs":5,"members":2,"runs_by_month":[0,0,0,0,4,1],"members_by_month":[0,0,0,0,2,1],"per_capita_by_month":[0,0,0,0,2.0,1.0],"avg_dur":71.8,"share":0.1}],"lexicon_sensitivity":{"topic":"마음챙김 어휘 추이","series":[{"name":"ad-hoc 사전 (본 파이프라인 초판)","values":[45.5,42.9,44.7,36.5,33.8,31.0],"tokens":"호흡·명상·마음챙김·마음이·집중·알아차·비우·고요·내려놓·감사·생각을·온전히·현재에","verdict":"6개월 단조 감소 (45.5 → 31.0)"},{"name":"MFRS 정본 LEXICON mindful","values":[21.4,24.3,26.5,24.1,22.0,21.5],"tokens":"평온·차분·고요·비우·내려놓·여유·편안·마음이·명상·생각을·잡념·위로·치유·다독","verdict":"단조 감소 아님 — 봄 정점(26.5) 후 여름 원위치(21.5)"},{"name":"MFRS 정본 LEXICON gratitude (참고)","values":[11.5,16.5,16.4,16.9,17.2,16.9],"tokens":"감사·고맙·고마운·고마웠·덕분","verdict":"오히려 상승 (11.5 → 16.9)"}],"conclusion":"두 사전이 공통으로 지지하는 것은 '봄 정점 후 여름 하락'(계절성)뿐이며, '6개월 단조 감소'는 ad-hoc 사전에서만 나타납니다. 초판의 단조 감소 서술은 정본 기준으로 재현되지 않아 철회하고 계절성 서술로 정정했습니다.","season_gap_pp":3.5},"streaks":[{"name":"백미라","best_streak":77,"run_days":179},{"name":"이세영","best_streak":43,"run_days":164},{"name":"신순주","best_streak":25,"run_days":148},{"name":"전영호","best_streak":22,"run_days":112},{"name":"김종훈","best_streak":16,"run_days":114},{"name":"임상범","best_streak":16,"run_days":89},{"name":"황유숙","best_streak":11,"run_days":141},{"name":"김찬현","best_streak":11,"run_days":99},{"name":"임자영","best_streak":10,"run_days":90},{"name":"설재영","best_streak":8,"run_days":109},{"name":"이유진","best_streak":8,"run_days":82},{"name":"이영화","best_streak":7,"run_days":26},{"name":"이훈영","best_streak":7,"run_days":97},{"name":"정남C","best_streak":7,"run_days":92},{"name":"박경애","best_streak":7,"run_days":90}],"raw_locations":[["동네공원",236],["트레드밀",119],["한강",89],["오금천",85],["올림픽공원",84],["동네한바퀴",69],["광교호수공원",69],["안양천",60],["탄천",49],["홍제천",49],["중랑천",34],["좌광천",33],["동네산책로",33],["양재천",32],["올공",32],["동네",28],["호수공원",27],["연희공원",23],["청림어울림길",23],["집",22],["여의도공원",22],["불암천",20],["인왕산",20],["헬스장",17],["팔달산둘레길",17]],"caveats":["run_time 필드는 8.5%만 채워졌고 값 의미가 혼재(페이스 08:07형 · 시각 22:55형)하여 전 분석에서 제외.","거리(km) 필드가 원천에 없어 볼륨 지표는 시간(분) 기준. 페이스·거리 기반 결론은 도출하지 않음.","duration_min 최댓값 1,440분(백미라님 6/13 100마일 도전)은 오류가 아닌 실제 울트라 이벤트로 확인 — 이상치 제거 대신 별도 세그먼트로 분리.","정성 분석은 규칙기반 어휘사전(감성 60어·주제 7군)+단순 부정어 반전이며 형태소 분석기를 쓰지 않음. 상대 비교용 지표로만 해석.","사진 첨부율이 2~4월 0% → 6월 75.3% → 7월 81.2%로 급변하는데, 이는 회원 행동 변화가 아니라 사진 업로드 기능 도입 시점으로 보임 — 참여도 지표로 쓰지 않음."],"qc":{"checks":[{"name":"total_runs","observed":3405,"expected":3405,"match":true,"note":""},{"name":"total_minutes","observed":206106,"expected":206106,"match":true,"note":""},{"name":"unique_members","observed":70,"expected":70,"match":true,"note":""},{"name":"months_present","observed":["2026-02","2026-03","2026-04","2026-05","2026-06","2026-07"],"expected":["2026-02","2026-03","2026-04","2026-05","2026-06","2026-07"],"match":true,"note":"파일명·summary.range는 2026-01 시작이나 실제 최소 일자는 2026-02-01 → 1월 기록 0건"}],"source":{"log":{"path":"/Users/peterkim/SynologyDrive/OneDrive/Downloads/run_logs_2026-01_07.json","sha256_16":"e003b4efd3f29a87","records":3405},"summary":{"path":"/Users/peterkim/SynologyDrive/OneDrive/Downloads/run_logs_2026-01_07_summary.json","sha256_16":"01d8a4d850848873"},"generated_at":"2026-08-04T13:17:56+09:00"},"coverage":{"title":99.6,"thought_before":99.8,"thought_during":99.8,"thought_after":99.8,"location":96.8,"photo_url":23.3,"run_time":8.5},"integrity":{"duplicate_ids":0,"semantic_duplicate_candidates":28,"semantic_duplicate_rate":0.82,"notion_id_missing":995,"notion_id_missing_rate":29.2,"text_complete":3398,"text_complete_rate":99.79,"duration_300_plus":42,"duration_300_plus_rate":1.23,"duration_300_plus_verified":[{"name":"백미라","date":"2026-06-13","min":1440,"title":"100마일 완주는 못했지만…"},{"name":"로함/김성우","date":"2026-07-12","min":993,"title":"힐링팀에서 나홀로 완주"},{"name":"로함/김성우","date":"2026-06-06","min":985,"title":"종주는 힘들다"},{"name":"로함/김성우","date":"2026-06-01","min":921,"title":"그래도 해냈다"},{"name":"로함/김성우","date":"2026-04-11","min":810,"title":"나는 왜 달리는가?"}],"note":"의미상 중복 후보(같은 회원·같은 날·같은 시간·같은 제목)는 공식 누계와 일치를 유지하기 위해 제거하지 않았으며, 최대 영향도는 전체의 0.82%입니다."},"caveats":["run_time 필드는 8.5%만 채워졌고 값 의미가 혼재(페이스 08:07형 · 시각 22:55형)하여 전 분석에서 제외.","거리(km) 필드가 원천에 없어 볼륨 지표는 시간(분) 기준. 페이스·거리 기반 결론은 도출하지 않음.","duration_min 최댓값 1,440분(백미라님 6/13 100마일 도전)은 오류가 아닌 실제 울트라 이벤트로 확인 — 이상치 제거 대신 별도 세그먼트로 분리.","정성 분석은 규칙기반 어휘사전(감성 60어·주제 7군)+단순 부정어 반전이며 형태소 분석기를 쓰지 않음. 상대 비교용 지표로만 해석.","사진 첨부율이 2~4월 0% → 6월 75.3% → 7월 81.2%로 급변하는데, 이는 회원 행동 변화가 아니라 사진 업로드 기능 도입 시점으로 보임 — 참여도 지표로 쓰지 않음."]}};
+const $ = s => document.querySelector(s);
+const el = (t,c,h) => { const e=document.createElement(t); if(c)e.className=c; if(h!==undefined)e.innerHTML=h; return e; };
+const nf = n => n.toLocaleString('ko-KR');
+/* MFRS 정본 팔레트(라이트·저채도) — CSS :root 와 1:1 대응. 빨강 금지 → 부정 신호는 코랄. */
+const C = { a1:'#2d6a4f', a2:'#2c6da6', a3:'#b86a2c', a4:'#146780', a5:'#6c4a7f', a6:'#b85f4d',
+            g1:'#2d6a4f', g2:'#b85f4d', gr:'#a3aeaa' };
+/* SVG 공통 잉크 — 라이트 배경 기준 */
+const INK='#1a1a1a', LBL='#4a4a4a', TICK='#888888', GRID='#e5e7eb', PAPER='#ffffff', NEUT='#a3aeaa';
+/* 막대 안 라벨은 채움색 명도에 따라 잉크/화이트를 고른다.
+   (다크 버전은 모든 막대가 어두워 화이트 고정으로 충분했지만, 라이트 팔레트는
+    옅은 중립색·순차 램프 하단이 섞여 화이트가 뭉개진다 — WCAG 상대 명도로 분기) */
+function lum(hex){ const h=hex.replace('#',''),
+  n=h.length===3?h.split('').map(c=>parseInt(c+c,16)):[0,2,4].map(i=>parseInt(h.substr(i,2),16));
+  const f=n.map(v=>{v/=255; return v<=.03928? v/12.92 : Math.pow((v+.055)/1.055,2.4);});
+  return .2126*f[0]+.7152*f[1]+.0722*f[2]; }
+/* opacity 로 흰 배경과 섞이는 실제 렌더값을 반영해 판정 */
+const onFill=(hex,op=1)=> (lum(hex)*op + (1-op)) > .45 ? INK : PAPER;
+
+/* ── SVG helpers ─────────────────────────────────────────── */
+function svg(w,h){ const s=document.createElementNS('http://www.w3.org/2000/svg','svg');
+  s.setAttribute('viewBox',`0 0 ${w} ${h}`); s.setAttribute('width','100%');
+  s.style.minWidth = (w<420?w:0)+'px'; return s; }
+function nd(t,a){ const e=document.createElementNS('http://www.w3.org/2000/svg',t);
+  for(const k in a) e.setAttribute(k,a[k]); return e; }
+function txt(x,y,s,o={}){ const t=nd('text',{x,y,fill:o.fill||LBL,'font-size':o.fs||11,
+  'text-anchor':o.anchor||'middle','font-weight':o.fw||400}); t.textContent=s; return t; }
+function legend(id, items){ const w=$(id); if(!w) return; w.innerHTML='';
+  items.forEach(i=>w.appendChild(el('span','',`<i style="background:${i.c}"></i>${i.n}`))); }
+
+/* 그룹 막대 + 라인 (2축) */
+function comboChart(host, o){
+  const W=o.w||680, H=o.h||300, P={t:22,r:52,b:34,l:46};
+  const iw=W-P.l-P.r, ih=H-P.t-P.b;
+  const s=svg(W,H); const n=o.labels.length;
+  const bmax = Math.max(...o.bars.flatMap(b=>b.values))*1.12;
+  const lmax = o.lines.length? Math.max(...o.lines.flatMap(l=>l.values))*1.18 : 1;
+  const lmin = o.lines.length? Math.min(0,...o.lines.flatMap(l=>l.values)) : 0;
+  for(let i=0;i<=4;i++){ const y=P.t+ih*i/4;
+    s.appendChild(nd('line',{x1:P.l,y1:y,x2:W-P.r,y2:y,stroke:GRID,'stroke-width':1}));
+    s.appendChild(txt(P.l-7,y+4,Math.round(bmax*(1-i/4)),{anchor:'end',fs:10,fill:TICK})); }
+  const step=iw/n, bw=Math.min(38,step*0.62/o.bars.length);
+  o.labels.forEach((L,i)=>{
+    const cx=P.l+step*(i+0.5);
+    o.bars.forEach((b,bi)=>{
+      const h=b.values[i]/bmax*ih;
+      const x=cx-(o.bars.length*bw)/2+bi*bw;
+      s.appendChild(nd('rect',{x,y:P.t+ih-h,width:bw-2,height:Math.max(h,1),fill:b.color,rx:3,opacity:.88}));
+      // 값 라벨은 막대 안쪽 밑단에 — 위쪽을 지나는 추세선 라벨과의 충돌 회피.
+      // 막대가 좁으면(다계열 그룹) 라벨끼리 겹치므로 생략한다.
+      if(bw>=22){
+        const inside = h>=24;
+        s.appendChild(txt(x+(bw-2)/2, inside? P.t+ih-7 : P.t+ih-h-5, nf(b.values[i]),
+          {fs:10.5, fill: inside?onFill(b.color,.88):INK, fw:750}));
+      }
+    });
+    s.appendChild(txt(cx,H-11,L,{fs:12,fill:LBL,fw:600}));
+  });
+  o.lines.forEach(l=>{
+    const pts=l.values.map((v,i)=>[P.l+step*(i+0.5), P.t+ih-(v-lmin)/(lmax-lmin)*ih]);
+    s.appendChild(nd('polyline',{points:pts.map(p=>p.join(',')).join(' '),fill:'none',
+      stroke:l.color,'stroke-width':2.4,'stroke-linejoin':'round'}));
+    pts.forEach((p,i)=>{ s.appendChild(nd('circle',{cx:p[0],cy:p[1],r:3.8,fill:PAPER,stroke:l.color,'stroke-width':2.2}));
+      const lab=String(l.fmt?l.fmt(l.values[i]):l.values[i]);
+      // 막대 위를 지날 때도 읽히도록 라벨 뒤에 배경 칩
+      s.appendChild(nd('rect',{x:p[0]-lab.length*3.1-3,y:p[1]-19,width:lab.length*6.2+6,height:13,
+        rx:3,fill:PAPER,opacity:.85}));
+      s.appendChild(txt(p[0],p[1]-9,lab,{fs:10,fill:l.color,fw:650})); });
+  });
+  if(o.lines.length){
+    for(let i=0;i<=4;i++){ const y=P.t+ih*i/4;
+      s.appendChild(txt(W-P.r+7,y+4,Math.round((lmax-(lmax-lmin)*i/4)*10)/10,{anchor:'start',fs:10,fill:TICK})); }
+  }
+  host.innerHTML=''; host.appendChild(s);
+}
+
+/* 다중 라인 */
+function lineChart(host,o){
+  const W=o.w||600,H=o.h||280,P={t:20,r:18,b:32,l:42};
+  const iw=W-P.l-P.r, ih=H-P.t-P.b, n=o.labels.length;
+  const all=o.series.flatMap(x=>x.values);
+  const mx=o.max!==undefined?o.max:Math.max(...all)*1.12, mn=o.min!==undefined?o.min:Math.min(0,...all);
+  const s=svg(W,H);
+  for(let i=0;i<=4;i++){const y=P.t+ih*i/4;
+    s.appendChild(nd('line',{x1:P.l,y1:y,x2:W-P.r,y2:y,stroke:GRID}));
+    s.appendChild(txt(P.l-7,y+4,Math.round((mx-(mx-mn)*i/4)*10)/10,{anchor:'end',fs:10,fill:TICK}));}
+  const step=n>1?iw/(n-1):0;
+  o.labels.forEach((L,i)=>s.appendChild(txt(P.l+step*i,H-10,L,{fs:11.5,fill:LBL,fw:600})));
+  o.series.forEach(se=>{
+    const pts=se.values.map((v,i)=>[P.l+step*i,P.t+ih-(v-mn)/(mx-mn)*ih]);
+    s.appendChild(nd('polyline',{points:pts.map(p=>p.join(',')).join(' '),fill:'none',
+      stroke:se.color,'stroke-width':2.6,'stroke-linejoin':'round','stroke-linecap':'round'}));
+    pts.forEach((p,i)=>{s.appendChild(nd('circle',{cx:p[0],cy:p[1],r:3.6,fill:PAPER,stroke:se.color,'stroke-width':2.2}));
+      if(se.label!==false && !(o.skipFirstLabel && i===0))
+        s.appendChild(txt(p[0],p[1]-9,se.fmt?se.fmt(se.values[i]):se.values[i],{fs:9.5,fill:se.color,fw:650}));});
+  });
+  host.innerHTML=''; host.appendChild(s);
+}
+
+/* 100% 누적 막대 */
+function stackChart(host,o){
+  const W=o.w||330,H=o.h||270,P={t:12,r:8,b:30,l:8};
+  const iw=W-P.l-P.r, ih=H-P.t-P.b, n=o.labels.length;
+  const s=svg(W,H); const step=iw/n, bw=step*0.66;
+  o.labels.forEach((L,i)=>{
+    let acc=0; const x=P.l+step*i+(step-bw)/2;
+    o.stacks.forEach((st,si)=>{
+      const v=st.values[i]; const h=v/100*ih;
+      s.appendChild(nd('rect',{x,y:P.t+ih-acc-h,width:bw,height:Math.max(h,0),fill:st.color,opacity:.9,
+        rx: (si===o.stacks.length-1?3:0)}));
+      if(h>17) s.appendChild(txt(x+bw/2,P.t+ih-acc-h/2+4,Math.round(v)+'',{fs:10,fill:onFill(st.color,.9),fw:750}));
+      acc+=h;
+    });
+    s.appendChild(txt(x+bw/2,H-9,L,{fs:11.5,fill:LBL,fw:600}));
+  });
+  host.innerHTML=''; host.appendChild(s);
+}
+
+/* 가로 막대 */
+function hbarChart(host,o){
+  const rowH=o.rowH||26, W=o.w||330, H=o.items.length*rowH+14, L=o.labelW||70;
+  const s=svg(W,H); const mx=Math.max(...o.items.map(i=>i.v))*1.16;
+  o.items.forEach((it,i)=>{
+    const y=i*rowH+8, w=(W-L-46)*it.v/mx;
+    s.appendChild(txt(L-8,y+13,it.k,{anchor:'end',fs:11.5,fill:LBL,fw:600}));
+    s.appendChild(nd('rect',{x:L,y,width:Math.max(w,2),height:rowH-9,fill:it.c||C.a2,rx:4,opacity:.9}));
+    s.appendChild(txt(L+w+7,y+13,o.fmt?o.fmt(it.v):nf(it.v),{anchor:'start',fs:11,fill:INK,fw:650}));
+  });
+  host.innerHTML=''; host.appendChild(s);
+}
+
+function spark(vals,w=92,h=22){
+  const mx=Math.max(...vals,1);
+  const bw=w/vals.length;
+  let r=`<svg class="spark" width="${w}" height="${h}" viewBox="0 0 ${w} ${h}">`;
+  vals.forEach((v,i)=>{ const bh=v/mx*(h-3);
+    const c = v===0?'#dfe3e1':(i>=3?C.a1:C.a2);
+    r+=`<rect x="${i*bw+0.8}" y="${h-bh}" width="${bw-1.6}" height="${Math.max(bh,1.5)}" fill="${c}" rx="1"/>`;});
+  return r+'</svg>';
+}
+
+/* ── 1. hero + KPI ───────────────────────────────────────── */
+const O=D.overall, M=D.monthly;
+$('#hsub').textContent = `${D.meta.period} · 마인드풀러닝 러닝 로그 ${nf(O.runs)}건 전수 분석 · 정량 지표와 회원이 직접 쓴 ${nf(O.journal_chars)}자의 기록을 함께 읽습니다.`;
+const qcOk = D.qc.checks.every(c=>c.match);
+$('#hbadge').innerHTML =
+  `<span class="badge priv">🔒 회원 전용</span>`+
+  `<span class="badge ${qcOk?'ok':''}">원천 대조 ${qcOk?'4/4 일치':'불일치 있음'}</span>`+
+  `<span class="badge">회원 ${O.members}명</span>`+
+  `<span class="badge">기록 ${nf(O.runs)}건</span>`+
+  `<span class="badge">누적 ${nf(O.hours)}시간</span>`+
+  `<span class="badge">생성 ${D.meta.generated_at.slice(0,10)} · engine=claude</span>`;
+
+const kpis=[
+  {v:nf(O.runs),l:'총 기록',d:`월평균 ${Math.round(O.runs/6)}건`},
+  {v:nf(O.hours)+'h',l:'누적 러닝 시간',d:`${nf(O.minutes)}분 · 1인 평균 ${Math.round(O.minutes/O.members/60)}시간`},
+  {v:O.members,l:'참여 회원',d:`7월 활동 ${M[5].active_members}명`},
+  {v:O.avg_dur+'분',l:'1회 평균 지속',d:`중앙값 ${O.median_dur}분`},
+  {v:`${O.active_days}/${O.period_days}`,l:'기록이 있는 날',d:'181일 전부 — 하루도 빈 날 없음'},
+  {v:nf(O.avg_journal)+'자',l:'기록 1건당 저널',d:`총 ${nf(Math.round(O.journal_chars/10000))}만 자`},
+  {v:D.concentration.top20_run_share+'%',l:'상위 20% 기록 점유',d:`${D.concentration.top20_members}명이 절반`},
+];
+kpis.forEach(k=>$('#kpis').appendChild(el('div','card kpi',
+  `<div class="v">${k.v}</div><div class="l">${k.l}</div><div class="d">${k.d}</div>`)));
+
+/* ── 2. 월별 궤적 ───────────────────────────────────────── */
+comboChart($('#ch-monthly'),{
+  labels:M.map(m=>m.label),
+  bars:[{name:'기록 수',values:M.map(m=>m.runs),color:C.a2}],
+  lines:[{name:'활동 회원',values:M.map(m=>m.active_members),color:C.a3},
+         {name:'1회 평균(분)',values:M.map(m=>m.avg_dur),color:C.a1,fmt:v=>v}],
+  w:700,h:310});
+legend('#lg-monthly',[{n:'기록 수 (왼쪽 축)',c:C.a2},{n:'활동 회원 수 (오른쪽 축)',c:C.a3},{n:'1회 평균 지속시간(분, 오른쪽 축)',c:C.a1}]);
+
+$('#ins-monthly').innerHTML = `<div class="h">읽는 법</div><p>
+6개월 동안 <b>기록 수는 695건 → 480건으로 31% 줄었고, 활동 회원은 63명 → 33명으로 48% 줄었습니다.</b>
+그런데 <b>1회 평균 지속시간은 53.8분 → 67.3분(6월)까지 25% 늘었습니다.</b>
+결정적인 것은 <b>1인당 지표입니다 — 활동 회원 1명이 한 달에 뛴 시간이 594분(2월) → 897분(7월)으로 51% 늘었고,
+기록 횟수도 11.0회 → 14.6회로 32% 늘었습니다.</b>
+즉 상반기 MFRS에서 벌어진 일은 "다 같이 조금씩 덜 뛰게 된 것"이 아니라
+<b>"남은 사람이 더 깊게 뛰게 된 것"</b>입니다. 인원이 빠진 자리를 밀도가 메웠습니다.
+7월에 1회 평균이 61.7분으로 꺾인 것은 폭염·장마의 첫 실질 저항으로 보입니다(§08 참조).</p>`;
+
+/* ── 3. 계절 카드 ───────────────────────────────────────── */
+M.forEach((m,i)=>{
+  const kw=D.keywords[m.month].slice(0,4).map(k=>`<span class="chip">${k.word} <b>${k.lift}×</b></span>`).join('');
+  const prev=i?M[i-1]:null;
+  const dr=prev?Math.round((m.runs-prev.runs)/prev.runs*100):null;
+  const c=el('div','mcard',
+    `<div class="m">${m.label}</div><div class="s">${m.season}</div>
+     <div class="mrow"><span>기록</span><b>${nf(m.runs)}건 ${dr!==null?`<span style="color:${dr<0?C.a6:C.a1};font-size:11px">${dr>0?'+':''}${dr}%</span>`:''}</b></div>
+     <div class="mrow"><span>활동 회원</span><b>${m.active_members}명</b></div>
+     <div class="mrow"><span>1회 평균</span><b>${m.avg_dur}분</b></div>
+     <div class="mrow"><span>90분+ 롱런</span><b>${m.long_runs_90}건</b></div>
+     <div class="mrow"><span>저널 분량</span><b>${Math.round(m.avg_journal)}자</b></div>
+     <div class="mrow"><span>동반러닝 언급</span><b>${m.themes.social}%</b></div>
+     <div class="chips">${kw}</div>`);
+  $('#mcards').appendChild(c);
+});
+
+/* ── 4. 리텐션 ───────────────────────────────────────────── */
+const R=D.retention;
+comboChart($('#ch-ret'),{
+  labels:R.labels.slice(1),
+  bars:[{name:'유지',values:R.retained.slice(1),color:C.a1},
+        {name:'이탈',values:R.churned.slice(1),color:C.a6},
+        {name:'복귀',values:R.returned.slice(1),color:C.a5}],
+  lines:[{name:'잔존율',values:R.rate.slice(1),color:C.a3,fmt:v=>v+'%'}],
+  w:600,h:280});
+legend('#lg-ret',[{n:'전월 대비 유지',c:C.a1},{n:'이탈',c:C.a6},{n:'복귀',c:C.a5},{n:'잔존율 %',c:C.a3}]);
+
+const T=D.tier_trend, cohColors=[C.a1,C.a2,C.a6,C.a5];
+lineChart($('#ch-coh'),{
+  labels:R.labels,
+  series:Object.entries(T).filter(([k])=>k!=='2월 미기록').map(([k,v],i)=>(
+    {name:k,values:v.survival,color:cohColors[i],fmt:x=>Math.round(x)+'%'})),
+  max:112,min:0,w:600,h:280,skipFirstLabel:true});
+legend('#lg-coh',Object.entries(T).filter(([k])=>k!=='2월 미기록')
+  .map(([k,v],i)=>({n:`${k} · ${v.members}명`,c:cohColors[i]})));
+
+$('#ins-ret').innerHTML = `<div class="h">읽는 법</div><p>
+월간 잔존율은 <b>75~89%로 견고</b>하지만, 신규 유입이 사실상 0(2~7월 합계 7명)이라
+매달 빠지는 5~11명이 그대로 순감소가 됩니다. 더 중요한 신호는 오른쪽입니다 —
+<b>2월에 20회 이상 기록한 8명은 7월까지 87.5%가 살아남았고, 2월에 1~9회만 기록한 29명은 27.6%만 남았습니다(60pp 격차).</b>
+첫 달의 습관 밀도가 반년 뒤 잔존을 거의 결정합니다. 붙잡을 골든타임은 6월이 아니라 <b>2월</b>이었습니다.</p>
+<p class="cav">코호트는 2월 기록만으로 사전 정의했으므로 이후 성과를 이용한 순환 정의가 아닙니다. 다만 각 군의 표본이 8·26·29명으로 작아 개인 몇 명의 이동에 민감합니다.</p>`;
+
+/* ── 5. 집중도 + 아키타입 ───────────────────────────────── */
+lineChart($('#ch-conc'),{labels:R.labels,
+  series:[{name:'상위 20% 점유율',values:D.concentration.by_month,color:C.a3,fmt:v=>v+'%'}],
+  max:70,min:30,w:520,h:250});
+const AR=D.archetypes;
+const arcOrder=['항상성','성장','유지','중도합류','감쇠','이탈위험','이탈','스팟'];
+const arcColor={'항상성':C.a1,'성장':C.a2,'유지':'#7d8a86','중도합류':C.a5,'감쇠':C.a3,'이탈위험':'#c97316','이탈':C.a6,'스팟':'#8a9490'};
+hbarChart($('#ch-arch'),{items:arcOrder.filter(k=>AR[k]).map(k=>({k,v:AR[k],c:arcColor[k]})),
+  fmt:v=>v+'명',w:520,rowH:29,labelW:78});
+
+$('#ins-conc').innerHTML = `<div class="h">읽는 법</div><p>
+상위 20%(14명)의 기록 점유율이 <b>2월 38.6% → 7월 57.1%</b>로 올랐습니다.
+전체 볼륨이 줄어드는 동안 코어의 절대 볼륨은 거의 그대로였기 때문입니다(코어 월 기록 268 → 274건).
+70명 중 <b>이탈·이탈위험이 30명(43%)</b>인 반면 <b>항상성·성장이 21명(30%)</b>으로,
+공동체가 "얇아지면서 단단해지는" 국면에 있습니다. 위험은 명확합니다 —
+지금 구조에서는 코어 14명 중 2~3명만 흔들려도 전체 지표가 즉시 무너집니다.</p>`;
+
+/* ── 6. 선행지표 ───────────────────────────────────────── */
+const P=D.predictors;
+comboChart($('#ch-pred'),{
+  labels:P.map(p=>p.label.replace('2월 ','')),
+  bars:[{name:'하위 50%',values:P.map(p=>p['하위 50%'].jul_survival),color:NEUT},
+        {name:'상위 50%',values:P.map(p=>p['상위 50%'].jul_survival),color:C.a1}],
+  lines:[],w:600,h:270});
+legend('#lg-pred',[{n:'2월 지표 하위 50%',c:NEUT},{n:'상위 50%',c:C.a1},{n:'막대 값 = 7월에도 기록한 비율(%)',c:'transparent'}]);
+
+const MX=D.matrix2x2, cellBy=k=>MX.cells.find(c=>c.key===k);
+const cellHTML=(k)=>{const c=cellBy(k);const p=c.jul_survival;
+  const col=p>=60?'#e9f1ec':p>=40?'#f6ead9':'#f8ece8';
+  const tc=p>=60?'#1d4a2e':p>=40?'#8f5220':'#8f4535';
+  return `<div class="cell" style="background:${col}"><div class="p" style="color:${tc}">${p}%</div><div class="n">n=${c.n}명</div></div>`;};
+$('#mat2x2').innerHTML =
+  `<div></div><div class="hd">기록 긺</div><div class="hd">기록 짧음</div>
+   <div class="rl">빈도 상위</div>${cellHTML('TT')}${cellHTML('TF')}
+   <div class="rl">빈도 하위</div>${cellHTML('FT')}${cellHTML('FF')}`;
+$('#mat-note').textContent = `2월 기록 횟수와 저널 분량의 상관은 ${MX.corr_runs_journal} — 상당 부분 독립된 두 축입니다. 각 칸 표본이 11~21명으로 작아 방향성 참고용입니다.`;
+
+$('#ins-pred').innerHTML = `<div class="h">가장 실용적인 발견</div><p>
+2월 지표 중 7월 생존을 가른 것은 <b>기록 횟수(+27.1pp)와 저널 분량(+27.1pp)</b>이었고,
+<b>1회 지속시간은 거의 무관했습니다(+1.7pp).</b>
+오래 뛴 사람이 아니라 <b>자주 나가고 길게 쓴 사람</b>이 남았습니다.
+2×2를 보면 더 분명합니다 — 빈도가 높아도 기록이 짧으면 생존율이 ${cellBy('TT').jul_survival}%에서 ${cellBy('TF').jul_survival}%로 반토막 납니다.
+"얼마나 달렸나"보다 <b>"달리기를 얼마나 자기 언어로 되새겼나"</b>가 반년의 지속을 설명합니다.
+마인드풀러닝의 저널링은 부가 기능이 아니라 잔존 엔진이라는 뜻입니다.</p>
+<p class="cav">상관이지 인과가 아닙니다 — 원래 몰입도가 높은 사람이 길게 쓸 수도 있습니다. 다만 개입 지점으로는 "2월 신규 회원의 저널 습관"이 가장 낮은 비용의 후보입니다.</p>`;
+
+/* ── 7. 감정 아크 ───────────────────────────────────────── */
+lineChart($('#ch-arc'),{labels:R.labels,
+  series:[
+    {name:'나가기 전',values:M.map(m=>m.sentiment.thought_before.net),color:C.a6},
+    {name:'달리는 중',values:M.map(m=>m.sentiment.thought_during.net),color:C.a2},
+    {name:'끝난 후',values:M.map(m=>m.sentiment.thought_after.net),color:C.a1}],
+  max:0.8,min:-0.1,w:560,h:270});
+legend('#lg-arc',[{n:'나가기 전',c:C.a6},{n:'달리는 중',c:C.a2},{n:'끝난 후',c:C.a1}]);
+
+const A=D.arc;
+$('#arcbox').innerHTML =
+  `<div class="mrow"><span>출발 저항 어휘가 등장한 기록</span><b>${nf(A.reluctant_runs)}건 (${A.reluctant_rate}%)</b></div>
+   <div class="mrow"><span>그중 사후 감정이 긍정 우위</span><b>${A.after_positive_share_reluctant}%</b></div>
+   <div class="mrow"><span>사후 순감정 — 저항군 vs 전체</span><b>${A.after_net_reluctant} vs ${A.after_net_all}</b></div>
+   <div class="mrow"><span>평균 지속 — 저항군 vs 전체</span><b>${A.avg_dur_reluctant}분 vs ${A.avg_dur_all}분</b></div>`
+  + A.samples.slice(0,4).map(s=>
+    `<div class="quote"><div class="who">${s.name} · ${s.date} · ${s.min}분</div>
+     <div class="b">${s.before}</div>
+     <div class="a"><span class="arrow">↓</span>${s.after}</div></div>`).join('');
+
+$('#ins-arc').innerHTML = `<div class="h">읽는 법</div><p>
+세 시점의 순감정은 <b>모든 달에서 예외 없이 "전 &lt; 중 &lt; 후"</b> 순서를 지켰습니다.
+출발 직전 감정은 6개월 내내 0 근처(−0.02~+0.11)에서 흔들리지만, 끝난 뒤는 항상 +0.46 이상입니다.
+더 흥미로운 건 <b>나가기 싫다고 쓴 ${nf(A.reluctant_runs)}건의 사후 감정이 전체 평균보다 오히려 높다는 점(${A.after_net_reluctant} vs ${A.after_net_all})</b>입니다.
+저항을 언어로 적어낸 사람은 그것을 넘었을 때 더 큰 보상을 기록했습니다.
+반면 지속시간은 평균보다 짧습니다(${A.avg_dur_reluctant}분 vs ${A.avg_dur_all}분) — <b>"짧아도 나가면 이긴다"</b>가 데이터에 있는 문장입니다.</p>
+<p class="cav">규칙기반 어휘 사전(긍정 30어·부정 30어 + 단순 부정어 반전)에 의한 근사치입니다. 반어·유머는 오분류될 수 있어 절대값이 아닌 시점 간·월 간 상대 비교로만 읽으시기 바랍니다.</p>`;
+
+/* ── 7b. 회복 전환 + 계절 3구간 ─────────────────────────── */
+const RC=D.recovery, SS=D.seasons;
+comboChart($('#ch-rec'),{labels:R.labels,
+  bars:[{name:'출발 부정 기록 수',values:R.months.map(m=>RC.by_month[m].denominator),color:NEUT},
+        {name:'그중 사후 긍정',values:R.months.map(m=>RC.by_month[m].recovered),color:C.a1}],
+  lines:[{name:'회복률',values:R.months.map(m=>RC.by_month[m].rate),color:C.a3,fmt:v=>v+'%'}],
+  w:600,h:280});
+$('#seasonbox').innerHTML = SS.map(s=>
+  `<div style="border-bottom:1px solid var(--line);padding:9px 0">
+     <div style="font-size:15px;font-weight:750">${s.emoji} ${s.label}
+       <span style="color:var(--tx3);font-size:11.5px;font-weight:400">${s.range} · ${s.days}일</span></div>
+     <div class="mrow"><span>기록 · 하루 평균</span><b>${nf(s.runs)}건 · ${s.runs_per_day}건/일</b></div>
+     <div class="mrow"><span>1회 평균 지속</span><b>${s.avg_dur}분</b></div>
+     <div class="mrow"><span>회복 전환율</span><b style="color:${s.recovery.rate>=45?C.a1:C.a3}">${s.recovery.rate}%
+       <span style="color:var(--tx3);font-size:11px">(${s.recovery.recovered}/${s.recovery.denominator})</span></b></div>
+     <div class="mrow"><span>저널 분량</span><b>${Math.round(s.journal)}자</b></div>
+   </div>`).join('');
+
+$('#ins-rec').innerHTML = `<div class="h">읽는 법</div><p>
+전체 기록의 <b>${RC.before_neg_rate}%(${nf(RC.overall.denominator)}건)가 부정 감정으로 출발</b>했고,
+그중 <b>${RC.overall.rate}%(${nf(RC.overall.recovered)}건)가 긍정으로 끝났습니다.</b>
+사후 긍정 비율은 사전 대비 <b>+${RC.positive_lift_pp}%p</b> — 달리기가 감정을 되돌리는 폭을 한 숫자로 보여줍니다.
+다만 <b>회복률은 계절을 따라 내려갑니다 — 겨울 ${SS[0].recovery.rate}% → 봄 ${SS[1].recovery.rate}% → 여름 ${SS[2].recovery.rate}%.</b>
+기록 밀도(하루 24.5건 → 15.8건)와 회복률이 같은 방향으로 내려가는 것은,
+여름이 <b>참여량뿐 아니라 정서적 회복력까지 함께 깎는다</b>는 뜻입니다 — 여름 리커버리 장치가 필요한 지점입니다.</p>
+<p class="cav">회복 전환율은 어휘사전 극성(긍정어 수 &gt; 부정어 수)으로 판정한 기술 통계이며 임상적 효과가 아닙니다. 계절 경계는 MFRS 정본(<code>analyze.py</code> SEASONS · 경칩 3/6)을 따랐고, 겨울은 2/1 시작이라 33일만 관측되어 커버리지가 다릅니다.</p>`;
+
+/* ── 8. 주제 ───────────────────────────────────────────── */
+const themeDef=[['heat','더위·습도',C.a6],['cold','추위·바람',C.a2],['rain','비·장마',C.a5],
+  ['social','함께 달리기',C.a1],['mindful','마음챙김(ad-hoc 사전)',C.a3],['body','몸·통증',C.a4]];
+lineChart($('#ch-theme'),{labels:R.labels,
+  series:themeDef.map(([k,n,c])=>({name:n,values:M.map(m=>m.themes[k]),color:c,fmt:v=>Math.round(v)})),
+  max:52,min:0,w:700,h:300});
+legend('#lg-theme',themeDef.map(([k,n,c])=>({n,c})));
+
+/* 정본 LEXICON 11주제 — 계절 3구간 그룹 막대 */
+const CT=D.canon_themes, ctKeys=Object.keys(CT.labels);
+const ctSeasonColors=[C.a2,C.a1,C.a6];
+comboChart($('#ch-canon'),{
+  labels:ctKeys.map(k=>CT.labels[k]),
+  bars:SS.map((s,i)=>({name:s.label,values:ctKeys.map(k=>CT.by_season[s.key][k]),color:ctSeasonColors[i]})),
+  lines:[],w:980,h:300});
+legend('#lg-canon',SS.map((s,i)=>({n:`${s.emoji} ${s.label}`,c:ctSeasonColors[i]})));
+
+$('#ins-theme').innerHTML = `<div class="h">읽는 법</div><p>
+날씨 어휘는 계절을 정확히 따라갑니다 — 추위 16.1%(2월) → 0.8%(7월), 더위 5.3% → <b>36.5%</b>(7월).
+주목할 것은 <b>몸·컨디션 어휘가 겨울 55.8% → 여름 45.8%로 10%p 내려간 것</b>입니다(정본 사전 기준, ad-hoc 사전도 같은 방향).
+부상이 줄었다기보다, 여름에 남아 달린 사람들이 <b>이미 몸이 만들어진 코어</b>이기 때문으로 읽힙니다(§05의 점유율 상승과 같은 방향).
+반대로 <b>자연·풍경 어휘는 18.5% → 35.6%로 두 배 가까이 늘었습니다</b> — §12에서 본 "산으로 올라간" 이동과 정확히 같은 이야기입니다.
+<b>함께·공동체는 봄 25.2% 정점 후 여름 23.0%로 후퇴</b>했고(월 단위로는 5월 29.3% → 7월 19.8%), 더위가 사람을 흩어놓았습니다.</p>`;
+
+/* 어휘사전 감도 — 초판 주장 정정 */
+const LS=D.lexicon_sensitivity;
+$('#ins-lex').innerHTML = `<div class="h" style="color:var(--a3)">⚠️ 정정 — 사전이 바뀌면 결론이 바뀝니다</div><p>
+본 대시보드 <b>초판은 "마음챙김 어휘가 6개월 단조 감소(45.5% → 31.0%)"라고 서술했으나, MFRS 정본 LEXICON으로는 재현되지 않아 철회합니다.</b></p>
+<div style="margin-top:10px">${LS.series.map(s=>
+  `<div class="mrow"><span>${s.name}</span><b style="font-size:12px">${s.values.join(' · ')}</b></div>
+   <div style="font-size:11.5px;color:var(--tx3);margin:-2px 0 7px">→ ${s.verdict}</div>`).join('')}</div>
+<p>초판 사전에는 <code>감사</code>·<code>마음이</code>·<code>생각을</code> 같은 광의어가 섞여 있었고,
+정본 기준으로 <b>감사 어휘는 오히려 상승(11.5% → 16.9%)</b> 합니다.
+두 사전이 공통으로 지지하는 것은 <b>"봄 정점 후 여름 ${LS.season_gap_pp}%p 하락"이라는 계절성</b>뿐입니다.
+따라서 "MFRS 정체성 지표의 구조적 하락"이라는 해석은 근거가 부족하며, <b>여름 한정 리앵커링</b>으로 범위를 좁힙니다.</p>`;
+
+/* ── 8b. Russell ──────────────────────────────────────── */
+const RU=D.russell, ruKeys=['hp','lp','hn','ln'];
+const ruColors={hp:C.a3,lp:C.a1,hn:C.a6,ln:C.a5};
+const phaseLbl={thought_before:'나가기 전',thought_during:'달리는 중',thought_after:'끝난 후'};
+comboChart($('#ch-rus'),{
+  labels:Object.keys(RU.phases).map(p=>phaseLbl[p]),
+  bars:ruKeys.map(k=>({name:RU.labels[k].quadrant,
+    values:Object.keys(RU.phases).map(p=>RU.phases[p][k]),color:ruColors[k]})),
+  lines:[],w:600,h:280});
+legend('#lg-rus',ruKeys.map(k=>({n:`${RU.labels[k].quadrant} · ${RU.labels[k].desc}`,c:ruColors[k]})));
+lineChart($('#ch-rusm'),{labels:R.labels,
+  series:ruKeys.map(k=>({name:RU.labels[k].quadrant,
+    values:R.months.map(m=>RU.by_month[m][k]),color:ruColors[k],fmt:v=>Math.round(v)})),
+  max:80,min:0,w:600,h:280});
+
+$('#ins-rus').innerHTML = `<div class="h">읽는 법</div><p>
+러셀 감정 원형(Russell 1980 · MFRS Core Ontology v2.2 §2)으로 보면 MFRS의 시그니처가 선명합니다 —
+달린 뒤 감정의 <b>${RU.phases.thought_after.lp}%가 "저각성·긍정"(평온·감사·만족)</b>이고, 고각성·긍정(활력·짜릿)은 ${RU.phases.thought_after.hp}%에 그칩니다.
+출발 전 ${RU.phases.thought_before.lp}%에서 ${RU.phases.thought_after.lp}%로 올라가는 동안 <b>고각성·부정(답답·불안·긴장)은 ${RU.phases.thought_before.hn}% → ${RU.phases.thought_after.hn}%로 줄었습니다.</b>
+이 커뮤니티의 달리기는 <b>흥분을 올리는 운동이 아니라 각성을 내리는 진정 활동</b>이라는 뜻이며, "마인드풀"이라는 이름과 데이터가 일치합니다.
+월별로는 <b>7월에 저각성·긍정이 66.8%로 최저, 저각성·부정(우울·무기력)이 5.7%로 최고</b>였습니다 — 여름의 정서적 마모가 여기서도 확인됩니다.</p>
+<p class="cav">Inferred 지표입니다 — 사전 기반 텍스트 추출이며 회원 직접 자기보고(Observed)가 아닙니다(Core Ontology v2.2 P3). 임상적 진단으로 해석하지 마십시오.</p>`;
+
+/* ── 8c. 기수 ─────────────────────────────────────────── */
+$('#gentbl tbody').innerHTML = D.generations.map(g=>
+  `<tr><td class="l"><b>${g.generation}</b></td><td>${g.members}</td><td>${nf(g.runs)}</td>
+   <td>${g.share}%</td><td>${g.avg_dur}</td>
+   <td class="l">${spark(g.per_capita_by_month.map(v=>Math.round(v)))}
+     <span style="color:var(--tx3);font-size:11px;margin-left:6px">${g.per_capita_by_month.join(' · ')}</span></td></tr>`).join('');
+const gMulti=D.generations.find(g=>g.generation.startsWith('다기수(')) || D.generations[1];
+$('#ins-gen').innerHTML = `<div class="h">읽는 법</div><p>
+기록의 ${D.generations[0].share}%는 <b>5기 단독 회원 ${D.generations[0].members}명</b>에게서 나옵니다. 그런데 밀도는 다릅니다 —
+<b>3·4·5기를 함께 거친 ${gMulti.members}명은 1인당 월 ${Math.min(...gMulti.per_capita_by_month.filter(Boolean))}~${Math.max(...gMulti.per_capita_by_month)}건</b>으로,
+5기 단독(${Math.min(...D.generations[0].per_capita_by_month)}~${Math.max(...D.generations[0].per_capita_by_month)}건)의 약 두 배입니다.
+게다가 <b>7월에도 1인당 ${gMulti.per_capita_by_month[5]}건으로 오히려 최고치</b>를 찍었습니다 — 계절 저항을 가장 덜 받은 층입니다.
+표본이 ${gMulti.members}명이라 일반화는 금물이지만, <b>여름 재진입 캠페인의 동료 연결자(peer anchor) 후보</b>로는 가장 유력합니다.</p>`;
+
+/* ── 9. 키워드 ─────────────────────────────────────────── */
+M.forEach(m=>{
+  const rows=D.keywords[m.month].slice(0,8).map(k=>
+    `<div class="mrow"><span>${k.word}</span><b>${k.lift}× <span style="color:var(--tx3);font-size:11px">${k.count}회</span></b></div>`).join('');
+  $('#kwcards').appendChild(el('div','mcard',
+    `<div class="m">${m.label}</div><div class="s">${m.season}</div>${rows}`));
+});
+
+/* ── 10. 계절 전환 ─────────────────────────────────────── */
+const S=D.season_shift;
+const shiftRows=(arr)=>arr.filter(x=>x.runs_delta_pct!==null).map(x=>
+  `<div class="mrow"><span>${x.name} <span class="tag t-${x.archetype}">${x.archetype}</span></span>
+   <b style="color:${x.runs_delta_pct>=0?C.a1:C.a6}">${x.runs_delta_pct>0?'+':''}${x.runs_delta_pct}%
+   <span style="color:var(--tx3);font-size:11px">${x.spring}→${x.summer}회</span></b></div>`).join('');
+$('#gainers').innerHTML=shiftRows(S.top_gainers);
+$('#losers').innerHTML=shiftRows(S.top_losers);
+$('#ins-season').innerHTML = `<div class="h">읽는 법</div><p>
+봄·여름 양쪽에 유의미한 기록이 있는 <b>${S.n}명 중 ${S.losers}명(${Math.round(S.losers/S.n*100)}%)이 여름에 볼륨을 줄였고, 중앙값은 ${S.median_delta_pct}%</b>입니다.
+그러나 ${S.gainers}명은 오히려 늘렸습니다. 늘린 쪽은 대부분 <b>2월 볼륨이 낮았던 후발주자·복귀자</b>입니다 —
+김소영님(2월 5회 → 6·7월 28회), 송승진님(2회 → 35회), 김희은님(8회 → 34회)처럼
+계절이 아니라 <b>개인의 성장 곡선이 계절 효과를 압도</b>한 경우입니다.
+반대로 −100%인 이름들은 여름 더위 때문이라기보다 이미 봄부터 이탈 궤도에 있던 회원입니다.
+따라서 "여름이라 빠졌다"는 설명은 절반만 맞습니다 — <b>여름은 이미 약해진 연결을 끊는 계기였지, 원인이 아니었습니다.</b></p>`;
+
+/* ── 11. 개인 테이블 ───────────────────────────────────── */
+const MEM=D.members;
+const sel=$('#fa'); arcOrder.forEach(a=>{ if(AR[a]) sel.appendChild(el('option','',a)), sel.lastChild.value=a; });
+// 기본 정렬 = 이름 가나다 (MFRS 비경쟁 원칙 — 볼륨 순위표로 열리지 않게)
+let sortK='name', sortD=1;
+function render(){
+  const q=$('#q').value.trim(), fa=sel.value;
+  let rows=MEM.filter(m=>(!q||m.name.includes(q))&&(!fa||m.archetype===fa));
+  rows.sort((a,b)=>{ let x=a[sortK],y=b[sortK];
+    if(sortK==='series'){x=a.slope;y=b.slope;}
+    if(x===null)x=-1e9; if(y===null)y=-1e9;
+    return typeof x==='string'? sortD*x.localeCompare(y,'ko') : sortD*(x-y); });
+  $('#tbl tbody').innerHTML = rows.map(m=>{
+    const d=m.delta_pct;
+    return `<tr>
+      <td class="l"><b>${m.name}</b></td>
+      <td class="l"><span class="tag t-${m.archetype}">${m.archetype}</span></td>
+      <td>${m.runs}</td><td>${m.hours}</td><td>${m.avg_dur}</td>
+      <td class="l">${spark(m.series)}<span style="color:var(--tx3);font-size:11px;margin-left:6px">${m.series.join('·')}</span></td>
+      <td style="color:${d===null?'var(--tx3)':d>=0?C.a1:C.a6}">${d===null?'—':(d>0?'+':'')+d+'%'}</td>
+      <td>${m.active_months}</td><td>${Math.round(m.journal_avg)}</td>
+      <td>${m.social_rate}</td>
+      <td style="color:${m.mood_lift>=0?C.a1:C.a6}">${m.mood_lift>0?'+':''}${m.mood_lift}</td>
+    </tr>`;}).join('');
+  $('#cnt').textContent=`${rows.length}명 표시`;
+}
+document.querySelectorAll('#tbl th').forEach(th=>th.onclick=()=>{
+  const k=th.dataset.k; sortD = (k===sortK)? -sortD : -1; sortK=k; render();});
+$('#q').oninput=render; sel.onchange=render; render();
+
+/* ── 12. 리듬 ─────────────────────────────────────────── */
+const WD=D.weekday;
+hbarChart($('#ch-wd'),{items:WD.labels.map((k,i)=>({k,v:WD.overall[i],
+  c:i>=5?C.a1:C.a2})),w:320,rowH:27,labelW:34});
+
+const durColors=['#d3dcd8','#a8c4b6','#7fb89c','#4e8f6e','#2d6a4f','#1d4a2e'];
+stackChart($('#ch-dur'),{labels:R.labels,
+  stacks:D.dur_dist.labels.map((L,i)=>({name:L,color:durColors[i],
+    values:R.months.map(m=>D.dur_dist.by_month[m][i])}))});
+legend('#lg-dur',D.dur_dist.labels.map((L,i)=>({n:L,c:durColors[i]})));
+
+const locKeys=['하천·강변','공원·호수','트레일·산','동네·로드','트레드밀·실내','트랙·운동장'];
+const locColors=[C.a1,C.a2,C.a3,C.a5,C.a4,C.a6];
+// 남은 비중(기타·해외·바다·미기입)을 합산해 100%를 채운다
+const locRest = M.map(m=>Math.round((100-locKeys.reduce((s,k)=>s+(m.locations[k]||0),0))*10)/10);
+stackChart($('#ch-loc'),{labels:R.labels,
+  stacks:locKeys.map((k,i)=>({name:k,color:locColors[i],
+    values:M.map(m=>m.locations[k]||0)})).concat([{name:'그 외·미기입',color:NEUT,values:locRest}])});
+legend('#lg-loc',locKeys.map((k,i)=>({n:k,c:locColors[i]})).concat([{n:'그 외·미기입',c:NEUT}]));
+
+$('#ins-rhythm').innerHTML = `<div class="h">읽는 법</div><p>
+<b>일요일(563건)이 금요일(443건)보다 27% 많습니다</b> — 주말 롱런 문화가 뚜렷합니다.
+지속시간 분포에서는 <b>91분 이상 롱런 비중이 2월 10.9% → 6월 16.6%</b>로 늘어, §02의 "1회가 길어졌다"를 뒷받침합니다.
+장소는 계절과 함께 이동합니다 — <b>트레드밀·실내는 2월 7.9%에서 6월 3.5%로 줄고, 트레일·산은 14.5% → 7월 25.4%로 배 가까이 늘었습니다.</b>
+7월 폭염에도 실내로 후퇴하지 않고 <b>산으로 올라간 것</b>이 이 커뮤니티의 여름 대응 방식이었습니다(그늘·고도).</p>`;
+
+/* ── 13. QC ───────────────────────────────────────────── */
+$('#qcbox').innerHTML = D.qc.checks.map(c=>
+  `<div class="mrow"><span>${c.name}</span><b style="color:${c.match?C.a1:C.a6}">
+   ${c.match?'일치':'불일치'} · ${Array.isArray(c.observed)?c.observed.length+'개월':nf(c.observed)}</b></div>`).join('')
+  + `<p class="sub" style="font-size:12px;margin-top:10px">
+     원천 <code>run_logs_2026-01_07.json</code>을 재집계한 값과 동봉된 summary 파일을 대조했습니다.
+     파일명·summary의 기간 표기는 2026-01부터이나 <b>실제 최소 일자는 2026-02-01로 1월 기록은 0건</b>입니다 —
+     본 대시보드는 2~7월 6개월로 표기합니다.</p>
+     <p class="sub" style="font-size:12px">필드 충실도: 저널 3종 ${D.qc.coverage.thought_during}% ·
+     장소 ${D.qc.coverage.location}% · 사진 ${D.qc.coverage.photo_url}% · run_time ${D.qc.coverage.run_time}%</p>`;
+const IT=D.qc.integrity;
+$('#intbox').innerHTML =
+  [['중복 id',`${IT.duplicate_ids}건`,IT.duplicate_ids===0],
+   ['의미상 중복 후보',`${IT.semantic_duplicate_candidates}건 (${IT.semantic_duplicate_rate}%)`,IT.semantic_duplicate_rate<1],
+   ['저널 3필드 완비',`${nf(IT.text_complete)}건 (${IT.text_complete_rate}%)`,IT.text_complete_rate>99],
+   ['notion_id 결측',`${nf(IT.notion_id_missing)}건 (${IT.notion_id_missing_rate}%)`,false],
+   ['300분+ 기록',`${IT.duration_300_plus}건 (${IT.duration_300_plus_rate}%)`,true]]
+  .map(([k,v,ok])=>`<div class="mrow"><span>${k}</span><b style="color:${ok?C.a1:C.a3}">${v}</b></div>`).join('')
+  + `<p class="sub" style="font-size:12px;margin-top:10px">${IT.note}
+     notion_id 결측은 Notion→Vercel 전환 이후 생성분으로 보이며 집계에 사용하지 않습니다.</p>
+     <p class="sub" style="font-size:12px">300분+ 기록은 원문 제목을 열어 실제 이벤트임을 확인했습니다 —
+     ${IT.duration_300_plus_verified.slice(0,3).map(r=>`${r.name}님 ${r.date} ${nf(r.min)}분 「${r.title}」`).join(' · ')}.</p>`;
+$('#cavbox').innerHTML = D.caveats.map(c=>`<li>${c}</li>`).join('');
+
+$('#foot').innerHTML =
+  `<b>MFRS 2026 상반기 누적 대시보드</b> · 기간 ${D.meta.period} · 생성 ${D.meta.generated_at}<br>
+   원천: <code>run_logs_2026-01_07.json</code> (${nf(O.runs)}건, sha256 ${D.qc.source.log.sha256_16}) ·
+   <code>run_logs_2026-01_07_summary.json</code> (sha256 ${D.qc.source.summary.sha256_16})<br>
+   재현: <code>python3 build.py &amp;&amp; python3 render.py</code> — 모든 수치는 원천 재집계 결과이며 수기 입력값이 없습니다.<br>
+   정성 어휘 SSoT: <code>mindfulrunning/operations/advance-5th/running-log/analyze.py</code>의
+   LEXICON 11주제 · RUSSELL 4분면(Core Ontology v2.2 §2) · SEASONS(경칩 경계)를 복제하지 않고 직접 로드합니다.<br>
+   회원 표기는 원천 데이터의 이름을 그대로 사용했습니다(동명이인 규칙: 로함/김성우 = 일반 회원, 김성우 코치님과 별개).<br>
+   병렬 산출물: 같은 원천으로 Codex가 만든 <code>../20260804-mfrs-2026-jul-ytd-dashboard-codex/dashboard.html</code>이 함께 있습니다 —
+   무결성 검사 5종(중복 0 · 의미상 중복 28 · notion_id 결측 995 · 저널 완비 3,398 · 300분+ 42)이 두 엔진에서 독립적으로 일치했습니다.`;
+</script>
+</body>
+</html>

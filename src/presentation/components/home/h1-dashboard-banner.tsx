@@ -125,7 +125,7 @@ export function H1DashboardBanner() {
             }}
           >
             <span style={{ fontSize: '0.7rem' }}>📊</span>
-            8월 말까지 공개
+            9월 7일까지 공개
           </div>
 
           <div

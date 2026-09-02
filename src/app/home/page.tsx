@@ -100,7 +100,7 @@ export default async function HomePage() {
   const isAdmin = memberId !== '' && adminMemberIds.includes(memberId)
   const showDiaryBanner =
     memberId !== '' && (isAdmin || (curDay >= 25 && thisMonthRunCount > 0))
-  const showH1DashboardBanner = todayKst <= '2026-08-31'
+  const showH1DashboardBanner = todayKst <= '2026-09-07'
 
   return (
     <main style={{ minHeight: '100vh', background: '#F7F7F5', position: 'relative' }}>

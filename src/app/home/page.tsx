@@ -79,30 +79,55 @@ export default async function HomePage() {
   const memberAvatarUrl = (memberRow.data?.avatar_url as string | undefined) ?? myRuns[0]?.memberAvatarUrl ?? ''
   const recentRuns = initialGridRuns
 
-  // Diary entry banner: show only late in month (day >= 25) and if user ran this month.
+  // Diary entry banner:
+  //   day 1~7  → 지난달 결산 (지난달 러닝이 있을 때만)
+  //   day 25~ → 이번달 예고 (이번달 러닝이 있을 때만)
+  //   그 외    → 숨김
   const todayKst = kstToday()
   const [yStr, mStr, dStr] = todayKst.split('-')
   const curYear = Number(yStr)
   const curMonth = Number(mStr)
   const curDay = Number(dStr)
+  const prevYear = curMonth === 1 ? curYear - 1 : curYear
+  const prevMonth = curMonth === 1 ? 12 : curMonth - 1
   const monthPrefix = `${yStr}-${mStr}`
+  const prevMonthPrefix = `${prevYear}-${String(prevMonth).padStart(2, '0')}`
   const thisMonthRunCount = memberId
     ? myRuns.filter(r => r.date.startsWith(monthPrefix)).length
     : 0
-  const showDiaryBanner =
-    memberId !== '' && curDay >= 25 && thisMonthRunCount > 0
+  const prevMonthRunCount = memberId
+    ? myRuns.filter(r => r.date.startsWith(prevMonthPrefix)).length
+    : 0
+  const diaryBannerVariant: 'previous' | 'current' | null =
+    memberId === ''
+      ? null
+      : curDay <= 7 && prevMonthRunCount > 0
+        ? 'previous'
+        : curDay >= 25 && thisMonthRunCount > 0
+          ? 'current'
+          : null
   const showH1DashboardBanner = todayKst <= '2026-09-07'
 
   return (
     <main style={{ minHeight: '100vh', background: '#F7F7F5', position: 'relative' }}>
       <AppHeader memberName={memberName || '?'} memberAvatarUrl={memberAvatarUrl} memberId={memberId} />
 
-      {showDiaryBanner && (
+      {diaryBannerVariant === 'previous' && (
+        <DiaryEntryBanner
+          memberId={memberId}
+          year={prevYear}
+          month={prevMonth}
+          runCount={prevMonthRunCount}
+          variant="previous"
+        />
+      )}
+      {diaryBannerVariant === 'current' && (
         <DiaryEntryBanner
           memberId={memberId}
           year={curYear}
           month={curMonth}
-          thisMonthRunCount={thisMonthRunCount}
+          runCount={thisMonthRunCount}
+          variant="current"
         />
       )}
 

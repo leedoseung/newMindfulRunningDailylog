@@ -6,14 +6,25 @@ type Props = {
   memberId: string
   year: number
   month: number
-  thisMonthRunCount: number
+  runCount: number
+  variant?: 'current' | 'previous'
 }
 
 const FONT = "'Pretendard Variable', Pretendard, -apple-system, sans-serif"
 
-export function DiaryEntryBanner({ memberId, year, month, thisMonthRunCount }: Props) {
+export function DiaryEntryBanner({ memberId, year, month, runCount, variant = 'current' }: Props) {
   const yearMonth = `${year}-${String(month).padStart(2, '0')}`
   const href = `/diary/${memberId}/${yearMonth}`
+  const isPrevious = variant === 'previous'
+  const title = isPrevious ? '지난 달, 한 줄로 돌아보기' : '이번 달, 한 줄로 모아보기'
+  const subtitle = isPrevious
+    ? `${month}월 회고 카드가 도착했어요`
+    : '나만의 월간 회고 카드를 펼쳐보세요'
+  const chipLabel = isPrevious
+    ? `지난 달 ${runCount}번`
+    : runCount > 0
+      ? `이번 달 ${runCount}번`
+      : '쉬어가는 달'
 
   return (
     <div style={{ padding: '12px 16px 0' }}>
@@ -129,7 +140,7 @@ export function DiaryEntryBanner({ memberId, year, month, thisMonthRunCount }: P
             backgroundClip: 'text',
           }}
         >
-          이번 달, 한 줄로 모아보기
+          {title}
         </div>
 
         <div
@@ -144,7 +155,7 @@ export function DiaryEntryBanner({ memberId, year, month, thisMonthRunCount }: P
             marginBottom: 16,
           }}
         >
-          나만의 월간 회고 카드를 펼쳐보세요
+          {subtitle}
         </div>
 
         {/* Footer row */}
@@ -177,7 +188,7 @@ export function DiaryEntryBanner({ memberId, year, month, thisMonthRunCount }: P
             }}
           >
             <span style={{ fontSize: '0.7rem' }}>🏃</span>
-            {thisMonthRunCount > 0 ? `이번 달 ${thisMonthRunCount}번` : '쉬어가는 달'}
+            {chipLabel}
           </div>
 
           <div

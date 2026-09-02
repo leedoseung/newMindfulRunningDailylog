@@ -80,8 +80,6 @@ export default async function HomePage() {
   const recentRuns = initialGridRuns
 
   // Diary entry banner: show only late in month (day >= 25) and if user ran this month.
-  // Admins (testing) always see the banner regardless of date — set ADMIN_EMAILS env (comma-separated)
-  // or fall back to the hardcoded admin email for QA visibility.
   const todayKst = kstToday()
   const [yStr, mStr, dStr] = todayKst.split('-')
   const curYear = Number(yStr)
@@ -91,15 +89,8 @@ export default async function HomePage() {
   const thisMonthRunCount = memberId
     ? myRuns.filter(r => r.date.startsWith(monthPrefix)).length
     : 0
-  // Admin override (testing): force-show banner regardless of date.
-  // 이두승 hardcoded as fallback; override via ADMIN_MEMBER_IDS env (comma-separated UUIDs).
-  const adminMemberIds = (process.env.ADMIN_MEMBER_IDS ?? '90d2a65e-ffd1-49de-adce-4aa36cdbd347')
-    .split(',')
-    .map(s => s.trim())
-    .filter(Boolean)
-  const isAdmin = memberId !== '' && adminMemberIds.includes(memberId)
   const showDiaryBanner =
-    memberId !== '' && (isAdmin || (curDay >= 25 && thisMonthRunCount > 0))
+    memberId !== '' && curDay >= 25 && thisMonthRunCount > 0
   const showH1DashboardBanner = todayKst <= '2026-09-07'
 
   return (

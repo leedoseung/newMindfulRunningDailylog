@@ -149,6 +149,7 @@ export class GetChallengeWrapUseCase {
     for (const log of notedLogs ?? []) {
       const note = (log.note as string | null)?.trim() ?? ''
       if (!note) continue
+      if (note.startsWith('관리자 백필')) continue
       const memberId = partToMember.get(log.participation_id) ?? ''
       const mem = memberById.get(memberId)
       if (!mem) continue

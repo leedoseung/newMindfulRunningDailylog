@@ -146,16 +146,36 @@ export class GetChallengeWrapUseCase {
     }
 
     // Load every mission log for the season once — used to build finisher
-    // stamps AND the season-wide aggregate below.
+    // stamps AND the season-wide aggregate below. PostgREST caps a single
+    // response at db-max-rows (default 1000); over 44 participants × 100 days
+    // that truncates late participants to empty logs. Page explicitly.
     const partIds = (parts ?? []).map(p => p.id)
-    const { data: allLogs, error: aErr } = await this.supabase
-      .from('mission_logs')
-      .select('id, participation_id, log_date, count, used_pass, is_rest_day, note, updated_at')
-      .in('participation_id', partIds)
-    if (aErr) throw new Error(`wrap aggregate failed: ${aErr.message}`)
+    const PAGE_SIZE = 1000
+    type LogRow = {
+      id: string
+      participation_id: string
+      log_date: string
+      count: number | null
+      used_pass: boolean | null
+      is_rest_day: boolean | null
+      note: string | null
+      updated_at: string | null
+    }
+    const allLogs: LogRow[] = []
+    for (let offset = 0; ; offset += PAGE_SIZE) {
+      const { data, error } = await this.supabase
+        .from('mission_logs')
+        .select('id, participation_id, log_date, count, used_pass, is_rest_day, note, updated_at')
+        .in('participation_id', partIds)
+        .range(offset, offset + PAGE_SIZE - 1)
+      if (error) throw new Error(`wrap aggregate failed: ${error.message}`)
+      const batch = (data as unknown as LogRow[]) ?? []
+      allLogs.push(...batch)
+      if (batch.length < PAGE_SIZE) break
+    }
 
     const logsByPart = new Map<string, MissionLog[]>()
-    for (const l of allLogs ?? []) {
+    for (const l of allLogs) {
       const domainLog: MissionLog = {
         id: l.id,
         participationId: l.participation_id,
@@ -219,8 +239,8 @@ export class GetChallengeWrapUseCase {
     }
 
     // Messages: mission_logs with non-empty note.
-    const notedLogs = (allLogs ?? [])
-      .filter(l => (l.note as string | null)?.trim())
+    const notedLogs = allLogs
+      .filter(l => l.note?.trim())
       .sort((a, b) => (a.log_date < b.log_date ? 1 : -1))
       .slice(0, 200)
 
@@ -251,7 +271,7 @@ export class GetChallengeWrapUseCase {
     let totalStamps = 0
     let totalRestDays = 0
     let totalPassesUsed = 0
-    for (const l of allLogs ?? []) {
+    for (const l of allLogs) {
       totalStamps += 1
       totalReps += l.count ?? 0
       if (l.is_rest_day) totalRestDays += 1

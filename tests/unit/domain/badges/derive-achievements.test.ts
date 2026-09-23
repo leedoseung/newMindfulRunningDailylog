@@ -91,12 +91,12 @@ describe('deriveAchievements', () => {
   })
 
   it('grants only the highest STREAK tier reached (90 wins over 60/30)', () => {
-    // 95 consecutive success days at the start
+    // 95 stamped days then 5 pass days
     const days = daysFrom(CHALLENGE_START, 100)
-    const logs = days.map((d, i) => log(d, i < 95 ? 100 : 40))
+    const logs = days.map((d, i) => (i < 95 ? log(d, 100) : log(d, 0, { usedPass: true })))
     const codes = deriveAchievements({
       logs,
-      passesUsed: 0,
+      passesUsed: 5,
       revived: false,
       durationDays: DURATION,
       challengeStartDate: CHALLENGE_START,
@@ -107,11 +107,12 @@ describe('deriveAchievements', () => {
   })
 
   it('grants STREAK_60 when max is between 60 and 89', () => {
+    // 70 stamped days followed by 30 pass days (pass breaks streak)
     const days = daysFrom(CHALLENGE_START, 100)
-    const logs = days.map((d, i) => log(d, i < 70 ? 100 : 40))
+    const logs = days.map((d, i) => (i < 70 ? log(d, 100) : log(d, 0, { usedPass: true })))
     const codes = deriveAchievements({
       logs,
-      passesUsed: 0,
+      passesUsed: 30,
       revived: false,
       durationDays: DURATION,
       challengeStartDate: CHALLENGE_START,

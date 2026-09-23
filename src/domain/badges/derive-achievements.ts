@@ -34,8 +34,9 @@ function computeSuccessStreak(
   for (let i = 0; i < durationDays; i++) {
     const date = addDays(startDate, i)
     const l = map.get(date)
-    const success = l != null && !l.usedPass && (l.isRestDay === true || l.count >= GOAL)
-    if (success) {
+    // 도장 관점: 로그가 있고 패스 아니면 연속. count 미달·rest·partial 모두 인정.
+    const stamped = l != null && !l.usedPass
+    if (stamped) {
       cur += 1
       if (cur > max) max = cur
     } else {

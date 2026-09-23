@@ -295,8 +295,25 @@ export class GetChallengeWrapUseCase {
       longestStreakName: longest.name,
     }
 
-    // Sort finishers by max_streak desc for the roster.
-    finishers.sort((a, b) => b.stats.maxStreak - a.stats.maxStreak)
+    // Sort by tier: every_day_stamp > perfect_100 > streak (higher first)
+    // > no_pass > everyone else. Revived finishers land at the very end.
+    const bit = (row: WrapFinisher, code: string) => (row.achievements.includes(code as AchievementCode) ? 1 : 0)
+    finishers.sort((a, b) => {
+      const aRev = bit(a, 'revived')
+      const bRev = bit(b, 'revived')
+      if (aRev !== bRev) return aRev - bRev
+      const aEvery = bit(a, 'every_day_stamp')
+      const bEvery = bit(b, 'every_day_stamp')
+      if (aEvery !== bEvery) return bEvery - aEvery
+      const aPerf = bit(a, 'perfect_100')
+      const bPerf = bit(b, 'perfect_100')
+      if (aPerf !== bPerf) return bPerf - aPerf
+      if (a.stats.maxStreak !== b.stats.maxStreak) return b.stats.maxStreak - a.stats.maxStreak
+      const aNoPass = bit(a, 'no_pass')
+      const bNoPass = bit(b, 'no_pass')
+      if (aNoPass !== bNoPass) return bNoPass - aNoPass
+      return b.stats.totalReps - a.stats.totalReps
+    })
 
     return { finishers, journeyers, messages, seasonStats }
   }

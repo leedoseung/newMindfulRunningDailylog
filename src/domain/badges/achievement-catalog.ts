@@ -7,7 +7,6 @@ export const ACHIEVEMENTS = {
   NO_PASS: { code: 'no_pass', label: '패스 없이', icon: '✨', hint: '패스 카드를 한 장도 쓰지 않았어요' },
   REVIVED: { code: 'revived', label: '돌아온 힘', icon: '💪', hint: '멈춤 뒤에 다시 돌아와 완주했어요' },
   ALL_100_REPS: { code: 'all_100_reps', label: '정직한 100회', icon: '🎯', hint: '도장을 찍은 모든 날이 100회 이상' },
-  MULTI_GEN: { code: 'multi_gen', label: '다기 완주', icon: '👥', hint: '여러 기수에 걸쳐 함께한 여정' },
 } as const
 
 export type AchievementKey = keyof typeof ACHIEVEMENTS
@@ -30,6 +29,5 @@ export const ACHIEVEMENT_ORDER: AchievementCode[] = [
   'streak_60',
   'streak_30',
   'all_100_reps',
-  'multi_gen',
   'revived',
 ]

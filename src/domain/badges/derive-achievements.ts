@@ -7,7 +7,6 @@ export type DeriveAchievementsInput = {
   revived: boolean
   durationDays: number
   challengeStartDate: string        // YYYY-MM-DD
-  memberGenerations: string         // e.g. '3기, 4기, 5기'
 }
 
 const GOAL = 100
@@ -46,11 +45,6 @@ function computeSuccessStreak(
   return max
 }
 
-function countGenerations(gens: string): number {
-  const matches = gens.match(/\d+기/g)
-  return matches ? matches.length : 0
-}
-
 export function deriveAchievements(input: DeriveAchievementsInput): AchievementCode[] {
   const codes: AchievementCode[] = ['finisher']
 
@@ -77,10 +71,6 @@ export function deriveAchievements(input: DeriveAchievementsInput): AchievementC
 
   if (nonPassNonRest.length > 0 && !anyUnder) {
     codes.push('all_100_reps')
-  }
-
-  if (countGenerations(input.memberGenerations) >= 2) {
-    codes.push('multi_gen')
   }
 
   return codes

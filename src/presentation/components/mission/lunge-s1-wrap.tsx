@@ -38,109 +38,236 @@ function Avatar({ url, name, size = 44 }: { url: string | null; name: string; si
   )
 }
 
-function Hero({ challengeTitle, stats }: { challengeTitle: string; stats: WrapSeasonStats }) {
+function Hero({ stats }: { challengeTitle: string; stats: WrapSeasonStats }) {
   return (
     <section
       style={{
         fontFamily: FONT,
-        color: '#fff',
-        borderRadius: 24,
-        padding: '32px 24px 28px',
-        background:
-          'radial-gradient(120% 140% at 100% 0%, rgba(244,114,182,0.35) 0%, rgba(167,139,250,0.15) 40%, transparent 65%),' +
-          'radial-gradient(80% 100% at 0% 100%, rgba(56,189,248,0.25) 0%, transparent 60%),' +
-          'linear-gradient(135deg, #1E1B4B 0%, #312E81 55%, #4C1D95 100%)',
-        boxShadow: '0 12px 32px rgba(30,27,75,0.28)',
-        isolation: 'isolate',
-        overflow: 'hidden',
+        color: '#F5F0E8',
+        borderRadius: 28,
+        padding: '48px 28px 44px',
+        background: '#151114',
+        boxShadow: '0 24px 60px rgba(21,17,20,0.35)',
         position: 'relative',
+        overflow: 'hidden',
+        isolation: 'isolate',
       }}
     >
-      <p
+      <div
+        aria-hidden
         style={{
-          fontSize: '0.6rem',
-          letterSpacing: '0.28em',
-          textTransform: 'uppercase',
-          color: 'rgba(255,255,255,0.68)',
-          margin: 0,
+          position: 'absolute',
+          top: -80,
+          right: -80,
+          width: 260,
+          height: 260,
+          borderRadius: '50%',
+          background:
+            'radial-gradient(circle, rgba(244,114,182,0.14) 0%, rgba(244,114,182,0) 68%)',
+          pointerEvents: 'none',
+          zIndex: 0,
         }}
-      >
-        SEASON WRAP · 2026
-      </p>
-      <h1
+      />
+      <div
+        aria-hidden
         style={{
-          fontSize: '1.6rem',
-          fontWeight: 800,
-          letterSpacing: '-0.02em',
-          lineHeight: 1.2,
-          margin: '10px 0 6px',
+          position: 'absolute',
+          bottom: -60,
+          left: -60,
+          width: 220,
+          height: 220,
+          borderRadius: '50%',
+          background:
+            'radial-gradient(circle, rgba(212,161,23,0.10) 0%, rgba(212,161,23,0) 66%)',
+          pointerEvents: 'none',
+          zIndex: 0,
         }}
-      >
-        {challengeTitle} <br />
-        <span
+      />
+
+      <div style={{ position: 'relative', zIndex: 1 }}>
+        <p
           style={{
-            fontSize: '1rem',
-            fontWeight: 500,
-            color: 'rgba(255,255,255,0.78)',
+            fontSize: '0.62rem',
+            letterSpacing: '0.36em',
+            textTransform: 'uppercase',
+            color: 'rgba(245,240,232,0.5)',
+            margin: 0,
+            fontWeight: 600,
           }}
         >
-          우리의 100일이 여기 담겨 있어요.
-        </span>
-      </h1>
+          SEASON 01 · LUNGE 100
+        </p>
 
+        <h1
+          style={{
+            fontSize: '2.4rem',
+            fontWeight: 800,
+            letterSpacing: '-0.045em',
+            lineHeight: 1.08,
+            margin: '20px 0 10px',
+            color: '#FBF6ED',
+          }}
+        >
+          여름의 100일
+        </h1>
+
+        <p
+          style={{
+            fontSize: '0.78rem',
+            color: 'rgba(245,240,232,0.5)',
+            margin: 0,
+            letterSpacing: '0.05em',
+            fontVariantNumeric: 'tabular-nums',
+          }}
+        >
+          2026 . 06 . 15 &nbsp;&mdash;&nbsp; 2026 . 09 . 22
+        </p>
+
+        <p
+          style={{
+            fontSize: '0.98rem',
+            lineHeight: 1.85,
+            color: 'rgba(245,240,232,0.82)',
+            margin: '34px 0 0',
+            letterSpacing: '-0.012em',
+            maxWidth: 460,
+          }}
+        >
+          {stats.totalParticipants}명이 여름의 첫 문을 열었고,
+          <br />
+          {stats.totalFinishers}명이 마지막 도장까지 걸었어요.
+        </p>
+
+        <p
+          style={{
+            fontSize: '1.02rem',
+            lineHeight: 1.7,
+            margin: '18px 0 0',
+            letterSpacing: '-0.015em',
+            color: '#FBF6ED',
+            fontWeight: 500,
+            maxWidth: 460,
+          }}
+        >
+          우리의 몸을 지나간 런지,{' '}
+          <strong
+            style={{
+              fontWeight: 800,
+              background: 'linear-gradient(90deg, #F4B183 0%, #E8A0BF 100%)',
+              WebkitBackgroundClip: 'text',
+              WebkitTextFillColor: 'transparent',
+              backgroundClip: 'text',
+              letterSpacing: '-0.02em',
+            }}
+          >
+            {stats.totalReps.toLocaleString()}회.
+          </strong>
+        </p>
+
+        <div
+          aria-hidden
+          style={{
+            height: 1,
+            background:
+              'linear-gradient(90deg, rgba(245,240,232,0.18), rgba(245,240,232,0))',
+            margin: '32px 0 22px',
+          }}
+        />
+
+        <p
+          style={{
+            fontSize: '0.86rem',
+            lineHeight: 1.75,
+            color: 'rgba(245,240,232,0.68)',
+            margin: 0,
+            letterSpacing: '-0.01em',
+            fontStyle: 'italic',
+          }}
+        >
+          매일 한 번의 숨, 한 번의 시작.
+          <br />
+          몸이 흔들려도 마음은 자리를 지켰던 여름.
+        </p>
+
+        <p
+          style={{
+            fontSize: '0.68rem',
+            color: 'rgba(245,240,232,0.4)',
+            margin: '22px 0 0',
+            letterSpacing: '0.14em',
+            textTransform: 'uppercase',
+          }}
+        >
+          &mdash; 매일 마인드풀 러닝
+        </p>
+      </div>
+    </section>
+  )
+}
+
+function SeasonStatsGrid({ stats }: { stats: WrapSeasonStats }) {
+  return (
+    <section style={{ fontFamily: FONT }}>
+      <SectionTitle eyebrow="OUR NUMBERS" title="숫자로 본 여름" />
       <ul
         style={{
           listStyle: 'none',
           padding: 0,
-          margin: '22px 0 0',
+          margin: '10px 0 0',
           display: 'grid',
           gridTemplateColumns: 'repeat(2, minmax(0, 1fr))',
-          gap: 12,
+          gap: 10,
         }}
       >
-        <StatCell label="함께한 사람" value={`${stats.totalParticipants}명`} />
-        <StatCell label="완주" value={`${stats.totalFinishers}명`} />
-        <StatCell label="쌓인 도장" value={`${stats.totalStamps.toLocaleString()}개`} />
-        <StatCell label="누적 런지" value={`${stats.totalReps.toLocaleString()}회`} />
+        <StatCell label="함께한 사람" value={`${stats.totalParticipants}`} unit="명" />
+        <StatCell label="완주" value={`${stats.totalFinishers}`} unit="명" />
+        <StatCell label="쌓인 도장" value={stats.totalStamps.toLocaleString()} unit="개" />
+        <StatCell label="쉬어간 날" value={stats.totalRestDays.toLocaleString()} unit="일" />
       </ul>
-
       {stats.longestStreakName && (
         <p
           style={{
             fontSize: 12,
-            color: 'rgba(255,255,255,0.72)',
-            margin: '18px 0 0',
+            color: '#666',
+            margin: '14px 2px 0',
             letterSpacing: '-0.01em',
+            lineHeight: 1.6,
           }}
         >
-          🔥 최장 연속 <strong style={{ color: '#fff' }}>{stats.longestStreak}일</strong> · {stats.longestStreakName}
+          🔥 최장 연속 <strong style={{ color: '#111' }}>{stats.longestStreak}일</strong>
+          {' · '}
+          <span style={{ color: '#111' }}>{stats.longestStreakName}</span>
         </p>
       )}
     </section>
   )
 }
 
-function StatCell({ label, value }: { label: string; value: string }) {
+function StatCell({ label, value, unit }: { label: string; value: string; unit: string }) {
   return (
     <li
       style={{
-        background: 'rgba(255,255,255,0.08)',
-        border: '1px solid rgba(255,255,255,0.12)',
-        borderRadius: 14,
-        padding: '12px 14px',
-        backdropFilter: 'blur(6px)',
+        background: '#fff',
+        border: '1px solid #EBEBEB',
+        borderRadius: 16,
+        padding: '16px 16px 14px',
       }}
     >
-      <p style={{ fontSize: 11, color: 'rgba(255,255,255,0.68)', margin: 0, letterSpacing: '0.04em' }}>{label}</p>
+      <p style={{ fontSize: 11, color: '#999', margin: 0, letterSpacing: '0.05em', textTransform: 'uppercase' }}>
+        {label}
+      </p>
       <p
         style={{
-          fontSize: 20,
-          fontWeight: 800,
-          margin: '4px 0 0',
-          letterSpacing: '-0.02em',
+          margin: '6px 0 0',
+          letterSpacing: '-0.03em',
+          color: '#111',
+          display: 'flex',
+          alignItems: 'baseline',
+          gap: 4,
         }}
       >
-        {value}
+        <span style={{ fontSize: 24, fontWeight: 800, lineHeight: 1 }}>{value}</span>
+        <span style={{ fontSize: 12, fontWeight: 600, color: '#666' }}>{unit}</span>
       </p>
     </li>
   )
@@ -161,7 +288,6 @@ function SectionTitle({ eyebrow, title }: { eyebrow: string; title: string }) {
 
 function FinisherCard({ finisher }: { finisher: WrapFinisher }) {
   const codes = sortCodes(finisher.achievements)
-  const isMulti = finisher.generation.includes(',')
   return (
     <article
       style={{
@@ -182,7 +308,7 @@ function FinisherCard({ finisher }: { finisher: WrapFinisher }) {
             {finisher.name}
           </p>
           <p style={{ fontSize: 11, color: '#888', margin: 0 }}>
-            {finisher.generation}{isMulti && ' · 다기 완주'}
+            {finisher.generation}
           </p>
         </div>
         <ul
@@ -332,6 +458,7 @@ export function LungeS1Wrap({ challengeTitle, finishers, journeyers, messages, s
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 22 }}>
       <Hero challengeTitle={challengeTitle} stats={seasonStats} />
+      <SeasonStatsGrid stats={seasonStats} />
 
       <section style={{ fontFamily: FONT }}>
         <SectionTitle eyebrow="FINISHERS" title={`끝까지 함께한 ${finishers.length}분`} />

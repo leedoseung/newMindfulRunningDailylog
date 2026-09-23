@@ -38,7 +38,6 @@ describe('deriveAchievements', () => {
       revived: true,
       durationDays: DURATION,
       challengeStartDate: CHALLENGE_START,
-      memberGenerations: '',
     })
     expect(codes).toContain('finisher')
   })
@@ -51,7 +50,6 @@ describe('deriveAchievements', () => {
       revived: false,
       durationDays: DURATION,
       challengeStartDate: CHALLENGE_START,
-      memberGenerations: '',
     })
     expect(codes).toContain('perfect_100')
   })
@@ -65,7 +63,6 @@ describe('deriveAchievements', () => {
       revived: false,
       durationDays: DURATION,
       challengeStartDate: CHALLENGE_START,
-      memberGenerations: '',
     })
     expect(codes).not.toContain('perfect_100')
   })
@@ -77,7 +74,6 @@ describe('deriveAchievements', () => {
       revived: false,
       durationDays: DURATION,
       challengeStartDate: CHALLENGE_START,
-      memberGenerations: '',
     })
     expect(codes).toContain('no_pass')
   })
@@ -89,7 +85,6 @@ describe('deriveAchievements', () => {
       revived: true,
       durationDays: DURATION,
       challengeStartDate: CHALLENGE_START,
-      memberGenerations: '',
     })
     expect(codes).toContain('revived')
     expect(codes).not.toContain('perfect_100')
@@ -105,7 +100,6 @@ describe('deriveAchievements', () => {
       revived: false,
       durationDays: DURATION,
       challengeStartDate: CHALLENGE_START,
-      memberGenerations: '',
     })
     expect(codes).toContain('streak_90')
     expect(codes).not.toContain('streak_60')
@@ -121,7 +115,6 @@ describe('deriveAchievements', () => {
       revived: false,
       durationDays: DURATION,
       challengeStartDate: CHALLENGE_START,
-      memberGenerations: '',
     })
     expect(codes).toContain('streak_60')
     expect(codes).not.toContain('streak_90')
@@ -140,7 +133,6 @@ describe('deriveAchievements', () => {
       revived: false,
       durationDays: DURATION,
       challengeStartDate: CHALLENGE_START,
-      memberGenerations: '',
     })
     expect(codes).toContain('streak_90')
   })
@@ -157,7 +149,6 @@ describe('deriveAchievements', () => {
       revived: false,
       durationDays: DURATION,
       challengeStartDate: CHALLENGE_START,
-      memberGenerations: '',
     })
     // best streak is 50 days → below 60
     expect(codes).toContain('streak_30')
@@ -180,7 +171,6 @@ describe('deriveAchievements', () => {
       revived: false,
       durationDays: DURATION,
       challengeStartDate: CHALLENGE_START,
-      memberGenerations: '',
     })
     expect(codes).toContain('all_100_reps')
   })
@@ -194,32 +184,8 @@ describe('deriveAchievements', () => {
       revived: false,
       durationDays: DURATION,
       challengeStartDate: CHALLENGE_START,
-      memberGenerations: '',
     })
     expect(codes).not.toContain('all_100_reps')
   })
 
-  it('grants MULTI_GEN when generations string names multiple 기', () => {
-    const codes = deriveAchievements({
-      logs: [],
-      passesUsed: 0,
-      revived: false,
-      durationDays: DURATION,
-      challengeStartDate: CHALLENGE_START,
-      memberGenerations: '3기, 4기, 5기',
-    })
-    expect(codes).toContain('multi_gen')
-  })
-
-  it('does not grant MULTI_GEN for a single generation', () => {
-    const codes = deriveAchievements({
-      logs: [],
-      passesUsed: 0,
-      revived: false,
-      durationDays: DURATION,
-      challengeStartDate: CHALLENGE_START,
-      memberGenerations: '5기',
-    })
-    expect(codes).not.toContain('multi_gen')
-  })
 })

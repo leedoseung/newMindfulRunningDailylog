@@ -93,6 +93,13 @@ export default async function MissionPage() {
           >
             <LungeS1Wrap
               challengeTitle={ended.title}
+              startDate={ended.startDate}
+              endDate={(() => {
+                const [y, m, d] = ended.startDate.split('-').map(Number) as [number, number, number]
+                const dt = new Date(Date.UTC(y, m - 1, d))
+                dt.setUTCDate(dt.getUTCDate() + ended.durationDays - 1)
+                return dt.toISOString().slice(0, 10)
+              })()}
               finishers={wrap.finishers}
               journeyers={wrap.journeyers}
               messages={wrap.messages}

@@ -5,6 +5,7 @@ import type {
   WrapMessage,
   WrapSeasonStats,
 } from '@/application/use-cases/get-challenge-wrap'
+import { FinisherStampLauncher } from './finisher-stamp-launcher'
 
 const FONT = "'Pretendard Variable', Pretendard, -apple-system, sans-serif"
 const RANK = new Map(ACHIEVEMENT_ORDER.map((c, i) => [c as string, i]))
@@ -286,7 +287,17 @@ function SectionTitle({ eyebrow, title }: { eyebrow: string; title: string }) {
   )
 }
 
-function FinisherCard({ finisher }: { finisher: WrapFinisher }) {
+function FinisherCard({
+  finisher,
+  challengeTitle,
+  startDate,
+  endDate,
+}: {
+  finisher: WrapFinisher
+  challengeTitle: string
+  startDate: string
+  endDate: string
+}) {
   const codes = sortCodes(finisher.achievements)
   return (
     <article
@@ -352,6 +363,16 @@ function FinisherCard({ finisher }: { finisher: WrapFinisher }) {
           누적 {finisher.stats.totalReps.toLocaleString()}회 · 최장 연속 {finisher.stats.maxStreak}일
           {finisher.stats.restDays > 0 && ` · 쉼 ${finisher.stats.restDays}일`}
         </p>
+        <FinisherStampLauncher
+          name={finisher.name}
+          generation={finisher.generation}
+          challengeTitle={challengeTitle}
+          startDate={startDate}
+          endDate={endDate}
+          achievements={finisher.achievements}
+          stats={finisher.stats}
+          stamps={finisher.stamps}
+        />
       </div>
     </article>
   )
@@ -448,13 +469,15 @@ function MessageWall({ messages }: { messages: WrapMessage[] }) {
 
 export type LungeS1WrapProps = {
   challengeTitle: string
+  startDate: string
+  endDate: string
   finishers: WrapFinisher[]
   journeyers: WrapJourneyer[]
   messages: WrapMessage[]
   seasonStats: WrapSeasonStats
 }
 
-export function LungeS1Wrap({ challengeTitle, finishers, journeyers, messages, seasonStats }: LungeS1WrapProps) {
+export function LungeS1Wrap({ challengeTitle, startDate, endDate, finishers, journeyers, messages, seasonStats }: LungeS1WrapProps) {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 22 }}>
       <Hero challengeTitle={challengeTitle} stats={seasonStats} />
@@ -468,7 +491,12 @@ export function LungeS1Wrap({ challengeTitle, finishers, journeyers, messages, s
         <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: 12 }}>
           {finishers.map(f => (
             <li key={f.memberId}>
-              <FinisherCard finisher={f} />
+              <FinisherCard
+                finisher={f}
+                challengeTitle={challengeTitle}
+                startDate={startDate}
+                endDate={endDate}
+              />
             </li>
           ))}
         </ul>

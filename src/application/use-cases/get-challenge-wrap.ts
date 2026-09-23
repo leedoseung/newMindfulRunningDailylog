@@ -1,8 +1,12 @@
 import type { SupabaseClient } from '@supabase/supabase-js'
 import type { AchievementCode } from '@/domain/badges/achievement-catalog'
+import type { MissionDayCell } from '@/domain/entities/mission-day-cell'
+import { computeMissionDayCell } from '@/domain/entities/mission-day-cell'
+import type { MissionLog } from '@/domain/entities/mission-log'
 
 export type WrapFinisher = {
   memberId: string
+  participationId: string
   name: string
   avatarUrl: string | null
   generation: string
@@ -14,6 +18,7 @@ export type WrapFinisher = {
     restDays: number
     passesUsed: number
   }
+  stamps: MissionDayCell[]
 }
 
 export type WrapJourneyer = {
@@ -67,10 +72,52 @@ function isStringArray(x: unknown): x is string[] {
   return Array.isArray(x) && x.every(v => typeof v === 'string')
 }
 
+function addDays(startDate: string, offset: number): string {
+  const [y, m, d] = startDate.split('-').map(Number) as [number, number, number]
+  const dt = new Date(Date.UTC(y, m - 1, d))
+  dt.setUTCDate(dt.getUTCDate() + offset)
+  return dt.toISOString().slice(0, 10)
+}
+
+type BuildStampsArgs = {
+  startDate: string
+  durationDays: number
+  today: string
+  logs: MissionLog[]
+  goalMin: number
+  bonusGoal: number
+}
+
+function buildStamps({ startDate, durationDays, today, logs, goalMin, bonusGoal }: BuildStampsArgs): MissionDayCell[] {
+  const logByDate = new Map(logs.map(l => [l.logDate, l]))
+  const cells: MissionDayCell[] = []
+  for (let i = 0; i < durationDays; i++) {
+    const cellDate = addDays(startDate, i)
+    cells.push(
+      computeMissionDayCell({
+        dayIndex: i,
+        cellDate,
+        today,
+        log: logByDate.get(cellDate) ?? null,
+        goalMin,
+        bonusGoal,
+      }),
+    )
+  }
+  return cells
+}
+
 export class GetChallengeWrapUseCase {
   constructor(private readonly supabase: SupabaseClient) {}
 
   async execute(challengeId: string): Promise<WrapData> {
+    const { data: challenge, error: cErr } = await this.supabase
+      .from('challenges')
+      .select('id, start_date, duration_days, goal_per_day, goal_min')
+      .eq('id', challengeId)
+      .single()
+    if (cErr) throw new Error(`wrap challenge failed: ${cErr.message}`)
+
     const { data: parts, error: pErr } = await this.supabase
       .from('challenge_participations')
       .select('id, member_id, completed_at, failed_at, revived_at, passes_remaining')
@@ -98,6 +145,35 @@ export class GetChallengeWrapUseCase {
       })
     }
 
+    // Load every mission log for the season once — used to build finisher
+    // stamps AND the season-wide aggregate below.
+    const partIds = (parts ?? []).map(p => p.id)
+    const { data: allLogs, error: aErr } = await this.supabase
+      .from('mission_logs')
+      .select('id, participation_id, log_date, count, used_pass, is_rest_day, note, updated_at')
+      .in('participation_id', partIds)
+    if (aErr) throw new Error(`wrap aggregate failed: ${aErr.message}`)
+
+    const logsByPart = new Map<string, MissionLog[]>()
+    for (const l of allLogs ?? []) {
+      const domainLog: MissionLog = {
+        id: l.id,
+        participationId: l.participation_id,
+        logDate: l.log_date,
+        count: l.count ?? 0,
+        completed: (l.count ?? 0) >= (challenge.goal_min ?? 10),
+        usedPass: !!l.used_pass,
+        isRestDay: !!l.is_rest_day,
+        note: (l.note as string | null) ?? null,
+        updatedAt: l.updated_at ?? '',
+      }
+      const arr = logsByPart.get(l.participation_id) ?? []
+      arr.push(domainLog)
+      logsByPart.set(l.participation_id, arr)
+    }
+
+    const seasonEnd = addDays(challenge.start_date, challenge.duration_days - 1)
+
     const finishers: WrapFinisher[] = []
     const journeyers: WrapJourneyer[] = []
 
@@ -108,8 +184,18 @@ export class GetChallengeWrapUseCase {
         const badge = mem.badges.find(b => b.challenge_id === challengeId)
         const codes = isStringArray(badge?.achievements) ? badge.achievements : ['finisher']
         const stats = badge?.stats ?? {}
+        const partLogs = logsByPart.get(p.id) ?? []
+        const stamps = buildStamps({
+          startDate: challenge.start_date,
+          durationDays: challenge.duration_days,
+          today: seasonEnd,
+          logs: partLogs,
+          goalMin: challenge.goal_min ?? 10,
+          bonusGoal: challenge.goal_per_day ?? 100,
+        })
         finishers.push({
           memberId: mem.id,
+          participationId: p.id,
           name: mem.name,
           avatarUrl: mem.avatarUrl,
           generation: mem.generation,
@@ -121,6 +207,7 @@ export class GetChallengeWrapUseCase {
             restDays: stats.rest_days ?? 0,
             passesUsed: stats.passes_used ?? 0,
           },
+          stamps,
         })
       } else {
         journeyers.push({
@@ -131,16 +218,11 @@ export class GetChallengeWrapUseCase {
       }
     }
 
-    // Messages: mission_logs with non-empty note, joined via participation → member.
-    const partIds = (parts ?? []).map(p => p.id)
-    const { data: notedLogs, error: lErr } = await this.supabase
-      .from('mission_logs')
-      .select('id, participation_id, log_date, count, is_rest_day, note')
-      .in('participation_id', partIds)
-      .not('note', 'is', null)
-      .order('log_date', { ascending: false })
-      .limit(200)
-    if (lErr) throw new Error(`wrap notes failed: ${lErr.message}`)
+    // Messages: mission_logs with non-empty note.
+    const notedLogs = (allLogs ?? [])
+      .filter(l => (l.note as string | null)?.trim())
+      .sort((a, b) => (a.log_date < b.log_date ? 1 : -1))
+      .slice(0, 200)
 
     const partToMember = new Map<string, string>()
     for (const p of parts ?? []) partToMember.set(p.id, p.member_id)
@@ -164,13 +246,6 @@ export class GetChallengeWrapUseCase {
         note,
       })
     }
-
-    // Season stats: aggregate across every participation.
-    const { data: allLogs, error: aErr } = await this.supabase
-      .from('mission_logs')
-      .select('participation_id, count, used_pass, is_rest_day')
-      .in('participation_id', partIds)
-    if (aErr) throw new Error(`wrap aggregate failed: ${aErr.message}`)
 
     let totalReps = 0
     let totalStamps = 0

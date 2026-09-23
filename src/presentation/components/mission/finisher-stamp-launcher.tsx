@@ -7,6 +7,7 @@ import {
   getAchievement,
   type AchievementCode,
 } from '@/domain/badges/achievement-catalog'
+import { StampCell } from './stamp-cell'
 
 const FONT = "'Pretendard Variable', Pretendard, -apple-system, sans-serif"
 const RANK = new Map(ACHIEVEMENT_ORDER.map((c, i) => [c as string, i]))
@@ -26,94 +27,6 @@ type Props = {
     passesUsed: number
   }
   stamps: MissionDayCell[]
-}
-
-function StampSquare({ cell, size }: { cell: MissionDayCell; size: number }) {
-  const s: React.CSSProperties = {
-    width: size,
-    height: size,
-    borderRadius: size / 2,
-    boxSizing: 'border-box',
-  }
-
-  if (cell.state === 'done') {
-    return (
-      <span
-        style={{
-          ...s,
-          background:
-            'radial-gradient(circle at 30% 30%, #f4a3a1, #b8231f 68%)',
-          boxShadow: 'inset 0 0 0 1.5px #6d1310',
-          display: 'inline-block',
-        }}
-      />
-    )
-  }
-  if (cell.state === 'rest') {
-    return (
-      <span
-        style={{
-          ...s,
-          background: '#E8F5EC',
-          border: '1.5px solid #1e7e34',
-          color: '#1e7e34',
-          display: 'inline-flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          fontSize: size * 0.5,
-        }}
-      >
-        🌿
-      </span>
-    )
-  }
-  if (cell.state === 'pass') {
-    return (
-      <span
-        style={{
-          ...s,
-          border: '1px solid #c8c8c4',
-          background: 'repeating-linear-gradient(45deg, #f0f0ee, #f0f0ee 3px, #fff 3px, #fff 6px)',
-          display: 'inline-block',
-        }}
-      />
-    )
-  }
-  if (cell.state === 'partial') {
-    return (
-      <span
-        style={{
-          ...s,
-          background: '#f4d0cf',
-          border: '1px solid #d4a017',
-          display: 'inline-block',
-          opacity: 0.7,
-        }}
-      />
-    )
-  }
-  if (cell.state === 'miss') {
-    return (
-      <span
-        style={{
-          ...s,
-          background: '#fef5f5',
-          border: '1px solid #f0e0e0',
-          display: 'inline-block',
-        }}
-      />
-    )
-  }
-  return (
-    <span
-      style={{
-        ...s,
-        background: 'transparent',
-        border: '1px dashed #d8d8d4',
-        display: 'inline-block',
-      }}
-    />
-  )
 }
 
 function sortCodes(codes: AchievementCode[]): AchievementCode[] {
@@ -302,18 +215,28 @@ export function FinisherStampLauncher({
                 </p>
               </div>
 
-              {/* Stamps grid */}
-              <div style={{ margin: '22px auto 0', position: 'relative', zIndex: 1 }}>
+              {/* Stamps grid — reuses the branded StampCell from the mission board */}
+              <div
+                style={{
+                  margin: '22px auto 0',
+                  position: 'relative',
+                  zIndex: 1,
+                  background: '#FBF6ED',
+                  borderRadius: 16,
+                  padding: 12,
+                  width: 284,
+                  boxSizing: 'border-box',
+                }}
+              >
                 <div
                   style={{
                     display: 'grid',
                     gridTemplateColumns: 'repeat(10, 1fr)',
                     gap: 4,
-                    width: 260,
                   }}
                 >
                   {stamps.map(cell => (
-                    <StampSquare key={cell.dayIndex} cell={cell} size={22} />
+                    <StampCell key={cell.dayIndex} cell={cell} />
                   ))}
                 </div>
               </div>

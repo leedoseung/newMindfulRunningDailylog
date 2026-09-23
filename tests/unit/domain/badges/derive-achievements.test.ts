@@ -156,6 +156,45 @@ describe('deriveAchievements', () => {
     expect(codes).not.toContain('no_pass')
   })
 
+  it('grants EVERY_DAY_STAMP when logs cover every day with no rest, pass, or revive', () => {
+    const days = daysFrom(CHALLENGE_START, 100)
+    const logs = days.map(d => log(d, 100))
+    const codes = deriveAchievements({
+      logs,
+      passesUsed: 0,
+      revived: false,
+      durationDays: DURATION,
+      challengeStartDate: CHALLENGE_START,
+    })
+    expect(codes).toContain('every_day_stamp')
+  })
+
+  it('does not grant EVERY_DAY_STAMP when there is a rest day', () => {
+    const days = daysFrom(CHALLENGE_START, 100)
+    const logs = days.map((d, i) => (i === 10 ? log(d, 0, { isRestDay: true }) : log(d, 100)))
+    const codes = deriveAchievements({
+      logs,
+      passesUsed: 0,
+      revived: false,
+      durationDays: DURATION,
+      challengeStartDate: CHALLENGE_START,
+    })
+    expect(codes).not.toContain('every_day_stamp')
+  })
+
+  it('does not grant EVERY_DAY_STAMP when a day is missing', () => {
+    const days = daysFrom(CHALLENGE_START, 99)
+    const logs = days.map(d => log(d, 100))
+    const codes = deriveAchievements({
+      logs,
+      passesUsed: 0,
+      revived: false,
+      durationDays: DURATION,
+      challengeStartDate: CHALLENGE_START,
+    })
+    expect(codes).not.toContain('every_day_stamp')
+  })
+
   it('grants ALL_100_REPS when every non-rest non-pass log is >= 100', () => {
     const days = daysFrom(CHALLENGE_START, 5)
     const logs = [

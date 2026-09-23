@@ -65,6 +65,15 @@ export function deriveAchievements(input: DeriveAchievementsInput): AchievementC
     codes.push('no_pass')
   }
 
+  // 매일의 도장: 매일 log 존재, rest 0, pass 0, 부활 0.
+  if (!input.revived && input.passesUsed === 0) {
+    const restCount = input.logs.filter(l => l.isRestDay === true).length
+    const has100Logs = input.logs.length >= input.durationDays
+    if (has100Logs && restCount === 0) {
+      codes.push('every_day_stamp')
+    }
+  }
+
   const streak = computeSuccessStreak(input.logs, input.challengeStartDate, input.durationDays)
   const bestTier = STREAK_TIERS.find(t => streak >= t.threshold)
   if (bestTier) codes.push(bestTier.code)

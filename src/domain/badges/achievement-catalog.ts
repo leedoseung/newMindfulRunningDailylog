@@ -1,6 +1,7 @@
 export const ACHIEVEMENTS = {
   FINISHER: { code: 'finisher', label: '100일 완주자', icon: '🌱', hint: '시즌을 함께 끝까지 걸었어요' },
-  PERFECT_100: { code: 'perfect_100', label: 'Perfect 100', icon: '💯', hint: '100일 하루도 놓치지 않았어요' },
+  PERFECT_100: { code: 'perfect_100', label: 'Perfect 100', icon: '💯', hint: '100일 매 도장이 100회 이상' },
+  EVERY_DAY_STAMP: { code: 'every_day_stamp', label: '매일의 도장', icon: '🌸', hint: '100일 하루도 자리를 비우지 않았어요' },
   STREAK_90: { code: 'streak_90', label: '90일 연속', icon: '🔥', hint: '90일 이상 이어진 흐름' },
   STREAK_60: { code: 'streak_60', label: '60일 연속', icon: '🔥', hint: '60일 이상 이어진 흐름' },
   STREAK_30: { code: 'streak_30', label: '30일 연속', icon: '🔥', hint: '30일 이상 이어진 흐름' },
@@ -24,6 +25,7 @@ export function getAchievement(code: string): AchievementEntry | null {
 export const ACHIEVEMENT_ORDER: AchievementCode[] = [
   'finisher',
   'perfect_100',
+  'every_day_stamp',
   'no_pass',
   'streak_90',
   'streak_60',

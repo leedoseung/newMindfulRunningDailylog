@@ -7,7 +7,90 @@ import {
   getAchievement,
   type AchievementCode,
 } from '@/domain/badges/achievement-catalog'
-import { StampCell } from './stamp-cell'
+function ShareStamp({ cell }: { cell: MissionDayCell }) {
+  const base: React.CSSProperties = {
+    width: '100%',
+    aspectRatio: '1 / 1',
+    borderRadius: '50%',
+    boxSizing: 'border-box',
+    display: 'block',
+  }
+  if (cell.state === 'done') {
+    return (
+      <span
+        style={{
+          ...base,
+          background:
+            'radial-gradient(circle at 32% 30%, #e85450 0%, #b8231f 60%, #7d1410 100%)',
+          border: '1.5px solid #6d1310',
+          boxShadow: 'inset 0 -1px 2px rgba(0,0,0,0.15)',
+        }}
+      />
+    )
+  }
+  if (cell.state === 'rest') {
+    return (
+      <span
+        style={{
+          ...base,
+          background: '#E8F5EC',
+          border: '1.5px solid #1e7e34',
+          display: 'inline-flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          fontSize: 10,
+          lineHeight: 1,
+        }}
+      >
+        🌿
+      </span>
+    )
+  }
+  if (cell.state === 'partial') {
+    return (
+      <span
+        style={{
+          ...base,
+          background: '#f4d0cf',
+          border: '1px solid #d4a017',
+          opacity: 0.85,
+        }}
+      />
+    )
+  }
+  if (cell.state === 'pass') {
+    return (
+      <span
+        style={{
+          ...base,
+          border: '1px solid #c8c8c4',
+          background:
+            'repeating-linear-gradient(45deg, #f0f0ee 0px, #f0f0ee 2px, #ffffff 2px, #ffffff 4px)',
+        }}
+      />
+    )
+  }
+  if (cell.state === 'miss') {
+    return (
+      <span
+        style={{
+          ...base,
+          background: '#fef5f5',
+          border: '1px solid #f0e0e0',
+        }}
+      />
+    )
+  }
+  return (
+    <span
+      style={{
+        ...base,
+        background: 'transparent',
+        border: '1px dashed #d8d8d4',
+      }}
+    />
+  )
+}
 
 const FONT = "'Pretendard Variable', Pretendard, -apple-system, sans-serif"
 const RANK = new Map(ACHIEVEMENT_ORDER.map((c, i) => [c as string, i]))
@@ -176,27 +259,33 @@ export function FinisherStampLauncher({
         >
           <div
             onClick={e => e.stopPropagation()}
-            style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 16, maxWidth: 460, width: '100%' }}
+            style={{
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              gap: 14,
+              width: '100%',
+              maxWidth: 380,
+            }}
           >
             {/* Shareable card */}
             <div
               ref={cardRef}
               style={{
                 width: '100%',
-                maxWidth: 380,
-                aspectRatio: '4 / 5',
                 background:
                   'radial-gradient(120% 140% at 100% 0%, rgba(244,114,182,0.18) 0%, rgba(167,139,250,0.10) 40%, transparent 65%),' +
                   'radial-gradient(80% 100% at 0% 100%, rgba(56,189,248,0.14) 0%, transparent 60%),' +
                   '#151114',
                 color: '#FBF6ED',
-                padding: '28px 24px',
+                padding: '24px 20px',
                 display: 'flex',
                 flexDirection: 'column',
                 boxShadow: '0 30px 60px rgba(21,17,20,0.5)',
                 position: 'relative',
                 overflow: 'hidden',
-                borderRadius: 24,
+                borderRadius: 22,
+                boxSizing: 'border-box',
               }}
             >
               <div style={{ position: 'relative', zIndex: 1 }}>
@@ -238,16 +327,15 @@ export function FinisherStampLauncher({
                 </p>
               </div>
 
-              {/* Stamps grid — reuses the branded StampCell from the mission board */}
+              {/* Stamps grid — html2canvas-safe (no hue-rotate filters) */}
               <div
                 style={{
-                  margin: '22px auto 0',
+                  margin: '20px 0 0',
                   position: 'relative',
                   zIndex: 1,
                   background: '#FBF6ED',
                   borderRadius: 16,
-                  padding: 12,
-                  width: 284,
+                  padding: 10,
                   boxSizing: 'border-box',
                 }}
               >
@@ -255,23 +343,23 @@ export function FinisherStampLauncher({
                   style={{
                     display: 'grid',
                     gridTemplateColumns: 'repeat(10, 1fr)',
-                    gap: 4,
+                    gap: 3,
+                    width: '100%',
                   }}
                 >
                   {stamps.map(cell => (
-                    <StampCell key={cell.dayIndex} cell={cell} />
+                    <ShareStamp key={cell.dayIndex} cell={cell} />
                   ))}
                 </div>
               </div>
 
               {/* Stats + Achievements */}
-              <div style={{ marginTop: 'auto', position: 'relative', zIndex: 1 }}>
+              <div style={{ marginTop: 20, position: 'relative', zIndex: 1 }}>
                 <div
                   style={{
                     display: 'grid',
-                    gridTemplateColumns: '1fr 1fr 1fr',
-                    gap: 8,
-                    marginTop: 24,
+                    gridTemplateColumns: 'repeat(3, minmax(0, 1fr))',
+                    gap: 6,
                   }}
                 >
                   <StatMini label="런지" value={stats.totalReps.toLocaleString()} />
@@ -334,7 +422,7 @@ export function FinisherStampLauncher({
             </div>
 
             {/* Actions */}
-            <div style={{ display: 'flex', gap: 10, width: '100%', maxWidth: 380 }}>
+            <div style={{ display: 'flex', gap: 8, width: '100%' }}>
               <button
                 type="button"
                 onClick={saveImage}
@@ -414,8 +502,10 @@ function StatMini({ label, value }: { label: string; value: string }) {
         background: 'rgba(245,240,232,0.06)',
         border: '1px solid rgba(245,240,232,0.10)',
         borderRadius: 12,
-        padding: '10px 8px',
+        padding: '10px 6px',
         textAlign: 'center',
+        minWidth: 0,
+        overflow: 'hidden',
       }}
     >
       <p style={{ fontSize: 9, color: 'rgba(245,240,232,0.5)', margin: 0, letterSpacing: '0.08em', textTransform: 'uppercase' }}>
@@ -423,12 +513,15 @@ function StatMini({ label, value }: { label: string; value: string }) {
       </p>
       <p
         style={{
-          fontSize: 14,
+          fontSize: 13,
           fontWeight: 800,
           margin: '4px 0 0',
           color: '#FBF6ED',
           letterSpacing: '-0.02em',
           lineHeight: 1,
+          whiteSpace: 'nowrap',
+          overflow: 'hidden',
+          textOverflow: 'ellipsis',
         }}
       >
         {value}

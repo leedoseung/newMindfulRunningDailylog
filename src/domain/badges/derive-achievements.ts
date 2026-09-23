@@ -11,6 +11,7 @@ export type DeriveAchievementsInput = {
 
 const GOAL = 100
 const STREAK_TIERS: Array<{ code: AchievementCode; threshold: number }> = [
+  { code: 'streak_100', threshold: 100 },
   { code: 'streak_90', threshold: 90 },
   { code: 'streak_60', threshold: 60 },
   { code: 'streak_30', threshold: 30 },

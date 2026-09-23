@@ -102,8 +102,23 @@ describe('deriveAchievements', () => {
       challengeStartDate: CHALLENGE_START,
     })
     expect(codes).toContain('streak_90')
+    expect(codes).not.toContain('streak_100')
     expect(codes).not.toContain('streak_60')
     expect(codes).not.toContain('streak_30')
+  })
+
+  it('grants STREAK_100 only for a full 100-day streak', () => {
+    const days = daysFrom(CHALLENGE_START, 100)
+    const logs = days.map(d => log(d, 100))
+    const codes = deriveAchievements({
+      logs,
+      passesUsed: 0,
+      revived: false,
+      durationDays: DURATION,
+      challengeStartDate: CHALLENGE_START,
+    })
+    expect(codes).toContain('streak_100')
+    expect(codes).not.toContain('streak_90')
   })
 
   it('grants STREAK_60 when max is between 60 and 89', () => {
@@ -135,7 +150,8 @@ describe('deriveAchievements', () => {
       durationDays: DURATION,
       challengeStartDate: CHALLENGE_START,
     })
-    expect(codes).toContain('streak_90')
+    expect(codes).toContain('streak_100')
+    expect(codes).not.toContain('streak_90')
   })
 
   it('counts used_pass as breaking the streak', () => {

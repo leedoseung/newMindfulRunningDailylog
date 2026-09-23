@@ -75,4 +75,17 @@ export class SupabaseChallengeRepository implements IChallengeRepository {
     if (error) throw new Error(`getUpcoming failed: ${error.message}`)
     return (data as unknown as ChallengeRow[]).map(toChallenge)
   }
+
+  async getMostRecentEnded(): Promise<Challenge | null> {
+    const { data, error } = await this.supabase
+      .from('challenges')
+      .select(SELECT)
+      .eq('status', 'ended')
+      .order('start_date', { ascending: false })
+      .limit(1)
+      .maybeSingle()
+
+    if (error) throw new Error(`getMostRecentEnded failed: ${error.message}`)
+    return data ? toChallenge(data as unknown as ChallengeRow) : null
+  }
 }

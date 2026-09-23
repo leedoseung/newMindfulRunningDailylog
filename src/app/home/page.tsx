@@ -107,6 +107,7 @@ export default async function HomePage() {
           ? 'current'
           : null
   const showH1DashboardBanner = todayKst <= '2026-09-07'
+  const showSeasonWrapBanner = todayKst >= '2026-09-23' && todayKst <= '2026-10-15'
 
   return (
     <main style={{ minHeight: '100vh', background: '#F7F7F5', position: 'relative' }}>
@@ -141,6 +142,7 @@ export default async function HomePage() {
         memberName={memberName}
         memberAvatarUrl={memberAvatarUrl}
         showH1DashboardBanner={showH1DashboardBanner}
+        showSeasonWrapBanner={showSeasonWrapBanner}
       />
     </main>
   )

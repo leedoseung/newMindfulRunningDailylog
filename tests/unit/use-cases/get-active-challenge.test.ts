@@ -19,7 +19,7 @@ const participation: ChallengeParticipation = {
 
 describe('GetActiveChallengeUseCase', () => {
   it('returns null challenge when none active', async () => {
-    const cRepo = { getActive: vi.fn().mockResolvedValue(null), getById: vi.fn(), getUpcoming: vi.fn() } as IChallengeRepository
+    const cRepo = { getActive: vi.fn().mockResolvedValue(null), getById: vi.fn(), getUpcoming: vi.fn(), getMostRecentEnded: vi.fn() } as IChallengeRepository
     const pRepo = { getByMember: vi.fn() } as unknown as IChallengeParticipationRepository
     const uc = new GetActiveChallengeUseCase(cRepo, pRepo)
     const result = await uc.execute('m1')
@@ -27,7 +27,7 @@ describe('GetActiveChallengeUseCase', () => {
   })
 
   it('returns challenge + participation when both exist', async () => {
-    const cRepo = { getActive: vi.fn().mockResolvedValue(challenge), getById: vi.fn(), getUpcoming: vi.fn() } as IChallengeRepository
+    const cRepo = { getActive: vi.fn().mockResolvedValue(challenge), getById: vi.fn(), getUpcoming: vi.fn(), getMostRecentEnded: vi.fn() } as IChallengeRepository
     const pRepo = { getByMember: vi.fn().mockResolvedValue(participation) } as unknown as IChallengeParticipationRepository
     const uc = new GetActiveChallengeUseCase(cRepo, pRepo)
     const result = await uc.execute('m1')
@@ -36,7 +36,7 @@ describe('GetActiveChallengeUseCase', () => {
   })
 
   it('returns challenge + null participation when not enrolled', async () => {
-    const cRepo = { getActive: vi.fn().mockResolvedValue(challenge), getById: vi.fn(), getUpcoming: vi.fn() } as IChallengeRepository
+    const cRepo = { getActive: vi.fn().mockResolvedValue(challenge), getById: vi.fn(), getUpcoming: vi.fn(), getMostRecentEnded: vi.fn() } as IChallengeRepository
     const pRepo = { getByMember: vi.fn().mockResolvedValue(null) } as unknown as IChallengeParticipationRepository
     const uc = new GetActiveChallengeUseCase(cRepo, pRepo)
     const result = await uc.execute('m1')

@@ -9,7 +9,9 @@ import { GetActiveChallengeUseCase } from '@/application/use-cases/get-active-ch
 import { GetMissionBoardUseCase } from '@/application/use-cases/get-mission-board'
 import { GetChallengeParticipantsUseCase } from '@/application/use-cases/get-challenge-participants'
 import { GetChallengeLeaderboardUseCase } from '@/application/use-cases/get-challenge-leaderboard'
+import { GetChallengeWrapUseCase } from '@/application/use-cases/get-challenge-wrap'
 import { MissionPageClient } from '@/presentation/components/mission/mission-page-client'
+import { LungeS1Wrap } from '@/presentation/components/mission/lunge-s1-wrap'
 import { AdminEntryButton } from '@/presentation/components/admin/admin-entry-button'
 import { redirect } from 'next/navigation'
 import { kstToday } from '@/lib/kst'
@@ -73,6 +75,34 @@ export default async function MissionPage() {
         </>
       )
     }
+
+    // No upcoming — surface the most recent ended challenge as a wrap-up dashboard.
+    const ended = await cRepo.getMostRecentEnded()
+    if (ended) {
+      const wrap = await new GetChallengeWrapUseCase(supabase).execute(ended.id)
+      return (
+        <>
+          <AdminEntryButton />
+          <main
+            style={{
+              padding: '16px 16px 120px',
+              background: '#F7F7F5',
+              minHeight: '100vh',
+              fontFamily: "'Pretendard Variable', Pretendard, -apple-system, sans-serif",
+            }}
+          >
+            <LungeS1Wrap
+              challengeTitle={ended.title}
+              finishers={wrap.finishers}
+              journeyers={wrap.journeyers}
+              messages={wrap.messages}
+              seasonStats={wrap.seasonStats}
+            />
+          </main>
+        </>
+      )
+    }
+
     return (
       <>
         <AdminEntryButton />

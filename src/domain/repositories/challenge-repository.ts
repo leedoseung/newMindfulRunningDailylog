@@ -4,4 +4,5 @@ export interface IChallengeRepository {
   getActive(): Promise<Challenge | null>
   getById(id: string): Promise<Challenge | null>
   getUpcoming(): Promise<Challenge[]>
+  getMostRecentEnded(): Promise<Challenge | null>
 }

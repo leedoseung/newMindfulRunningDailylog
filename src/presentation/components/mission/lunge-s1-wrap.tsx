@@ -156,7 +156,7 @@ function Hero({ stats }: { challengeTitle: string; stats: WrapSeasonStats }) {
           <strong style={{ fontWeight: 800 }}>{stats.totalParticipants}명</strong>의 마풀런 러너가 함께 문을 열었고,{' '}
           <br />
           그중{' '}
-          <strong style={{ fontWeight: 800 }}>{stats.totalFinishers}명</strong>이 100일 마지막 도장까지 걸어왔어요.
+          <strong style={{ fontWeight: 800 }}>{stats.totalFinishers}명</strong>이 100일 마지막 날까지 런지를 완료하였습니다.
         </p>
 
         <div
@@ -274,7 +274,7 @@ function Hero({ stats }: { challengeTitle: string; stats: WrapSeasonStats }) {
 function SeasonStatsGrid({ stats }: { stats: WrapSeasonStats }) {
   return (
     <section style={{ fontFamily: FONT }}>
-      <SectionTitle eyebrow="OUR NUMBERS" title="숫자로 본 여름" />
+      <SectionTitle eyebrow="OUR NUMBERS" title="멤버들의 런지 기록" />
       <ul
         style={{
           listStyle: 'none',
@@ -523,7 +523,7 @@ function MessageWall({ messages }: { messages: WrapMessage[] }) {
     <section style={{ fontFamily: FONT, padding: '4px 0 0' }}>
       <SectionTitle eyebrow="OUR VOICES" title="시즌에 남긴 한 줄들" />
       <p style={{ fontSize: 12, color: '#666', margin: '0 0 14px', lineHeight: 1.6 }}>
-        걸으며 남겼던 마음의 결. 우리의 여정에 이런 문장들이 흘렀어요.
+        런지하며 생각했던 마음의 결. 우리의 여정에 이런 문장들이 흘렀어요.
       </p>
       <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: 12 }}>
         {messages.map(m => <MessageCard key={m.logId} message={m} />)}

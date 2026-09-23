@@ -1,5 +1,7 @@
 import { GetRecentRunsUseCase } from '@/application/use-cases/get-recent-runs'
 import { GetMemberRecordsUseCase } from '@/application/use-cases/get-member-records'
+import { GetMyChallengeCardUseCase } from '@/application/use-cases/get-my-challenge-card'
+import { SupabaseChallengeRepository } from '@/infrastructure/supabase/challenge-repository'
 import { SupabaseRunLogRepository } from '@/infrastructure/supabase/run-log-repository'
 import { createServerClient } from '@/infrastructure/supabase/client'
 import { getAuthFromHeaders } from '@/infrastructure/supabase/server-auth'
@@ -109,6 +111,18 @@ export default async function HomePage() {
   const showH1DashboardBanner = todayKst <= '2026-09-07'
   const showSeasonWrapBanner = todayKst >= '2026-09-23' && todayKst <= '2026-10-15'
 
+  let myLungeS1Card: Awaited<ReturnType<GetMyChallengeCardUseCase['execute']>> = null
+  if (memberId) {
+    const cRepo = new SupabaseChallengeRepository(supabase)
+    const ended = await cRepo.getMostRecentEnded()
+    if (ended) {
+      myLungeS1Card = await new GetMyChallengeCardUseCase(supabase).execute({
+        memberId,
+        challengeId: ended.id,
+      })
+    }
+  }
+
   return (
     <main style={{ minHeight: '100vh', background: '#F7F7F5', position: 'relative' }}>
       <AppHeader memberName={memberName || '?'} memberAvatarUrl={memberAvatarUrl} memberId={memberId} />
@@ -143,6 +157,7 @@ export default async function HomePage() {
         memberAvatarUrl={memberAvatarUrl}
         showH1DashboardBanner={showH1DashboardBanner}
         showSeasonWrapBanner={showSeasonWrapBanner}
+        myLungeS1Card={myLungeS1Card}
       />
     </main>
   )

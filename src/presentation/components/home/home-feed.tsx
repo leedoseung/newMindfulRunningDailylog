@@ -10,6 +10,8 @@ import { AvatarImage } from '../shared/avatar-image'
 import { DonationBanner } from './donation-banner'
 import { H1DashboardBanner } from './h1-dashboard-banner'
 import { SeasonWrapBanner } from './season-wrap-banner'
+import { MyLungeS1Card } from './my-lunge-s1-card'
+import type { MyChallengeCard } from '@/application/use-cases/get-my-challenge-card'
 import { MilestoneToast } from './milestone-toast'
 import type { RunLog } from '@/domain/entities/run-log'
 
@@ -47,6 +49,7 @@ type Props = {
   memberAvatarUrl?: string
   showH1DashboardBanner?: boolean
   showSeasonWrapBanner?: boolean
+  myLungeS1Card?: MyChallengeCard | null
 }
 
 function MiniBarChart({ bars }: { bars: WeeklyBar[] }) {
@@ -206,7 +209,7 @@ function StatsHeader({
   )
 }
 
-export function HomeFeed({ recentRuns, myRuns, memberId, crew, weeklyBars, weeklyTotalHours = 0, initialOffset = 20, memberName = '', memberAvatarUrl = '', showH1DashboardBanner = false, showSeasonWrapBanner = false }: Props) {
+export function HomeFeed({ recentRuns, myRuns, memberId, crew, weeklyBars, weeklyTotalHours = 0, initialOffset = 20, memberName = '', memberAvatarUrl = '', showH1DashboardBanner = false, showSeasonWrapBanner = false, myLungeS1Card = null }: Props) {
   const router = useRouter()
   const [tab, setTab] = useState<Tab>('all')
   const [refreshing, setRefreshing] = useState(false)
@@ -352,6 +355,7 @@ export function HomeFeed({ recentRuns, myRuns, memberId, crew, weeklyBars, weekl
       <div style={{ height: 12 }} />
       {showSeasonWrapBanner && <SeasonWrapBanner />}
       {showH1DashboardBanner && <H1DashboardBanner />}
+      {myLungeS1Card && <MyLungeS1Card card={myLungeS1Card} />}
       <DonationBanner />
 
       <StatsHeader

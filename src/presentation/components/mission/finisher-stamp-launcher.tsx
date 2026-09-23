@@ -20,10 +20,11 @@ function ShareStamp({ cell }: { cell: MissionDayCell }) {
       <span
         style={{
           ...base,
-          background:
-            'radial-gradient(circle at 32% 30%, #e85450 0%, #b8231f 60%, #7d1410 100%)',
-          border: '1.5px solid #6d1310',
-          boxShadow: 'inset 0 -1px 2px rgba(0,0,0,0.15)',
+          border: '1.5px solid #111',
+          backgroundImage: "url('/icon-192-red.png')",
+          backgroundSize: '75%',
+          backgroundRepeat: 'no-repeat',
+          backgroundPosition: 'center',
         }}
       />
     )

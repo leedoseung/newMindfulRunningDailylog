@@ -44,27 +44,27 @@ function Hero({ stats }: { challengeTitle: string; stats: WrapSeasonStats }) {
     <section
       style={{
         fontFamily: FONT,
-        color: '#F5F0E8',
+        color: '#231B17',
         borderRadius: 28,
-        padding: '48px 28px 44px',
-        background: '#151114',
-        boxShadow: '0 24px 60px rgba(21,17,20,0.35)',
+        padding: '36px 28px 32px',
+        background: '#F5EEE1',
         position: 'relative',
         overflow: 'hidden',
         isolation: 'isolate',
+        boxShadow: '0 2px 0 rgba(35,27,23,0.04)',
       }}
     >
       <div
         aria-hidden
         style={{
           position: 'absolute',
-          top: -80,
-          right: -80,
-          width: 260,
-          height: 260,
+          top: -70,
+          right: -60,
+          width: 220,
+          height: 220,
           borderRadius: '50%',
           background:
-            'radial-gradient(circle, rgba(244,114,182,0.14) 0%, rgba(244,114,182,0) 68%)',
+            'radial-gradient(circle, rgba(232,160,191,0.32) 0%, rgba(232,160,191,0) 65%)',
           pointerEvents: 'none',
           zIndex: 0,
         }}
@@ -73,40 +73,58 @@ function Hero({ stats }: { challengeTitle: string; stats: WrapSeasonStats }) {
         aria-hidden
         style={{
           position: 'absolute',
-          bottom: -60,
-          left: -60,
-          width: 220,
-          height: 220,
+          bottom: -90,
+          left: -70,
+          width: 240,
+          height: 240,
           borderRadius: '50%',
           background:
-            'radial-gradient(circle, rgba(212,161,23,0.10) 0%, rgba(212,161,23,0) 66%)',
+            'radial-gradient(circle, rgba(212,161,23,0.16) 0%, rgba(212,161,23,0) 65%)',
           pointerEvents: 'none',
           zIndex: 0,
         }}
       />
 
       <div style={{ position: 'relative', zIndex: 1 }}>
-        <p
+        <div
           style={{
-            fontSize: '0.62rem',
-            letterSpacing: '0.36em',
-            textTransform: 'uppercase',
-            color: 'rgba(245,240,232,0.5)',
-            margin: 0,
-            fontWeight: 600,
+            display: 'flex',
+            alignItems: 'center',
+            gap: 10,
+            marginBottom: 24,
           }}
         >
-          SEASON 01 · LUNGE 100
-        </p>
+          <span
+            style={{
+              display: 'inline-block',
+              width: 22,
+              height: 2,
+              background: '#B8231F',
+              borderRadius: 2,
+            }}
+          />
+          <p
+            style={{
+              fontSize: '0.6rem',
+              letterSpacing: '0.32em',
+              textTransform: 'uppercase',
+              color: '#B8231F',
+              margin: 0,
+              fontWeight: 700,
+            }}
+          >
+            SEASON 01 · LUNGE 100
+          </p>
+        </div>
 
         <h1
           style={{
-            fontSize: '2.4rem',
-            fontWeight: 800,
-            letterSpacing: '-0.045em',
-            lineHeight: 1.08,
-            margin: '20px 0 10px',
-            color: '#FBF6ED',
+            fontSize: '2.6rem',
+            fontWeight: 900,
+            letterSpacing: '-0.05em',
+            lineHeight: 1.02,
+            margin: '0 0 6px',
+            color: '#231B17',
           }}
         >
           여름의 100일
@@ -114,92 +132,139 @@ function Hero({ stats }: { challengeTitle: string; stats: WrapSeasonStats }) {
 
         <p
           style={{
-            fontSize: '0.78rem',
-            color: 'rgba(245,240,232,0.5)',
+            fontSize: '0.72rem',
+            color: '#8B7A6E',
             margin: 0,
-            letterSpacing: '0.05em',
+            letterSpacing: '0.06em',
             fontVariantNumeric: 'tabular-nums',
+            fontWeight: 500,
           }}
         >
-          2026 . 06 . 15 &nbsp;&mdash;&nbsp; 2026 . 09 . 22
+          2026.06.15 &nbsp;—&nbsp; 2026.09.22
         </p>
 
         <p
           style={{
             fontSize: '0.98rem',
-            lineHeight: 1.85,
-            color: 'rgba(245,240,232,0.82)',
-            margin: '34px 0 0',
-            letterSpacing: '-0.012em',
+            lineHeight: 1.75,
+            color: '#3B2E27',
+            margin: '30px 0 0',
+            letterSpacing: '-0.015em',
             maxWidth: 460,
           }}
         >
-          {stats.totalParticipants}명이 여름의 첫 문을 열었고,
+          <strong style={{ fontWeight: 800 }}>{stats.totalParticipants}명</strong>의 마풀런 러너가 함께 문을 열었고,{' '}
           <br />
-          {stats.totalFinishers}명이 마지막 도장까지 걸었어요.
+          그중{' '}
+          <strong style={{ fontWeight: 800 }}>{stats.totalFinishers}명</strong>이 100일 마지막 도장까지 걸어왔어요.
         </p>
 
-        <p
+        <div
           style={{
-            fontSize: '1.02rem',
-            lineHeight: 1.7,
-            margin: '18px 0 0',
-            letterSpacing: '-0.015em',
-            color: '#FBF6ED',
-            fontWeight: 500,
-            maxWidth: 460,
+            margin: '28px 0 0',
+            padding: '20px 22px',
+            background: 'rgba(184,35,31,0.06)',
+            border: '1px solid rgba(184,35,31,0.14)',
+            borderRadius: 18,
+            position: 'relative',
           }}
         >
-          우리의 몸을 지나간 런지,{' '}
-          <strong
+          <p
             style={{
-              fontWeight: 800,
-              background: 'linear-gradient(90deg, #F4B183 0%, #E8A0BF 100%)',
-              WebkitBackgroundClip: 'text',
-              WebkitTextFillColor: 'transparent',
-              backgroundClip: 'text',
-              letterSpacing: '-0.02em',
+              fontSize: '0.62rem',
+              letterSpacing: '0.18em',
+              color: '#B8231F',
+              margin: 0,
+              textTransform: 'uppercase',
+              fontWeight: 700,
             }}
           >
-            {stats.totalReps.toLocaleString()}회.
-          </strong>
-        </p>
+            우리가 지나온 런지
+          </p>
+          <p
+            style={{
+              margin: '6px 0 0',
+              fontSize: '2.4rem',
+              fontWeight: 900,
+              letterSpacing: '-0.04em',
+              color: '#B8231F',
+              lineHeight: 1,
+              fontVariantNumeric: 'tabular-nums',
+            }}
+          >
+            {stats.totalReps.toLocaleString()}
+            <span
+              style={{
+                fontSize: '1.1rem',
+                fontWeight: 800,
+                marginLeft: 4,
+                letterSpacing: '-0.02em',
+              }}
+            >
+              회
+            </span>
+          </p>
+        </div>
 
         <div
           aria-hidden
           style={{
             height: 1,
             background:
-              'linear-gradient(90deg, rgba(245,240,232,0.18), rgba(245,240,232,0))',
-            margin: '32px 0 22px',
+              'linear-gradient(90deg, rgba(35,27,23,0.12), rgba(35,27,23,0))',
+            margin: '30px 0 22px',
           }}
         />
 
         <p
           style={{
-            fontSize: '0.86rem',
-            lineHeight: 1.75,
-            color: 'rgba(245,240,232,0.68)',
+            fontSize: '1rem',
+            lineHeight: 1.7,
+            color: '#231B17',
             margin: 0,
-            letterSpacing: '-0.01em',
-            fontStyle: 'italic',
+            letterSpacing: '-0.015em',
+            fontWeight: 600,
           }}
         >
-          매일 한 번의 숨, 한 번의 시작.
+          매일 런지로 고생하신 여러분,{' '}
           <br />
-          몸이 흔들려도 마음은 자리를 지켰던 여름.
+          엉덩이에{' '}
+          <span
+            style={{
+              background: 'linear-gradient(180deg, transparent 62%, #FBD5C4 62%)',
+              padding: '0 2px',
+            }}
+          >
+            꽃 피셨나요?
+          </span>{' '}
+          🌸
         </p>
 
         <p
           style={{
-            fontSize: '0.68rem',
-            color: 'rgba(245,240,232,0.4)',
-            margin: '22px 0 0',
-            letterSpacing: '0.14em',
-            textTransform: 'uppercase',
+            fontSize: '0.9rem',
+            lineHeight: 1.75,
+            color: '#6B554A',
+            margin: '16px 0 0',
+            letterSpacing: '-0.01em',
           }}
         >
-          &mdash; 매일 마인드풀 러닝
+          여름 내내 자리를 지켜준 다리와 마음에 박수를.
+          <br />
+          이제 그 튼튼한 다리로, 다음 탐험을 떠나요.
+        </p>
+
+        <p
+          style={{
+            fontSize: '0.66rem',
+            color: '#B8A79A',
+            margin: '26px 0 0',
+            letterSpacing: '0.16em',
+            textTransform: 'uppercase',
+            fontWeight: 600,
+          }}
+        >
+          — 매일 마인드풀 러닝
         </p>
       </div>
     </section>

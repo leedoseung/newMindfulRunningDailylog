@@ -2,15 +2,18 @@ import { GetRecentRunsUseCase } from '@/application/use-cases/get-recent-runs'
 import { GetMemberRecordsUseCase } from '@/application/use-cases/get-member-records'
 import { GetMyChallengeCardUseCase } from '@/application/use-cases/get-my-challenge-card'
 import { SupabaseChallengeRepository } from '@/infrastructure/supabase/challenge-repository'
+import { SupabaseChallengeParticipationRepository } from '@/infrastructure/supabase/challenge-participation-repository'
 import { SupabaseRunLogRepository } from '@/infrastructure/supabase/run-log-repository'
 import { createServerClient } from '@/infrastructure/supabase/client'
 import { getAuthFromHeaders } from '@/infrastructure/supabase/server-auth'
 import { HomeFeed } from '@/presentation/components/home/home-feed'
 import type { CrewMember, WeeklyBar } from '@/presentation/components/home/home-feed'
 import { DiaryEntryBanner } from '@/presentation/components/home/diary-entry-banner'
+import { ChallengeAnnouncementBanner } from '@/presentation/components/home/challenge-announcement-banner'
 import { AppHeader } from '@/presentation/components/layout/app-header'
 import { kstToday } from '@/lib/kst'
 import type { RunLog } from '@/domain/entities/run-log'
+import type { Challenge } from '@/domain/entities/challenge'
 
 const DAY_LABELS = ['일', '월', '화', '수', '목', '금', '토']
 
@@ -112,20 +115,57 @@ export default async function HomePage() {
   const showSeasonWrapBanner = todayKst >= '2026-09-23' && todayKst <= '2026-10-15'
 
   let myLungeS1Card: Awaited<ReturnType<GetMyChallengeCardUseCase['execute']>> = null
+  let upcomingChallenge: Challenge | null = null
+  let upcomingEnrolled = false
   if (memberId) {
     const cRepo = new SupabaseChallengeRepository(supabase)
-    const ended = await cRepo.getMostRecentEnded()
-    if (ended) {
-      myLungeS1Card = await new GetMyChallengeCardUseCase(supabase).execute({
-        memberId,
-        challengeId: ended.id,
-      })
-    }
+    const [ended, upcomingList] = await Promise.all([
+      cRepo.getMostRecentEnded(),
+      cRepo.getUpcoming(),
+    ])
+    // MyLungeS1Card is season-1-specific brand ("MY LUNGE 100 / 여름의 100일"). Gate by
+    // seasonNumber so later seasons don't render it with their own data.
+    const myLungeS1Promise = ended && ended.seasonNumber === 1
+      ? new GetMyChallengeCardUseCase(supabase).execute({
+          memberId,
+          challengeId: ended.id,
+        })
+      : Promise.resolve(null)
+    // Upcoming banner — show when there's a `status='upcoming'` challenge; parallelize
+    // enrollment check so the banner knows whether to render "참가 신청" vs "참가 중".
+    const next = upcomingList[0] ?? null
+    const enrolledPromise = next
+      ? new SupabaseChallengeParticipationRepository(supabase).getByMember(next.id, memberId)
+      : Promise.resolve(null)
+    const [myLungeResolved, enrolledResolved] = await Promise.all([
+      myLungeS1Promise,
+      enrolledPromise,
+    ])
+    myLungeS1Card = myLungeResolved
+    upcomingChallenge = next
+    upcomingEnrolled = enrolledResolved !== null
   }
 
   return (
     <main style={{ minHeight: '100vh', background: '#F7F7F5', position: 'relative' }}>
       <AppHeader memberName={memberName || '?'} memberAvatarUrl={memberAvatarUrl} memberId={memberId} />
+
+      {upcomingChallenge && (
+        <div style={{ padding: '12px 16px 0' }}>
+          <ChallengeAnnouncementBanner
+            challenge={{
+              id: upcomingChallenge.id,
+              title: upcomingChallenge.title,
+              description: upcomingChallenge.description,
+              startDate: upcomingChallenge.startDate,
+              registrationDeadline: upcomingChallenge.registrationDeadline,
+              imageUrl: upcomingChallenge.imageUrl,
+            }}
+            today={todayKst}
+            enrolled={upcomingEnrolled}
+          />
+        </div>
+      )}
 
       {diaryBannerVariant === 'previous' && (
         <DiaryEntryBanner

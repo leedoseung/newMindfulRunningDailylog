@@ -65,7 +65,7 @@ export function MyLungeS1Card({ card }: { card: MyChallengeCard }) {
               fontWeight: 700,
             }}
           >
-            MY LUNGE 100
+            MY LUNGE {card.goalPerDay}
           </p>
         </div>
         <h2
@@ -77,7 +77,7 @@ export function MyLungeS1Card({ card }: { card: MyChallengeCard }) {
             margin: '6px 0 4px',
           }}
         >
-          {card.memberName}의 100일 완주
+          {card.memberName}의 {card.durationDays}일 완주
         </h2>
         <p
           style={{
@@ -147,6 +147,9 @@ export function MyLungeS1Card({ card }: { card: MyChallengeCard }) {
           challengeTitle={card.challengeTitle}
           startDate={card.startDate}
           endDate={card.endDate}
+          seasonNumber={card.seasonNumber}
+          durationDays={card.durationDays}
+          goalPerDay={card.goalPerDay}
           achievements={card.achievements}
           stats={card.stats}
           stamps={card.stamps}

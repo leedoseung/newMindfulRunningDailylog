@@ -258,6 +258,7 @@ export function MissionPageClient(props: Props) {
         )}
         <PushConsentSheet
           open={showPushConsent}
+          goalPerDay={props.challenge.goalPerDay}
           onAllow={() => {
             setShowPushConsent(false)
             if (isIOSWithoutPWA()) setShowIosSheet(true)
@@ -381,6 +382,8 @@ export function MissionPageClient(props: Props) {
         <CompletionSheet
           open
           participationId={participation.id}
+          durationDays={challenge.durationDays}
+          goalPerDay={challenge.goalPerDay}
           onClose={() => setCompletionDismissed(true)}
         />
       )}

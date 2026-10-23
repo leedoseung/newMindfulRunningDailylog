@@ -17,6 +17,7 @@ const challenge: Challenge = {
   imageUrl: null,
   goalMin: 10,
   restDaysPerWeek: 1,
+  seasonNumber: 1,
   createdAt: '2026-05-01T00:00:00Z',
 }
 

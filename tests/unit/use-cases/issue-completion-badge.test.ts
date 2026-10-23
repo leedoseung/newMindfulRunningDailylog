@@ -10,7 +10,7 @@ import type { MissionLog } from '@/domain/entities/mission-log'
 const challenge: Challenge = {
   id: 'c1', title: 't', description: '', goalPerDay: 100, durationDays: 100,
   startDate: '2026-07-01', registrationDeadline: '2026-07-04',
-  passCount: 5, status: 'active', createdAt: '2026-06-01T00:00:00Z',
+  passCount: 5, status: 'active', seasonNumber: 1, createdAt: '2026-06-01T00:00:00Z',
 }
 
 function mkLog(date: string, count: number, usedPass = false): MissionLog {

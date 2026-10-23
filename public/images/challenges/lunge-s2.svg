@@ -1,0 +1,78 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 600" preserveAspectRatio="xMidYMid slice">
+  <defs>
+    <radialGradient id="base" cx="35%" cy="55%" r="92%">
+      <stop offset="0%" stop-color="#4a1419"/>
+      <stop offset="55%" stop-color="#260a0e"/>
+      <stop offset="100%" stop-color="#0a0304"/>
+    </radialGradient>
+
+    <radialGradient id="halo" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#f4b25a" stop-opacity="0.55"/>
+      <stop offset="55%" stop-color="#cc4a1e" stop-opacity="0.18"/>
+      <stop offset="100%" stop-color="#cc4a1e" stop-opacity="0"/>
+    </radialGradient>
+
+    <linearGradient id="figure" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#fde68a"/>
+      <stop offset="45%" stop-color="#f4b25a"/>
+      <stop offset="100%" stop-color="#cc4a1e"/>
+    </linearGradient>
+
+    <radialGradient id="vignette" cx="50%" cy="55%" r="78%">
+      <stop offset="55%" stop-color="#000" stop-opacity="0"/>
+      <stop offset="100%" stop-color="#000" stop-opacity="0.7"/>
+    </radialGradient>
+
+    <filter id="grain" x="0%" y="0%" width="100%" height="100%">
+      <feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="2" seed="5" stitchTiles="stitch"/>
+      <feColorMatrix values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 0.12 0"/>
+      <feComposite in2="SourceGraphic" operator="in"/>
+    </filter>
+
+    <filter id="glow">
+      <feGaussianBlur stdDeviation="18"/>
+    </filter>
+  </defs>
+
+  <!-- 1. Warm-dark field -->
+  <rect width="1200" height="600" fill="url(#base)"/>
+
+  <!-- 2. Backlight halo behind figure -->
+  <circle cx="840" cy="330" r="380" fill="url(#halo)" filter="url(#glow)"/>
+  <circle cx="840" cy="330" r="280" fill="url(#halo)"/>
+
+  <!-- 3. Motion arcs sweeping in from the left (dynamic entry) -->
+  <g fill="none" stroke-linecap="round">
+    <path d="M -60,210 Q 240,150 480,280" stroke="#d4a017" stroke-width="3" opacity="0.28"/>
+    <path d="M -60,340 Q 260,280 500,420" stroke="#cc4a1e" stroke-width="2.5" opacity="0.26"/>
+    <path d="M -60,470 Q 260,410 500,520" stroke="#8b1a24" stroke-width="2" opacity="0.22"/>
+  </g>
+
+  <!-- 4. Ground shadow (ellipse under the lunge) -->
+  <ellipse cx="860" cy="548" rx="300" ry="18" fill="#000" opacity="0.55"/>
+
+  <!-- 5. Figure — lunge pose, facing LEFT, right leg driving back -->
+  <g stroke="url(#figure)" stroke-width="46" stroke-linecap="round" stroke-linejoin="round" fill="none">
+    <!-- Torso (shoulder → hip) -->
+    <line x1="770" y1="215" x2="800" y2="340"/>
+    <!-- Front leg (left): hip → bent knee → planted foot -->
+    <polyline points="800,340 680,410 680,540"/>
+    <!-- Back leg (right): hip → extended knee → trailing toe -->
+    <polyline points="800,340 970,478 1080,540"/>
+    <!-- Lead arm (right) driving forward -->
+    <polyline points="770,215 700,270 625,235"/>
+    <!-- Trail arm (left) swinging back -->
+    <polyline points="770,215 840,285 875,355"/>
+    <!-- Front foot (flat on ground) -->
+    <line x1="680" y1="540" x2="628" y2="540"/>
+  </g>
+
+  <!-- 6. Head -->
+  <circle cx="750" cy="155" r="38" fill="url(#figure)"/>
+
+  <!-- 7. Grain texture overlay (painterly) -->
+  <rect width="1200" height="600" filter="url(#grain)" opacity="0.9"/>
+
+  <!-- 8. Vignette: darken edges for text legibility -->
+  <rect width="1200" height="600" fill="url(#vignette)"/>
+</svg>

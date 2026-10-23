@@ -1,6 +1,6 @@
 import type { MissionDayCell } from '@/domain/entities/mission-day-cell'
 
-type Props = { cell: MissionDayCell; onClick?: (cell: MissionDayCell) => void }
+type Props = { cell: MissionDayCell; goal: number; onClick?: (cell: MissionDayCell) => void }
 
 function seededRotation(date: string): number {
   let hash = 0
@@ -9,7 +9,7 @@ function seededRotation(date: string): number {
   return (norm - 0.5) * 16  // -8 ~ +8 deg
 }
 
-export function StampCell({ cell, onClick }: Props) {
+export function StampCell({ cell, goal, onClick }: Props) {
   const interactive = !!onClick && cell.state !== 'future'
   const handleClick = interactive ? () => onClick!(cell) : undefined
   const rotation = seededRotation(cell.date)
@@ -91,7 +91,7 @@ export function StampCell({ cell, onClick }: Props) {
           border: '2px dashed #111',
           transform: 'none',
         }}
-        aria-label={`오늘 (${cell.count}/100)`}
+        aria-label={`오늘 (${cell.count}/${goal})`}
       />
     )
   }
@@ -113,7 +113,7 @@ export function StampCell({ cell, onClick }: Props) {
           backgroundPosition: 'center',
           opacity: 0.45,
         }}
-        aria-label={`부분 달성 ${cell.count}/100`}
+        aria-label={`부분 달성 ${cell.count}/${goal}`}
       />
     )
   }

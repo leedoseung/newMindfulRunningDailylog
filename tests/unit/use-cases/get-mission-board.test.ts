@@ -10,7 +10,7 @@ const challenge: Challenge = {
   id: 'c1', title: '런지 100일', description: '', goalPerDay: 100,
   durationDays: 100, startDate: '2026-07-01', registrationDeadline: '2026-07-04',
   passCount: 5, status: 'active', goalMin: 100, restDaysPerWeek: 0,
-  createdAt: '2026-06-01T00:00:00Z',
+  seasonNumber: 1, createdAt: '2026-06-01T00:00:00Z',
 }
 
 const participation: ChallengeParticipation = {

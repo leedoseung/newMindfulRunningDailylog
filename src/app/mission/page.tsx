@@ -77,8 +77,10 @@ export default async function MissionPage() {
     }
 
     // No upcoming — surface the most recent ended challenge as a wrap-up dashboard.
+    // LungeS1Wrap is season-1-specific (hero copy, "여름의 100일"). S2+ gets no-challenge
+    // until a season-aware wrap variant lands.
     const ended = await cRepo.getMostRecentEnded()
-    if (ended) {
+    if (ended && ended.seasonNumber === 1) {
       const wrap = await new GetChallengeWrapUseCase(supabase).execute(ended.id)
       return (
         <>
@@ -100,6 +102,9 @@ export default async function MissionPage() {
                 dt.setUTCDate(dt.getUTCDate() + ended.durationDays - 1)
                 return dt.toISOString().slice(0, 10)
               })()}
+              seasonNumber={ended.seasonNumber}
+              durationDays={ended.durationDays}
+              goalPerDay={ended.goalPerDay}
               finishers={wrap.finishers}
               journeyers={wrap.journeyers}
               messages={wrap.messages}

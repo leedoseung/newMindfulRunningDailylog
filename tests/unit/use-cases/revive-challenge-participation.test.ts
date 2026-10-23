@@ -10,7 +10,7 @@ const challenge: Challenge = {
   id: 'c1', title: 't', description: '', goalPerDay: 1, durationDays: 30,
   startDate: '2026-06-01', registrationDeadline: '2026-05-31', passCount: 3,
   status: 'active', imageUrl: null, goalMin: 10, restDaysPerWeek: 1,
-  createdAt: '2026-05-01T00:00:00Z',
+  seasonNumber: 1, createdAt: '2026-05-01T00:00:00Z',
 }
 
 const failedPart: ChallengeParticipation = {

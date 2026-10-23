@@ -13,5 +13,6 @@ export type Challenge = {
   imageUrl?: string | null
   goalMin?: number             // daily stamp threshold (default 10)
   restDaysPerWeek?: number     // weekly rest budget (default 1)
+  seasonNumber: number         // 1=S1, 2=S2, …; UI label + variant 분기 single source
   createdAt: string            // ISO timestamptz
 }

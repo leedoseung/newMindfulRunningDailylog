@@ -4,10 +4,17 @@ import Link from 'next/link'
 
 const FONT = "'Pretendard Variable', Pretendard, -apple-system, sans-serif"
 
-type Props = { open: boolean; participationId: string; onClose: () => void }
+type Props = {
+  open: boolean
+  participationId: string
+  durationDays: number
+  goalPerDay: number
+  onClose: () => void
+}
 
-export function CompletionSheet({ open, participationId, onClose }: Props) {
+export function CompletionSheet({ open, participationId, durationDays, goalPerDay, onClose }: Props) {
   if (!open) return null
+  const total = durationDays * goalPerDay
   return (
     <div
       role="dialog"
@@ -26,10 +33,10 @@ export function CompletionSheet({ open, participationId, onClose }: Props) {
       >
         <div style={{ fontSize: 48, marginBottom: 16 }} aria-hidden>🏆</div>
         <h2 style={{ fontSize: 22, fontWeight: 700, letterSpacing: '-0.02em', margin: 0 }}>
-          100일 완주!
+          {durationDays}일 완주!
         </h2>
         <p style={{ fontSize: 13, color: '#555', margin: '12px 0 24px', lineHeight: 1.6 }}>
-          매일 100개 × 100일 = 10,000개의 런지를 완주하셨어요.
+          매일 {goalPerDay}개 × {durationDays}일 = {total.toLocaleString()}개의 런지를 완주하셨어요.
         </p>
         <Link
           href={`/mission/certificate/${participationId}`}

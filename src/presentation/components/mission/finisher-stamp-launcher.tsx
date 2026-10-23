@@ -102,6 +102,9 @@ type Props = {
   challengeTitle: string
   startDate: string
   endDate: string
+  seasonNumber: number
+  durationDays: number
+  goalPerDay: number
   achievements: AchievementCode[]
   stats: {
     totalReps: number
@@ -127,10 +130,15 @@ export function FinisherStampLauncher({
   challengeTitle,
   startDate,
   endDate,
+  seasonNumber,
+  durationDays,
+  goalPerDay,
   achievements,
   stats,
   stamps,
 }: Props) {
+  const seasonLabel = `SEASON ${String(seasonNumber).padStart(2, '0')} · LUNGE ${goalPerDay}`
+  const fileSlug = `lunge-s${seasonNumber}`
   const [open, setOpen] = useState(false)
   const [saving, setSaving] = useState(false)
   const [savedNotice, setSavedNotice] = useState<string | null>(null)
@@ -180,14 +188,14 @@ export function FinisherStampLauncher({
       })
       canvas.toBlob(async blob => {
         if (!blob) throw new Error('empty blob')
-        const file = new File([blob], `lunge-s1-${name}.png`, { type: 'image/png' })
+        const file = new File([blob], `${fileSlug}-${name}.png`, { type: 'image/png' })
         const nav = navigator as Navigator & {
           canShare?: (data: ShareData) => boolean
           share?: (data: ShareData) => Promise<void>
         }
         if (nav.share && nav.canShare?.({ files: [file] })) {
           try {
-            await nav.share({ files: [file], title: `${name}의 100일`, text: `${challengeTitle}` })
+            await nav.share({ files: [file], title: `${name}의 ${durationDays}일`, text: `${challengeTitle}` })
             setSavedNotice('공유 완료')
             return
           } catch {
@@ -197,7 +205,7 @@ export function FinisherStampLauncher({
         const url = URL.createObjectURL(blob)
         const a = document.createElement('a')
         a.href = url
-        a.download = `lunge-s1-${name}.png`
+        a.download = `${fileSlug}-${name}.png`
         document.body.appendChild(a)
         a.click()
         a.remove()
@@ -301,7 +309,7 @@ export function FinisherStampLauncher({
                     lineHeight: 1,
                   }}
                 >
-                  SEASON 01 · LUNGE 100
+                  {seasonLabel}
                 </p>
                 <h2
                   style={{
@@ -313,7 +321,7 @@ export function FinisherStampLauncher({
                     color: '#FBF6ED',
                   }}
                 >
-                  {name}의 100일
+                  {name}의 {durationDays}일
                 </h2>
                 <p
                   style={{

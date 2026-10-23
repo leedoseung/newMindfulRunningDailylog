@@ -2,13 +2,14 @@
 
 type Props = {
   open: boolean
+  goalPerDay: number
   onAllow: () => void
   onLater: () => void
 }
 
 const FONT = "'Pretendard Variable', Pretendard, -apple-system, sans-serif"
 
-export function PushConsentSheet({ open, onAllow, onLater }: Props) {
+export function PushConsentSheet({ open, goalPerDay, onAllow, onLater }: Props) {
   if (!open) return null
   return (
     <div
@@ -41,7 +42,7 @@ export function PushConsentSheet({ open, onAllow, onLater }: Props) {
           미션 알림 받기
         </h2>
         <p style={{ fontSize: 13, color: '#555', margin: '10px 0 24px', lineHeight: 1.6 }}>
-          매일 저녁 8시에 런지 100개 미션 리마인더를 보내드려요.<br />
+          매일 저녁 8시에 런지 {goalPerDay}개 미션 리마인더를 보내드려요.<br />
           알림을 끄려면 휴대폰 설정에서 변경할 수 있어요.
         </p>
         <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>

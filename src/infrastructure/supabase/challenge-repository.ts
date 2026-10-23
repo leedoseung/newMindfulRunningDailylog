@@ -15,6 +15,7 @@ type ChallengeRow = {
   image_url: string | null
   goal_min: number | null
   rest_days_per_week: number | null
+  season_number: number
   created_at: string
 }
 
@@ -32,11 +33,12 @@ function toChallenge(row: ChallengeRow): Challenge {
     imageUrl: row.image_url,
     goalMin: row.goal_min ?? 10,
     restDaysPerWeek: row.rest_days_per_week ?? 1,
+    seasonNumber: row.season_number,
     createdAt: row.created_at,
   }
 }
 
-const SELECT = 'id, title, description, goal_per_day, duration_days, start_date, registration_deadline, pass_count, status, image_url, goal_min, rest_days_per_week, created_at'
+const SELECT = 'id, title, description, goal_per_day, duration_days, start_date, registration_deadline, pass_count, status, image_url, goal_min, rest_days_per_week, season_number, created_at'
 
 export class SupabaseChallengeRepository implements IChallengeRepository {
   constructor(private supabase: SupabaseClient) {}

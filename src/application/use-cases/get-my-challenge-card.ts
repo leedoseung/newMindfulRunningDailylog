@@ -9,6 +9,9 @@ export type MyChallengeCard = {
   challengeTitle: string
   startDate: string
   endDate: string
+  seasonNumber: number
+  durationDays: number
+  goalPerDay: number
   memberName: string
   memberGeneration: string
   achievements: AchievementCode[]
@@ -56,7 +59,7 @@ export class GetMyChallengeCardUseCase {
 
     const { data: challenge, error: cErr } = await this.supabase
       .from('challenges')
-      .select('id, title, start_date, duration_days, goal_per_day, goal_min')
+      .select('id, title, start_date, duration_days, goal_per_day, goal_min, season_number')
       .eq('id', challengeId)
       .single()
     if (cErr || !challenge) return null
@@ -122,6 +125,9 @@ export class GetMyChallengeCardUseCase {
       challengeTitle: challenge.title,
       startDate: challenge.start_date,
       endDate,
+      seasonNumber: challenge.season_number ?? 1,
+      durationDays: challenge.duration_days,
+      goalPerDay: challenge.goal_per_day ?? 100,
       memberName: member.name ?? '?',
       memberGeneration: member.generation ?? '',
       achievements: achievements as AchievementCode[],

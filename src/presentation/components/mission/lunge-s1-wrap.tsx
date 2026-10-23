@@ -357,11 +357,17 @@ function FinisherCard({
   challengeTitle,
   startDate,
   endDate,
+  seasonNumber,
+  durationDays,
+  goalPerDay,
 }: {
   finisher: WrapFinisher
   challengeTitle: string
   startDate: string
   endDate: string
+  seasonNumber: number
+  durationDays: number
+  goalPerDay: number
 }) {
   const codes = sortCodes(finisher.achievements)
   return (
@@ -434,6 +440,9 @@ function FinisherCard({
           challengeTitle={challengeTitle}
           startDate={startDate}
           endDate={endDate}
+          seasonNumber={seasonNumber}
+          durationDays={durationDays}
+          goalPerDay={goalPerDay}
           achievements={finisher.achievements}
           stats={finisher.stats}
           stamps={finisher.stamps}
@@ -536,13 +545,16 @@ export type LungeS1WrapProps = {
   challengeTitle: string
   startDate: string
   endDate: string
+  seasonNumber: number
+  durationDays: number
+  goalPerDay: number
   finishers: WrapFinisher[]
   journeyers: WrapJourneyer[]
   messages: WrapMessage[]
   seasonStats: WrapSeasonStats
 }
 
-export function LungeS1Wrap({ challengeTitle, startDate, endDate, finishers, journeyers, messages, seasonStats }: LungeS1WrapProps) {
+export function LungeS1Wrap({ challengeTitle, startDate, endDate, seasonNumber, durationDays, goalPerDay, finishers, journeyers, messages, seasonStats }: LungeS1WrapProps) {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 22 }}>
       <Hero challengeTitle={challengeTitle} stats={seasonStats} />
@@ -561,6 +573,9 @@ export function LungeS1Wrap({ challengeTitle, startDate, endDate, finishers, jou
                 challengeTitle={challengeTitle}
                 startDate={startDate}
                 endDate={endDate}
+                seasonNumber={seasonNumber}
+                durationDays={durationDays}
+                goalPerDay={goalPerDay}
               />
             </li>
           ))}

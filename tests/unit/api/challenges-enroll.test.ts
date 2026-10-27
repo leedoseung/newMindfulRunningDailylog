@@ -41,7 +41,7 @@ function authedSupabase(memberId: string) {
   return {
     auth: {
       getUser: vi.fn().mockResolvedValue({
-        data: { user: { id: 'u1', app_metadata: { member_id: memberId } } },
+        data: { user: { id: 'u1', user_metadata: { member_id: memberId } } },
       }),
     },
   } as unknown as Awaited<ReturnType<typeof createServerClient>>

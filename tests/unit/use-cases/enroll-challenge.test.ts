@@ -105,6 +105,19 @@ describe('EnrollChallengeUseCase', () => {
     expect(lRepo.markPass).not.toHaveBeenCalled()
   })
 
+  it('returns existing participation AFTER deadline — never throws REGISTRATION_CLOSED to an enrollee', async () => {
+    const { cRepo, pRepo, lRepo } = makeRepos()
+    pRepo.getByMember = vi.fn().mockResolvedValue(participation)
+    const uc = new EnrollChallengeUseCase(cRepo, pRepo, lRepo)
+    const result = await uc.execute({
+      challengeId: 'c1',
+      memberId: 'm1',
+      today: '2026-07-10',  // > deadline 2026-07-04
+    })
+    expect(result).toEqual(participation)
+    expect(pRepo.enroll).not.toHaveBeenCalled()
+  })
+
   it('throws SEASON_ENDED when status == ended', async () => {
     const { cRepo, pRepo, lRepo } = makeRepos()
     cRepo.getById = vi.fn().mockResolvedValue({ ...challenge, status: 'ended' })

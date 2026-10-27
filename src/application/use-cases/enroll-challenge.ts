@@ -50,15 +50,20 @@ export class EnrollChallengeUseCase {
     const challenge = await this.challengeRepo.getById(input.challengeId)
     if (!challenge) throw new EnrollError('CHALLENGE_NOT_FOUND')
     if (challenge.status === 'ended') throw new EnrollError('SEASON_ENDED')
-    if (input.today > challenge.registrationDeadline) {
-      throw new EnrollError('REGISTRATION_CLOSED')
-    }
 
+    // Idempotency comes BEFORE deadline. Already-enrolled callers must get
+    // their participation back regardless of today vs deadline — otherwise a
+    // stale cached UI that re-POSTs enroll yields REGISTRATION_CLOSED even
+    // though the member is in the challenge.
     const existing = await this.participationRepo.getByMember(
       challenge.id,
       input.memberId
     )
     if (existing) return existing
+
+    if (input.today > challenge.registrationDeadline) {
+      throw new EnrollError('REGISTRATION_CLOSED')
+    }
 
     // Late signup: challenge already started. For each missed day from startDate
     // up to yesterday, burn a pass (capped at passCount) and mark the day as

@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server'
 import { createServerClient } from '@/infrastructure/supabase/client'
 import { SupabaseChallengeRepository } from '@/infrastructure/supabase/challenge-repository'
 import { SupabaseChallengeParticipationRepository } from '@/infrastructure/supabase/challenge-participation-repository'
+import { SupabaseMissionLogRepository } from '@/infrastructure/supabase/mission-log-repository'
 import { EnrollChallengeUseCase, EnrollError } from '@/application/use-cases/enroll-challenge'
 import { CancelEnrollUseCase, CancelEnrollError } from '@/application/use-cases/cancel-enroll'
 import { kstToday } from '@/lib/kst'
@@ -25,7 +26,8 @@ export async function POST(req: Request) {
   try {
     const cRepo = new SupabaseChallengeRepository(supabase)
     const pRepo = new SupabaseChallengeParticipationRepository(supabase)
-    const uc = new EnrollChallengeUseCase(cRepo, pRepo)
+    const lRepo = new SupabaseMissionLogRepository(supabase)
+    const uc = new EnrollChallengeUseCase(cRepo, pRepo, lRepo)
     const participation = await uc.execute({
       challengeId: body.challengeId,
       memberId,

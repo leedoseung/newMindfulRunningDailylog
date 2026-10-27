@@ -28,4 +28,17 @@ describe('SupabaseChallengeRepository (integration)', () => {
     expect(Array.isArray(list)).toBe(true)
     list.forEach(c => expect(c.status).toBe('upcoming'))
   })
+
+  it('getUpcomingOrLateSignup returns upcoming + active-in-signup-window only', async () => {
+    const repo = new SupabaseChallengeRepository(supabase)
+    const today = new Date().toISOString().slice(0, 10)
+    const list = await repo.getUpcomingOrLateSignup(today)
+    expect(Array.isArray(list)).toBe(true)
+    list.forEach(c => {
+      expect(['upcoming', 'active']).toContain(c.status)
+      if (c.status === 'active') {
+        expect(c.registrationDeadline >= today).toBe(true)
+      }
+    })
+  })
 })

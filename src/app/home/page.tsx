@@ -121,7 +121,7 @@ export default async function HomePage() {
     const cRepo = new SupabaseChallengeRepository(supabase)
     const [ended, upcomingList] = await Promise.all([
       cRepo.getMostRecentEnded(),
-      cRepo.getUpcoming(),
+      cRepo.getUpcomingOrLateSignup(todayKst),
     ])
     // MyLungeS1Card is season-1-specific brand ("MY LUNGE 100 / 여름의 100일"). Gate by
     // seasonNumber so later seasons don't render it with their own data.

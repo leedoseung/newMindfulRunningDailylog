@@ -9,27 +9,48 @@ vi.mock('@/infrastructure/supabase/challenge-repository', () => ({
 vi.mock('@/infrastructure/supabase/challenge-participation-repository', () => ({
   SupabaseChallengeParticipationRepository: vi.fn(),
 }))
+vi.mock('@/infrastructure/supabase/mission-log-repository', () => ({
+  SupabaseMissionLogRepository: vi.fn(),
+}))
 
 import { POST } from '@/app/api/challenges/enroll/route'
 import { createServerClient } from '@/infrastructure/supabase/client'
 import { SupabaseChallengeRepository } from '@/infrastructure/supabase/challenge-repository'
 import { SupabaseChallengeParticipationRepository } from '@/infrastructure/supabase/challenge-participation-repository'
+import { SupabaseMissionLogRepository } from '@/infrastructure/supabase/mission-log-repository'
 
 const mockedCreate = vi.mocked(createServerClient)
 const mockedCRepo = vi.mocked(SupabaseChallengeRepository)
 const mockedPRepo = vi.mocked(SupabaseChallengeParticipationRepository)
+const mockedLRepo = vi.mocked(SupabaseMissionLogRepository)
+
+function stubLogRepo() {
+  mockedLRepo.mockImplementation(function () {
+    return {
+      getByParticipation: vi.fn(),
+      getOne: vi.fn(),
+      upsertCount: vi.fn(),
+      setCount: vi.fn(),
+      markPass: vi.fn(),
+      markRestDay: vi.fn(),
+    } as unknown as InstanceType<typeof SupabaseMissionLogRepository>
+  })
+}
 
 function authedSupabase(memberId: string) {
   return {
     auth: {
       getUser: vi.fn().mockResolvedValue({
-        data: { user: { id: 'u1', user_metadata: { member_id: memberId } } },
+        data: { user: { id: 'u1', app_metadata: { member_id: memberId } } },
       }),
     },
   } as unknown as Awaited<ReturnType<typeof createServerClient>>
 }
 
-beforeEach(() => { vi.clearAllMocks() })
+beforeEach(() => {
+  vi.clearAllMocks()
+  stubLogRepo()
+})
 
 describe('POST /api/challenges/enroll', () => {
   it('returns 401 when not authenticated', async () => {

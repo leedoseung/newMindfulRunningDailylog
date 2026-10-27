@@ -78,6 +78,18 @@ export class SupabaseChallengeRepository implements IChallengeRepository {
     return (data as unknown as ChallengeRow[]).map(toChallenge)
   }
 
+  async getUpcomingOrLateSignup(today: string): Promise<Challenge[]> {
+    // status='upcoming' OR (status='active' AND today <= registration_deadline)
+    const { data, error } = await this.supabase
+      .from('challenges')
+      .select(SELECT)
+      .or(`status.eq.upcoming,and(status.eq.active,registration_deadline.gte.${today})`)
+      .order('start_date', { ascending: true })
+
+    if (error) throw new Error(`getUpcomingOrLateSignup failed: ${error.message}`)
+    return (data as unknown as ChallengeRow[]).map(toChallenge)
+  }
+
   async getMostRecentEnded(): Promise<Challenge | null> {
     const { data, error } = await this.supabase
       .from('challenges')
